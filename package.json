@@ -9,7 +9,9 @@
         "preview": "vite preview",
         "format:check": "npx prettier --check .",
         "format:write": "npx prettier --write .",
-        "lint": "npmPkgJsonLint ."
+        "lint": "npm run lint:code && npm run lint:packages",
+        "lint:code": "npx eslint .",
+        "lint:packages": "npmPkgJsonLint ."
     },
     "dependencies": {
         "react": "18.2.0",
