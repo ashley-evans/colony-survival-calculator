@@ -1,7 +1,7 @@
 import React from "react";
 
 function App() {
-    return <p>Colony Survival Calculator</p>;
+    return <h1>Colony Survival Calculator</h1>;
 }
 
 export default App;
