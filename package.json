@@ -8,6 +8,7 @@
         "dev:open": "vite --open",
         "build": "tsc && vite build",
         "preview": "vite preview",
+        "validate": "./scripts/validate-json.sh",
         "format:check": "npx prettier --check .",
         "format:write": "npx prettier --write .",
         "lint": "npm run lint:code && npm run lint:packages",
