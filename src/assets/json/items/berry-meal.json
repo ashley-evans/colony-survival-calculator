@@ -1,0 +1,5 @@
+{
+    "$schema": "../schemas/item.json",
+    "name": "Berry Meal",
+    "createTime": 8.5
+}
