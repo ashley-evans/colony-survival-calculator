@@ -3,6 +3,7 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 root_dir="$( dirname "$script_dir")"
 
-json_folder="$root_dir/src/assets/json"
+schema_folder="$root_dir/src/schemas"
+static_json_folder="$root_dir/public/json"
 
-npx ajv-cli -s "$json_folder/schemas/item.json" -d "$json_folder/items/*.json"
+npx --yes ajv-cli -s "$schema_folder/item.json" -d "$static_json_folder/items/*.json"
