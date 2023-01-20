@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Items",
+    "description": "An array of all items that can be constructed in Colony Survival",
+    "type": "array",
+    "items": {
+        "title": "Item",
+        "description": "A item that can be constructed in Colony Survival",
+        "type": "object",
+        "properties": {
+            "name": {
+                "description": "The name of the item",
+                "type": "string"
+            },
+            "createTime": {
+                "description": "The number of seconds it takes to create the item",
+                "type": "number",
+                "minimum": 0
+            }
+        },
+        "required": ["name", "createTime"],
+        "additionalProperties": false
+    }
+}
