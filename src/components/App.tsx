@@ -28,6 +28,16 @@ function App() {
             {items && items.length == 0 ? (
                 <p role="alert">Error: Unable to fetch known items</p>
             ) : null}
+            {items && items.length > 0 ? (
+                <>
+                    <label htmlFor="output-select">Item:</label>
+                    <select id="output-select">
+                        {items.map((item) => (
+                            <option key={item.name}>{item.name}</option>
+                        ))}
+                    </select>
+                </>
+            ) : null}
         </>
     );
 }

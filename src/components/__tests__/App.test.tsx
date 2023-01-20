@@ -60,18 +60,19 @@ describe("output selector", () => {
         ).toBeVisible();
     });
 
-    test.each([
+    describe.each([
         ["no static items returned", []],
         ["invalid static items returned", [{ invalid: "invalid" }]],
-    ])(
-        "renders a missing known items error if %s",
-        async (_: string, items) => {
+    ])("given %s", (_: string, items) => {
+        beforeEach(() => {
             server.use(
                 rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
                     return res(ctx.json(items));
                 })
             );
+        });
 
+        test("renders a missing items error", async () => {
             const expectedError = "Error: Unable to fetch known items";
 
             render(<App />);
@@ -79,8 +80,18 @@ describe("output selector", () => {
             expect(await screen.findByRole("alert")).toHaveTextContent(
                 expectedError
             );
-        }
-    );
+        });
+
+        test("does not render a combo box for the desired output", () => {
+            const expectedLabel = "Item:";
+
+            render(<App />);
+
+            expect(
+                screen.queryByRole("combobox", { name: expectedLabel })
+            ).not.toBeInTheDocument();
+        });
+    });
 
     test("does not render a missing known items if static items are returned", async () => {
         const expectedRequest = waitForRequest(
@@ -94,6 +105,27 @@ describe("output selector", () => {
         await waitFor(() => expectedRequest);
 
         expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
+    });
+
+    test("renders a select for the desired output selector if static items exist", async () => {
+        const expectedLabel = "Item:";
+
+        render(<App />);
+
+        expect(
+            await screen.findByRole("combobox", { name: expectedLabel })
+        ).toBeVisible();
+    });
+
+    it("renders each item returned as an option in the combo box", async () => {
+        const expectedLabel = "Item:";
+
+        render(<App />);
+        await screen.findByRole("combobox", { name: expectedLabel });
+
+        for (const expected of VALID_ITEMS) {
+            expect(screen.getByRole("option", { name: expected.name }));
+        }
     });
 });
 
