@@ -41,7 +41,7 @@ function App() {
     };
 
     const onWorkerChange = (event: FormEvent<HTMLInputElement>) => {
-        const input = parseInt(event.currentTarget.value);
+        const input = parseFloat(event.currentTarget.value);
         if (isNaN(input) || input < 0) {
             setError("Invalid input, must be a positive number");
         } else {

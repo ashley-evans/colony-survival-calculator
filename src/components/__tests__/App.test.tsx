@@ -252,22 +252,27 @@ describe("output selector", () => {
             expect(await screen.findByText(expectedOutput)).toBeVisible();
         });
 
-        test("renders the optimal output given multiple workers and default item selected", async () => {
-            const input = "3";
-            const expectedOutput = "Optimal output: 90 per minute";
-            const user = userEvent.setup();
+        test.each([
+            ["(whole)", "3", "90"],
+            ["(float)", "3.5", "105"],
+        ])(
+            "renders the optimal output given %s workers and default item selected",
+            async (_: string, input: string, expected: string) => {
+                const expectedOutput = `Optimal output: ${expected} per minute`;
+                const user = userEvent.setup();
 
-            render(<App />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, input);
+                render(<App />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.type(workerInput, input);
 
-            expect(await screen.findByText(expectedOutput)).toBeVisible();
-        });
+                expect(await screen.findByText(expectedOutput)).toBeVisible();
+            }
+        );
 
         test("renders the optimal output given multiple workers and non-default item selected", async () => {
             const input = "5";
