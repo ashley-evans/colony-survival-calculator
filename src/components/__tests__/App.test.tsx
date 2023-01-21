@@ -8,6 +8,8 @@ import { waitForRequest } from "../../helpers/utils";
 import App from "../App";
 import { Items } from "../../types";
 
+const ITEM_SELECT_LABEL = "Item:";
+const WORKERS_INPUT_LABEL = "Workers:";
 const STATIC_ITEMS_PATH = "json/items.json";
 const VALID_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2 },
@@ -131,18 +133,28 @@ describe("output selector", () => {
     });
 
     test("renders each item returned as an option in the combo box", async () => {
-        const expectedLabel = "Item:";
-
         render(<App />);
-        await screen.findByRole("combobox", { name: expectedLabel });
+        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
 
         for (const expected of VALID_ITEMS) {
-            expect(screen.getByRole("option", { name: expected.name }));
+            expect(
+                screen.getByRole("option", { name: expected.name })
+            ).toBeInTheDocument();
         }
     });
 
+    test("renders the first option in the list as selected by default", async () => {
+        render(<App />);
+
+        expect(
+            await screen.findByRole("option", {
+                name: VALID_ITEMS[0].name,
+                selected: true,
+            })
+        ).toBeInTheDocument();
+    });
+
     describe("worker input rendering", () => {
-        const expectedLabel = "Workers:";
         const expectedErrorMessage =
             "Error: Invalid input, must be a positive number";
 
@@ -150,7 +162,7 @@ describe("output selector", () => {
             render(<App />);
 
             expect(
-                await screen.findByLabelText(expectedLabel, {
+                await screen.findByLabelText(WORKERS_INPUT_LABEL, {
                     selector: "input",
                 })
             );
@@ -158,7 +170,7 @@ describe("output selector", () => {
 
         test("does not render an error message by default", async () => {
             render(<App />);
-            await screen.findByLabelText(expectedLabel, {
+            await screen.findByLabelText(WORKERS_INPUT_LABEL, {
                 selector: "input",
             });
 
@@ -175,7 +187,7 @@ describe("output selector", () => {
 
                 render(<App />);
                 const workerInput = await screen.findByLabelText(
-                    expectedLabel,
+                    WORKERS_INPUT_LABEL,
                     {
                         selector: "input",
                     }
@@ -194,15 +206,111 @@ describe("output selector", () => {
             const user = userEvent.setup();
 
             render(<App />);
-            const workerInput = await screen.findByLabelText(expectedLabel, {
-                selector: "input",
-            });
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
             await user.type(workerInput, invalidInput);
             await screen.findByRole("alert");
             await user.clear(workerInput);
             await user.type(workerInput, validInput);
 
             expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+        });
+    });
+
+    describe("optimal output rendering", () => {
+        const expectedOutputPrefix = "Optimal output:";
+
+        test("does not render any output message by default", async () => {
+            render(<App />);
+            await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+                selector: "input",
+            });
+
+            expect(
+                screen.queryByText(expectedOutputPrefix, { exact: false })
+            ).not.toBeInTheDocument();
+        });
+
+        test("renders zero output given zero workers", async () => {
+            const input = "0";
+            const expectedOutput = "Optimal output: 0 per minute";
+            const user = userEvent.setup();
+
+            render(<App />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.type(workerInput, input);
+
+            expect(await screen.findByText(expectedOutput)).toBeVisible();
+        });
+
+        test("renders the optimal output given multiple workers and default item selected", async () => {
+            const input = "3";
+            const expectedOutput = "Optimal output: 90 per minute";
+            const user = userEvent.setup();
+
+            render(<App />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.type(workerInput, input);
+
+            expect(await screen.findByText(expectedOutput)).toBeVisible();
+        });
+
+        test("renders the optimal output given multiple workers and non-default item selected", async () => {
+            const input = "5";
+            const expectedOutput = `Optimal output: 75 per minute`;
+            const user = userEvent.setup();
+
+            render(<App />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                VALID_ITEMS[1].name
+            );
+            await user.type(workerInput, input);
+
+            expect(await screen.findByText(expectedOutput)).toBeVisible();
+        });
+
+        test("clears output if workers is changed to invalid number", async () => {
+            const validInput = "3";
+            const expectedOutput = "Optimal output: 90 per minute";
+            const user = userEvent.setup();
+
+            render(<App />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.type(workerInput, validInput);
+            await screen.findByText(expectedOutput);
+            await user.clear(workerInput);
+
+            expect(
+                screen.queryByText(expectedOutputPrefix, { exact: false })
+            ).not.toBeInTheDocument();
         });
     });
 });
