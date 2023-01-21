@@ -2,6 +2,10 @@
 
 node_modules
 
+# Generated files
+
+src/types/generated/*
+
 # Built files
 
 dist
