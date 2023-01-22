@@ -21,6 +21,24 @@
                 "description": "The number of items produced every create",
                 "type": "number",
                 "minimum": 1
+            },
+            "size": {
+                "description": "Optimal size of crafting area, only provided for farms",
+                "type": "object",
+                "properties": {
+                    "width": {
+                        "description": "The optimal width of the farm",
+                        "type": "number",
+                        "minimum": 1
+                    },
+                    "height": {
+                        "description": "The optimal height of the farm",
+                        "type": "number",
+                        "minimum": 1
+                    }
+                },
+                "required": ["width", "height"],
+                "additionalProperties": false
             }
         },
         "required": ["name", "createTime", "output"],
