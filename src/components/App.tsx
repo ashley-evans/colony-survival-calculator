@@ -4,6 +4,12 @@ import Ajv from "ajv";
 
 import { Item, Items } from "../types";
 import ItemsSchema from "../schemas/items.json";
+import {
+    isUnit,
+    UnitDisplayMappings,
+    Units,
+    UnitSecondMappings,
+} from "../utils/units";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -12,6 +18,9 @@ function App() {
     const [items, setItems] = useState<Record<string, Omit<Item, "name">>>({});
     const [selectedItem, setSelectedItem] = useState<Item>();
     const [workers, setWorkers] = useState<number>();
+    const [selectedOutputUnit, setSelectedOutputUnit] = useState<Units>(
+        Units.MINUTES
+    );
     const [error, setError] = useState<string>();
 
     useEffect(() => {
@@ -44,10 +53,24 @@ function App() {
         }
     };
 
-    const calculateOutput = (workers: number, selectedItem: Item): number => {
-        const numberPerMinute =
-            (60 / selectedItem.createTime) * selectedItem.output;
-        return workers * numberPerMinute;
+    const onOutputUnitChange = (event: FormEvent<HTMLSelectElement>) => {
+        const unit = event.currentTarget.value;
+        if (isUnit(unit)) {
+            setSelectedOutputUnit(unit);
+        }
+    };
+
+    const calculateOutput = (
+        workers: number,
+        selectedItem: Item,
+        outputUnit: Units
+    ): string => {
+        const outputPerWorker =
+            (UnitSecondMappings[outputUnit] / selectedItem.createTime) *
+            selectedItem.output;
+        return `${workers * outputPerWorker} per ${
+            UnitDisplayMappings[outputUnit]
+        }`;
     };
 
     const itemKeys = Object.keys(items);
@@ -58,11 +81,7 @@ function App() {
             {itemKeys.length > 0 ? (
                 <>
                     <label htmlFor="output-select">Item:</label>
-                    <select
-                        id="output-select"
-                        onChange={onItemChange}
-                        defaultValue={selectedItem?.name}
-                    >
+                    <select id="output-select" onChange={onItemChange}>
                         {Object.keys(items).map((name) => (
                             <option key={name}>{name}</option>
                         ))}
@@ -73,10 +92,22 @@ function App() {
                         inputMode="numeric"
                         onChange={onWorkerChange}
                     ></input>
+                    <label htmlFor="units-select" defaultValue={Units.MINUTES}>
+                        Desired output units:
+                    </label>
+                    <select id="units-select" onChange={onOutputUnitChange}>
+                        {Object.values(Units).map((unit) => (
+                            <option key={unit}>{unit}</option>
+                        ))}
+                    </select>
                     {workers != undefined && selectedItem && !error ? (
                         <p>
                             Optimal output:{" "}
-                            {calculateOutput(workers, selectedItem)} per minute
+                            {calculateOutput(
+                                workers,
+                                selectedItem,
+                                selectedOutputUnit
+                            )}
                         </p>
                     ) : null}
                     {selectedItem?.size ? (
