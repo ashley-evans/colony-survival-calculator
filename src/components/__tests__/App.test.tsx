@@ -6,15 +6,25 @@ import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../helpers/utils";
 import App from "../App";
-import { Items } from "../../types";
+import { Item, Items } from "../../types";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
 const STATIC_ITEMS_PATH = "json/items.json";
-const VALID_ITEMS: Items = [
+
+const VALID_FARM_ABLES: Required<Item>[] = [
+    {
+        name: "Test Farmable 1",
+        createTime: 5,
+        output: 10,
+        size: { width: 10, height: 10 },
+    },
+];
+const CRAFT_ABLE_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1 },
     { name: "Test Item 2", createTime: 4, output: 1 },
 ];
+const VALID_ITEMS: Items = [...CRAFT_ABLE_ITEMS, ...VALID_FARM_ABLES];
 
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
@@ -307,6 +317,44 @@ describe("optimal output rendering", () => {
 
         expect(
             screen.queryByText(expectedOutputPrefix, { exact: false })
+        ).not.toBeInTheDocument();
+    });
+});
+
+describe("optimal farm size note rendering", () => {
+    const expectedNotePrefix = "Calculations use optimal farm size:";
+
+    test("renders the optimal height and width of the farm if provided", async () => {
+        const farmable = VALID_FARM_ABLES[0];
+        const expectedMessage = `${expectedNotePrefix} ${farmable.size.width} x ${farmable.size.height}`;
+        const user = userEvent.setup();
+
+        render(<App />);
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            farmable.name
+        );
+
+        expect(await screen.findByText(expectedMessage)).toBeVisible();
+    });
+
+    test("does not render optimal farm size message if no size provided", async () => {
+        const craft_able = CRAFT_ABLE_ITEMS[1];
+        const user = userEvent.setup();
+
+        render(<App />);
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            craft_able.name
+        );
+        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
+
+        expect(
+            screen.queryByText(expectedNotePrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
 });

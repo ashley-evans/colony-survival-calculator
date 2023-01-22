@@ -78,6 +78,13 @@ function App() {
                             {calculateOutput(workers, selectedItem)} per minute
                         </p>
                     ) : null}
+                    {selectedItem?.size ? (
+                        <p>
+                            Calculations use optimal farm size:{" "}
+                            {selectedItem.size.width} x{" "}
+                            {selectedItem.size.height}
+                        </p>
+                    ) : null}
                 </>
             ) : null}
             {error ? <p role="alert">Error: {error}</p> : null}
