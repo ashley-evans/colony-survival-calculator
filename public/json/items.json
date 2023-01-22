@@ -8,5 +8,14 @@
         "name": "Pot of Water",
         "createTime": 6,
         "output": 1
+    },
+    {
+        "name": "Wheat",
+        "createTime": 720,
+        "output": 100,
+        "size": {
+            "width": 10,
+            "height": 10
+        }
     }
 ]
