@@ -12,8 +12,8 @@ const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
 const STATIC_ITEMS_PATH = "json/items.json";
 const VALID_ITEMS: Items = [
-    { name: "Test Item 1", createTime: 2 },
-    { name: "Test Item 2", createTime: 4 },
+    { name: "Test Item 1", createTime: 2, output: 1 },
+    { name: "Test Item 2", createTime: 4, output: 1 },
 ];
 
 const server = setupServer(

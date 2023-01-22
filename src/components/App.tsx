@@ -9,7 +9,7 @@ const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
 
 function App() {
-    const [items, setItems] = useState<Record<string, number>>({});
+    const [items, setItems] = useState<Record<string, Omit<Item, "name">>>({});
     const [selectedItem, setSelectedItem] = useState<Item>();
     const [workers, setWorkers] = useState<number>();
     const [error, setError] = useState<string>();
@@ -18,16 +18,10 @@ function App() {
         axios.get<unknown>("json/items.json").then(({ data }) => {
             if (Array.isArray(data) && data.length > 0 && validateItems(data)) {
                 setItems(
-                    Object.fromEntries(
-                        data.map((item) => [item.name, item.createTime])
-                    )
+                    Object.fromEntries(data.map((item) => [item.name, item]))
                 );
 
-                const initialSelected = data[0];
-                setSelectedItem({
-                    name: initialSelected.name,
-                    createTime: initialSelected.createTime,
-                });
+                setSelectedItem(data[0]);
             } else {
                 setError("Unable to fetch known items");
             }
@@ -36,8 +30,8 @@ function App() {
 
     const onItemChange = (event: FormEvent<HTMLSelectElement>) => {
         const name = event.currentTarget.value;
-        const createTime = items[name];
-        setSelectedItem({ name, createTime });
+        const item = items[name];
+        setSelectedItem({ name, ...item });
     };
 
     const onWorkerChange = (event: FormEvent<HTMLInputElement>) => {

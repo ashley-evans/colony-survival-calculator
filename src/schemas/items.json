@@ -16,9 +16,14 @@
                 "description": "The number of seconds it takes to create the item",
                 "type": "number",
                 "minimum": 0
+            },
+            "output": {
+                "description": "The number of items produced every create",
+                "type": "number",
+                "minimum": 1
             }
         },
-        "required": ["name", "createTime"],
+        "required": ["name", "createTime", "output"],
         "additionalProperties": false
     }
 }
