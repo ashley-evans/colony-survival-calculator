@@ -1,10 +1,21 @@
 [
     {
         "name": "Berry Meal",
-        "createTime": 8.5
+        "createTime": 8.5,
+        "output": 1
     },
     {
         "name": "Pot of Water",
-        "createTime": 6
+        "createTime": 6,
+        "output": 1
+    },
+    {
+        "name": "Wheat",
+        "createTime": 1440,
+        "output": 100,
+        "size": {
+            "width": 10,
+            "height": 10
+        }
     }
 ]
