@@ -12,6 +12,7 @@ import { Units } from "../../utils/units";
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
 const UNIT_SELECT_LABEL = "Desired output units:";
+const EXPECTED_OUTPUT_PREFIX = "Optimal output:";
 const STATIC_ITEMS_PATH = "json/items.json";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
@@ -241,8 +242,6 @@ describe("output selector", () => {
 });
 
 describe("optimal output rendering", () => {
-    const expectedOutputPrefix = "Optimal output:";
-
     test("does not render any output message by default", async () => {
         render(<App />);
         await screen.findByLabelText(WORKERS_INPUT_LABEL, {
@@ -250,13 +249,13 @@ describe("optimal output rendering", () => {
         });
 
         expect(
-            screen.queryByText(expectedOutputPrefix, { exact: false })
+            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
         ).not.toBeInTheDocument();
     });
 
     test("renders zero output given zero workers", async () => {
         const input = "0";
-        const expectedOutput = "Optimal output: 0 per minute";
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 0 per minute`;
         const user = userEvent.setup();
 
         render(<App />);
@@ -274,7 +273,7 @@ describe("optimal output rendering", () => {
     ])(
         "renders the optimal output given %s workers and default item selected",
         async (_: string, input: string, expected: string) => {
-            const expectedOutput = `Optimal output: ${expected} per minute`;
+            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per minute`;
             const user = userEvent.setup();
 
             render(<App />);
@@ -292,7 +291,7 @@ describe("optimal output rendering", () => {
 
     test("renders the optimal output given multiple workers and non-default item selected", async () => {
         const input = "5";
-        const expectedOutput = `Optimal output: 75 per minute`;
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 75 per minute`;
         const user = userEvent.setup();
 
         render(<App />);
@@ -312,7 +311,7 @@ describe("optimal output rendering", () => {
 
     test("clears output if workers is changed to invalid number", async () => {
         const validInput = "3";
-        const expectedOutput = "Optimal output: 90 per minute";
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
         const user = userEvent.setup();
 
         render(<App />);
@@ -324,14 +323,14 @@ describe("optimal output rendering", () => {
         await user.clear(workerInput);
 
         expect(
-            screen.queryByText(expectedOutputPrefix, { exact: false })
+            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
         ).not.toBeInTheDocument();
     });
 
     test("factors multiple output per create into optimal output", async () => {
         const workers = "3";
         const farmable = VALID_FARM_ABLES[0];
-        const expectedOutput = "Optimal output: 360 per minute";
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 360 per minute`;
         const user = userEvent.setup();
 
         render(<App />);
@@ -420,6 +419,41 @@ describe("output unit selection", () => {
             })
         ).toBeInTheDocument();
     });
+
+    test.each([
+        ["one item per craft", VALID_ITEMS[1].name, 360],
+        ["multiple items per craft", VALID_FARM_ABLES[0].name, 2880],
+    ])(
+        "changing the unit to game days updates optimal output for items that create %s",
+        async (_: string, itemName: string, expected: number) => {
+            const workers = "2";
+            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per game day`;
+            const user = userEvent.setup();
+
+            render(<App />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                itemName
+            );
+            await user.type(workerInput, workers);
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: UNIT_SELECT_LABEL,
+                }),
+                Units.GAME_DAYS
+            );
+
+            expect(await screen.findByText(expectedOutput)).toBeVisible();
+        }
+    );
 });
 
 afterAll(() => {
