@@ -45,7 +45,8 @@ function App() {
     };
 
     const calculateOutput = (workers: number, selectedItem: Item): number => {
-        const numberPerMinute = 60 / selectedItem.createTime;
+        const numberPerMinute =
+            (60 / selectedItem.createTime) * selectedItem.output;
         return workers * numberPerMinute;
     };
 

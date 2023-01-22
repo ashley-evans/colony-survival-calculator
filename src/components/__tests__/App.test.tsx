@@ -319,6 +319,27 @@ describe("optimal output rendering", () => {
             screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
+
+    test("factors multiple output per create into optimal output", async () => {
+        const workers = "3";
+        const farmable = VALID_FARM_ABLES[0];
+        const expectedOutput = "Optimal output: 360 per minute";
+        const user = userEvent.setup();
+
+        render(<App />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            farmable.name
+        );
+        await user.type(workerInput, workers);
+
+        expect(await screen.findByText(expectedOutput)).toBeVisible();
+    });
 });
 
 describe("optimal farm size note rendering", () => {
