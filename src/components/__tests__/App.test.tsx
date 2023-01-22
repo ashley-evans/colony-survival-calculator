@@ -220,24 +220,43 @@ describe("output selector", () => {
             expect(screen.queryByRole("alert")).not.toBeInTheDocument();
         });
     });
+});
 
-    describe("optimal output rendering", () => {
-        const expectedOutputPrefix = "Optimal output:";
+describe("optimal output rendering", () => {
+    const expectedOutputPrefix = "Optimal output:";
 
-        test("does not render any output message by default", async () => {
-            render(<App />);
-            await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-                selector: "input",
-            });
-
-            expect(
-                screen.queryByText(expectedOutputPrefix, { exact: false })
-            ).not.toBeInTheDocument();
+    test("does not render any output message by default", async () => {
+        render(<App />);
+        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
         });
 
-        test("renders zero output given zero workers", async () => {
-            const input = "0";
-            const expectedOutput = "Optimal output: 0 per minute";
+        expect(
+            screen.queryByText(expectedOutputPrefix, { exact: false })
+        ).not.toBeInTheDocument();
+    });
+
+    test("renders zero output given zero workers", async () => {
+        const input = "0";
+        const expectedOutput = "Optimal output: 0 per minute";
+        const user = userEvent.setup();
+
+        render(<App />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.type(workerInput, input);
+
+        expect(await screen.findByText(expectedOutput)).toBeVisible();
+    });
+
+    test.each([
+        ["(whole)", "3", "90"],
+        ["(float)", "3.5", "105"],
+    ])(
+        "renders the optimal output given %s workers and default item selected",
+        async (_: string, input: string, expected: string) => {
+            const expectedOutput = `Optimal output: ${expected} per minute`;
             const user = userEvent.setup();
 
             render(<App />);
@@ -250,73 +269,45 @@ describe("output selector", () => {
             await user.type(workerInput, input);
 
             expect(await screen.findByText(expectedOutput)).toBeVisible();
+        }
+    );
+
+    test("renders the optimal output given multiple workers and non-default item selected", async () => {
+        const input = "5";
+        const expectedOutput = `Optimal output: 75 per minute`;
+        const user = userEvent.setup();
+
+        render(<App />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
         });
-
-        test.each([
-            ["(whole)", "3", "90"],
-            ["(float)", "3.5", "105"],
-        ])(
-            "renders the optimal output given %s workers and default item selected",
-            async (_: string, input: string, expected: string) => {
-                const expectedOutput = `Optimal output: ${expected} per minute`;
-                const user = userEvent.setup();
-
-                render(<App />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.type(workerInput, input);
-
-                expect(await screen.findByText(expectedOutput)).toBeVisible();
-            }
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            VALID_ITEMS[1].name
         );
+        await user.type(workerInput, input);
 
-        test("renders the optimal output given multiple workers and non-default item selected", async () => {
-            const input = "5";
-            const expectedOutput = `Optimal output: 75 per minute`;
-            const user = userEvent.setup();
+        expect(await screen.findByText(expectedOutput)).toBeVisible();
+    });
 
-            render(<App />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                VALID_ITEMS[1].name
-            );
-            await user.type(workerInput, input);
+    test("clears output if workers is changed to invalid number", async () => {
+        const validInput = "3";
+        const expectedOutput = "Optimal output: 90 per minute";
+        const user = userEvent.setup();
 
-            expect(await screen.findByText(expectedOutput)).toBeVisible();
+        render(<App />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
         });
+        await user.type(workerInput, validInput);
+        await screen.findByText(expectedOutput);
+        await user.clear(workerInput);
 
-        test("clears output if workers is changed to invalid number", async () => {
-            const validInput = "3";
-            const expectedOutput = "Optimal output: 90 per minute";
-            const user = userEvent.setup();
-
-            render(<App />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, validInput);
-            await screen.findByText(expectedOutput);
-            await user.clear(workerInput);
-
-            expect(
-                screen.queryByText(expectedOutputPrefix, { exact: false })
-            ).not.toBeInTheDocument();
-        });
+        expect(
+            screen.queryByText(expectedOutputPrefix, { exact: false })
+        ).not.toBeInTheDocument();
     });
 });
 
