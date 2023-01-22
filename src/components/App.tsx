@@ -4,6 +4,7 @@ import Ajv from "ajv";
 
 import { Item, Items } from "../types";
 import ItemsSchema from "../schemas/items.json";
+import { Units } from "../utils/units";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -73,6 +74,12 @@ function App() {
                         inputMode="numeric"
                         onChange={onWorkerChange}
                     ></input>
+                    <label htmlFor="units-select">Desired output units:</label>
+                    <select id="units-select">
+                        {Object.values(Units).map((unit) => (
+                            <option key={unit}>{unit}</option>
+                        ))}
+                    </select>
                     {workers != undefined && selectedItem && !error ? (
                         <p>
                             Optimal output:{" "}

@@ -7,9 +7,11 @@ import { setupServer } from "msw/node";
 import { waitForRequest } from "../../helpers/utils";
 import App from "../App";
 import { Item, Items } from "../../types";
+import { Units } from "../../utils/units";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
+const UNIT_SELECT_LABEL = "Desired output units:";
 const STATIC_ITEMS_PATH = "json/items.json";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
@@ -96,23 +98,29 @@ describe("output selector", () => {
         });
 
         test("does not render a combo box for the desired output", () => {
-            const expectedLabel = "Item:";
-
             render(<App />);
 
             expect(
-                screen.queryByRole("combobox", { name: expectedLabel })
+                screen.queryByRole("combobox", { name: ITEM_SELECT_LABEL })
             ).not.toBeInTheDocument();
         });
 
         test("does not render a worker input box", () => {
-            const expectedLabel = "Workers:";
-
             render(<App />);
 
             expect(
-                screen.queryByLabelText(expectedLabel, {
+                screen.queryByLabelText(WORKERS_INPUT_LABEL, {
                     selector: "input",
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        test("does not render a combo box for the desired output units", () => {
+            render(<App />);
+
+            expect(
+                screen.queryByRole("combobox", {
+                    name: UNIT_SELECT_LABEL,
                 })
             ).not.toBeInTheDocument();
         });
@@ -153,7 +161,7 @@ describe("output selector", () => {
         }
     });
 
-    test("renders the first option in the list as selected by default", async () => {
+    test("renders the first option in the items list as selected by default", async () => {
         render(<App />);
 
         expect(
@@ -377,6 +385,40 @@ describe("optimal farm size note rendering", () => {
         expect(
             screen.queryByText(expectedNotePrefix, { exact: false })
         ).not.toBeInTheDocument();
+    });
+});
+
+describe("output unit selection", () => {
+    test("renders an output unit selector if static items exist", async () => {
+        render(<App />);
+
+        expect(
+            await screen.findByRole("combobox", {
+                name: UNIT_SELECT_LABEL,
+            })
+        ).toBeVisible();
+    });
+
+    test("renders each valid output unit inside the unit selector", async () => {
+        render(<App />);
+        await screen.findByRole("combobox", { name: UNIT_SELECT_LABEL });
+
+        for (const expected of Object.values(Units)) {
+            expect(
+                screen.getByRole("option", { name: expected })
+            ).toBeInTheDocument();
+        }
+    });
+
+    test("renders the minutes option in the unit selector as selected by default", async () => {
+        render(<App />);
+
+        expect(
+            await screen.findByRole("option", {
+                name: Units.MINUTES,
+                selected: true,
+            })
+        ).toBeInTheDocument();
     });
 });
 
