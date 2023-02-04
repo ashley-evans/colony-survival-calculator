@@ -9,3 +9,9 @@ src/types/generated/*
 # Built files
 
 dist
+
+# Terraform
+
+**/.terraform/*
+*.tfstate
+*.tfstate.*
