@@ -5,7 +5,10 @@ root_dir="$( dirname "$script_dir")"
 
 folders=$(find $root_dir -type f -name '*.tf' -exec dirname {} \; | uniq)
 for folder in $folders; do
-    echo "Validating all terraform files in $folder"
+    echo "Ensuring terraform is initialised..."
+    terraform -chdir=$folder init -input=false > /dev/null
+
+    echo "Validating all terraform files in $folder..."
     terraform -chdir=$folder validate
 
     exit_code=$(echo $?)
