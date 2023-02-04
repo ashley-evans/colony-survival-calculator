@@ -9,7 +9,3 @@ variable "dynamodb_table" {
 variable "region" {
   type = string
 }
-
-variable "workspace_key_prefix" {
-  type = string
-}

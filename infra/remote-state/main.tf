@@ -1,6 +1,7 @@
 terraform {
   backend "s3" {
-    key = "remote-state/terraform.tfstate"
+    key                  = "remote-state/terraform.tfstate"
+    workspace_key_prefix = ""
   }
 
   required_providers {
