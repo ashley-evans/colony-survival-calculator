@@ -60,3 +60,28 @@ resource "aws_iam_policy" "remote_state_read_write_policy" {
     ]
   })
 }
+
+resource "aws_iam_role" "ui_deploy_role" {
+  assume_role_policy = data.aws_iam_policy_document.deploy_policy_document.json
+  managed_policy_arns = [
+    aws_iam_policy.remote_state_read_write_policy.arn,
+    aws_iam_policy.ui_deploy_policy.arn
+  ]
+}
+
+resource "aws_iam_policy" "ui_deploy_policy" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "route53:*"
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+output "ui_deploy_role_arn" {
+  value = aws_iam_role.ui_deploy_role.arn
+}
