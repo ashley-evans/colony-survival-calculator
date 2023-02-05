@@ -98,3 +98,25 @@ jobs:
             - name: Run dry run deployment
               run: |
                   ./scripts/deploy.sh -e prod -d
+    deploy:
+        runs-on: ubuntu-latest
+        needs: [format, lint, validate, build, test, deploy-dryrun]
+        if: ${{ github.ref == 'refs/heads/master' }}
+        permissions:
+            id-token: write
+            contents: read
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: "18"
+            - uses: aws-actions/configure-aws-credentials@v1-node16
+              with:
+                  aws-region: eu-west-2
+                  role-to-assume: ${{ secrets.UI_DEPLOY_ROLE_ARN }}
+            - uses: hashicorp/setup-terraform@v2
+              with:
+                  terraform_version: 1.3.7
+            - name: Run deployment
+              run: |
+                  ./scripts/deploy.sh -e prod
