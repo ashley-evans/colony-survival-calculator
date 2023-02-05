@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    key                  = "deploy/terraform.tfstate"
+    key                  = "ui/terraform.tfstate"
     workspace_key_prefix = ""
   }
 
