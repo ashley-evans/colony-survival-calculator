@@ -3,17 +3,21 @@
 usage() {
     echo "Usage:
     -e [Environment to deploy]
-    -d [Flag: Dry-run]" 1>&2;
+    -d [Flag: Dry-run]
+    -t [Flag: Teardown environment]" 1>&2;
     exit 1;
 }
 
-while getopts "e:dh" opt; do
+while getopts "e:dth" opt; do
     case $opt in
         e)
             environment=$OPTARG
             ;;
         d)
             dryrun=true
+            ;;
+        t)
+            teardown=true
             ;;
         h)
             usage
@@ -59,6 +63,9 @@ fi
 if [ $dryrun ]; then
     echo "Dry run deployment of UI for environment: $environment..."
     terraform -chdir="$ui_infra_dir" plan -var-file="$ui_infra_dir/$environment.tfvars"
+elif [ $teardown ]; then
+    echo "Tearing down UI for environment: $environment..."
+    terraform -chdir="$ui_infra_dir" apply -var-file="$ui_infra_dir/$environment.tfvars" -destroy
 else
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$ui_infra_dir" apply -auto-approve -var-file="$ui_infra_dir/$environment.tfvars"
