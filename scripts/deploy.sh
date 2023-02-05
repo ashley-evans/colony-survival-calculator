@@ -33,6 +33,15 @@ root_dir="$( dirname "$script_dir")"
 
 ui_infra_dir="$root_dir/infra/ui"
 
+echo "Ensuring terraform is initialised..."
+
+terraform -chdir="$ui_infra_dir" init -input=false -backend-config="../remote-state.tfbackend" > /dev/null
+
+exit_code=$(echo $?)
+if [ $exit_code -ne 0 ]; then
+    exit $exit_code
+fi
+
 echo "Switching to environment: $environment"
 
 terraform -chdir="$ui_infra_dir" workspace select $environment
@@ -41,10 +50,6 @@ exit_code=$(echo $?)
 if [ $exit_code -ne 0 ]; then
     exit $exit_code
 fi
-
-echo "Ensuring terraform is initialised..."
-
-terraform -chdir="$ui_infra_dir" init -input=false -backend-config="../remote-state.tfbackend" > /dev/null
 
 exit_code=$(echo $?)
 if [ $exit_code -ne 0 ]; then
