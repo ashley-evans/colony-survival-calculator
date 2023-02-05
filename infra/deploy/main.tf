@@ -15,6 +15,10 @@ terraform {
   required_version = ">= 1.3.7"
 }
 
+provider "aws" {
+  region = var.region
+}
+
 data "aws_iam_policy_document" "deploy_policy_document" {
   statement {
     actions = [

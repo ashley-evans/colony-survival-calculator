@@ -17,3 +17,7 @@ variable "remote_state_bucket_arn" {
 variable "remote_state_table_arn" {
   type = string
 }
+
+variable "region" {
+  type = string
+}
