@@ -3,7 +3,7 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 root_dir="$( dirname "$script_dir")"
 
-folders=$(find $root_dir -type f -name '*.tf' -exec dirname {} \; | uniq)
+folders=$(find $root_dir -type f -name '*.tf' ! -path "*/.terraform/*" -exec dirname {} \; | uniq)
 for folder in $folders; do
     echo "Ensuring terraform is initialised..."
     terraform -chdir=$folder init -input=false -backend-config="../remote-state.tfbackend" > /dev/null
