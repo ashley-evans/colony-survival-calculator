@@ -69,7 +69,8 @@ resource "aws_iam_role" "ui_deploy_role" {
   assume_role_policy = data.aws_iam_policy_document.deploy_policy_document.json
   managed_policy_arns = [
     aws_iam_policy.remote_state_read_write_policy.arn,
-    aws_iam_policy.ui_deploy_policy.arn
+    aws_iam_policy.ui_deploy_policy.arn,
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   ]
 }
 
@@ -78,7 +79,7 @@ resource "aws_iam_policy" "ui_deploy_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "route53:*"
+        Action   = ["route53:*", "cloudfront:*"]
         Effect   = "Allow"
         Resource = "*"
       }

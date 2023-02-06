@@ -18,6 +18,12 @@ Ensure that all scripts have the permission to run on your system, this can be d
 chmod u+x $(find ./scripts/ -type f)
 ```
 
+Many of the scripts used within the project require `jq` to function, this can be installed by executing:
+
+```
+sudo apt-get install jq
+```
+
 ## Deploying infrastructure
 
 Run the following command to setup the UI infrastructure for development:
