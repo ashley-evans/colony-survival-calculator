@@ -69,4 +69,32 @@ elif [ $teardown ]; then
 else
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$ui_infra_dir" apply -auto-approve -var-file="$ui_infra_dir/$environment.tfvars"
+    
+    exit_code=$(echo $?)
+    if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+
+    dist_dir="$root_dir/dist"
+
+    echo "Cleaning built file directory..."
+    rm -rf $dist_dir
+
+    exit_code=$(echo $?)
+    if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+
+    echo "Building UI..."
+    npm --prefix $root_dir run build
+
+    exit_code=$(echo $?)
+    if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+
+    bucket=$(terraform -chdir="$ui_infra_dir" output -json | jq -r .static_file_bucket_name.value)
+    
+    echo "Deploying built files to S3 bucket: $bucket..."
+    aws s3 cp $dist_dir "s3://$bucket" --recursive
 fi
