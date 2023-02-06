@@ -79,7 +79,7 @@ resource "aws_iam_policy" "ui_deploy_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "route53:*"
+        Action   = ["route53:*", "cloudfront:*"]
         Effect   = "Allow"
         Resource = "*"
       }
