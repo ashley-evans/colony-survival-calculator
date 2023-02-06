@@ -20,9 +20,10 @@ provider "aws" {
 }
 
 locals {
-  uk_domain_name        = "factorycalculator.co.uk"
-  com_domain_name       = "factorycalculator.com"
-  static_file_origin_id = "UIStaticAssetOrigin"
+  uk_domain_name                         = "factorycalculator.co.uk"
+  com_domain_name                        = "factorycalculator.com"
+  static_file_origin_id                  = "UIStaticAssetOrigin"
+  cloudfront_distribution_hosted_zone_id = "Z2FDTNDATAQYW2"
 }
 
 data "aws_cloudfront_cache_policy" "managed_caching_optimized_cache_policy" {
@@ -174,6 +175,32 @@ resource "aws_route53_record" "com_hosted_zone_certificate_validation_records" {
   ttl             = 60
   type            = each.value.type
   zone_id         = aws_route53_zone.com_hosted_zone[0].zone_id
+}
+
+resource "aws_route53_record" "uk_hosted_zone_alias_record" {
+  count   = terraform.workspace == "prod" ? 1 : 0
+  zone_id = aws_route53_zone.uk_hosted_zone[0].zone_id
+  name    = local.uk_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.static_file_distribution.domain_name
+    zone_id                = local.cloudfront_distribution_hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "com_hosted_zone_alias_record" {
+  count   = terraform.workspace == "prod" ? 1 : 0
+  zone_id = aws_route53_zone.com_hosted_zone[0].zone_id
+  name    = local.com_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.static_file_distribution.domain_name
+    zone_id                = local.cloudfront_distribution_hosted_zone_id
+    evaluate_target_health = true
+  }
 }
 
 output "static_file_bucket_name" {
