@@ -131,3 +131,7 @@ resource "aws_s3_bucket_policy" "static_file_bucket_policy" {
 output "static_file_bucket_name" {
   value = aws_s3_bucket.static_file_bucket.id
 }
+
+output "static_file_distribution_domain_name" {
+  value = terraform.workspace == "prod" ? null : aws_cloudfront_distribution.static_file_distribution.domain_name
+}
