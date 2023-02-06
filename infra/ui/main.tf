@@ -100,6 +100,34 @@ resource "aws_cloudfront_distribution" "static_file_distribution" {
   }
 }
 
+data "aws_iam_policy_document" "static_file_bucket_cloudfront_access_policy" {
+  statement {
+    actions = [
+      "s3:GetObject*"
+    ]
+    resources = [
+      "${aws_s3_bucket.static_file_bucket.arn}/*",
+    ]
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values = [
+        aws_cloudfront_distribution.static_file_distribution.arn
+      ]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "static_file_bucket_policy" {
+  bucket = aws_s3_bucket.static_file_bucket.id
+  policy = data.aws_iam_policy_document.static_file_bucket_cloudfront_access_policy.json
+}
+
 output "static_file_bucket_name" {
   value = aws_s3_bucket.static_file_bucket.id
 }
