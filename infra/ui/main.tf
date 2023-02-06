@@ -28,3 +28,26 @@ resource "aws_route53_zone" "com_hosted_zone" {
   count = terraform.workspace == "prod" ? 1 : 0
   name  = "factorycalculator.com"
 }
+
+resource "aws_s3_bucket" "static_file_bucket" {
+  bucket = "colony-survival-calculator-tf-static-file-bucket-${terraform.workspace}"
+}
+
+resource "aws_s3_bucket_public_access_block" "static_file_bucket_public_access_block" {
+  bucket = aws_s3_bucket.static_file_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_acl" "static_file_bucket_acl" {
+  bucket = aws_s3_bucket.static_file_bucket.id
+
+  acl = "private"
+}
+
+output "static_file_bucket_name" {
+  value = aws_s3_bucket.static_file_bucket.id
+}
