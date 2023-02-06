@@ -93,7 +93,7 @@ else
         exit $exit_code
     fi
 
-    bucket=$(terraform -chdir="$ui_infra_dir" output -json | jq -r .static_file_bucket_name.value)
+    bucket=$(terraform -chdir="$ui_infra_dir" output -raw static_file_bucket_name)
     
     echo "Deploying built files to S3 bucket: $bucket..."
     aws s3 cp $dist_dir "s3://$bucket" --recursive
