@@ -4,13 +4,20 @@
 
 Job/Resource ratio calculator for Colony Survival
 
-# Requirements
+## Active Deployments
+
+The currently deployed version of the application can be found at the following URLs:
+
+-   https://factorycalculator.com/
+-   https://factorycalculator.co.uk/
+
+## Requirements
 
 | Name      | Version  | Instructions                                        |
 | --------- | -------- | --------------------------------------------------- |
 | Terraform | >= 1.3.7 | https://developer.hashicorp.com/terraform/downloads |
 
-# Setup
+## Setup
 
 Ensure that all scripts have the permission to run on your system, this can be done by running the following command:
 
@@ -18,7 +25,7 @@ Ensure that all scripts have the permission to run on your system, this can be d
 chmod u+x $(find ./scripts/ -type f)
 ```
 
-## Deploying infrastructure
+### Deploying infrastructure
 
 Run the following command to setup the UI infrastructure for development:
 
@@ -26,7 +33,7 @@ Run the following command to setup the UI infrastructure for development:
 ./scripts/deploy.sh -e dev
 ```
 
-## Tearing down infrastructure
+### Tearing down infrastructure
 
 Run the following command to remove any deployed UI infrastructure for development:
 
