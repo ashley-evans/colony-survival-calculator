@@ -19,6 +19,11 @@ provider "aws" {
   region = var.region
 }
 
+provider "aws" {
+  alias  = "certificate_region"
+  region = var.certificate_region
+}
+
 locals {
   uk_domain_name                         = "factorycalculator.co.uk"
   com_domain_name                        = "factorycalculator.com"
@@ -138,6 +143,7 @@ resource "aws_s3_bucket_policy" "static_file_bucket_policy" {
 
 resource "aws_acm_certificate" "site_certificate" {
   count                     = terraform.workspace == "prod" ? 1 : 0
+  provider                  = aws.certificate_region
   domain_name               = local.com_domain_name
   subject_alternative_names = [local.uk_domain_name]
   validation_method         = "DNS"
