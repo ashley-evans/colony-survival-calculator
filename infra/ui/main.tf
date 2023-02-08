@@ -216,3 +216,7 @@ output "static_file_bucket_name" {
 output "static_file_distribution_domain_name" {
   value = terraform.workspace == "prod" ? null : aws_cloudfront_distribution.static_file_distribution.domain_name
 }
+
+output "static_file_distribution_id" {
+  value = aws_cloudfront_distribution.static_file_distribution.id
+}
