@@ -76,7 +76,6 @@ function Calculator() {
     const itemKeys = Object.keys(items);
     return (
         <>
-            <h1>Colony Survival Calculator</h1>
             <h2>Desired output:</h2>
             {itemKeys.length > 0 ? (
                 <>

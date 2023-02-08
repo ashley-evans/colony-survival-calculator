@@ -7,13 +7,12 @@ import { setupServer } from "msw/node";
 import { waitForRequest } from "../../helpers/utils";
 import Calculator from "../Calculator";
 import { Item, Items } from "../../types";
-import { Units } from "../../utils/units";
+import { Units, STATIC_ITEMS_PATH } from "../../utils";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
 const UNIT_SELECT_LABEL = "Desired output units:";
 const EXPECTED_OUTPUT_PREFIX = "Optimal output:";
-const STATIC_ITEMS_PATH = "json/items.json";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
     {
@@ -41,16 +40,6 @@ beforeAll(() => {
 
 beforeEach(() => {
     server.resetHandlers();
-});
-
-test("renders application header", async () => {
-    const expectedHeader = "Colony Survival Calculator";
-
-    render(<Calculator />);
-
-    expect(
-        await screen.findByRole("heading", { name: expectedHeader })
-    ).toBeVisible();
 });
 
 describe("output selector", () => {
