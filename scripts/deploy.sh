@@ -97,4 +97,17 @@ else
     
     echo "Deploying built files to S3 bucket: $bucket..."
     aws s3 cp $dist_dir "s3://$bucket" --recursive
+
+    exit_code=$(echo $?)
+    if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+
+    cloudfront_dist_id=$(terraform -chdir="$ui_infra_dir" output -raw static_file_distribution_id)
+
+    echo "Invalidating Cloudfront cache: $cloudfront_dist_id"
+    aws cloudfront create-invalidation \
+        --distribution-id $cloudfront_dist_id \
+        --paths "/*" \
+        --no-paginate | cat
 fi
