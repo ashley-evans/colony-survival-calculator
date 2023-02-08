@@ -14,7 +14,7 @@ import {
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
 
-function App() {
+function Calculator() {
     const [items, setItems] = useState<Record<string, Omit<Item, "name">>>({});
     const [selectedItem, setSelectedItem] = useState<Item>();
     const [workers, setWorkers] = useState<number>();
@@ -124,4 +124,4 @@ function App() {
     );
 }
 
-export default App;
+export default Calculator;
