@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
 
-import Calculator from "./components/Calculator";
+import router from "./routes/router";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-        <Calculator />
+        <RouterProvider router={router} />
     </React.StrictMode>
 );
