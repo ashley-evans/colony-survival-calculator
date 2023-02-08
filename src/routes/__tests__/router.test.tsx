@@ -24,6 +24,14 @@ beforeEach(() => {
 });
 
 describe("root rendering", () => {
+    test("renders a loading message when the application is loading", async () => {
+        const expectedLoadingMessage = "Loading...";
+
+        renderWithRouterProvider({ router });
+
+        expect(screen.getByText(expectedLoadingMessage)).toBeVisible();
+    });
+
     test("renders application header on the root page", async () => {
         const expectedHeader = "Colony Survival Calculator";
 
