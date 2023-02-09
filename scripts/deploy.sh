@@ -64,6 +64,16 @@ if [ $dryrun ]; then
     echo "Dry run deployment of UI for environment: $environment..."
     terraform -chdir="$ui_infra_dir" plan -var-file="$ui_infra_dir/$environment.tfvars"
 elif [ $teardown ]; then
+    bucket=$(terraform -chdir="$ui_infra_dir" output -raw static_file_bucket_name)
+
+    echo "Emptying static file bucket: $bucket"
+    aws s3 rm $dist_dir "s3://$bucket" --recursive
+
+    exit_code=$(echo $?)
+    if [ $exit_code -ne 0 ]; then
+        exit $exit_code
+    fi
+
     echo "Tearing down UI for environment: $environment..."
     terraform -chdir="$ui_infra_dir" apply -var-file="$ui_infra_dir/$environment.tfvars" -destroy
 else
