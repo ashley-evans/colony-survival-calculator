@@ -5,15 +5,14 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../helpers/utils";
-import App from "../App";
+import Calculator from "../Calculator";
 import { Item, Items } from "../../types";
-import { Units } from "../../utils/units";
+import { Units, STATIC_ITEMS_PATH } from "../../utils";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
 const UNIT_SELECT_LABEL = "Desired output units:";
 const EXPECTED_OUTPUT_PREFIX = "Optimal output:";
-const STATIC_ITEMS_PATH = "json/items.json";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
     {
@@ -43,16 +42,6 @@ beforeEach(() => {
     server.resetHandlers();
 });
 
-test("renders application header", async () => {
-    const expectedHeader = "Colony Survival Calculator";
-
-    render(<App />);
-
-    expect(
-        await screen.findByRole("heading", { name: expectedHeader })
-    ).toBeVisible();
-});
-
 describe("output selector", () => {
     test("fetches all known static items", async () => {
         const expectedRequest = waitForRequest(
@@ -61,7 +50,7 @@ describe("output selector", () => {
             STATIC_ITEMS_PATH
         );
 
-        render(<App />);
+        render(<Calculator />);
 
         await expect(expectedRequest).resolves.not.toThrowError();
     });
@@ -69,7 +58,7 @@ describe("output selector", () => {
     test("renders desired output header", async () => {
         const expectedHeader = "Desired output:";
 
-        render(<App />);
+        render(<Calculator />);
 
         expect(
             await screen.findByRole("heading", { name: expectedHeader })
@@ -91,7 +80,7 @@ describe("output selector", () => {
         test("renders a missing items error", async () => {
             const expectedError = "Error: Unable to fetch known items";
 
-            render(<App />);
+            render(<Calculator />);
 
             expect(await screen.findByRole("alert")).toHaveTextContent(
                 expectedError
@@ -99,7 +88,7 @@ describe("output selector", () => {
         });
 
         test("does not render a combo box for the desired output", () => {
-            render(<App />);
+            render(<Calculator />);
 
             expect(
                 screen.queryByRole("combobox", { name: ITEM_SELECT_LABEL })
@@ -107,7 +96,7 @@ describe("output selector", () => {
         });
 
         test("does not render a worker input box", () => {
-            render(<App />);
+            render(<Calculator />);
 
             expect(
                 screen.queryByLabelText(WORKERS_INPUT_LABEL, {
@@ -117,7 +106,7 @@ describe("output selector", () => {
         });
 
         test("does not render a combo box for the desired output units", () => {
-            render(<App />);
+            render(<Calculator />);
 
             expect(
                 screen.queryByRole("combobox", {
@@ -135,7 +124,7 @@ describe("output selector", () => {
         );
         const errorMessage = "Error: Unable to fetch known items";
 
-        render(<App />);
+        render(<Calculator />);
         await waitFor(() => expectedRequest);
 
         expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
@@ -144,7 +133,7 @@ describe("output selector", () => {
     test("renders a select for the desired output selector if static items exist", async () => {
         const expectedLabel = "Item:";
 
-        render(<App />);
+        render(<Calculator />);
 
         expect(
             await screen.findByRole("combobox", { name: expectedLabel })
@@ -152,7 +141,7 @@ describe("output selector", () => {
     });
 
     test("renders each item returned as an option in the combo box", async () => {
-        render(<App />);
+        render(<Calculator />);
         await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
 
         for (const expected of VALID_ITEMS) {
@@ -163,7 +152,7 @@ describe("output selector", () => {
     });
 
     test("renders the first option in the items list as selected by default", async () => {
-        render(<App />);
+        render(<Calculator />);
 
         expect(
             await screen.findByRole("option", {
@@ -178,7 +167,7 @@ describe("output selector", () => {
             "Error: Invalid input, must be a positive number";
 
         test("renders an input to enter the number of workers", async () => {
-            render(<App />);
+            render(<Calculator />);
 
             expect(
                 await screen.findByLabelText(WORKERS_INPUT_LABEL, {
@@ -188,7 +177,7 @@ describe("output selector", () => {
         });
 
         test("does not render an error message by default", async () => {
-            render(<App />);
+            render(<Calculator />);
             await screen.findByLabelText(WORKERS_INPUT_LABEL, {
                 selector: "input",
             });
@@ -204,7 +193,7 @@ describe("output selector", () => {
             async (_: string, input: string) => {
                 const user = userEvent.setup();
 
-                render(<App />);
+                render(<Calculator />);
                 const workerInput = await screen.findByLabelText(
                     WORKERS_INPUT_LABEL,
                     {
@@ -224,7 +213,7 @@ describe("output selector", () => {
             const validInput = "1";
             const user = userEvent.setup();
 
-            render(<App />);
+            render(<Calculator />);
             const workerInput = await screen.findByLabelText(
                 WORKERS_INPUT_LABEL,
                 {
@@ -243,7 +232,7 @@ describe("output selector", () => {
 
 describe("optimal output rendering", () => {
     test("does not render any output message by default", async () => {
-        render(<App />);
+        render(<Calculator />);
         await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
@@ -258,7 +247,7 @@ describe("optimal output rendering", () => {
         const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 0 per minute`;
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
@@ -276,7 +265,7 @@ describe("optimal output rendering", () => {
             const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per minute`;
             const user = userEvent.setup();
 
-            render(<App />);
+            render(<Calculator />);
             const workerInput = await screen.findByLabelText(
                 WORKERS_INPUT_LABEL,
                 {
@@ -294,7 +283,7 @@ describe("optimal output rendering", () => {
         const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 75 per minute`;
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
@@ -314,7 +303,7 @@ describe("optimal output rendering", () => {
         const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
@@ -333,7 +322,7 @@ describe("optimal output rendering", () => {
         const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 360 per minute`;
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
@@ -357,7 +346,7 @@ describe("optimal farm size note rendering", () => {
         const expectedMessage = `${expectedNotePrefix} ${farmable.size.width} x ${farmable.size.height}`;
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         await user.selectOptions(
             await screen.findByRole("combobox", {
                 name: ITEM_SELECT_LABEL,
@@ -372,7 +361,7 @@ describe("optimal farm size note rendering", () => {
         const craft_able = CRAFT_ABLE_ITEMS[1];
         const user = userEvent.setup();
 
-        render(<App />);
+        render(<Calculator />);
         await user.selectOptions(
             await screen.findByRole("combobox", {
                 name: ITEM_SELECT_LABEL,
@@ -389,7 +378,7 @@ describe("optimal farm size note rendering", () => {
 
 describe("output unit selection", () => {
     test("renders an output unit selector if static items exist", async () => {
-        render(<App />);
+        render(<Calculator />);
 
         expect(
             await screen.findByRole("combobox", {
@@ -399,7 +388,7 @@ describe("output unit selection", () => {
     });
 
     test("renders each valid output unit inside the unit selector", async () => {
-        render(<App />);
+        render(<Calculator />);
         await screen.findByRole("combobox", { name: UNIT_SELECT_LABEL });
 
         for (const expected of Object.values(Units)) {
@@ -410,7 +399,7 @@ describe("output unit selection", () => {
     });
 
     test("renders the minutes option in the unit selector as selected by default", async () => {
-        render(<App />);
+        render(<Calculator />);
 
         expect(
             await screen.findByRole("option", {
@@ -430,7 +419,7 @@ describe("output unit selection", () => {
             const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per game day`;
             const user = userEvent.setup();
 
-            render(<App />);
+            render(<Calculator />);
             const workerInput = await screen.findByLabelText(
                 WORKERS_INPUT_LABEL,
                 {

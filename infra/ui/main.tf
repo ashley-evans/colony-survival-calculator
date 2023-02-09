@@ -29,6 +29,7 @@ locals {
   com_domain_name                        = "factorycalculator.com"
   static_file_origin_id                  = "UIStaticAssetOrigin"
   cloudfront_distribution_hosted_zone_id = "Z2FDTNDATAQYW2"
+  root_object                            = "index.html"
 }
 
 data "aws_cloudfront_cache_policy" "managed_caching_optimized_cache_policy" {
@@ -84,7 +85,7 @@ resource "aws_cloudfront_distribution" "static_file_distribution" {
     origin_id                = local.static_file_origin_id
   }
 
-  default_root_object = "index.html"
+  default_root_object = local.root_object
   default_cache_behavior {
     allowed_methods          = ["GET", "HEAD"]
     cached_methods           = ["GET", "HEAD"]
@@ -111,6 +112,11 @@ resource "aws_cloudfront_distribution" "static_file_distribution" {
   }
 
   aliases = terraform.workspace == "prod" ? [local.com_domain_name, local.uk_domain_name] : null
+  custom_error_response {
+    error_code         = 403
+    response_code      = 200
+    response_page_path = "/${local.root_object}"
+  }
 }
 
 data "aws_iam_policy_document" "static_file_bucket_cloudfront_access_policy" {

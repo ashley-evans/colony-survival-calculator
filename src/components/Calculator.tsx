@@ -14,7 +14,7 @@ import {
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
 
-function App() {
+function Calculator() {
     const [items, setItems] = useState<Record<string, Omit<Item, "name">>>({});
     const [selectedItem, setSelectedItem] = useState<Item>();
     const [workers, setWorkers] = useState<number>();
@@ -76,7 +76,6 @@ function App() {
     const itemKeys = Object.keys(items);
     return (
         <>
-            <h1>Colony Survival Calculator</h1>
             <h2>Desired output:</h2>
             {itemKeys.length > 0 ? (
                 <>
@@ -124,4 +123,4 @@ function App() {
     );
 }
 
-export default App;
+export default Calculator;
