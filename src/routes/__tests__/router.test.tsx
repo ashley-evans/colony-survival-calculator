@@ -10,6 +10,7 @@ import { STATIC_ITEMS_PATH } from "../../utils";
 const EXPECTED_CALCULATOR_HEADER = "Desired output:";
 const EXPECTED_CALCULATOR_ITEM_LABEL = "Item:";
 const EXPECTED_CALCULATOR_WORKER_LABEL = "Workers:";
+const EXPECTED_LOADING_MESSAGE = "Loading...";
 const ITEMS: Items = [{ name: "Test Item 1", createTime: 2, output: 1 }];
 
 const server = setupServer(
@@ -27,12 +28,10 @@ beforeEach(() => {
 });
 
 describe("root rendering", () => {
-    test("renders a loading message while loading calculator", async () => {
-        const expectedLoadingMessage = "Loading...";
-
+    test("renders a loading message while loading", async () => {
         renderWithRouterProvider({ router });
 
-        expect(screen.getByText(expectedLoadingMessage)).toBeVisible();
+        expect(screen.getByText(EXPECTED_LOADING_MESSAGE)).toBeVisible();
     });
 
     test("renders application header", async () => {
@@ -67,6 +66,12 @@ describe("root rendering", () => {
 describe("unknown path rendering", () => {
     const invalidPath = "/invalid";
     const expectedLinkText = "Return to calculator";
+
+    test("renders a loading message while loading", async () => {
+        renderWithRouterProvider({ router }, invalidPath);
+
+        expect(screen.getByText(EXPECTED_LOADING_MESSAGE)).toBeVisible();
+    });
 
     test("renders application header", async () => {
         const expectedHeader = "Colony Survival Calculator";

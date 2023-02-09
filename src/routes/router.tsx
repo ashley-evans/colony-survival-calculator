@@ -1,7 +1,8 @@
 import React, { lazy, ReactElement, Suspense } from "react";
-import { createBrowserRouter, Link, Outlet } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 
 const Calculator = lazy(() => import("../components/Calculator"));
+const MissingRoute = lazy(() => import("./MissingRoute"));
 
 type LazyLoadingWrapperProps = {
     children: ReactElement;
@@ -22,15 +23,6 @@ function SiteLayout() {
     );
 }
 
-function MissingRoute() {
-    return (
-        <>
-            <p>Oh no! You have gotten lost!</p>
-            <Link to={"/"}>Return to calculator</Link>
-        </>
-    );
-}
-
 const router = createBrowserRouter([
     {
         element: <SiteLayout />,
@@ -45,7 +37,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "*",
-                element: <MissingRoute />,
+                element: (
+                    <LazyLoadingWrapper>
+                        <MissingRoute />
+                    </LazyLoadingWrapper>
+                ),
             },
         ],
     },
