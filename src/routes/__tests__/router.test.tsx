@@ -11,7 +11,9 @@ const EXPECTED_CALCULATOR_HEADER = "Desired output:";
 const EXPECTED_CALCULATOR_ITEM_LABEL = "Item:";
 const EXPECTED_CALCULATOR_WORKER_LABEL = "Workers:";
 const EXPECTED_LOADING_MESSAGE = "Loading...";
-const ITEMS: Items = [{ name: "Test Item 1", createTime: 2, output: 1 }];
+const ITEMS: Items = [
+    { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
+];
 
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {

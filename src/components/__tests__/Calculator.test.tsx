@@ -19,12 +19,13 @@ const VALID_FARM_ABLES: Required<Item>[] = [
         name: "Test Farmable 1",
         createTime: 5,
         output: 10,
+        requires: [],
         size: { width: 10, height: 10 },
     },
 ];
 const CRAFT_ABLE_ITEMS: Items = [
-    { name: "Test Item 1", createTime: 2, output: 1 },
-    { name: "Test Item 2", createTime: 4, output: 1 },
+    { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
+    { name: "Test Item 2", createTime: 4, output: 1, requires: [] },
 ];
 const VALID_ITEMS: Items = [...CRAFT_ABLE_ITEMS, ...VALID_FARM_ABLES];
 
