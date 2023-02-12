@@ -118,6 +118,10 @@ function Calculator() {
                     ) : null}
                 </>
             ) : null}
+            {(workers != undefined && selectedItem?.requires.length) ??
+            0 > 0 ? (
+                <h2>Requirements:</h2>
+            ) : null}
             {error ? <p role="alert">Error: {error}</p> : null}
         </>
     );

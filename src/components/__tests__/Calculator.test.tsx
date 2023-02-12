@@ -23,11 +23,36 @@ const VALID_FARM_ABLES: Required<Item>[] = [
         size: { width: 10, height: 10 },
     },
 ];
+
 const CRAFT_ABLE_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
     { name: "Test Item 2", createTime: 4, output: 1, requires: [] },
 ];
-const VALID_ITEMS: Items = [...CRAFT_ABLE_ITEMS, ...VALID_FARM_ABLES];
+
+const CRAFT_ABLE_ITEMS_REQS: Items = [
+    {
+        name: "Test Item 3",
+        createTime: 8,
+        output: 1,
+        requires: [{ name: "Test Item 1", amount: 5 }],
+    },
+];
+
+const CRAFT_ABLE_ITEMS_MISSING_REQS: Items = [
+    {
+        name: "Test Item 4",
+        createTime: 8,
+        output: 1,
+        requires: [{ name: "Invalid Test Item", amount: 5 }],
+    },
+];
+
+const VALID_ITEMS: Items = [
+    ...CRAFT_ABLE_ITEMS,
+    ...VALID_FARM_ABLES,
+    ...CRAFT_ABLE_ITEMS_REQS,
+    ...CRAFT_ABLE_ITEMS_MISSING_REQS,
+];
 
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
@@ -444,6 +469,72 @@ describe("output unit selection", () => {
             expect(await screen.findByText(expectedOutput)).toBeVisible();
         }
     );
+});
+
+describe("requirements rendering", () => {
+    const expectedRequirementsHeading = "Requirements:";
+
+    test("renders a requirements heading if an item with requirements and a number of workers are selected", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS_REQS[0].name
+        );
+        await user.type(workerInput, "5");
+
+        expect(
+            await screen.findByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).toBeVisible();
+    });
+
+    test("does not render the requirements heading if an item with no requirements is selected", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS[0].name
+        );
+        await user.type(workerInput, "5");
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render the requirements heading if no workers provided for item with requirements", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS_REQS[0].name
+        );
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).not.toBeInTheDocument();
+    });
 });
 
 afterAll(() => {
