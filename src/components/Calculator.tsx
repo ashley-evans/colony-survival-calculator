@@ -1,17 +1,13 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Ajv from "ajv";
 
 import { Item, Items } from "../types";
 import ItemsSchema from "../schemas/items.json";
-import {
-    isUnit,
-    UnitDisplayMappings,
-    Units,
-    UnitSecondMappings,
-} from "../utils/units";
+import { UnitDisplayMappings, Units, UnitSecondMappings } from "../utils/units";
 import { ItemSelector } from "./ItemSelector";
 import { WorkerInput } from "./WorkerInput";
+import { OutputUnitSelector } from "./OutputUnitSelector";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -36,13 +32,6 @@ function Calculator() {
         });
     }, []);
 
-    const onOutputUnitChange = (event: FormEvent<HTMLSelectElement>) => {
-        const unit = event.currentTarget.value;
-        if (isUnit(unit)) {
-            setSelectedOutputUnit(unit);
-        }
-    };
-
     const calculateOutput = (
         workers: number,
         selectedItem: Item,
@@ -64,20 +53,13 @@ function Calculator() {
                 <>
                     <ItemSelector
                         items={items}
-                        onItemChange={(item) => setSelectedItem(item)}
+                        onItemChange={setSelectedItem}
                     />
                     <WorkerInput
-                        onWorkerChange={(workers) => setWorkers(workers)}
-                        onError={(error) => setError(error)}
+                        onWorkerChange={setWorkers}
+                        onError={setError}
                     />
-                    <label htmlFor="units-select" defaultValue={Units.MINUTES}>
-                        Desired output units:
-                    </label>
-                    <select id="units-select" onChange={onOutputUnitChange}>
-                        {Object.values(Units).map((unit) => (
-                            <option key={unit}>{unit}</option>
-                        ))}
-                    </select>
+                    <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
                     {workers != undefined && selectedItem && !error ? (
                         <p>
                             Optimal output:{" "}
