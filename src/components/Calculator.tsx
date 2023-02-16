@@ -47,6 +47,7 @@ function Calculator() {
         const input = parseFloat(event.currentTarget.value);
         if (isNaN(input) || input < 0) {
             setError("Invalid input, must be a positive number");
+            setWorkers(undefined);
         } else {
             setError(undefined);
             setWorkers(input);

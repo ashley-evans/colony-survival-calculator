@@ -522,6 +522,32 @@ describe("requirements rendering", () => {
         const user = userEvent.setup();
 
         render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS_REQS[0].name
+        );
+        await user.type(workerInput, "5");
+        await screen.findByRole("heading", {
+            name: expectedRequirementsHeading,
+        });
+        await user.clear(workerInput);
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("hides the requirements heading if worker input is changed to empty", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />);
         await user.selectOptions(
             await screen.findByRole("combobox", {
                 name: ITEM_SELECT_LABEL,
