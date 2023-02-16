@@ -10,12 +10,13 @@ import {
     Units,
     UnitSecondMappings,
 } from "../utils/units";
+import { ItemSelector } from "./ItemSelector";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
 
 function Calculator() {
-    const [items, setItems] = useState<Record<string, Omit<Item, "name">>>({});
+    const [items, setItems] = useState<Items>([]);
     const [selectedItem, setSelectedItem] = useState<Item>();
     const [workers, setWorkers] = useState<number>();
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<Units>(
@@ -26,22 +27,13 @@ function Calculator() {
     useEffect(() => {
         axios.get<unknown>("json/items.json").then(({ data }) => {
             if (Array.isArray(data) && data.length > 0 && validateItems(data)) {
-                setItems(
-                    Object.fromEntries(data.map((item) => [item.name, item]))
-                );
-
+                setItems(data);
                 setSelectedItem(data[0]);
             } else {
                 setError("Unable to fetch known items");
             }
         });
     }, []);
-
-    const onItemChange = (event: FormEvent<HTMLSelectElement>) => {
-        const name = event.currentTarget.value;
-        const item = items[name];
-        setSelectedItem({ name, ...item });
-    };
 
     const onWorkerChange = (event: FormEvent<HTMLInputElement>) => {
         const input = parseFloat(event.currentTarget.value);
@@ -80,12 +72,10 @@ function Calculator() {
             <h2>Desired output:</h2>
             {itemKeys.length > 0 ? (
                 <>
-                    <label htmlFor="output-select">Item:</label>
-                    <select id="output-select" onChange={onItemChange}>
-                        {Object.keys(items).map((name) => (
-                            <option key={name}>{name}</option>
-                        ))}
-                    </select>
+                    <ItemSelector
+                        items={items}
+                        onItemChange={(item) => setSelectedItem(item)}
+                    />
                     <label htmlFor="worker-input">Workers:</label>
                     <input
                         id="worker-input"
