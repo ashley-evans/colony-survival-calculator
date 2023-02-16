@@ -11,6 +11,7 @@ import {
     UnitSecondMappings,
 } from "../utils/units";
 import { ItemSelector } from "./ItemSelector";
+import { WorkerInput } from "./WorkerInput";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -34,17 +35,6 @@ function Calculator() {
             }
         });
     }, []);
-
-    const onWorkerChange = (event: FormEvent<HTMLInputElement>) => {
-        const input = parseFloat(event.currentTarget.value);
-        if (isNaN(input) || input < 0) {
-            setError("Invalid input, must be a positive number");
-            setWorkers(undefined);
-        } else {
-            setError(undefined);
-            setWorkers(input);
-        }
-    };
 
     const onOutputUnitChange = (event: FormEvent<HTMLSelectElement>) => {
         const unit = event.currentTarget.value;
@@ -76,12 +66,10 @@ function Calculator() {
                         items={items}
                         onItemChange={(item) => setSelectedItem(item)}
                     />
-                    <label htmlFor="worker-input">Workers:</label>
-                    <input
-                        id="worker-input"
-                        inputMode="numeric"
-                        onChange={onWorkerChange}
-                    ></input>
+                    <WorkerInput
+                        onWorkerChange={(workers) => setWorkers(workers)}
+                        onError={(error) => setError(error)}
+                    />
                     <label htmlFor="units-select" defaultValue={Units.MINUTES}>
                         Desired output units:
                     </label>
