@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -26,7 +26,7 @@ const VALID_FARM_ABLES: Required<Item>[] = [
 
 const CRAFT_ABLE_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
-    { name: "Test Item 2", createTime: 4, output: 1, requires: [] },
+    { name: "Test Item 2", createTime: 4, output: 2, requires: [] },
 ];
 
 const CRAFT_ABLE_ITEMS_REQS: Items = [
@@ -36,11 +36,17 @@ const CRAFT_ABLE_ITEMS_REQS: Items = [
         output: 1,
         requires: [{ name: "Test Item 1", amount: 5 }],
     },
+    {
+        name: "Test Item 4",
+        createTime: 16,
+        output: 1,
+        requires: [{ name: "Test Item 2", amount: 3 }],
+    },
 ];
 
 const CRAFT_ABLE_ITEMS_MISSING_REQS: Items = [
     {
-        name: "Test Item 4",
+        name: "Test Item 5",
         createTime: 8,
         output: 1,
         requires: [{ name: "Invalid Test Item", amount: 5 }],
@@ -306,7 +312,7 @@ describe("optimal output rendering", () => {
 
     test("renders the optimal output given multiple workers and non-default item selected", async () => {
         const input = "5";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 75 per minute`;
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 150 per minute`;
         const user = userEvent.setup();
 
         render(<Calculator />);
@@ -436,7 +442,7 @@ describe("output unit selection", () => {
     });
 
     test.each([
-        ["one item per craft", VALID_ITEMS[1].name, 360],
+        ["one item per craft", VALID_ITEMS[1].name, 720],
         ["multiple items per craft", VALID_FARM_ABLES[0].name, 2880],
     ])(
         "changing the unit to game days updates optimal output for items that create %s",
@@ -473,8 +479,10 @@ describe("output unit selection", () => {
 
 describe("requirements rendering", () => {
     const expectedRequirementsHeading = "Requirements:";
+    const expectedItemNameColumnName = "Item";
+    const expectedWorkerColumnName = "Workers";
 
-    test("renders a requirements heading if an item with requirements and a number of workers are selected", async () => {
+    test("renders the requirements section if an item with requirements and a number of workers are selected", async () => {
         const user = userEvent.setup();
 
         render(<Calculator />);
@@ -494,9 +502,20 @@ describe("requirements rendering", () => {
                 name: expectedRequirementsHeading,
             })
         ).toBeVisible();
+        const requirementsTable = screen.getByRole("table");
+        expect(
+            within(requirementsTable).queryByRole("columnheader", {
+                name: expectedItemNameColumnName,
+            })
+        ).toBeInTheDocument();
+        expect(
+            within(requirementsTable).queryByRole("columnheader", {
+                name: expectedWorkerColumnName,
+            })
+        ).toBeInTheDocument();
     });
 
-    test("does not render the requirements heading if an item with no requirements is selected", async () => {
+    test("does not render the requirements section if an item with no requirements is selected", async () => {
         const user = userEvent.setup();
 
         render(<Calculator />);
@@ -516,9 +535,29 @@ describe("requirements rendering", () => {
                 name: expectedRequirementsHeading,
             })
         ).not.toBeInTheDocument();
+        expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
 
-    test("does not render the requirements heading if no workers provided for item with requirements", async () => {
+    test("does not render the requirements section if no workers provided for item with requirements", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS_REQS[0].name
+        );
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).not.toBeInTheDocument();
+        expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    });
+
+    test("hides the requirements heading if worker input is changed to empty", async () => {
         const user = userEvent.setup();
 
         render(<Calculator />);
@@ -542,25 +581,74 @@ describe("requirements rendering", () => {
                 name: expectedRequirementsHeading,
             })
         ).not.toBeInTheDocument();
+        expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
 
-    test("hides the requirements heading if worker input is changed to empty", async () => {
-        const user = userEvent.setup();
+    describe.each([
+        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "6.25"],
+        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "1.875"],
+    ])(
+        "given an item with a single item requirement",
+        (
+            selectedItemName: string,
+            expectedItemName: string,
+            expectedAmountOfWorkers: string
+        ) => {
+            const amountOfWorkers = "5";
 
-        render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS_REQS[0].name
-        );
+            test("renders the name of the required item in the table body", async () => {
+                const user = userEvent.setup();
 
-        expect(
-            screen.queryByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).not.toBeInTheDocument();
-    });
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.selectOptions(
+                    await screen.findByRole("combobox", {
+                        name: ITEM_SELECT_LABEL,
+                    }),
+                    selectedItemName
+                );
+                await user.type(workerInput, amountOfWorkers);
+                const requirementsTable = await screen.findByRole("table");
+
+                expect(
+                    within(requirementsTable).getByRole("cell", {
+                        name: expectedItemName,
+                    })
+                );
+            });
+
+            test("renders the required amount of workers on the required item to satisfy the desired output", async () => {
+                const user = userEvent.setup();
+
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.selectOptions(
+                    await screen.findByRole("combobox", {
+                        name: ITEM_SELECT_LABEL,
+                    }),
+                    selectedItemName
+                );
+                await user.type(workerInput, amountOfWorkers);
+                const requirementsTable = await screen.findByRole("table");
+
+                expect(
+                    within(requirementsTable).getByRole("cell", {
+                        name: expectedAmountOfWorkers,
+                    })
+                );
+            });
+        }
+    );
 });
 
 afterAll(() => {

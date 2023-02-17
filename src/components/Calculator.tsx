@@ -20,6 +20,7 @@ function Calculator() {
         Units.MINUTES
     );
     const [error, setError] = useState<string>();
+    const itemMap = Object.fromEntries(items.map((item) => [item.name, item]));
 
     useEffect(() => {
         axios.get<unknown>("json/items.json").then(({ data }) => {
@@ -43,6 +44,26 @@ function Calculator() {
         return `${workers * outputPerWorker} per ${
             UnitDisplayMappings[outputUnit]
         }`;
+    };
+
+    const calculateRequiredWorkers = (
+        selectedItem: Item,
+        selectedWorkers: number,
+        requiredItemName: string
+    ): number | undefined => {
+        const requirement = selectedItem.requires.find(
+            (i) => i.name == requiredItemName
+        );
+        if (!requirement) {
+            setError("Something went wrong, please try again");
+            return;
+        }
+
+        const requiredItem = itemMap[requiredItemName];
+        const createdInTime =
+            (selectedItem.createTime / requiredItem.createTime) *
+            requiredItem.output;
+        return (requirement.amount / createdInTime) * selectedWorkers;
     };
 
     const itemKeys = Object.keys(items);
@@ -79,9 +100,32 @@ function Calculator() {
                     ) : null}
                 </>
             ) : null}
-            {(workers != undefined && selectedItem?.requires.length) ??
-            0 > 0 ? (
-                <h2>Requirements:</h2>
+            {workers != undefined &&
+            selectedItem?.requires &&
+            selectedItem.requires.length > 0 ? (
+                <>
+                    <h2>Requirements:</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Workers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{selectedItem.requires[0].name}</td>
+                                <td>
+                                    {calculateRequiredWorkers(
+                                        selectedItem,
+                                        workers,
+                                        selectedItem.requires[0].name
+                                    )}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </>
             ) : null}
             {error ? <p role="alert">Error: {error}</p> : null}
         </>
