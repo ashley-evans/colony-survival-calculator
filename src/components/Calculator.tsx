@@ -81,12 +81,14 @@ function Calculator() {
                 </>
             ) : null}
             {workers != undefined &&
+            !error &&
             selectedItem?.requires &&
             selectedItem.requires.length > 0 ? (
                 <Requirements
                     items={items}
                     selectedItem={selectedItem}
                     workers={workers}
+                    onError={setError}
                 />
             ) : null}
             {error ? <p role="alert">Error: {error}</p> : null}

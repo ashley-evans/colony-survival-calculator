@@ -649,6 +649,79 @@ describe("requirements rendering", () => {
             });
         }
     );
+
+    describe("given an item with an unknown requirement", () => {
+        const invalidItemName = CRAFT_ABLE_ITEMS_MISSING_REQS[0].name;
+        const amountOfWorkers = "5";
+
+        test("does not render the requirements section", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                invalidItemName
+            );
+            await user.type(workerInput, amountOfWorkers);
+
+            expect(screen.queryByRole("table")).not.toBeInTheDocument();
+        });
+
+        test("does not render the optimal output calculation", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                invalidItemName
+            );
+            await user.type(workerInput, amountOfWorkers);
+
+            expect(
+                screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+            ).not.toBeInTheDocument();
+        });
+
+        test("renders unexpected requirement error message", async () => {
+            const expectedErrorMessage = "Error: Unknown required item";
+            const user = userEvent.setup();
+
+            render(<Calculator />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                invalidItemName
+            );
+            await user.type(workerInput, amountOfWorkers);
+
+            expect(
+                await screen.findByText(expectedErrorMessage)
+            ).toBeInTheDocument();
+        });
+    });
 });
 
 afterAll(() => {

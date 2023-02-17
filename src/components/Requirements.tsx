@@ -1,27 +1,33 @@
 import React from "react";
 
-import { Items, Item } from "../types";
+import { Items, Item, Requirement } from "../types";
 
 type RequirementsProps = {
     items: Items;
     selectedItem: Item;
     workers: number;
+    onError: (error: string) => void;
 };
 
-function Requirements({ items, selectedItem, workers }: RequirementsProps) {
-    const itemMap = Object.fromEntries(items.map((item) => [item.name, item]));
+function Requirements({
+    items,
+    selectedItem,
+    workers,
+    onError,
+}: RequirementsProps) {
+    const itemMap: Record<string, Item | undefined> = Object.fromEntries(
+        items.map((item) => [item.name, item])
+    );
 
     const calculateRequiredWorkers = (
-        requiredItemName: string
+        requirement: Requirement
     ): number | undefined => {
-        const requirement = selectedItem.requires.find(
-            (i) => i.name == requiredItemName
-        );
-        if (!requirement) {
+        const requiredItem = itemMap[requirement.name];
+        if (!requiredItem) {
+            onError("Unknown required item");
             return;
         }
 
-        const requiredItem = itemMap[requiredItemName];
         const createdInTime =
             (selectedItem.createTime / requiredItem.createTime) *
             requiredItem.output;
@@ -42,9 +48,7 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
                     <tr>
                         <td>{selectedItem.requires[0].name}</td>
                         <td>
-                            {calculateRequiredWorkers(
-                                selectedItem.requires[0].name
-                            )}
+                            {calculateRequiredWorkers(selectedItem.requires[0])}
                         </td>
                     </tr>
                 </tbody>
