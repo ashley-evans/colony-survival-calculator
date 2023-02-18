@@ -5,10 +5,10 @@ import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
-import { waitForRequest } from "../../helpers/utils";
+import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
-import { Item, Items } from "../../types";
-import { Units, STATIC_ITEMS_PATH } from "../../utils";
+import { Item, Items } from "../../../types";
+import { Units, STATIC_ITEMS_PATH } from "../../../utils";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";

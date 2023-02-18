@@ -1,7 +1,7 @@
 import React, { lazy, ReactElement, Suspense } from "react";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
-const Calculator = lazy(() => import("../components/Calculator"));
+const Calculator = lazy(() => import("../pages/Calculator/Calculator"));
 const MissingRoute = lazy(() => import("./MissingRoute"));
 
 type LazyLoadingWrapperProps = {

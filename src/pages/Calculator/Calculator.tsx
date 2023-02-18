@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Ajv from "ajv";
 
-import { Item, Items } from "../types";
-import ItemsSchema from "../schemas/items.json";
-import { UnitDisplayMappings, Units, UnitSecondMappings } from "../utils/units";
-import { ItemSelector } from "./ItemSelector";
-import { WorkerInput } from "./WorkerInput";
-import { OutputUnitSelector } from "./OutputUnitSelector";
-import { Requirements } from "./Requirements";
-import { ErrorBoundary } from "./ErrorBoundary";
+import { Item, Items } from "../../types";
+import ItemsSchema from "../../schemas/items.json";
+import { UnitDisplayMappings, Units, UnitSecondMappings } from "../../utils";
+import { ItemSelector } from "./components/ItemSelector";
+import { WorkerInput } from "./components/WorkerInput";
+import { OutputUnitSelector } from "./components/OutputUnitSelector";
+import { Requirements } from "./components/Requirements";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
