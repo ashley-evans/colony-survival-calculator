@@ -1,18 +1,19 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 
 type ItemSelectorProps = {
     onWorkerChange: (workers?: number) => void;
-    onError: (error?: string) => void;
 };
 
-function WorkerInput({ onWorkerChange, onError }: ItemSelectorProps) {
+function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
+    const [isInvalid, setIsInvalid] = useState<boolean>(false);
+
     const handleWorkerChange = (event: FormEvent<HTMLInputElement>) => {
         const input = parseFloat(event.currentTarget.value);
         if (isNaN(input) || input < 0) {
-            onError("Invalid input, must be a positive number");
+            setIsInvalid(true);
             onWorkerChange(undefined);
         } else {
-            onError(undefined);
+            setIsInvalid(false);
             onWorkerChange(input);
         }
     };
@@ -25,6 +26,9 @@ function WorkerInput({ onWorkerChange, onError }: ItemSelectorProps) {
                 inputMode="numeric"
                 onChange={handleWorkerChange}
             ></input>
+            {isInvalid ? (
+                <p role="alert">Invalid input, must be a positive number</p>
+            ) : null}
         </>
     );
 }

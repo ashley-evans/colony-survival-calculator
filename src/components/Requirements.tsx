@@ -6,26 +6,17 @@ type RequirementsProps = {
     items: Items;
     selectedItem: Item;
     workers: number;
-    onError: (error: string) => void;
 };
 
-function Requirements({
-    items,
-    selectedItem,
-    workers,
-    onError,
-}: RequirementsProps) {
+function Requirements({ items, selectedItem, workers }: RequirementsProps) {
     const itemMap: Record<string, Item | undefined> = Object.fromEntries(
         items.map((item) => [item.name, item])
     );
 
-    const calculateRequiredWorkers = (
-        requirement: Requirement
-    ): number | undefined => {
+    const calculateRequiredWorkers = (requirement: Requirement): number => {
         const requiredItem = itemMap[requirement.name];
         if (!requiredItem) {
-            onError("Unknown required item");
-            return;
+            throw new Error("Unknown required item");
         }
 
         const createdInTime =
@@ -45,12 +36,12 @@ function Requirements({
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>{selectedItem.requires[0].name}</td>
-                        <td>
-                            {calculateRequiredWorkers(selectedItem.requires[0])}
-                        </td>
-                    </tr>
+                    {selectedItem.requires.map((requirement) => (
+                        <tr key={requirement.name}>
+                            <td>{requirement.name}</td>
+                            <td>{calculateRequiredWorkers(requirement)}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </>

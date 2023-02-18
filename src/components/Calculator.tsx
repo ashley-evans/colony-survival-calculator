@@ -9,6 +9,7 @@ import { ItemSelector } from "./ItemSelector";
 import { WorkerInput } from "./WorkerInput";
 import { OutputUnitSelector } from "./OutputUnitSelector";
 import { Requirements } from "./Requirements";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -56,11 +57,12 @@ function Calculator() {
                         items={items}
                         onItemChange={setSelectedItem}
                     />
-                    <WorkerInput
-                        onWorkerChange={setWorkers}
-                        onError={setError}
-                    />
+                    <WorkerInput onWorkerChange={setWorkers} />
                     <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
+                </>
+            ) : null}
+            <ErrorBoundary>
+                <>
                     {workers != undefined && selectedItem && !error ? (
                         <p>
                             Optimal output:{" "}
@@ -78,19 +80,18 @@ function Calculator() {
                             {selectedItem.size.height}
                         </p>
                     ) : null}
+                    {workers != undefined &&
+                    selectedItem?.requires &&
+                    selectedItem.requires.length > 0 ? (
+                        <Requirements
+                            items={items}
+                            selectedItem={selectedItem}
+                            workers={workers}
+                        />
+                    ) : null}
                 </>
-            ) : null}
-            {workers != undefined &&
-            !error &&
-            selectedItem?.requires &&
-            selectedItem.requires.length > 0 ? (
-                <Requirements
-                    items={items}
-                    selectedItem={selectedItem}
-                    workers={workers}
-                    onError={setError}
-                />
-            ) : null}
+            </ErrorBoundary>
+
             {error ? <p role="alert">Error: {error}</p> : null}
         </>
     );

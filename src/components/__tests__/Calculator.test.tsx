@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from "vitest";
 
 import { waitForRequest } from "../../helpers/utils";
 import Calculator from "../Calculator";
@@ -41,6 +42,15 @@ const CRAFT_ABLE_ITEMS_REQS: Items = [
         createTime: 16,
         output: 1,
         requires: [{ name: "Test Item 2", amount: 3 }],
+    },
+    {
+        name: "Test Item 6",
+        createTime: 30,
+        output: 4,
+        requires: [
+            { name: "Test Item 1", amount: 9 },
+            { name: "Test Item 2", amount: 3 },
+        ],
     },
 ];
 
@@ -195,8 +205,7 @@ describe("output selector", () => {
     });
 
     describe("worker input rendering", () => {
-        const expectedErrorMessage =
-            "Error: Invalid input, must be a positive number";
+        const expectedErrorMessage = "Invalid input, must be a positive number";
 
         test("renders an input to enter the number of workers", async () => {
             render(<Calculator />);
@@ -650,7 +659,74 @@ describe("requirements rendering", () => {
         }
     );
 
+    describe("given an item with multiple item requirements", () => {
+        const selectedItem = CRAFT_ABLE_ITEMS_REQS[2];
+        const amountOfWorkers = "8";
+
+        test("renders the name of each required item in the table body", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                selectedItem.name
+            );
+            await user.type(workerInput, amountOfWorkers);
+            const requirementsTable = await screen.findByRole("table");
+
+            for (const requirement of selectedItem.requires) {
+                expect(
+                    within(requirementsTable).getByRole("cell", {
+                        name: requirement.name,
+                    })
+                );
+            }
+        });
+
+        test("renders the required amount of workers for each required item to satisfy the desired output", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />);
+            const workerInput = await screen.findByLabelText(
+                WORKERS_INPUT_LABEL,
+                {
+                    selector: "input",
+                }
+            );
+            await user.selectOptions(
+                await screen.findByRole("combobox", {
+                    name: ITEM_SELECT_LABEL,
+                }),
+                selectedItem.name
+            );
+            await user.type(workerInput, amountOfWorkers);
+            const requirementsTable = await screen.findByRole("table");
+
+            const item1Row = within(requirementsTable).getByRole("cell", {
+                name: selectedItem.requires[0].name,
+            }).parentElement as HTMLElement;
+            expect(within(item1Row).getByRole("cell", { name: "4.8" }));
+
+            const item2Row = within(requirementsTable).getByRole("cell", {
+                name: selectedItem.requires[1].name,
+            }).parentElement as HTMLElement;
+            expect(within(item2Row).getByRole("cell", { name: "1.6" }));
+        });
+    });
+
     describe("given an item with an unknown requirement", () => {
+        beforeAll(() => {
+            vi.spyOn(console, "error").mockImplementation(() => undefined);
+        });
+
         const invalidItemName = CRAFT_ABLE_ITEMS_MISSING_REQS[0].name;
         const amountOfWorkers = "5";
 
