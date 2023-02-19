@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Items, Item, Requirement } from "../types";
+import { Items, Item, Requirement } from "../../../types";
 
 type RequirementsProps = {
     items: Items;

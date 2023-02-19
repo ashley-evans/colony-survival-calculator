@@ -203,55 +203,36 @@ describe("output selector", () => {
             })
         ).toBeInTheDocument();
     });
+});
 
-    describe("worker input rendering", () => {
-        const expectedErrorMessage = "Invalid input, must be a positive number";
+describe("worker input rendering", () => {
+    const expectedErrorMessage = "Invalid input, must be a positive number";
 
-        test("renders an input to enter the number of workers", async () => {
-            render(<Calculator />);
+    test("renders an input to enter the number of workers", async () => {
+        render(<Calculator />);
 
-            expect(
-                await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-                    selector: "input",
-                })
-            );
-        });
-
-        test("does not render an error message by default", async () => {
-            render(<Calculator />);
+        expect(
             await screen.findByLabelText(WORKERS_INPUT_LABEL, {
                 selector: "input",
-            });
+            })
+        );
+    });
 
-            expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    test("does not render an error message by default", async () => {
+        render(<Calculator />);
+        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
         });
 
-        test.each([
-            ["negative", "-1"],
-            ["not a number", "test"],
-        ])(
-            "renders invalid workers message if workers is %s",
-            async (_: string, input: string) => {
-                const user = userEvent.setup();
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
 
-                render(<Calculator />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.type(workerInput, input);
-
-                expect(await screen.findByRole("alert")).toHaveTextContent(
-                    expectedErrorMessage
-                );
-            }
-        );
-
-        test("clears error message after changing input to a valid input", async () => {
-            const invalidInput = "Invalid";
-            const validInput = "1";
+    test.each([
+        ["negative", "-1"],
+        ["not a number", "test"],
+    ])(
+        "renders invalid workers message if workers is %s",
+        async (_: string, input: string) => {
             const user = userEvent.setup();
 
             render(<Calculator />);
@@ -261,13 +242,29 @@ describe("output selector", () => {
                     selector: "input",
                 }
             );
-            await user.type(workerInput, invalidInput);
-            await screen.findByRole("alert");
-            await user.clear(workerInput);
-            await user.type(workerInput, validInput);
+            await user.type(workerInput, input);
 
-            expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+            expect(await screen.findByRole("alert")).toHaveTextContent(
+                expectedErrorMessage
+            );
+        }
+    );
+
+    test("clears error message after changing input to a valid input", async () => {
+        const invalidInput = "Invalid";
+        const validInput = "1";
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
         });
+        await user.type(workerInput, invalidInput);
+        await screen.findByRole("alert");
+        await user.clear(workerInput);
+        await user.type(workerInput, validInput);
+
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 });
 
