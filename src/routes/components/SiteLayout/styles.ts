@@ -13,12 +13,7 @@ export const SiteHeader = styled.h1`
 export const SiteTheme = styled.div`
     height: 100%;
     color: ${(props) => props.theme.color.text};
-    font-family ${(props) => props.theme.typography.family}; 
-    
-    h1,
-    h2 {
-        margin: 0;
-    }
+    font-family ${(props) => props.theme.typography.family};
 `;
 
 export const ContentWrapper = styled.div`

@@ -10,6 +10,7 @@ import { WorkerInput } from "./components/WorkerInput";
 import { OutputUnitSelector } from "./components/OutputUnitSelector";
 import { Requirements } from "./components/Requirements";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { CalculatorContainer, CalculatorHeader } from "./styles";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -49,8 +50,8 @@ function Calculator() {
 
     const itemKeys = Object.keys(items);
     return (
-        <>
-            <h2>Desired output:</h2>
+        <CalculatorContainer>
+            <CalculatorHeader>Desired output:</CalculatorHeader>
             {itemKeys.length > 0 ? (
                 <>
                     <ItemSelector
@@ -93,7 +94,7 @@ function Calculator() {
             </ErrorBoundary>
 
             {error ? <p role="alert">Error: {error}</p> : null}
-        </>
+        </CalculatorContainer>
     );
 }
 
