@@ -9,6 +9,8 @@ declare module "styled-components" {
             banner: string;
             background: string;
             text: string;
+            primary: string;
+            error: string;
         };
         typography: {
             family: string;
