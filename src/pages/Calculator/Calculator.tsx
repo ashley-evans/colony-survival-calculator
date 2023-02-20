@@ -5,11 +5,11 @@ import Ajv from "ajv";
 import { Item, Items } from "../../types";
 import ItemsSchema from "../../schemas/items.json";
 import { UnitDisplayMappings, Units, UnitSecondMappings } from "../../utils";
-import { ItemSelector } from "./components/ItemSelector";
-import { WorkerInput } from "./components/WorkerInput";
-import { OutputUnitSelector } from "./components/OutputUnitSelector";
-import { Requirements } from "./components/Requirements";
-import { ErrorBoundary } from "./components/ErrorBoundary";
+import ItemSelector from "./components/ItemSelector";
+import WorkerInput from "./components/WorkerInput";
+import OutputUnitSelector from "./components/OutputUnitSelector";
+import Requirements from "./components/Requirements";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { CalculatorContainer, CalculatorHeader } from "./styles";
 
 const ajv = new Ajv();

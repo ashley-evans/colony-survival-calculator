@@ -1,6 +1,6 @@
 import React, { FormEvent } from "react";
 
-import { Item, Items } from "../../../types";
+import { Item, Items } from "../../../../types";
 
 type ItemSelectorProps = {
     items: Items;

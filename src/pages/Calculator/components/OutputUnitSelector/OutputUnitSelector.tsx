@@ -1,6 +1,6 @@
 import React, { FormEvent } from "react";
 
-import { isUnit, Units } from "../../../utils";
+import { isUnit, Units } from "../../../../utils";
 
 type ItemSelectorProps = {
     onUnitChange: (unit: Units) => void;
