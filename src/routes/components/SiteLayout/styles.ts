@@ -1,24 +1,39 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Banner = styled.div`
-    width: 100%;
-    background: ${(props) => props.theme.color.banner};
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    ${(props) => css`
+        background: ${props.theme.color.banner};
+        padding: ${props.theme.container.padding};
+
+        a:link,
+        a:visited {
+            color: ${props.theme.color.text};
+        }
+    `}
 `;
 
 export const SiteHeader = styled.h1`
     margin: 0;
-    padding: ${(props) => props.theme.container.padding};
 `;
 
 export const SiteTheme = styled.div`
     height: 100%;
-    color: ${(props) => props.theme.color.text};
-    font-family ${(props) => props.theme.typography.family};
+
+    ${(props) => css`
+        color: ${props.theme.color.text};
+        font-family ${props.theme.typography.family};
+    `}
 `;
 
 export const ContentWrapper = styled.div`
-    background: ${(props) => props.theme.color.background};
-    padding: ${(props) => props.theme.container.padding};
-
     height: 100%;
+
+    ${(props) => css`
+        background: ${props.theme.color.background};
+        padding: ${props.theme.container.padding};
+    `}
 `;

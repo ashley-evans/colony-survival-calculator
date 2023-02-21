@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
@@ -11,6 +11,9 @@ const EXPECTED_CALCULATOR_HEADER = "Desired output:";
 const EXPECTED_CALCULATOR_ITEM_LABEL = "Item:";
 const EXPECTED_CALCULATOR_WORKER_LABEL = "Workers:";
 const EXPECTED_LOADING_MESSAGE = "Loading...";
+const EXPECTED_APPLICATION_TITLE = "Colony Survival Calculator";
+const EXPECTED_REPOSITORY_URL =
+    "https://github.com/ashley-evans/colony-survival-calculator";
 const ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
 ];
@@ -37,13 +40,24 @@ describe("root rendering", () => {
     });
 
     test("renders application header", async () => {
-        const expectedHeader = "Colony Survival Calculator";
-
         renderWithRouterProvider({ router });
 
         expect(
-            await screen.findByRole("heading", { name: expectedHeader })
+            await screen.findByRole("heading", {
+                name: EXPECTED_APPLICATION_TITLE,
+            })
         ).toBeVisible();
+    });
+
+    test("renders a link to the Github repository inside banner", async () => {
+        renderWithRouterProvider({ router });
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+        const link = within(banner).getByRole("link");
+
+        expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
     });
 
     test("renders the calculator", async () => {
@@ -76,13 +90,24 @@ describe("unknown path rendering", () => {
     });
 
     test("renders application header", async () => {
-        const expectedHeader = "Colony Survival Calculator";
-
         renderWithRouterProvider({ router }, invalidPath);
 
         expect(
-            await screen.findByRole("heading", { name: expectedHeader })
+            await screen.findByRole("heading", {
+                name: EXPECTED_APPLICATION_TITLE,
+            })
         ).toBeVisible();
+    });
+
+    test("renders a link to the Github repository inside banner", async () => {
+        renderWithRouterProvider({ router }, invalidPath);
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+        const link = within(banner).getByRole("link");
+
+        expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
     });
 
     test("renders a 404 message", async () => {
