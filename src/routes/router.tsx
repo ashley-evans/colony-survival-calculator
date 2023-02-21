@@ -1,8 +1,12 @@
 import React, { lazy, ReactElement, Suspense } from "react";
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
+
+import SiteLayout from "./components/SiteLayout/SiteLayout";
 
 const Calculator = lazy(() => import("../pages/Calculator/Calculator"));
-const MissingRoute = lazy(() => import("./MissingRoute"));
+const MissingRoute = lazy(
+    () => import("./components/MissingRoute/MissingRoute")
+);
 
 type LazyLoadingWrapperProps = {
     children: ReactElement;
@@ -11,15 +15,6 @@ type LazyLoadingWrapperProps = {
 function LazyLoadingWrapper(props: LazyLoadingWrapperProps) {
     return (
         <Suspense fallback={<div>Loading...</div>}>{props.children}</Suspense>
-    );
-}
-
-function SiteLayout() {
-    return (
-        <>
-            <h1>Colony Survival Calculator</h1>
-            <Outlet />
-        </>
     );
 }
 

@@ -27,7 +27,9 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
                 onChange={handleWorkerChange}
             ></input>
             {isInvalid ? (
-                <p role="alert">Invalid input, must be a positive number</p>
+                <span role="alert">
+                    Invalid input, must be a positive number
+                </span>
             ) : null}
         </>
     );

@@ -20,7 +20,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
     render(): ReactNode {
         if (this.state.error) {
-            return <p role="alert">Error: {this.state.error}</p>;
+            return <span role="alert">Error: {this.state.error}</span>;
         }
 
         return this.props.children;

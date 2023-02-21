@@ -5,11 +5,16 @@ import Ajv from "ajv";
 import { Item, Items } from "../../types";
 import ItemsSchema from "../../schemas/items.json";
 import { UnitDisplayMappings, Units, UnitSecondMappings } from "../../utils";
-import { ItemSelector } from "./components/ItemSelector";
-import { WorkerInput } from "./components/WorkerInput";
-import { OutputUnitSelector } from "./components/OutputUnitSelector";
-import { Requirements } from "./components/Requirements";
-import { ErrorBoundary } from "./components/ErrorBoundary";
+import ItemSelector from "./components/ItemSelector";
+import WorkerInput from "./components/WorkerInput";
+import OutputUnitSelector from "./components/OutputUnitSelector";
+import Requirements from "./components/Requirements";
+import ErrorBoundary from "./components/ErrorBoundary";
+import {
+    CalculatorContainer,
+    CalculatorHeader,
+    DesiredOutputText,
+} from "./styles";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -49,8 +54,8 @@ function Calculator() {
 
     const itemKeys = Object.keys(items);
     return (
-        <>
-            <h2>Desired output:</h2>
+        <CalculatorContainer>
+            <CalculatorHeader>Desired output:</CalculatorHeader>
             {itemKeys.length > 0 ? (
                 <>
                     <ItemSelector
@@ -63,22 +68,22 @@ function Calculator() {
             ) : null}
             <ErrorBoundary>
                 <>
+                    {selectedItem?.size ? (
+                        <span>
+                            Calculations use optimal farm size:{" "}
+                            {selectedItem.size.width} x{" "}
+                            {selectedItem.size.height}
+                        </span>
+                    ) : null}
                     {workers != undefined && selectedItem && !error ? (
-                        <p>
+                        <DesiredOutputText>
                             Optimal output:{" "}
                             {calculateOutput(
                                 workers,
                                 selectedItem,
                                 selectedOutputUnit
                             )}
-                        </p>
-                    ) : null}
-                    {selectedItem?.size ? (
-                        <p>
-                            Calculations use optimal farm size:{" "}
-                            {selectedItem.size.width} x{" "}
-                            {selectedItem.size.height}
-                        </p>
+                        </DesiredOutputText>
                     ) : null}
                     {workers != undefined &&
                     selectedItem?.requires &&
@@ -91,9 +96,8 @@ function Calculator() {
                     ) : null}
                 </>
             </ErrorBoundary>
-
-            {error ? <p role="alert">Error: {error}</p> : null}
-        </>
+            {error ? <span role="alert">Error: {error}</span> : null}
+        </CalculatorContainer>
     );
 }
 

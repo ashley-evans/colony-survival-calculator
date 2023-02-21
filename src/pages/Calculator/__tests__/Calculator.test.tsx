@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -9,6 +9,7 @@ import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import { Item, Items } from "../../../types";
 import { Units, STATIC_ITEMS_PATH } from "../../../utils";
+import { renderWithThemeProvider as render } from "../../../test/utils";
 
 const ITEM_SELECT_LABEL = "Item:";
 const WORKERS_INPUT_LABEL = "Workers:";
