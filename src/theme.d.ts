@@ -10,6 +10,7 @@ declare module "styled-components" {
             background: string;
             foreground: string;
             text: string;
+            text_hover: string;
             primary: string;
             error: string;
         };

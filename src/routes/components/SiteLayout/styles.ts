@@ -5,6 +5,10 @@ export const Banner = styled.div`
     justify-content: space-between;
     align-items: center;
 
+    a {
+        transition: color 0.2s ease-in-out;
+    }
+
     ${(props) => css`
         background: ${props.theme.color.banner};
         padding: ${props.theme.container.padding};
@@ -12,6 +16,10 @@ export const Banner = styled.div`
         a:link,
         a:visited {
             color: ${props.theme.color.text};
+        }
+
+        a:hover {
+            color: ${props.theme.color.text_hover};
         }
     `}
 `;
