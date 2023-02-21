@@ -38,7 +38,7 @@ export const SiteTheme = styled.div`
 export const ContentWrapper = styled.div`
     height: 100vh;
     max-height: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     ${(props) => css`
         background: ${props.theme.color.background};
