@@ -1,7 +1,5 @@
 import React, { FormEvent, useState } from "react";
 
-import { ErrorText } from "./styles";
-
 type ItemSelectorProps = {
     onWorkerChange: (workers?: number) => void;
 };
@@ -29,9 +27,9 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
                 onChange={handleWorkerChange}
             ></input>
             {isInvalid ? (
-                <ErrorText role="alert">
+                <span role="alert">
                     Invalid input, must be a positive number
-                </ErrorText>
+                </span>
             ) : null}
         </>
     );

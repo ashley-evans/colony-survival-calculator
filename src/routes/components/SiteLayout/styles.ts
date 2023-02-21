@@ -35,5 +35,9 @@ export const ContentWrapper = styled.div`
     ${(props) => css`
         background: ${props.theme.color.background};
         padding: ${props.theme.container.padding};
+
+        span[role="alert"] {
+            color: ${props.theme.color.error};
+        }
     `}
 `;

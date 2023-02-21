@@ -96,8 +96,7 @@ function Calculator() {
                     ) : null}
                 </>
             </ErrorBoundary>
-
-            {error ? <p role="alert">Error: {error}</p> : null}
+            {error ? <span role="alert">Error: {error}</span> : null}
         </CalculatorContainer>
     );
 }
