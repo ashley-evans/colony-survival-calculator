@@ -36,8 +36,7 @@ export const SiteTheme = styled.div`
 `;
 
 export const ContentWrapper = styled.div`
-    height: 100vh;
-    max-height: 100%;
+    min-height: 100vh;
     overflow-y: hidden;
 
     ${(props) => css`
