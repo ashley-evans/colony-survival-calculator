@@ -15,6 +15,7 @@ const darkTheme: DefaultTheme = {
     color: {
         banner: "#22223B",
         background: "#4A4E69",
+        foreground: "#787695",
         text: "white",
         primary: "#1EB980",
         error: "#FF6859",

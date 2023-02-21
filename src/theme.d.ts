@@ -8,6 +8,7 @@ declare module "styled-components" {
         color: {
             banner: string;
             background: string;
+            foreground: string;
             text: string;
             primary: string;
             error: string;

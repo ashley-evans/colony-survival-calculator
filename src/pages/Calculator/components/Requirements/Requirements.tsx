@@ -1,6 +1,13 @@
 import React from "react";
 
 import { Items, Item, Requirement } from "../../../../types";
+import {
+    RequirementsTable,
+    TextColumnHeader,
+    TextColumnCell,
+    NumberColumnHeader,
+    NumberColumnCell,
+} from "./styles";
 
 type RequirementsProps = {
     items: Items;
@@ -28,22 +35,24 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
     return (
         <>
             <h2>Requirements:</h2>
-            <table>
+            <RequirementsTable>
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Workers</th>
+                        <TextColumnHeader>Item</TextColumnHeader>
+                        <NumberColumnHeader>Workers</NumberColumnHeader>
                     </tr>
                 </thead>
                 <tbody>
                     {selectedItem.requires.map((requirement) => (
                         <tr key={requirement.name}>
-                            <td>{requirement.name}</td>
-                            <td>{calculateRequiredWorkers(requirement)}</td>
+                            <TextColumnCell>{requirement.name}</TextColumnCell>
+                            <NumberColumnCell>
+                                {calculateRequiredWorkers(requirement)}
+                            </NumberColumnCell>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </RequirementsTable>
         </>
     );
 }
