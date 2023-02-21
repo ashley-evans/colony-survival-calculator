@@ -10,7 +10,11 @@ import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
 import Requirements from "./components/Requirements";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { CalculatorContainer, CalculatorHeader } from "./styles";
+import {
+    CalculatorContainer,
+    CalculatorHeader,
+    DesiredOutputText,
+} from "./styles";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -64,22 +68,22 @@ function Calculator() {
             ) : null}
             <ErrorBoundary>
                 <>
+                    {selectedItem?.size ? (
+                        <span>
+                            Calculations use optimal farm size:{" "}
+                            {selectedItem.size.width} x{" "}
+                            {selectedItem.size.height}
+                        </span>
+                    ) : null}
                     {workers != undefined && selectedItem && !error ? (
-                        <p>
+                        <DesiredOutputText>
                             Optimal output:{" "}
                             {calculateOutput(
                                 workers,
                                 selectedItem,
                                 selectedOutputUnit
                             )}
-                        </p>
-                    ) : null}
-                    {selectedItem?.size ? (
-                        <p>
-                            Calculations use optimal farm size:{" "}
-                            {selectedItem.size.width} x{" "}
-                            {selectedItem.size.height}
-                        </p>
+                        </DesiredOutputText>
                     ) : null}
                     {workers != undefined &&
                     selectedItem?.requires &&
