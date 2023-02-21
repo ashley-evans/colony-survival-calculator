@@ -21,8 +21,6 @@ export const SiteHeader = styled.h1`
 `;
 
 export const SiteTheme = styled.div`
-    height: 100%;
-
     ${(props) => css`
         color: ${props.theme.color.text};
         font-family ${props.theme.typography.family};
@@ -30,7 +28,9 @@ export const SiteTheme = styled.div`
 `;
 
 export const ContentWrapper = styled.div`
-    height: 100%;
+    height: 100vh;
+    max-height: 100%;
+    overflow-y: auto;
 
     ${(props) => css`
         background: ${props.theme.color.background};
