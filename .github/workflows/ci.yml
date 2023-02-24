@@ -42,7 +42,7 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
-            - uses: aws-actions/configure-aws-credentials@v1-node16
+            - uses: aws-actions/configure-aws-credentials@567d4149d67f15f52b09796bea6573fc32952783
               with:
                   aws-region: eu-west-2
                   role-to-assume: ${{ secrets.UI_DEPLOY_ROLE_ARN }}
@@ -88,7 +88,7 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
-            - uses: aws-actions/configure-aws-credentials@v1-node16
+            - uses: aws-actions/configure-aws-credentials@567d4149d67f15f52b09796bea6573fc32952783
               with:
                   aws-region: eu-west-2
                   role-to-assume: ${{ secrets.UI_DEPLOY_ROLE_ARN }}
@@ -110,7 +110,7 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
-            - uses: aws-actions/configure-aws-credentials@v1-node16
+            - uses: aws-actions/configure-aws-credentials@567d4149d67f15f52b09796bea6573fc32952783
               with:
                   aws-region: eu-west-2
                   role-to-assume: ${{ secrets.UI_DEPLOY_ROLE_ARN }}
