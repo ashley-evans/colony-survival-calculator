@@ -14,6 +14,9 @@ const EXPECTED_LOADING_MESSAGE = "Loading...";
 const EXPECTED_APPLICATION_TITLE = "Colony Survival Calculator";
 const EXPECTED_REPOSITORY_URL =
     "https://github.com/ashley-evans/colony-survival-calculator";
+const EXPECTED_DARK_THEME_BUTTON_LABEL = "Change to dark theme";
+const EXPECTED_LIGHT_THEME_BUTTON_LABEL = "Change to light theme";
+
 const ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
 ];
@@ -58,6 +61,45 @@ describe("root rendering", () => {
         const link = within(banner).getByRole("link");
 
         expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
+    });
+
+    test("renders a button to change the theme inside the banner", async () => {
+        renderWithRouterProvider({ router });
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+
+        expect(
+            within(banner).getByRole("button", {
+                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
+    });
+
+    test("clicking the theme button toggles the theme", async () => {
+        const { user } = renderWithRouterProvider({ router });
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+        const themeButton = within(banner).getByRole("button", {
+            name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+        });
+        user.click(themeButton);
+
+        expect(
+            await within(banner).findByRole("button", {
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
+
+        user.click(themeButton);
+        expect(
+            await within(banner).findByRole("button", {
+                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
     });
 
     test("renders the calculator", async () => {
@@ -108,6 +150,20 @@ describe("unknown path rendering", () => {
         const link = within(banner).getByRole("link");
 
         expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
+    });
+
+    test("renders a button to change the theme inside the banner", async () => {
+        renderWithRouterProvider({ router }, invalidPath);
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+
+        expect(
+            within(banner).getByRole("button", {
+                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
     });
 
     test("renders a 404 message", async () => {

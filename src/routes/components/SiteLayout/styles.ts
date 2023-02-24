@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 
 export const Banner = styled.div`
@@ -5,22 +6,9 @@ export const Banner = styled.div`
     justify-content: space-between;
     align-items: center;
 
-    a {
-        transition: color 0.2s ease-in-out;
-    }
-
     ${(props) => css`
         background: ${props.theme.color.surface_variant.main};
         padding: ${props.theme.container.padding};
-
-        a:link,
-        a:visited {
-            color: ${props.theme.color.surface.on_main};
-        }
-
-        a:hover {
-            color: ${props.theme.color.surface_variant.on_main};
-        }
     `}
 `;
 
@@ -47,4 +35,31 @@ export const ContentWrapper = styled.div`
             color: ${props.theme.color.error.main};
         }
     `}
+`;
+
+export const ThemeButton = styled(FontAwesomeIcon)`
+    cursor: pointer;
+`;
+
+export const Icons = styled.div`
+    a,
+    *[role="button"] {
+        transition: color 0.2s ease-in-out;
+    }
+
+    ${(props) => css`
+        a:link,
+        a:visited {
+            color: ${props.theme.color.surface.on_main};
+        }
+
+        a:hover,
+        *[role="button"]:hover {
+            color: ${props.theme.color.surface_variant.on_main};
+        }
+    `}
+
+    *:not(:last-child) {
+        margin-right: 1rem;
+    }
 `;
