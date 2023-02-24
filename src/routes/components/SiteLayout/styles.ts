@@ -42,6 +42,8 @@ export const ThemeButton = styled(FontAwesomeIcon)`
 `;
 
 export const Icons = styled.div`
+    display: flex;
+
     a,
     *[role="button"] {
         transition: color 0.2s ease-in-out;
