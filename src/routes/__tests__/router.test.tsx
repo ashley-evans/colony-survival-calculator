@@ -86,7 +86,7 @@ describe("root rendering", () => {
 
         expect(
             within(banner).getByRole("button", {
-                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
             })
         ).toBeVisible();
     });
@@ -98,20 +98,20 @@ describe("root rendering", () => {
         });
         const banner = header.parentElement as HTMLElement;
         const themeButton = within(banner).getByRole("button", {
-            name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+            name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
         });
         user.click(themeButton);
 
         expect(
             await within(banner).findByRole("button", {
-                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
             })
         ).toBeVisible();
 
         user.click(themeButton);
         expect(
             await within(banner).findByRole("button", {
-                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
             })
         ).toBeVisible();
     });
@@ -175,7 +175,7 @@ describe("unknown path rendering", () => {
 
         expect(
             within(banner).getByRole("button", {
-                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
             })
         ).toBeVisible();
     });
@@ -237,7 +237,7 @@ describe("theme preference handling", () => {
             const banner = header.parentElement as HTMLElement;
 
             expect(
-                within(banner).queryByRole("button", {
+                await within(banner).findByRole("button", {
                     name: expectedLabel,
                 })
             ).toBeVisible();

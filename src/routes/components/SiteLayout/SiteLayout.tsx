@@ -19,7 +19,7 @@ const DARK_THEME_MEDIA_MATCH = "(prefers-color-scheme: dark)";
 const LIGHT_THEME_MEDIA_MATCH = "(prefers-color-scheme: light)";
 
 function SiteLayout() {
-    const [isDarkTheme, setDarkTheme] = useState<boolean>(false);
+    const [isDarkTheme, setDarkTheme] = useState<boolean>(true);
 
     useEffect(() => {
         function handleColourSchemePreference(
@@ -35,7 +35,7 @@ function SiteLayout() {
             LIGHT_THEME_MEDIA_MATCH
         );
 
-        handleColourSchemePreference(darkPreferenceMatcher);
+        handleColourSchemePreference(lightPreferenceMatcher);
 
         darkPreferenceMatcher.addEventListener(
             "change",
