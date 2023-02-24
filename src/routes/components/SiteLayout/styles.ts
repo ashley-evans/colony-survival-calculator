@@ -10,16 +10,16 @@ export const Banner = styled.div`
     }
 
     ${(props) => css`
-        background: ${props.theme.color.banner};
+        background: ${props.theme.color.surface_variant.main};
         padding: ${props.theme.container.padding};
 
         a:link,
         a:visited {
-            color: ${props.theme.color.text};
+            color: ${props.theme.color.surface.on_main};
         }
 
         a:hover {
-            color: ${props.theme.color.text_hover};
+            color: ${props.theme.color.surface_variant.on_main};
         }
     `}
 `;
@@ -30,7 +30,7 @@ export const SiteHeader = styled.h1`
 
 export const SiteTheme = styled.div`
     ${(props) => css`
-        color: ${props.theme.color.text};
+        color: ${props.theme.color.background.on_main};
         font-family ${props.theme.typography.family};
     `}
 `;
@@ -40,11 +40,11 @@ export const ContentWrapper = styled.div`
     overflow-y: hidden;
 
     ${(props) => css`
-        background: ${props.theme.color.background};
+        background: ${props.theme.color.background.main};
         padding: ${props.theme.container.padding};
 
         span[role="alert"] {
-            color: ${props.theme.color.error};
+            color: ${props.theme.color.error.main};
         }
     `}
 `;

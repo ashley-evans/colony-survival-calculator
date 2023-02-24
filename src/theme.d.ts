@@ -1,18 +1,31 @@
 import "styled-components";
 
+type KeyColor = {
+    main: string;
+    on_main: string;
+    container: string;
+    on_container: string;
+};
+
+type SurfaceTone = {
+    main: string;
+    on_main: string;
+};
+
 declare module "styled-components" {
     export interface DefaultTheme {
         container: {
             padding: string;
         };
         color: {
-            banner: string;
-            background: string;
-            foreground: string;
-            text: string;
-            text_hover: string;
-            primary: string;
-            error: string;
+            primary: KeyColor;
+            secondary: KeyColor;
+            tertiary: KeyColor;
+            error: KeyColor;
+            background: SurfaceTone;
+            surface: SurfaceTone;
+            surface_variant: SurfaceTone;
+            outline: string;
         };
         typography: {
             family: string;
