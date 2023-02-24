@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,8 +15,48 @@ import {
     ThemeButton,
 } from "./styles";
 
+const DARK_THEME_MEDIA_MATCH = "(prefers-color-scheme: dark)";
+const LIGHT_THEME_MEDIA_MATCH = "(prefers-color-scheme: light)";
+
 function SiteLayout() {
     const [isDarkTheme, setDarkTheme] = useState<boolean>(false);
+
+    useEffect(() => {
+        function handleColourSchemePreference(
+            event: Pick<MediaQueryListEvent, "matches" | "media">
+        ) {
+            if (event.matches) {
+                setDarkTheme(event.media === DARK_THEME_MEDIA_MATCH);
+            }
+        }
+
+        const darkPreferenceMatcher = window.matchMedia(DARK_THEME_MEDIA_MATCH);
+        const lightPreferenceMatcher = window.matchMedia(
+            LIGHT_THEME_MEDIA_MATCH
+        );
+
+        handleColourSchemePreference(darkPreferenceMatcher);
+
+        darkPreferenceMatcher.addEventListener(
+            "change",
+            handleColourSchemePreference
+        );
+        lightPreferenceMatcher.addEventListener(
+            "change",
+            handleColourSchemePreference
+        );
+
+        return () => {
+            darkPreferenceMatcher.removeEventListener(
+                "change",
+                handleColourSchemePreference
+            );
+            lightPreferenceMatcher.removeEventListener(
+                "change",
+                handleColourSchemePreference
+            );
+        };
+    }, []);
 
     return (
         <ThemeProvider theme={isDarkTheme ? darkTheme : lightTheme}>

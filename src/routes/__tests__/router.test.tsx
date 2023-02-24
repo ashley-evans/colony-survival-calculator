@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from "vitest";
 
 import router from "../router";
 import { renderWithRouterProvider } from "../../test/utils";
@@ -27,12 +28,25 @@ const server = setupServer(
     })
 );
 
+const mockMatchesMedia = vi.fn();
+
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => ({
+        matches: query === mockMatchesMedia(),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+    })),
+});
+
 beforeAll(() => {
     server.listen();
 });
 
 beforeEach(() => {
     server.resetHandlers();
+    mockMatchesMedia.mockReturnValue("");
 });
 
 describe("root rendering", () => {
@@ -203,4 +217,30 @@ describe("unknown path rendering", () => {
             })
         );
     });
+});
+
+describe("theme preference handling", () => {
+    test.each([
+        ["dark", EXPECTED_LIGHT_THEME_BUTTON_LABEL],
+        ["light", EXPECTED_DARK_THEME_BUTTON_LABEL],
+    ])(
+        `renders in %s theme given preference`,
+        async (theme: string, expectedLabel: string) => {
+            mockMatchesMedia.mockReturnValue(
+                `(prefers-color-scheme: ${theme})`
+            );
+
+            renderWithRouterProvider({ router });
+            const header = await screen.findByRole("heading", {
+                name: EXPECTED_APPLICATION_TITLE,
+            });
+            const banner = header.parentElement as HTMLElement;
+
+            expect(
+                within(banner).queryByRole("button", {
+                    name: expectedLabel,
+                })
+            ).toBeVisible();
+        }
+    );
 });
