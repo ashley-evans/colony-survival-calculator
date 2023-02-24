@@ -10,6 +10,49 @@ const common: Pick<DefaultTheme, "container" | "typography"> = {
     },
 };
 
+const lightTheme: DefaultTheme = {
+    ...common,
+    color: {
+        primary: {
+            main: "#00677f",
+            on_main: "#ffffff",
+            container: "#b6ebff",
+            on_container: "#001f28",
+        },
+        secondary: {
+            main: "#4c626a",
+            on_main: "#ffffff",
+            container: "#cfe6f0",
+            on_container: "#071e26",
+        },
+        tertiary: {
+            main: "#5a5c7e",
+            on_main: "#ffffff",
+            container: "#e0e0ff",
+            on_container: "#161937",
+        },
+        error: {
+            main: "#ba1a1a",
+            on_main: "#ffffff",
+            container: "#ffdad6",
+            on_container: "#410002",
+        },
+        background: {
+            main: "#fbfcfe",
+            on_main: "#191c1d",
+        },
+        surface: {
+            main: "#fbfcfe",
+            on_main: "#191c1d",
+        },
+        surface_variant: {
+            main: "#dbe4e8",
+            on_main: "#40484c",
+        },
+        outline: "#70787c",
+    },
+};
+
 const darkTheme: DefaultTheme = {
     ...common,
     color: {
@@ -53,4 +96,4 @@ const darkTheme: DefaultTheme = {
     },
 };
 
-export { darkTheme };
+export { darkTheme, lightTheme };
