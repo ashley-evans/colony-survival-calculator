@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from "vitest";
 
 import router from "../router";
 import { renderWithRouterProvider } from "../../test/utils";
@@ -14,6 +15,9 @@ const EXPECTED_LOADING_MESSAGE = "Loading...";
 const EXPECTED_APPLICATION_TITLE = "Colony Survival Calculator";
 const EXPECTED_REPOSITORY_URL =
     "https://github.com/ashley-evans/colony-survival-calculator";
+const EXPECTED_DARK_THEME_BUTTON_LABEL = "Change to dark theme";
+const EXPECTED_LIGHT_THEME_BUTTON_LABEL = "Change to light theme";
+
 const ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
 ];
@@ -24,12 +28,25 @@ const server = setupServer(
     })
 );
 
+const mockMatchesMedia = vi.fn();
+
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => ({
+        matches: query === mockMatchesMedia(),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+    })),
+});
+
 beforeAll(() => {
     server.listen();
 });
 
 beforeEach(() => {
     server.resetHandlers();
+    mockMatchesMedia.mockReturnValue("");
 });
 
 describe("root rendering", () => {
@@ -58,6 +75,45 @@ describe("root rendering", () => {
         const link = within(banner).getByRole("link");
 
         expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
+    });
+
+    test("renders a button to change the theme inside the banner", async () => {
+        renderWithRouterProvider({ router });
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+
+        expect(
+            within(banner).getByRole("button", {
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
+    });
+
+    test("clicking the theme button toggles the theme", async () => {
+        const { user } = renderWithRouterProvider({ router });
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+        const themeButton = within(banner).getByRole("button", {
+            name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+        });
+        user.click(themeButton);
+
+        expect(
+            await within(banner).findByRole("button", {
+                name: EXPECTED_DARK_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
+
+        user.click(themeButton);
+        expect(
+            await within(banner).findByRole("button", {
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
     });
 
     test("renders the calculator", async () => {
@@ -110,6 +166,20 @@ describe("unknown path rendering", () => {
         expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
     });
 
+    test("renders a button to change the theme inside the banner", async () => {
+        renderWithRouterProvider({ router }, invalidPath);
+        const header = await screen.findByRole("heading", {
+            name: EXPECTED_APPLICATION_TITLE,
+        });
+        const banner = header.parentElement as HTMLElement;
+
+        expect(
+            within(banner).getByRole("button", {
+                name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
+            })
+        ).toBeVisible();
+    });
+
     test("renders a 404 message", async () => {
         const expectedMessage = "Oh no! You have gotten lost!";
 
@@ -147,4 +217,30 @@ describe("unknown path rendering", () => {
             })
         );
     });
+});
+
+describe("theme preference handling", () => {
+    test.each([
+        ["dark", EXPECTED_LIGHT_THEME_BUTTON_LABEL],
+        ["light", EXPECTED_DARK_THEME_BUTTON_LABEL],
+    ])(
+        `renders in %s theme given preference`,
+        async (theme: string, expectedLabel: string) => {
+            mockMatchesMedia.mockReturnValue(
+                `(prefers-color-scheme: ${theme})`
+            );
+
+            renderWithRouterProvider({ router });
+            const header = await screen.findByRole("heading", {
+                name: EXPECTED_APPLICATION_TITLE,
+            });
+            const banner = header.parentElement as HTMLElement;
+
+            expect(
+                await within(banner).findByRole("button", {
+                    name: expectedLabel,
+                })
+            ).toBeVisible();
+        }
+    );
 });
