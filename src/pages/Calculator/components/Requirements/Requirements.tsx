@@ -29,7 +29,7 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
         const createdInTime =
             (selectedItem.createTime / requiredItem.createTime) *
             requiredItem.output;
-        return (requirement.amount / createdInTime) * workers;
+        return Math.ceil((requirement.amount / createdInTime) * workers);
     };
 
     return (

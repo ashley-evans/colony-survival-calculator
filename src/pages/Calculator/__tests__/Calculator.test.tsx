@@ -613,8 +613,8 @@ describe("requirements rendering", () => {
     });
 
     describe.each([
-        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "6.25"],
-        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "1.875"],
+        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "7"],
+        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "2"],
     ])(
         "given an item with a single item requirement",
         (
@@ -732,12 +732,12 @@ describe("requirements rendering", () => {
             const item1Row = within(requirementsTable).getByRole("cell", {
                 name: selectedItem.requires[0].name,
             }).parentElement as HTMLElement;
-            expect(within(item1Row).getByRole("cell", { name: "4.8" }));
+            expect(within(item1Row).getByRole("cell", { name: "5" }));
 
             const item2Row = within(requirementsTable).getByRole("cell", {
                 name: selectedItem.requires[1].name,
             }).parentElement as HTMLElement;
-            expect(within(item2Row).getByRole("cell", { name: "1.6" }));
+            expect(within(item2Row).getByRole("cell", { name: "2" }));
         });
     });
 
