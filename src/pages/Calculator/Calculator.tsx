@@ -15,6 +15,7 @@ import {
     CalculatorHeader,
     DesiredOutputText,
 } from "./styles";
+import roundOutput from "./utils/roundOutput";
 
 const ajv = new Ajv();
 const validateItems = ajv.compile<Items>(ItemsSchema);
@@ -47,9 +48,8 @@ function Calculator() {
         const outputPerWorker =
             (UnitSecondMappings[outputUnit] / selectedItem.createTime) *
             selectedItem.output;
-        return `${workers * outputPerWorker} per ${
-            UnitDisplayMappings[outputUnit]
-        }`;
+        const total = workers * outputPerWorker;
+        return `${roundOutput(total)} per ${UnitDisplayMappings[outputUnit]}`;
     };
 
     const itemKeys = Object.keys(items);

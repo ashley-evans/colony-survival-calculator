@@ -29,6 +29,7 @@ const VALID_FARM_ABLES: Required<Item>[] = [
 const CRAFT_ABLE_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
     { name: "Test Item 2", createTime: 4, output: 2, requires: [] },
+    { name: "Test Item 7", createTime: 8.5, output: 1, requires: [] },
 ];
 
 const CRAFT_ABLE_ITEMS_REQS: Items = [
@@ -375,6 +376,26 @@ describe("optimal output rendering", () => {
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
+
+    test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
+        const input = "4";
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ≈28.2 per minute`;
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS[2].name
+        );
+        await user.type(workerInput, input);
+
+        expect(await screen.findByText(expectedOutput)).toBeVisible();
+    });
 });
 
 describe("optimal farm size note rendering", () => {
@@ -592,8 +613,8 @@ describe("requirements rendering", () => {
     });
 
     describe.each([
-        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "6.25"],
-        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "1.875"],
+        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "7"],
+        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "2"],
     ])(
         "given an item with a single item requirement",
         (
@@ -711,12 +732,12 @@ describe("requirements rendering", () => {
             const item1Row = within(requirementsTable).getByRole("cell", {
                 name: selectedItem.requires[0].name,
             }).parentElement as HTMLElement;
-            expect(within(item1Row).getByRole("cell", { name: "4.8" }));
+            expect(within(item1Row).getByRole("cell", { name: "5" }));
 
             const item2Row = within(requirementsTable).getByRole("cell", {
                 name: selectedItem.requires[1].name,
             }).parentElement as HTMLElement;
-            expect(within(item2Row).getByRole("cell", { name: "1.6" }));
+            expect(within(item2Row).getByRole("cell", { name: "2" }));
         });
     });
 
