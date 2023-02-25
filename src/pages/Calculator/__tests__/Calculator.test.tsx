@@ -29,6 +29,7 @@ const VALID_FARM_ABLES: Required<Item>[] = [
 const CRAFT_ABLE_ITEMS: Items = [
     { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
     { name: "Test Item 2", createTime: 4, output: 2, requires: [] },
+    { name: "Test Item 7", createTime: 8.5, output: 1, requires: [] },
 ];
 
 const CRAFT_ABLE_ITEMS_REQS: Items = [
@@ -372,6 +373,26 @@ describe("optimal output rendering", () => {
             farmable.name
         );
         await user.type(workerInput, workers);
+
+        expect(await screen.findByText(expectedOutput)).toBeVisible();
+    });
+
+    test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
+        const input = "4";
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ≈28.2 per minute`;
+        const user = userEvent.setup();
+
+        render(<Calculator />);
+        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            selector: "input",
+        });
+        await user.selectOptions(
+            await screen.findByRole("combobox", {
+                name: ITEM_SELECT_LABEL,
+            }),
+            CRAFT_ABLE_ITEMS[2].name
+        );
+        await user.type(workerInput, input);
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
