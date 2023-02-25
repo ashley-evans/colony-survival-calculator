@@ -25,5 +25,103 @@
             "width": 10,
             "height": 10
         }
+    },
+    {
+        "name": "Log",
+        "createTime": 720,
+        "output": 44,
+        "requires": [],
+        "size": {
+            "width": 3,
+            "height": 33
+        }
+    },
+    {
+        "name": "Planks",
+        "createTime": 40,
+        "output": 4,
+        "requires": [
+            {
+                "name": "Log",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "name": "Clay",
+        "createTime": 20,
+        "output": 1,
+        "requires": []
+    },
+    {
+        "name": "Empty Pot",
+        "createTime": 160,
+        "output": 1,
+        "requires": [
+            {
+                "name": "Clay",
+                "amount": 3
+            },
+            {
+                "name": "Planks",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "name": "Pot of Flour",
+        "createTime": 12.5,
+        "output": 1,
+        "requires": [
+            {
+                "name": "Wheat",
+                "amount": 3
+            },
+            {
+                "name": "Empty Pot",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "name": "Firewood",
+        "createTime": 40,
+        "output": 3,
+        "requires": [
+            {
+                "name": "Planks",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "name": "Pot of Water",
+        "createTime": 6,
+        "output": 1,
+        "requires": [
+            {
+                "name": "Empty Pot",
+                "amount": 1
+            }
+        ]
+    },
+    {
+        "name": "Bread",
+        "createTime": 20,
+        "output": 1,
+        "requires": [
+            {
+                "name": "Pot of Flour",
+                "amount": 1
+            },
+            {
+                "name": "Firewood",
+                "amount": 1
+            },
+            {
+                "name": "Pot of Water",
+                "amount": 1
+            }
+        ]
     }
 ]
