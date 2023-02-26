@@ -29,7 +29,7 @@ jobs:
                   npm run ci
             - name: Run formatters
               run: |
-                  lerna run --since=origin/master format:check
+                  lerna run format:check --since=origin/master
     lint:
         runs-on: ubuntu-latest
         steps:
@@ -50,7 +50,7 @@ jobs:
                   npm run ci
             - name: Run linters
               run: |
-                  lerna run --since=origin/master lint
+                  lerna run lint --since=origin/master
     validate:
         runs-on: ubuntu-latest
         permissions:
@@ -81,7 +81,7 @@ jobs:
                   npm run ci
             - name: Run validators
               run: |
-                  lerna run --since=origin/master validate
+                  lerna run validate --since=origin/master
     build:
         runs-on: ubuntu-latest
         steps:
@@ -102,7 +102,7 @@ jobs:
                   npm run ci
             - name: Build Project
               run: |
-                  lerna run --since=origin/master build
+                  lerna run build --since=origin/master
     test:
         runs-on: ubuntu-latest
         steps:
@@ -123,7 +123,7 @@ jobs:
                   npm run ci
             - name: Run Unit Tests
               run: |
-                  lerna run --since=origin/master test
+                  lerna run test --since=origin/master
     deploy-dryrun:
         runs-on: ubuntu-latest
         permissions:
