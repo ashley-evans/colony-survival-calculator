@@ -3,7 +3,9 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "postinstall": "npx graphql-codegen --config ./codegen.ts"
+        "postinstall": "npx graphql-codegen --config ./codegen.ts",
+        "format:check": "npx prettier --check .",
+        "format:write": "npx prettier --write ."
     },
     "devDependencies": {
         "@graphql-codegen/cli": "^3.2.1",

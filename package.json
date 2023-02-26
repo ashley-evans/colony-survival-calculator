@@ -7,8 +7,8 @@
         "ci": "npx lerna bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
-        "format:check": "npx prettier --check .",
-        "format:write": "npx prettier --write .",
+        "format:check": "npx prettier --check . '!(api|ui)/**/*'",
+        "format:write": "npx prettier --write . '!(api|ui)/**/*'",
         "prepare": "husky install"
     },
     "devDependencies": {
