@@ -1,0 +1,15 @@
+type ItemInput {
+    name: String!
+}
+
+type Item {
+    id: ID!
+}
+
+type Mutation {
+    addItem(input: ItemInput!): Item!
+}
+
+schema {
+    mutation: Mutation
+}

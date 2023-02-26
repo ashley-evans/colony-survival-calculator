@@ -2,7 +2,13 @@
     "name": "@colony-survival-calculator/api",
     "private": true,
     "version": "0.0.0",
+    "scripts": {
+        "postinstall": "npx graphql-codegen --config ./codegen.ts"
+    },
     "devDependencies": {
-        "@tsconfig/node18-strictest": "^1.0.0"
+        "@graphql-codegen/cli": "^3.2.1",
+        "@graphql-codegen/typescript": "^3.0.1",
+        "@tsconfig/node18-strictest": "^1.0.0",
+        "graphql": "^16.6.0"
     }
 }
