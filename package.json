@@ -1,20 +1,22 @@
 {
-  "name": "@colony-survival-calculator/root",
-  "private": true,
-  "version": "0.0.0",
-  "workspaces": [
-    ".",
-    "ui"
-  ],
-  "scripts": {
-    "lint": "npmPkgJsonLint .",
-    "i": "lerna bootstrap --no-ci",
-    "ci": "lerna bootstrap --ci",
-    "prepare": "husky install"
-  },
-  "devDependencies": {
-    "husky": "^8.0.3",
-    "lerna": "^5.5.2",
-    "npm-package-json-lint": "^6.4.0"
-  }
+    "name": "@colony-survival-calculator/root",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "i": "lerna bootstrap --no-ci",
+        "ci": "lerna bootstrap --ci",
+        "clean": "rm -rf `find . -type d -name node_modules`",
+        "lint": "npmPkgJsonLint .",
+        "prepare": "husky install"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.53.0",
+        "@typescript-eslint/parser": "^5.53.0",
+        "eslint": "^8.35.0",
+        "eslint-config-prettier": "^8.6.0",
+        "husky": "^8.0.3",
+        "lerna": "^5.5.2",
+        "npm-package-json-lint": "^6.4.0",
+        "prettier": "^2.8.4"
+    }
 }
