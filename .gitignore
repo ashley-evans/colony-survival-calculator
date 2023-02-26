@@ -15,3 +15,8 @@ dist
 **/.terraform/*
 *.tfstate
 *.tfstate.*
+
+# Lerna
+
+lerna-debug.log
+*.lerna_backup
