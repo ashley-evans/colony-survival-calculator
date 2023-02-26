@@ -16,6 +16,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -29,6 +35,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -52,6 +64,12 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -65,6 +83,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -78,6 +102,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -101,6 +131,12 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
@@ -127,6 +163,12 @@ jobs:
               with:
                   terraform_version: 1.3.7
                   terraform_wrapper: false
+            - uses: actions/cache@v3
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
                   npm run ci
