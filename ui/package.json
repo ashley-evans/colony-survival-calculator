@@ -7,6 +7,8 @@
         "dev": "vite",
         "dev:open": "vite --open",
         "build": "tsc && vite build",
+        "deploy": "./scripts/deploy.sh",
+        "deploy:plan": "./scripts/deploy.sh -d",
         "preview": "vite preview",
         "validate": "./scripts/validate-json.sh && ./scripts/validate-terraform.sh",
         "format:check": "npx prettier --check . && terraform fmt -recursive -check -diff ./infra/",

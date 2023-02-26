@@ -16,9 +16,12 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Install Dependencies
+              run: |
+                  npm run ci
             - name: Run formatters
               run: |
-                  npm run format:check
+                  lerna run format:check
     lint:
         runs-on: ubuntu-latest
         steps:
@@ -28,10 +31,10 @@ jobs:
                   node-version: "18.12.1"
             - name: Install Dependencies
               run: |
-                  npm ci
+                  npm run ci
             - name: Run linters
               run: |
-                  npm run lint
+                  lerna run lint
     validate:
         runs-on: ubuntu-latest
         permissions:
@@ -49,9 +52,12 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - name: Install Dependencies
+              run: |
+                  npm run ci
             - name: Run validators
               run: |
-                  npm run validate
+                  lerna run validate
     build:
         runs-on: ubuntu-latest
         steps:
@@ -61,10 +67,10 @@ jobs:
                   node-version: "18.12.1"
             - name: Install Dependencies
               run: |
-                  npm ci
+                  npm run ci
             - name: Build Project
               run: |
-                  npm run build
+                  lerna run build
     test:
         runs-on: ubuntu-latest
         steps:
@@ -74,10 +80,10 @@ jobs:
                   node-version: "18.12.1"
             - name: Install Dependencies
               run: |
-                  npm ci
+                  npm run ci
             - name: Run Unit Tests
               run: |
-                  npm run test
+                  lerna run test
     deploy-dryrun:
         runs-on: ubuntu-latest
         permissions:
@@ -95,9 +101,12 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - name: Install Dependencies
+              run: |
+                  npm run ci
             - name: Run dry run deployment
               run: |
-                  ./scripts/deploy.sh -e prod -d
+                  lerna run deploy:plan -- -e prod
     deploy:
         runs-on: ubuntu-latest
         needs: [format, lint, validate, build, test, deploy-dryrun]
@@ -120,7 +129,7 @@ jobs:
                   terraform_wrapper: false
             - name: Install Dependencies
               run: |
-                  npm ci
+                  npm run ci
             - name: Run deployment
               run: |
-                  ./scripts/deploy.sh -e prod
+                  lerna run deploy -- -e prod

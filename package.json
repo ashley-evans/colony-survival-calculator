@@ -3,8 +3,8 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "i": "lerna bootstrap --no-ci",
-        "ci": "lerna bootstrap --ci",
+        "i": "npx lerna bootstrap --no-ci",
+        "ci": "npx lerna bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
         "prepare": "husky install"
