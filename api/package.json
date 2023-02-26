@@ -1,0 +1,8 @@
+{
+    "name": "@colony-survival-calculator/api",
+    "private": true,
+    "version": "0.0.0",
+    "devDependencies": {
+        "@tsconfig/node18-strictest": "^1.0.0"
+    }
+}
