@@ -5,3 +5,8 @@ updates:
       schedule:
           interval: weekly
       versioning-strategy: increase
+    - directory: /ui
+      package-ecosystem: npm
+      schedule:
+          interval: weekly
+      versioning-strategy: increase

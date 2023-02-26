@@ -1,5 +1,5 @@
 #!/bin/sh
 
-./node_modules/.bin/lerna run lint
-./node_modules/.bin/lerna run format:check
-./node_modules/.bin/lerna run validate
+npx lerna run lint --since=origin/master
+npx lerna run format:check --since=origin/master
+npx lerna run validate --since=origin/master
