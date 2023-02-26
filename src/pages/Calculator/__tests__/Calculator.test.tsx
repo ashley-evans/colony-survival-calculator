@@ -54,6 +54,12 @@ const CRAFT_ABLE_ITEMS_REQS: Items = [
             { name: "Test Item 2", amount: 3 },
         ],
     },
+    {
+        name: "Test Item 8",
+        createTime: 20,
+        output: 2,
+        requires: [{ name: "Test Item 6", amount: 2 }],
+    },
 ];
 
 const CRAFT_ABLE_ITEMS_MISSING_REQS: Items = [
@@ -678,68 +684,96 @@ describe("requirements rendering", () => {
         }
     );
 
-    describe("given an item with multiple item requirements", () => {
-        const selectedItem = CRAFT_ABLE_ITEMS_REQS[2];
-        const amountOfWorkers = "8";
-
-        test("renders the name of each required item in the table body", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
+    describe.each([
+        [
+            "multiple item requirements",
+            CRAFT_ABLE_ITEMS_REQS[2],
+            [
                 {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                selectedItem.name
-            );
-            await user.type(workerInput, amountOfWorkers);
-            const requirementsTable = await screen.findByRole("table");
+                    name: CRAFT_ABLE_ITEMS_REQS[2].requires[0].name,
+                    workers: 3,
+                },
+                { name: CRAFT_ABLE_ITEMS_REQS[2].requires[1].name, workers: 1 },
+            ],
+        ],
+        [
+            "a requirement that has nested requirements",
+            CRAFT_ABLE_ITEMS_REQS[3],
+            [
+                { name: CRAFT_ABLE_ITEMS_REQS[3].requires[0].name, workers: 3 },
+                { name: CRAFT_ABLE_ITEMS[0].name, workers: 4 },
+                { name: CRAFT_ABLE_ITEMS[1].name, workers: 2 },
+            ],
+        ],
+    ])(
+        "given an item with %s",
+        (
+            _: string,
+            selectedItem: Item,
+            expected: { name: string; workers: number }[]
+        ) => {
+            const amountOfWorkers = "4";
 
-            for (const requirement of selectedItem.requires) {
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.name,
-                    })
+            test("renders the name of each required item in the table body", async () => {
+                const user = userEvent.setup();
+
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
                 );
-            }
-        });
+                await user.selectOptions(
+                    await screen.findByRole("combobox", {
+                        name: ITEM_SELECT_LABEL,
+                    }),
+                    selectedItem.name
+                );
+                await user.type(workerInput, amountOfWorkers);
+                const requirementsTable = await screen.findByRole("table");
 
-        test("renders the required amount of workers for each required item to satisfy the desired output", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
+                for (const requirement of expected) {
+                    expect(
+                        within(requirementsTable).getByRole("cell", {
+                            name: requirement.name,
+                        })
+                    );
                 }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                selectedItem.name
-            );
-            await user.type(workerInput, amountOfWorkers);
-            const requirementsTable = await screen.findByRole("table");
+            });
 
-            const item1Row = within(requirementsTable).getByRole("cell", {
-                name: selectedItem.requires[0].name,
-            }).parentElement as HTMLElement;
-            expect(within(item1Row).getByRole("cell", { name: "5" }));
+            test("renders the required amount of workers for each required item to satisfy the desired output", async () => {
+                const user = userEvent.setup();
 
-            const item2Row = within(requirementsTable).getByRole("cell", {
-                name: selectedItem.requires[1].name,
-            }).parentElement as HTMLElement;
-            expect(within(item2Row).getByRole("cell", { name: "2" }));
-        });
-    });
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.selectOptions(
+                    await screen.findByRole("combobox", {
+                        name: ITEM_SELECT_LABEL,
+                    }),
+                    selectedItem.name
+                );
+                await user.type(workerInput, amountOfWorkers);
+                const requirementsTable = await screen.findByRole("table");
+
+                for (const requirement of expected) {
+                    const row = within(requirementsTable).getByRole("cell", {
+                        name: requirement.name,
+                    }).parentElement as HTMLElement;
+                    expect(
+                        within(row).getByRole("cell", {
+                            name: requirement.workers.toString(),
+                        })
+                    );
+                }
+            });
+        }
+    );
 
     describe("given an item with an unknown requirement", () => {
         beforeAll(() => {

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Fragment, ReactElement } from "react";
 
-import { Items, Item, Requirement } from "../../../../types";
+import { Items, Item } from "../../../../types";
 import {
     RequirementsTable,
     TextColumnHeader,
@@ -8,6 +8,20 @@ import {
     NumberColumnHeader,
     NumberColumnCell,
 } from "./styles";
+
+type RequirementRowProps = {
+    name: string;
+    workers: number;
+};
+
+function RequirementRow({ name, workers }: RequirementRowProps) {
+    return (
+        <tr key={name}>
+            <TextColumnCell>{name}</TextColumnCell>
+            <NumberColumnCell>{workers}</NumberColumnCell>
+        </tr>
+    );
+}
 
 type RequirementsProps = {
     items: Items;
@@ -20,16 +34,36 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
         items.map((item) => [item.name, item])
     );
 
-    const calculateRequiredWorkers = (requirement: Requirement): number => {
-        const requiredItem = itemMap[requirement.name];
-        if (!requiredItem) {
-            throw new Error("Unknown required item");
-        }
-
+    const calculateRequiredWorkers = (
+        requirement: Item,
+        amount: number
+    ): number => {
         const createdInTime =
-            (selectedItem.createTime / requiredItem.createTime) *
-            requiredItem.output;
-        return Math.ceil((requirement.amount / createdInTime) * workers);
+            (selectedItem.createTime / requirement.createTime) *
+            requirement.output;
+        return Math.ceil((amount / createdInTime) * workers);
+    };
+
+    const createRequirementRows = (currentItem: Item): ReactElement[] => {
+        return currentItem.requires.map((requirement) => {
+            const requiredItem = itemMap[requirement.name];
+            if (!requiredItem) {
+                throw new Error("Unknown required item");
+            }
+
+            return (
+                <Fragment key={`${currentItem.name}-${requiredItem.name}`}>
+                    <RequirementRow
+                        name={requirement.name}
+                        workers={calculateRequiredWorkers(
+                            requiredItem,
+                            requirement.amount
+                        )}
+                    />
+                    {createRequirementRows(requiredItem)}
+                </Fragment>
+            );
+        });
     };
 
     return (
@@ -42,16 +76,7 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
                         <NumberColumnHeader>Workers</NumberColumnHeader>
                     </tr>
                 </thead>
-                <tbody>
-                    {selectedItem.requires.map((requirement) => (
-                        <tr key={requirement.name}>
-                            <TextColumnCell>{requirement.name}</TextColumnCell>
-                            <NumberColumnCell>
-                                {calculateRequiredWorkers(requirement)}
-                            </NumberColumnCell>
-                        </tr>
-                    ))}
-                </tbody>
+                <tbody>{createRequirementRows(selectedItem)}</tbody>
             </RequirementsTable>
         </>
     );
