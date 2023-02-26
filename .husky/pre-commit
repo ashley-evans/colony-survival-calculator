@@ -1,5 +1,5 @@
 #!/bin/sh
 
-npm run lint
-npm run format:check
-npm run validate
+./node_modules/.bin/lerna run lint
+./node_modules/.bin/lerna run format:check
+./node_modules/.bin/lerna run validate

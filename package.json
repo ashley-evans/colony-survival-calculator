@@ -1,62 +1,22 @@
 {
-    "name": "colony-survival-calculator",
+    "name": "@colony-survival-calculator/root",
     "private": true,
     "version": "0.0.0",
-    "type": "module",
     "scripts": {
-        "dev": "vite",
-        "dev:open": "vite --open",
-        "build": "tsc && vite build",
-        "preview": "vite preview",
-        "validate": "./scripts/validate-json.sh && ./scripts/validate-terraform.sh",
-        "format:check": "npx prettier --check . && terraform fmt -recursive -check -diff ./infra/",
-        "format:write": "npx prettier --write . && terraform fmt -recursive ./infra/",
-        "lint": "npm run lint:code && npm run lint:packages",
-        "lint:code": "npx eslint .",
-        "lint:packages": "npmPkgJsonLint .",
-        "test": "vitest run",
-        "test:watch": "vitest watch",
-        "generate": "json2ts -i 'src/schemas/*.json' -o src/types/generated/",
-        "prepare": "husky install",
-        "postinstall": "npm run generate"
-    },
-    "resolutions": {
-        "styled-components": "^5"
-    },
-    "dependencies": {
-        "@fontsource/roboto-mono": "4.5.10",
-        "@fortawesome/free-brands-svg-icons": "6.3.0",
-        "@fortawesome/free-solid-svg-icons": "6.3.0",
-        "@fortawesome/react-fontawesome": "0.2.0",
-        "ajv": "8.12.0",
-        "axios": "1.2.3",
-        "normalize.css": "8.0.1",
-        "react": "18.2.0",
-        "react-dom": "18.2.0",
-        "react-router-dom": "6.8.1",
-        "styled-components": "5.3.6"
+        "i": "npx lerna bootstrap --no-ci",
+        "ci": "npx lerna bootstrap --ci",
+        "clean": "rm -rf `find . -type d -name node_modules`",
+        "lint": "npmPkgJsonLint .",
+        "prepare": "husky install"
     },
     "devDependencies": {
-        "@testing-library/jest-dom": "^5.16.5",
-        "@testing-library/react": "^13.4.0",
-        "@testing-library/user-event": "^14.4.3",
-        "@types/react": "^18.0.27",
-        "@types/react-dom": "^18.0.9",
-        "@types/styled-components": "^5.1.26",
-        "@typescript-eslint/eslint-plugin": "^5.48.2",
-        "@typescript-eslint/parser": "^5.48.2",
-        "@vitejs/plugin-react": "^3.1.0",
-        "eslint": "^8.33.0",
+        "@typescript-eslint/eslint-plugin": "^5.53.0",
+        "@typescript-eslint/parser": "^5.53.0",
+        "eslint": "^8.35.0",
         "eslint-config-prettier": "^8.6.0",
-        "eslint-plugin-react": "^7.32.1",
         "husky": "^8.0.3",
-        "jsdom": "^21.1.0",
-        "json-schema-to-typescript": "^11.0.3",
-        "msw": "^0.49.3",
+        "lerna": "^5.5.2",
         "npm-package-json-lint": "^6.4.0",
-        "prettier": "^2.8.3",
-        "typescript": "^4.9.3",
-        "vite": "^4.1.4",
-        "vitest": "^0.28.5"
+        "prettier": "^2.8.4"
     }
 }
