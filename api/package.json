@@ -5,7 +5,8 @@
     "scripts": {
         "postinstall": "npx graphql-codegen --config ./codegen.ts",
         "format:check": "npx prettier --check .",
-        "format:write": "npx prettier --write ."
+        "format:write": "npx prettier --write .",
+        "lint": "eslint ."
     },
     "devDependencies": {
         "@graphql-codegen/cli": "^3.2.1",
