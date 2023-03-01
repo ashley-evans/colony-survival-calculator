@@ -6,6 +6,8 @@
         "postinstall": "npx graphql-codegen --config ./codegen.ts",
         "build": "tsc --project tsconfig.build.json",
         "build:clean": "rm -rf ./dist && npm run build",
+        "deploy": "./scripts/deploy.sh",
+        "deploy:plan": "./scripts/deploy.sh -d",
         "validate": "../scripts/validate-terraform.sh -r ./infra/",
         "format:check": "npx prettier --check .",
         "format:write": "npx prettier --write .",
