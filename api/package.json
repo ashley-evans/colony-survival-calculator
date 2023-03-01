@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "scripts": {
         "postinstall": "npx graphql-codegen --config ./codegen.ts",
+        "validate": "../scripts/validate-terraform.sh -r ./infra/",
         "format:check": "npx prettier --check .",
         "format:write": "npx prettier --write .",
         "lint": "eslint .",
