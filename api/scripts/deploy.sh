@@ -3,15 +3,19 @@
 usage() {
     echo "Usage:
     -e [Environment to deploy]
+    -r [Lambda target runtime]
     -d [Flag: Dry-run]
     -t [Flag: Teardown environment]" 1>&2;
     exit 1;
 }
 
-while getopts "e:dth" opt; do
+while getopts "e:r:dth" opt; do
     case $opt in
         e)
             environment=$OPTARG
+            ;;
+        r)
+            runtime=$OPTARG
             ;;
         d)
             dryrun=true
@@ -30,6 +34,10 @@ done
 
 if [ -z $environment ]; then
     environment="dev"
+fi
+
+if [ -z $runtime ]; then
+    runtime="node18"
 fi
 
 current_dir=$(pwd)
@@ -79,7 +87,7 @@ else
     cd $dist_dir && npx lerna bootstrap --ci -- --production
 
     echo "Bundle code for deployment..."
-    cd $dist_dir && npx lerna exec -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --outfile=dist/main.js
+    cd $dist_dir && npx lerna exec -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --platform=node --target=$runtime --outfile=dist/index.js
 
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"

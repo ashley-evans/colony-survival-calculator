@@ -85,7 +85,7 @@ resource "aws_lambda_function" "add_item_lambda" {
   s3_key    = aws_s3_object.add_item_lambda_dist.key
 
   runtime = var.runtime
-  handler = "main.handler"
+  handler = "index.handler"
 
   source_code_hash = data.archive_file.add_item_lambda_archive.output_base64sha256
 
