@@ -12,6 +12,6 @@ dist
 
 # Terraform
 
-**/.terraform/*
+.terraform
 *.tfstate
 *.tfstate.*

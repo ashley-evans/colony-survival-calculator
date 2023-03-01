@@ -7,6 +7,7 @@
         "ci": "npx lerna bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
+        "validate": "./scripts/validate-terraform.sh -r ./infra/",
         "format:check": "npx prettier --check . '!(api|ui)/**/*'",
         "format:write": "npx prettier --write . '!(api|ui)/**/*'",
         "prepare": "husky install"
