@@ -8,8 +8,8 @@
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
         "validate": "./scripts/validate-terraform.sh -r ./infra/",
-        "format:check": "npx prettier --check . '!(api|ui)/**/*'",
-        "format:write": "npx prettier --write . '!(api|ui)/**/*'",
+        "format:check": "npx prettier --check . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
+        "format:write": "npx prettier --write . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
         "prepare": "husky install"
     },
     "devDependencies": {
