@@ -1,5 +1,8 @@
 {
     "name": "@colony-survival-calculator/add-item-function",
     "private": true,
-    "version": "0.0.0"
+    "version": "0.0.0",
+    "dependencies": {
+        "dayjs": "1.11.7"
+    }
 }

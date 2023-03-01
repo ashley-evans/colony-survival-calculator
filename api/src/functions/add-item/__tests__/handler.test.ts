@@ -2,7 +2,7 @@ import type { AppSyncResolverEvent } from "aws-lambda";
 import { mock } from "jest-mock-extended";
 
 import type { ItemInput } from "../../../graphql/schema";
-import { handler } from "../add-item";
+import { handler } from "../handler";
 
 function createEvent(name: string): AppSyncResolverEvent<ItemInput> {
     const event = mock<AppSyncResolverEvent<ItemInput>>();
