@@ -32,14 +32,13 @@ if [ -z $environment ]; then
     environment="dev"
 fi
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-root_dir="$( dirname "$script_dir")"
-
-ui_infra_dir="$root_dir/infra/ui"
+script_parent_dir=$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")
+repository_dir="$(dirname "$script_parent_dir")"
+ui_infra_dir="$script_parent_dir/infra"
 
 echo "Ensuring terraform is initialised..."
 
-terraform -chdir="$ui_infra_dir" init -input=false -backend-config="../remote-state.tfbackend" > /dev/null
+terraform -chdir="$ui_infra_dir" init -input=false -backend-config="$repository_dir/infra/remote-state.tfbackend" > /dev/null
 
 exit_code=$(echo $?)
 if [ $exit_code -ne 0 ]; then
@@ -85,7 +84,7 @@ else
         exit $exit_code
     fi
 
-    dist_dir="$root_dir/dist"
+    dist_dir="$script_parent_dir/dist"
 
     echo "Cleaning built file directory..."
     rm -rf $dist_dir
@@ -96,7 +95,7 @@ else
     fi
 
     echo "Building UI..."
-    npm --prefix $root_dir run build
+    npm --prefix $script_parent_dir run build
 
     exit_code=$(echo $?)
     if [ $exit_code -ne 0 ]; then
