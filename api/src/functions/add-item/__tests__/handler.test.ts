@@ -13,7 +13,7 @@ function createEvent(name: string): AppSyncResolverEvent<ItemInput> {
 }
 
 beforeAll(() => {
-    jest.spyOn(console, "dir").mockImplementation(() => undefined);
+    jest.spyOn(console, "log").mockImplementation(() => undefined);
 });
 
 test("returns the provided name as ID in response", async () => {
