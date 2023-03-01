@@ -41,7 +41,7 @@ resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
 data "archive_file" "add_item_lambda" {
   type = "zip"
 
-  source_dir = "${var.dist_folder}/functions/add-item/dist"
+  source_dir  = "${var.dist_folder}/functions/add-item/dist"
   output_path = "${var.dist_folder}/functions/add-item/add-item.zip"
 }
 

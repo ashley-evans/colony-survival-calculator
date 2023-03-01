@@ -3,6 +3,6 @@ variable "region" {
 }
 
 variable "dist_folder" {
-  type = string
+  type    = string
   default = "../dist"
 }
