@@ -7,8 +7,9 @@
         "ci": "npx lerna bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
-        "format:check": "npx prettier --check .",
-        "format:write": "npx prettier --write .",
+        "validate": "./scripts/validate-terraform.sh -r ./infra/",
+        "format:check": "npx prettier --check . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
+        "format:write": "npx prettier --write . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
         "prepare": "husky install"
     },
     "devDependencies": {
@@ -19,6 +20,7 @@
         "husky": "^8.0.3",
         "lerna": "^6.5.1",
         "npm-package-json-lint": "^6.4.0",
-        "prettier": "^2.8.4"
+        "prettier": "^2.8.4",
+        "typescript": "^4.9.5"
     }
 }

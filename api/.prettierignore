@@ -2,6 +2,14 @@
 
 node_modules
 
+# Generated files
+
+schema.d.ts
+
+# Built files
+
+dist
+
 # Terraform
 
 .terraform
