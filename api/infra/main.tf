@@ -19,8 +19,12 @@ provider "aws" {
   region = var.region
 }
 
+locals {
+  resource_prefix = "colony-survival-calculator-tf-"
+}
+
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "colony-survival-calculator-tf-lambda-bucket-${terraform.workspace}"
+  bucket = "${local.resource_prefix}lambda-bucket-${terraform.workspace}"
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_bucket_public_access_block" {
@@ -38,7 +42,7 @@ resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
   acl = "private"
 }
 
-data "archive_file" "add_item_lambda" {
+data "archive_file" "add_item_lambda_archive" {
   type = "zip"
 
   source_dir  = "${var.dist_folder}/functions/add-item/dist"
@@ -49,7 +53,41 @@ resource "aws_s3_object" "add_item_lambda_dist" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
   key    = "add-item.zip"
-  source = data.archive_file.add_item_lambda.output_path
+  source = data.archive_file.add_item_lambda_archive.output_path
 
-  etag = filemd5(data.archive_file.add_item_lambda.output_path)
+  etag = filemd5(data.archive_file.add_item_lambda_archive.output_path)
+}
+
+data "aws_iam_policy_document" "lambda_policy_document" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "add_item_lambda_role" {
+  assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+}
+
+resource "aws_lambda_function" "add_item_lambda" {
+  function_name = "${local.resource_prefix}add-item-${terraform.workspace}"
+
+  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_key    = aws_s3_object.add_item_lambda_dist.key
+
+  runtime = var.runtime
+  handler = "main.handler"
+
+  source_code_hash = data.archive_file.add_item_lambda_archive.output_base64sha256
+
+  role = aws_iam_role.add_item_lambda_role.arn
 }
