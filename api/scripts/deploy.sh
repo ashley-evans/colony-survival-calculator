@@ -32,9 +32,12 @@ if [ -z $environment ]; then
     environment="dev"
 fi
 
+current_dir=$(pwd)
 script_parent_dir=$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")
 repository_dir="$(dirname "$script_parent_dir")"
 infra_dir="$script_parent_dir/infra"
+dist_dir="$script_parent_dir/dist"
+src_dir=$(realpath --relative-to $current_dir "$script_parent_dir/src")
 
 echo "Ensuring terraform is initialised..."
 
@@ -63,4 +66,18 @@ elif [ $teardown ]; then
 else
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
+
+    echo "Building API..."
+    npm --prefix $script_parent_dir run build:clean
+
+    echo "Copying package definitions..."
+    $script_parent_dir/node_modules/.bin/copyfiles -E -u 1 \
+        -e "$src_dir/**/node_modules/**" \
+        "$src_dir/**/package*.json" \
+        $dist_dir
+    cp $script_parent_dir/package.json $dist_dir/package.json
+
+    echo "Installing dependencies"
+    cp $script_parent_dir/lerna.dist.json $dist_dir/lerna.json
+    cd $dist_dir && npx lerna bootstrap --ci -- --production
 fi
