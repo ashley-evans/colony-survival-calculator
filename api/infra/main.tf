@@ -21,6 +21,7 @@ provider "aws" {
 
 locals {
   resource_prefix = "colony-survival-calculator-tf-"
+  architectures   = ["arm64"]
 }
 
 resource "aws_s3_bucket" "lambda_bucket" {
@@ -84,8 +85,9 @@ resource "aws_lambda_function" "add_item_lambda" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.add_item_lambda.key
 
-  runtime = var.runtime
-  handler = "index.handler"
+  runtime       = var.runtime
+  handler       = "index.handler"
+  architectures = local.architectures
 
   source_code_hash = data.archive_file.add_item_lambda.output_base64sha256
 
