@@ -64,9 +64,6 @@ elif [ $teardown ]; then
     echo "Tearing down UI for environment: $environment..."
     terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy
 else
-    echo "Deploying UI for environment: $environment..."
-    terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
-
     echo "Building API..."
     npm --prefix $script_parent_dir run build:clean
 
@@ -77,7 +74,13 @@ else
         $dist_dir
     cp $script_parent_dir/package.json $dist_dir/package.json
 
-    echo "Installing dependencies"
+    echo "Installing dependencies..."
     cp $script_parent_dir/lerna.dist.json $dist_dir/lerna.json
     cd $dist_dir && npx lerna bootstrap --ci -- --production
+
+    echo "Bundle code for deployment..."
+    cd $dist_dir && npx lerna exec -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --outfile=dist/main.js
+
+    echo "Deploying UI for environment: $environment..."
+    terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
 fi
