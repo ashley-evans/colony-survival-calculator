@@ -255,6 +255,6 @@ jobs:
                   npm run ci
             - name: Create Tags
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.TAG_TOKEN }}
               run: |
                   npx semantic-release
