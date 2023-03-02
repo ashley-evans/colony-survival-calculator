@@ -32,7 +32,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run format:check --since=origin/master
                   else
-                    lerna run format:check
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run format:check --since="$previous_tag"
+                    else
+                      lerna run format:check
+                    fi
                   fi
     lint:
         runs-on: ubuntu-latest
@@ -57,7 +62,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run lint --since=origin/master
                   else
-                    lerna run lint
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run lint --since="$previous_tag"
+                    else
+                      lerna run lint
+                    fi
                   fi
     commit-lint:
         runs-on: ubuntu-latest
@@ -114,7 +124,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run validate --since=origin/master
                   else
-                    lerna run validate
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run validate --since="$previous_tag"
+                    else
+                      lerna run validate
+                    fi
                   fi
     build:
         runs-on: ubuntu-latest
@@ -139,7 +154,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run build --since=origin/master
                   else
-                    lerna run build
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run build --since="$previous_tag"
+                    else
+                      lerna run build
+                    fi
                   fi
     test:
         runs-on: ubuntu-latest
@@ -164,7 +184,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run test --since=origin/master
                   else
-                    lerna run test
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run test --since="$previous_tag"
+                    else
+                      lerna run test
+                    fi
                   fi
     deploy-dryrun:
         runs-on: ubuntu-latest
@@ -199,7 +224,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run deploy:plan --since=origin/master -- -e prod
                   else
-                    lerna run deploy:plan -- -e prod
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run deploy:plan --since="$previous_tag" -- -e prod
+                    else
+                      lerna run deploy:plan -- -e prod
+                    fi
                   fi
     create-release:
         runs-on: ubuntu-latest
