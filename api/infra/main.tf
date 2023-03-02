@@ -24,12 +24,12 @@ locals {
   architectures   = ["arm64"]
 }
 
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "${local.resource_prefix}lambda-bucket-${terraform.workspace}"
+resource "aws_s3_bucket" "api_bucket" {
+  bucket = "${local.resource_prefix}api-bucket-${terraform.workspace}"
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda_bucket_public_access_block" {
-  bucket = aws_s3_bucket.lambda_bucket.id
+  bucket = aws_s3_bucket.api_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -38,9 +38,18 @@ resource "aws_s3_bucket_public_access_block" "lambda_bucket_public_access_block"
 }
 
 resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
-  bucket = aws_s3_bucket.lambda_bucket.id
+  bucket = aws_s3_bucket.api_bucket.id
 
   acl = "private"
+}
+
+resource "aws_s3_object" "items_json_seed" {
+  bucket = aws_s3_bucket.api_bucket.id
+
+  key    = "seeds/items.json"
+  source = "${var.src_folder}/json/items.json"
+
+  etag = filemd5("${var.src_folder}/json/items.json")
 }
 
 data "archive_file" "add_item_lambda" {
@@ -51,7 +60,7 @@ data "archive_file" "add_item_lambda" {
 }
 
 resource "aws_s3_object" "add_item_lambda" {
-  bucket = aws_s3_bucket.lambda_bucket.id
+  bucket = aws_s3_bucket.api_bucket.id
 
   key    = "add-item.zip"
   source = data.archive_file.add_item_lambda.output_path
@@ -82,7 +91,7 @@ resource "aws_iam_role" "add_item_lambda" {
 resource "aws_lambda_function" "add_item_lambda" {
   function_name = "${local.resource_prefix}add-item-${terraform.workspace}"
 
-  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_bucket = aws_s3_bucket.api_bucket.id
   s3_key    = aws_s3_object.add_item_lambda.key
 
   runtime       = var.runtime

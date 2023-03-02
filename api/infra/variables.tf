@@ -7,6 +7,11 @@ variable "dist_folder" {
   default = "../dist"
 }
 
+variable "src_folder" {
+  type    = string
+  default = "../src"
+}
+
 variable "runtime" {
   type    = string
   default = "nodejs18.x"
