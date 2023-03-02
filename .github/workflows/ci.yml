@@ -233,6 +233,8 @@ jobs:
                   fi
     create-release:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         needs: [format, lint, validate, build, test, deploy-dryrun]
         if: ${{ github.ref == 'refs/heads/master' }}
         steps:
