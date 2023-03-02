@@ -3,6 +3,8 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
+        "cm": "cz",
+        "cz": "cz",
         "i": "npx lerna bootstrap --no-ci",
         "ci": "npx lerna bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
@@ -15,6 +17,8 @@
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.53.0",
         "@typescript-eslint/parser": "^5.53.0",
+        "commitizen": "^4.3.0",
+        "cz-conventional-changelog": "^3.3.0",
         "eslint": "^8.35.0",
         "eslint-config-prettier": "^8.6.0",
         "husky": "^8.0.3",
@@ -22,5 +26,10 @@
         "npm-package-json-lint": "^6.4.0",
         "prettier": "^2.8.4",
         "typescript": "^4.9.5"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
     }
 }
