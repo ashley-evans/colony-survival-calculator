@@ -1,4 +1,4 @@
-name: Validate and Deploy
+name: Validate and Create Release
 
 on:
     push:
@@ -32,7 +32,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run format:check --since=origin/master
                   else
-                    lerna run format:check
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run format:check --since="$previous_tag"
+                    else
+                      lerna run format:check
+                    fi
                   fi
     lint:
         runs-on: ubuntu-latest
@@ -57,7 +62,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run lint --since=origin/master
                   else
-                    lerna run lint
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run lint --since="$previous_tag"
+                    else
+                      lerna run lint
+                    fi
                   fi
     commit-lint:
         runs-on: ubuntu-latest
@@ -114,7 +124,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run validate --since=origin/master
                   else
-                    lerna run validate
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run validate --since="$previous_tag"
+                    else
+                      lerna run validate
+                    fi
                   fi
     build:
         runs-on: ubuntu-latest
@@ -139,7 +154,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run build --since=origin/master
                   else
-                    lerna run build
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run build --since="$previous_tag"
+                    else
+                      lerna run build
+                    fi
                   fi
     test:
         runs-on: ubuntu-latest
@@ -164,7 +184,12 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run test --since=origin/master
                   else
-                    lerna run test
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run test --since="$previous_tag"
+                    else
+                      lerna run test
+                    fi
                   fi
     deploy-dryrun:
         runs-on: ubuntu-latest
@@ -199,11 +224,16 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run deploy:plan --since=origin/master -- -e prod
                   else
-                    lerna run deploy:plan -- -e prod
+                    previous_tag=$(git tag | tail -n 2 | head -n 1)
+                    if [ -n "$previous_tag" ]; then
+                      lerna run deploy:plan --since="$previous_tag" -- -e prod
+                    else
+                      lerna run deploy:plan -- -e prod
+                    fi
                   fi
     create-release:
         runs-on: ubuntu-latest
-        needs: [format, lint, commit-lint, validate, build, test, deploy-dryrun]
+        needs: [format, lint, validate, build, test, deploy-dryrun]
         if: ${{ github.ref == 'refs/heads/master' }}
         steps:
             - uses: actions/checkout@v3
@@ -226,41 +256,3 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   npx semantic-release
-    deploy:
-        runs-on: ubuntu-latest
-        needs: [create-release]
-        if: ${{ github.ref == 'refs/heads/master' }}
-        permissions:
-            id-token: write
-            contents: read
-        steps:
-            - uses: actions/checkout@v3
-              with:
-                  fetch-depth: 0
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: "18.12.1"
-            - uses: aws-actions/configure-aws-credentials@v1-node16
-              with:
-                  aws-region: eu-west-2
-                  role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
-            - uses: hashicorp/setup-terraform@v2
-              with:
-                  terraform_version: 1.3.7
-                  terraform_wrapper: false
-            - uses: actions/cache@v3
-              with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-dependencies-v1-
-            - name: Install Dependencies
-              run: |
-                  npm run ci
-            - name: Run deployment
-              run: |
-                  if [ "${{ github.ref }}" != "refs/heads/master" ]; then
-                    lerna run deploy --since=origin/master -- -e prod
-                  else
-                    lerna run deploy -- -e prod
-                  fi
