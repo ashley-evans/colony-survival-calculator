@@ -1,8 +1,8 @@
 import { matchRequestUrl, MockedRequest } from "msw";
-import { SetupServerApi } from "msw/lib/node";
+import { SetupServer } from "msw/lib/node";
 
 function waitForRequest(
-    server: SetupServerApi,
+    server: SetupServer,
     method: string,
     url: string
 ): Promise<MockedRequest> {
