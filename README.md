@@ -1,6 +1,7 @@
 # Colony Survival Calculator
 
-[![Validate and Deploy](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/ci.yml)
+[![Validate and Create Release](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/ci.yml)
+[![Deploy Release](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/cd.yml/badge.svg)](https://github.com/ashley-evans/colony-survival-calculator/actions/workflows/cd.yml)
 
 Job/Resource ratio calculator for Colony Survival
 
@@ -21,22 +22,30 @@ The currently deployed version of the application can be found at the following 
 
 Ensure that all scripts have the permission to run on your system, this can be done by running the following command:
 
+```sh
+chmod u+x $(find . -type f -name "*.sh" | egrep -v "(/node_modules/|/\.husky/)")
 ```
-chmod u+x $(find ./scripts/ -type f)
+
+## Installing dependencies
+
+The project uses Lerna to run tasks against packages inside the repository. Running the following command will install all required dependencies for all packages:
+
+```sh
+npm run ci
 ```
 
 ### Deploying infrastructure
 
 Run the following command to setup the UI infrastructure for development:
 
-```
-./scripts/deploy.sh -e dev
+```sh
+npx lerna run deploy -- -e dev
 ```
 
 ### Tearing down infrastructure
 
 Run the following command to remove any deployed UI infrastructure for development:
 
-```
-./scripts/deploy.sh -e dev -t
+```sh
+npx lerna run deploy -- -e dev -t
 ```
