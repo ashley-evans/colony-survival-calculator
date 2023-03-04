@@ -71,24 +71,27 @@ const handler: S3EventHandler<void> = async (event) => {
         return;
     }
 
-    await Promise.all(
-        event.Records.map(async (record) => {
-            if (validateEventRecord(record)) {
-                const key = record.s3.object.key;
-                if (key !== EXPECTED_OBJECT_KEY) {
-                    return;
-                }
+    const promises = event.Records.map(async (record) => {
+        if (validateEventRecord(record)) {
+            const key = record.s3.object.key;
+            if (key !== EXPECTED_OBJECT_KEY) {
+                return;
+            }
 
-                const content = await fetchObjectContent(
-                    key,
-                    record.s3.bucket.name
-                );
-                if (content) {
-                    addItem(content);
+            const content = await fetchObjectContent(
+                key,
+                record.s3.bucket.name
+            );
+            if (content) {
+                const added = await addItem(content);
+                if (!added) {
+                    throw new Error("Failed to add new items");
                 }
             }
-        })
-    );
+        }
+    });
+
+    await Promise.all(promises);
 };
 
 export { handler };

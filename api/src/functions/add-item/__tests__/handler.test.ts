@@ -23,6 +23,8 @@ jest.mock("../domain/add-item", () => ({
     addItem: jest.fn(),
 }));
 
+const mockAddItem = addItem as jest.Mock;
+
 import { handler } from "../handler";
 
 const mockS3Client = mockClient(S3Client);
@@ -48,7 +50,9 @@ const validRecord = createValidEventRecord(EXPECTED_KEY);
 
 beforeEach(() => {
     mockS3Client.reset();
-    (addItem as jest.Mock).mockReset();
+    mockAddItem.mockReset();
+
+    mockAddItem.mockResolvedValue(true);
 });
 
 describe.each([
@@ -183,5 +187,39 @@ describe("given multiple records, one valid and one invalid", () => {
 
         expect(addItem).toHaveBeenCalledTimes(1);
         expect(addItem).toHaveBeenCalledWith(EXPECTED_CONTENT);
+    });
+});
+
+describe("error handling", () => {
+    const event = createS3Event([validRecord]);
+
+    beforeEach(() => {
+        const output = mock<GetObjectCommandOutput>();
+        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
+        mockS3Client.on(GetObjectCommand).resolves(output);
+    });
+
+    test("throws an error if an unhandled exception occurs when fetching S3 content", async () => {
+        const expectedError = new Error("test S3 error");
+        mockS3Client.on(GetObjectCommand).rejects(expectedError);
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrowError(expectedError);
+    });
+
+    test("throws an error if an unhandled exception occurs when adding item", async () => {
+        const expectedError = new Error("test error");
+        mockAddItem.mockRejectedValue(expectedError);
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrowError(expectedError);
+    });
+
+    test("throws an error if the item could not be added", async () => {
+        const expectedError = new Error("Failed to add new items");
+        mockAddItem.mockResolvedValue(false);
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrowError(expectedError);
     });
 });
