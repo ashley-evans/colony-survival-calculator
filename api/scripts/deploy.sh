@@ -61,7 +61,7 @@ echo "Building API..."
 npm --prefix $script_parent_dir run build:clean
 
 echo "Copying package definitions..."
-$script_parent_dir/node_modules/.bin/copyfiles -E -u 1 \
+$script_parent_dir/node_modules/.bin/copyfiles -E -u 2 \
     -e "$src_dir/**/node_modules/**" \
     "$src_dir/**/package*.json" \
     $dist_dir
