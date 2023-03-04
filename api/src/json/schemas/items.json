@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Items",
+    "description": "An array of all items that can be constructed in Colony Survival",
+    "type": "array",
+    "items": {
+        "title": "Item",
+        "description": "A item that can be constructed in Colony Survival",
+        "type": "object",
+        "properties": {
+            "name": {
+                "description": "The name of the item",
+                "type": "string"
+            },
+            "createTime": {
+                "description": "The number of seconds it takes to create the item",
+                "type": "number",
+                "minimum": 0
+            },
+            "output": {
+                "description": "The number of items produced every create",
+                "type": "number",
+                "minimum": 1
+            },
+            "requires": {
+                "title": "Requirements",
+                "description": "The required items needed to create the item",
+                "type": "array",
+                "items": {
+                    "title": "Requirement",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "description": "The name of the required item",
+                            "type": "string"
+                        },
+                        "amount": {
+                            "description": "The amount of the required item needed",
+                            "type": "number",
+                            "minimum": 1
+                        }
+                    },
+                    "required": ["name", "amount"],
+                    "additionalProperties": false
+                }
+            },
+            "size": {
+                "description": "Optimal size of crafting area, only provided for farms",
+                "type": "object",
+                "properties": {
+                    "width": {
+                        "description": "The optimal width of the farm",
+                        "type": "number",
+                        "minimum": 1
+                    },
+                    "height": {
+                        "description": "The optimal height of the farm",
+                        "type": "number",
+                        "minimum": 1
+                    }
+                },
+                "required": ["width", "height"],
+                "additionalProperties": false
+            }
+        },
+        "required": ["name", "createTime", "output", "requires"],
+        "additionalProperties": false
+    }
+}

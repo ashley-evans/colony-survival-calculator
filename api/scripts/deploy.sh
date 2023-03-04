@@ -61,7 +61,8 @@ echo "Building API..."
 npm --prefix $script_parent_dir run build:clean
 
 echo "Copying package definitions..."
-$script_parent_dir/node_modules/.bin/copyfiles -E -u 1 \
+folder_diff=$(( $(echo "$src_dir" | tr -cd '/' | wc -c) + 1 ))
+$script_parent_dir/node_modules/.bin/copyfiles -E -u $folder_diff \
     -e "$src_dir/**/node_modules/**" \
     "$src_dir/**/package*.json" \
     $dist_dir
