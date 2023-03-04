@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-s3";
 
 import type { S3EventHandler } from "../../interfaces/S3EventHandler";
+import { addItem } from "./domain/add-item";
 
 type ValidS3EventRecord = {
     s3: {
@@ -68,7 +69,11 @@ const handler: S3EventHandler<void> = async (event) => {
             Bucket: record.s3.bucket.name,
         };
 
-        await client.send(new GetObjectCommand(input));
+        const response = await client.send(new GetObjectCommand(input));
+        const body = await response.Body?.transformToString();
+        if (body) {
+            addItem(body);
+        }
     } else {
         throw validateEventRecord.errors;
     }
