@@ -130,6 +130,7 @@ resource "aws_s3_bucket_notification" "seed_notification" {
     lambda_function_arn = aws_lambda_function.add_item_lambda.arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = local.seed_file_key_prefix
+    filter_suffix       = ".json"
   }
 
   depends_on = [aws_lambda_permission.allow_api_bucket_seed_execution]

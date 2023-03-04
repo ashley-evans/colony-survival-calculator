@@ -80,7 +80,7 @@ if [ $dryrun ]; then
     terraform -chdir="$infra_dir" plan -var-file="$infra_dir/$environment.tfvars"
 elif [ $teardown ]; then
     echo "Tearing down UI for environment: $environment..."
-    terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy -lock=false
+    terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy
 else
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
