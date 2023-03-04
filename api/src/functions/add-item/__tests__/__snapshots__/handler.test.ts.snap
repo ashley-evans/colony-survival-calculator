@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`throws an error if an event with a record with missing bucket details 1`] = `
+[
+  {
+    "instancePath": "/s3/bucket",
+    "keyword": "type",
+    "message": "must be object",
+    "params": {
+      "type": "object",
+    },
+    "schemaPath": "#/properties/s3/properties/bucket/type",
+  },
+]
+`;
+
+exports[`throws an error if an event with a record with missing bucket name 1`] = `
+[
+  {
+    "instancePath": "/s3/bucket/name",
+    "keyword": "type",
+    "message": "must be string",
+    "params": {
+      "type": "string",
+    },
+    "schemaPath": "#/properties/s3/properties/bucket/properties/name/type",
+  },
+]
+`;
+
+exports[`throws an error if an event with a record with missing bucket object details 1`] = `
+[
+  {
+    "instancePath": "/s3/object",
+    "keyword": "type",
+    "message": "must be object",
+    "params": {
+      "type": "object",
+    },
+    "schemaPath": "#/properties/s3/properties/object/type",
+  },
+]
+`;
+
+exports[`throws an error if an event with a record with missing bucket object key 1`] = `
+[
+  {
+    "instancePath": "/s3/object/key",
+    "keyword": "type",
+    "message": "must be string",
+    "params": {
+      "type": "string",
+    },
+    "schemaPath": "#/properties/s3/properties/object/properties/key/type",
+  },
+]
+`;
+
+exports[`throws an error if an event with a record with missing notification details 1`] = `
+[
+  {
+    "instancePath": "/s3",
+    "keyword": "type",
+    "message": "must be object",
+    "params": {
+      "type": "object",
+    },
+    "schemaPath": "#/properties/s3/type",
+  },
+]
+`;
+
+exports[`throws an error if an event with no records are provided 1`] = `"No event records provided"`;
+
+exports[`throws an error if an event with undefined records are provided 1`] = `"No event records provided"`;
