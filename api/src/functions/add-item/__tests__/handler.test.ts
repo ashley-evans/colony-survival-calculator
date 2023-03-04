@@ -25,12 +25,20 @@ beforeAll(() => {
 const EXPECTED_BUCKET_NAME = "test_bucket_name";
 const EXPECTED_KEY = "seeds/items.json";
 
-const validRecord = createS3EventRecord(
-    createS3EventNotificationDetails(
-        createS3EventBucketDetails(EXPECTED_BUCKET_NAME),
-        createS3EventBucketObjectDetails(EXPECTED_KEY)
-    )
-);
+function createValidEventRecord(key: string): S3EventRecord {
+    return createS3EventRecord(
+        createS3EventNotificationDetails(
+            createS3EventBucketDetails(EXPECTED_BUCKET_NAME),
+            createS3EventBucketObjectDetails(key)
+        )
+    );
+}
+
+const validRecord = createValidEventRecord(EXPECTED_KEY);
+
+beforeEach(() => {
+    mockS3Client.reset();
+});
 
 test.each([
     ["undefined records are provided", undefined],
@@ -102,4 +110,14 @@ test("calls S3 to get item JSON details given single valid record", async () => 
     const input = calls[0]?.args[0].input as GetObjectCommandInput;
     expect(input.Bucket).toEqual(EXPECTED_BUCKET_NAME);
     expect(input.Key).toEqual(EXPECTED_KEY);
+});
+
+test("does not call S3 if given a valid event with a unknown object key", async () => {
+    const record = createValidEventRecord("unexpected");
+    const event = createS3Event([record]);
+
+    await handler(event);
+
+    const calls = mockS3Client.commandCalls(GetObjectCommand);
+    expect(calls).toHaveLength(0);
 });

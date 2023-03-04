@@ -50,17 +50,19 @@ const validateEventRecord = ajv.compile<ValidS3EventRecord>(eventSchema);
 
 const client = new S3Client({});
 
+const EXPECTED_OBJECT_KEY = "seeds/items.json";
+
 const handler: S3EventHandler<void> = async (event) => {
     if (!event.Records || event.Records.length === 0) {
         throw "No event records provided";
     }
 
     const record = event.Records[0];
-    if (!record) {
-        throw "";
-    }
-
     if (validateEventRecord(record)) {
+        if (record.s3.object.key !== EXPECTED_OBJECT_KEY) {
+            return;
+        }
+
         const input: GetObjectCommandInput = {
             Key: record.s3.object.key,
             Bucket: record.s3.bucket.name,
