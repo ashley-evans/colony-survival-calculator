@@ -37,7 +37,7 @@ jobs:
                   npm run ci
             - name: Run deployment
               run: |
-                  previous_tag=$(git tag | tail -n +2 | head -n 1)
+                  previous_tag=$(git tag | tail -n 2 | head -n 1)
                   if [ -n "$previous_tag" ]; then
                     lerna run deploy --since="$previous_tag" -- -e prod
                   else
