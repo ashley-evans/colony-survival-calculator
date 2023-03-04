@@ -33,6 +33,7 @@ beforeAll(() => {
 
 const EXPECTED_BUCKET_NAME = "test_bucket_name";
 const EXPECTED_KEY = "seeds/items.json";
+const EXPECTED_CONTENT = '{ "test": "content" }';
 
 function createValidEventRecord(key: string): S3EventRecord {
     return createS3EventRecord(
@@ -50,7 +51,7 @@ beforeEach(() => {
     (addItem as jest.Mock).mockReset();
 });
 
-test.each([
+describe.each([
     ["undefined records are provided", undefined],
     ["no records are provided", []],
     ["a record with missing notification details", [createS3EventRecord()]],
@@ -98,23 +99,30 @@ test.each([
             ),
         ],
     ],
-])(
-    "throws an error if an event with %s",
-    async (_: string, records?: S3EventRecord[]) => {
-        const event = createS3Event(records);
+    ["an unknown object key", [createValidEventRecord("unknown_key")]],
+])("handles invalid events with %s", (_: string, records?: S3EventRecord[]) => {
+    const event = createS3Event(records);
 
-        expect.assertions(1);
-        await expect(handler(event)).rejects.toMatchSnapshot();
-    }
-);
+    test("does not call S3 to get any content", async () => {
+        await handler(event);
+
+        const calls = mockS3Client.commandCalls(GetObjectCommand);
+        expect(calls).toHaveLength(0);
+    });
+
+    test("does not call domain", async () => {
+        await handler(event);
+
+        expect(addItem).toHaveBeenCalledTimes(0);
+    });
+});
 
 describe("handles valid item list create events", () => {
     const event = createS3Event([validRecord]);
-    const expectedContent = '{ "test": "content" }';
 
     beforeEach(() => {
         const output = mock<GetObjectCommandOutput>();
-        output.Body = sdkStreamMixin(Readable.from([expectedContent]));
+        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
         mockS3Client.on(GetObjectCommand).resolves(output);
     });
 
@@ -134,7 +142,7 @@ describe("handles valid item list create events", () => {
         await handler(event);
 
         expect(addItem).toHaveBeenCalledTimes(1);
-        expect(addItem).toHaveBeenCalledWith(expectedContent);
+        expect(addItem).toHaveBeenCalledWith(EXPECTED_CONTENT);
     });
 
     test("does not call domain if no content returned", async () => {
@@ -146,12 +154,34 @@ describe("handles valid item list create events", () => {
     });
 });
 
-test("does not call S3 if given a valid event with a unknown object key", async () => {
-    const record = createValidEventRecord("unexpected");
-    const event = createS3Event([record]);
+describe("given multiple records, one valid and one invalid", () => {
+    const invalidEventRecord = createValidEventRecord("unexpected");
+    const event = createS3Event([invalidEventRecord, validRecord]);
 
-    await handler(event);
+    beforeEach(() => {
+        const output = mock<GetObjectCommandOutput>();
+        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
+        mockS3Client
+            .on(GetObjectCommand, { Key: EXPECTED_KEY })
+            .resolves(output);
+    });
 
-    const calls = mockS3Client.commandCalls(GetObjectCommand);
-    expect(calls).toHaveLength(0);
+    test("only calls S3 to get content for valid record", async () => {
+        await handler(event);
+
+        const calls = mockS3Client.commandCalls(GetObjectCommand);
+        expect(calls).toHaveLength(1);
+        expect(calls[0]?.args).toHaveLength(1);
+
+        const input = calls[0]?.args[0].input as GetObjectCommandInput;
+        expect(input.Bucket).toEqual(EXPECTED_BUCKET_NAME);
+        expect(input.Key).toEqual(EXPECTED_KEY);
+    });
+
+    test("only calls domain with content related to valid record", async () => {
+        await handler(event);
+
+        expect(addItem).toHaveBeenCalledTimes(1);
+        expect(addItem).toHaveBeenCalledWith(EXPECTED_CONTENT);
+    });
 });

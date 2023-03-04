@@ -53,30 +53,42 @@ const client = new S3Client({});
 
 const EXPECTED_OBJECT_KEY = "seeds/items.json";
 
+async function fetchObjectContent(
+    key: string,
+    bucket: string
+): Promise<string | undefined> {
+    const input: GetObjectCommandInput = {
+        Key: key,
+        Bucket: bucket,
+    };
+
+    const response = await client.send(new GetObjectCommand(input));
+    return response.Body?.transformToString();
+}
+
 const handler: S3EventHandler<void> = async (event) => {
     if (!event.Records || event.Records.length === 0) {
-        throw "No event records provided";
+        return;
     }
 
-    const record = event.Records[0];
-    if (validateEventRecord(record)) {
-        if (record.s3.object.key !== EXPECTED_OBJECT_KEY) {
-            return;
-        }
+    await Promise.all(
+        event.Records.map(async (record) => {
+            if (validateEventRecord(record)) {
+                const key = record.s3.object.key;
+                if (key !== EXPECTED_OBJECT_KEY) {
+                    return;
+                }
 
-        const input: GetObjectCommandInput = {
-            Key: record.s3.object.key,
-            Bucket: record.s3.bucket.name,
-        };
-
-        const response = await client.send(new GetObjectCommand(input));
-        const body = await response.Body?.transformToString();
-        if (body) {
-            addItem(body);
-        }
-    } else {
-        throw validateEventRecord.errors;
-    }
+                const content = await fetchObjectContent(
+                    key,
+                    record.s3.bucket.name
+                );
+                if (content) {
+                    addItem(content);
+                }
+            }
+        })
+    );
 };
 
 export { handler };
