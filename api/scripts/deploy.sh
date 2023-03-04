@@ -61,7 +61,8 @@ echo "Building API..."
 npm --prefix $script_parent_dir run build:clean
 
 echo "Copying package definitions..."
-$script_parent_dir/node_modules/.bin/copyfiles -E -u 2 \
+folder_diff=$(( $(echo "$src_dir" | tr -cd '/' | wc -c) + 1 ))
+$script_parent_dir/node_modules/.bin/copyfiles -E -u $folder_diff \
     -e "$src_dir/**/node_modules/**" \
     "$src_dir/**/package*.json" \
     $dist_dir
@@ -79,7 +80,7 @@ if [ $dryrun ]; then
     terraform -chdir="$infra_dir" plan -var-file="$infra_dir/$environment.tfvars"
 elif [ $teardown ]; then
     echo "Tearing down UI for environment: $environment..."
-    terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy
+    terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy -lock=false
 else
     echo "Deploying UI for environment: $environment..."
     terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
