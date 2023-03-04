@@ -107,6 +107,12 @@ resource "aws_lambda_function" "add_item_lambda" {
   source_code_hash = data.archive_file.add_item_lambda.output_base64sha256
 
   role = aws_iam_role.add_item_lambda.arn
+
+  environment {
+    variables = {
+      ITEM_SEED_KEY = "${local.seed_file_key_prefix}items.json"
+    }
+  }
 }
 
 resource "aws_lambda_permission" "allow_api_bucket_seed_execution" {

@@ -51,7 +51,15 @@ const validateEventRecord = ajv.compile<ValidS3EventRecord>(eventSchema);
 
 const client = new S3Client({});
 
-const EXPECTED_OBJECT_KEY = "seeds/items.json";
+function getSeedKey(): string {
+    const processKey = "ITEM_SEED_KEY";
+    const key = process.env[processKey];
+    if (!key) {
+        throw new Error(`Missing ${processKey} environment variable`);
+    }
+
+    return key;
+}
 
 async function fetchObjectContent(
     key: string,
@@ -71,10 +79,11 @@ const handler: S3EventHandler<void> = async (event) => {
         return;
     }
 
+    const seedKey = getSeedKey();
     const promises = event.Records.map(async (record) => {
         if (validateEventRecord(record)) {
             const key = record.s3.object.key;
-            if (key !== EXPECTED_OBJECT_KEY) {
+            if (key !== seedKey) {
                 return;
             }
 

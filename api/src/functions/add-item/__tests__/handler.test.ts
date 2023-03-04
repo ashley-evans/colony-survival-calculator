@@ -34,8 +34,9 @@ beforeAll(() => {
 });
 
 const EXPECTED_BUCKET_NAME = "test_bucket_name";
-const EXPECTED_KEY = "seeds/items.json";
+const EXPECTED_KEY = "seeds/test_seed.json";
 const EXPECTED_CONTENT = '{ "test": "content" }';
+const EXPECTED_PROCESS_SEED_KEY = "ITEM_SEED_KEY";
 
 function createValidEventRecord(key: string): S3EventRecord {
     return createS3EventRecord(
@@ -53,6 +54,7 @@ beforeEach(() => {
     mockAddItem.mockReset();
 
     mockAddItem.mockResolvedValue(true);
+    process.env[EXPECTED_PROCESS_SEED_KEY] = EXPECTED_KEY;
 });
 
 describe.each([
@@ -197,6 +199,16 @@ describe("error handling", () => {
         const output = mock<GetObjectCommandOutput>();
         output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
         mockS3Client.on(GetObjectCommand).resolves(output);
+    });
+
+    test("throws an error if the seed key is not configured", async () => {
+        delete process.env[EXPECTED_PROCESS_SEED_KEY];
+        const expectedError = new Error(
+            `Missing ${EXPECTED_PROCESS_SEED_KEY} environment variable`
+        );
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrowError(expectedError);
     });
 
     test("throws an error if an unhandled exception occurs when fetching S3 content", async () => {
