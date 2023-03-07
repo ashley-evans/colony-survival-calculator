@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.0"
     }
+
+    mongodbatlas = {
+      source = "mongodb/mongodbatlas"
+    }
   }
 
 
@@ -17,6 +21,11 @@ terraform {
 
 provider "aws" {
   region = var.region
+}
+
+provider "mongodbatlas" {
+  public_key  = var.mongodb_public_key
+  private_key = var.mongodb_private_key
 }
 
 locals {

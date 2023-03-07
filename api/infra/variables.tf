@@ -16,3 +16,11 @@ variable "runtime" {
   type    = string
   default = "nodejs18.x"
 }
+
+variable "mongodb_public_key" {
+  type = string
+}
+
+variable "mongodb_private_key" {
+  type = string
+}
