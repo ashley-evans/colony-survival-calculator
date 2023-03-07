@@ -23,8 +23,7 @@ function parseItems(input: string): Items {
 
 const addItem: AddItemPrimaryPort = async (items) => {
     const parsedItems = parseItems(items);
-    await storeItem(parsedItems);
-    return true;
+    return storeItem(parsedItems);
 };
 
 export { addItem };

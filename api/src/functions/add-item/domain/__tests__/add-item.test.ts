@@ -12,6 +12,10 @@ const mockStoreItem = storeItem as jest.Mock;
 import { addItem } from "../add-item";
 
 const validItem = createItem("item name 1", 2, 3, [], 10, 2);
+const validItemWithReqs = createItem("item name 2", 1, 2, [
+    { name: "item name 1", amount: 2 },
+]);
+const validItems = [validItem, validItemWithReqs];
 
 beforeEach(() => {
     mockStoreItem.mockReset();
@@ -270,8 +274,10 @@ describe.each([
     }
 );
 
-describe("handles valid input with a single item", () => {
-    const expected: Items = [validItem];
+describe.each([
+    ["a single item", [validItem]],
+    ["multiple items", validItems],
+])("handles valid input with %s", (_: string, expected: Items) => {
     const input = JSON.stringify(expected);
 
     test("stores provided item in database", async () => {
@@ -285,5 +291,25 @@ describe("handles valid input with a single item", () => {
         const actual = await addItem(input);
 
         expect(actual).toBe(true);
+    });
+});
+
+describe("error handling", () => {
+    test("returns failure if the storage of items failed", async () => {
+        const input = JSON.stringify(validItems);
+        mockStoreItem.mockResolvedValue(false);
+
+        const actual = await addItem(input);
+
+        expect(actual).toBe(false);
+    });
+
+    test("throws an error if an unhandled exception is thrown while storing items", async () => {
+        const input = JSON.stringify(validItems);
+        const expectedError = new Error("test error");
+        mockStoreItem.mockRejectedValue(expectedError);
+
+        expect.assertions(1);
+        await expect(addItem(input)).rejects.toEqual(expectedError);
     });
 });
