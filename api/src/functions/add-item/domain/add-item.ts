@@ -23,6 +23,15 @@ function parseItems(input: string): Items {
 
 const addItem: AddItemPrimaryPort = async (items) => {
     const parsedItems = parseItems(items);
+    const itemMap = new Set<string>(parsedItems.map((item) => item.name));
+    for (const item of parsedItems) {
+        for (const requirement of item.requires) {
+            if (!itemMap.has(requirement.name)) {
+                throw `Missing requirement: ${requirement.name} in ${item.name}`;
+            }
+        }
+    }
+
     return storeItem(parsedItems);
 };
 

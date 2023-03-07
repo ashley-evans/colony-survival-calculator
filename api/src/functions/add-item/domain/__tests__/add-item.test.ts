@@ -274,6 +274,34 @@ describe.each([
     }
 );
 
+describe("handles items with unknown item requirements", () => {
+    const items: Items = [validItemWithReqs];
+    const input = JSON.stringify(items);
+
+    beforeAll(() => {
+        jest.spyOn(console, "error").mockImplementation(() => undefined);
+    });
+
+    test("does not store any items in database", async () => {
+        try {
+            await addItem(input);
+        } catch {
+            // Ignore
+        }
+
+        expect(storeItem).not.toHaveBeenCalled();
+    });
+
+    test("throws a validation error", async () => {
+        const expectedError = "Missing requirement:";
+
+        expect.assertions(1);
+        await expect(addItem(input)).rejects.toEqual(
+            expect.stringContaining(expectedError)
+        );
+    });
+});
+
 describe.each([
     ["a single item", [validItem]],
     ["multiple items", validItems],
