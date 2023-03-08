@@ -32,6 +32,7 @@ locals {
   resource_prefix      = "colony-survival-calculator-tf-"
   architectures        = ["arm64"]
   seed_file_key_prefix = "seeds/"
+  mongodb_org_prefix   = "colony-survival-calculator-db-"
 }
 
 resource "aws_s3_bucket" "api_bucket" {
@@ -154,4 +155,20 @@ resource "aws_s3_object" "items_json_seed" {
   etag = filemd5("${var.src_folder}/json/items.json")
 
   depends_on = [aws_s3_bucket_notification.seed_notification]
+}
+
+data "mongodbatlas_roles_org_id" "main" {}
+
+resource "mongodbatlas_project" "main" {
+  name   = "${local.mongodb_org_prefix}${terraform.workspace}"
+  org_id = data.mongodbatlas_roles_org_id.main.org_id
+}
+
+resource "mongodbatlas_serverless_instance" "main" {
+  project_id = mongodbatlas_project.main.id
+  name       = "${local.resource_prefix}db-instance"
+
+  provider_settings_backing_provider_name = "AWS"
+  provider_settings_provider_name         = "SERVERLESS"
+  provider_settings_region_name           = replace(upper(var.region), "-", "_")
 }
