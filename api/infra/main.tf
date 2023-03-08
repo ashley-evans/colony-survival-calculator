@@ -29,10 +29,11 @@ provider "mongodbatlas" {
 }
 
 locals {
-  resource_prefix      = "colony-survival-calculator-tf-"
-  architectures        = ["arm64"]
-  seed_file_key_prefix = "seeds/"
-  mongodb_org_prefix   = "colony-survival-calculator-db-"
+  resource_prefix              = "colony-survival-calculator-tf-"
+  architectures                = ["arm64"]
+  seed_file_key_prefix         = "seeds/"
+  mongodb_org_prefix           = "colony-survival-calculator-db-"
+  mongodb_item_collection_name = "items"
 }
 
 resource "aws_s3_bucket" "api_bucket" {
@@ -171,4 +172,22 @@ resource "mongodbatlas_serverless_instance" "main" {
   provider_settings_backing_provider_name = "AWS"
   provider_settings_provider_name         = "SERVERLESS"
   provider_settings_region_name           = replace(upper(var.region), "-", "_")
+}
+
+resource "mongodbatlas_project_ip_access_list" "main" {
+  project_id = mongodbatlas_project.main.id
+  cidr_block = "0.0.0.0/0"
+}
+
+resource "mongodbatlas_database_user" "add_item_lambda" {
+  username           = aws_iam_role.add_item_lambda.arn
+  project_id         = mongodbatlas_project.main.id
+  auth_database_name = "$external"
+  aws_iam_type       = "ROLE"
+
+  roles {
+    role_name       = "readWrite"
+    database_name   = "${local.resource_prefix}db-instance"
+    collection_name = local.mongodb_item_collection_name
+  }
 }
