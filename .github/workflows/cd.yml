@@ -36,6 +36,9 @@ jobs:
               run: |
                   npm run ci
             - name: Run deployment
+              env:
+                  TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}
+                  TF_VAR_mongodb_public_key: ${{ secrets.MONGODB_PUBLIC_KEY }}
               run: |
                   previous_tag=$(git tag | tail -n 2 | head -n 1)
                   if [ -n "$previous_tag" ]; then

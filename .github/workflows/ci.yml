@@ -220,6 +220,9 @@ jobs:
               run: |
                   npm run ci
             - name: Run dry run deployment
+              env:
+                  TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}
+                  TF_VAR_mongodb_public_key: ${{ secrets.MONGODB_PUBLIC_KEY }}
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run deploy:plan --since=origin/master -- -e prod
