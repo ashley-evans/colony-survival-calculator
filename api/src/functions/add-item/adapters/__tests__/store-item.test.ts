@@ -145,6 +145,20 @@ describe.each([
     });
 });
 
+test("removes any old entries prior to storing new items", async () => {
+    const oldItem = createItem("old", 1, 2, []);
+    const newItem = createItem("new", 2, 3, []);
+    const { storeItem } = await import("../store-item");
+
+    await storeItem([oldItem]);
+    await storeItem([newItem]);
+
+    const itemsCollection = getItemsCollection();
+    const items = await itemsCollection.find().toArray();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toEqual(newItem);
+});
+
 afterAll(async () => {
     await mongoDBMemoryServer.stop();
 });
