@@ -33,6 +33,7 @@ locals {
   architectures                = ["arm64"]
   seed_file_key_prefix         = "seeds/"
   mongodb_org_prefix           = "colony-survival-calculator-db-"
+  mongodb_database_name        = "main_db"
   mongodb_item_collection_name = "items"
 }
 
@@ -121,7 +122,10 @@ resource "aws_lambda_function" "add_item_lambda" {
 
   environment {
     variables = {
-      ITEM_SEED_KEY = "${local.seed_file_key_prefix}items.json"
+      ITEM_SEED_KEY        = "${local.seed_file_key_prefix}items.json"
+      DATABASE_NAME        = local.mongodb_database_name
+      ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
+      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
     }
   }
 }
@@ -187,7 +191,7 @@ resource "mongodbatlas_database_user" "add_item_lambda" {
 
   roles {
     role_name       = "readWrite"
-    database_name   = "${local.resource_prefix}db-instance"
+    database_name   = local.mongodb_database_name
     collection_name = local.mongodb_item_collection_name
   }
 }
