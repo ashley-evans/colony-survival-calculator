@@ -8,15 +8,31 @@ const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
 
 let mongoDBMemoryServer: MongoMemoryServer;
-let connection: MongoClient;
 
-function getItemsCollection() {
-    const db = connection.db(databaseName);
+jest.mock("../mongo-client", async () => {
+    mongoDBMemoryServer = await MongoMemoryServer.create({
+        binary: {
+            version: "6.0.4",
+        },
+        instance: {
+            dbName: databaseName,
+        },
+    });
+
+    return MongoClient.connect(mongoDBMemoryServer.getUri());
+});
+
+import mockClient from "../mongo-client";
+
+async function getItemsCollection() {
+    const client = await mockClient;
+    const db = client.db(databaseName);
     return db.collection(itemCollectionName);
 }
 
 async function clearItemsCollection() {
-    const db = connection.db(databaseName);
+    const client = await mockClient;
+    const db = client.db(databaseName);
 
     const existingCollections = await db.listCollections().toArray();
     const collectionExists =
@@ -29,25 +45,9 @@ async function clearItemsCollection() {
     }
 }
 
-beforeAll(async () => {
-    mongoDBMemoryServer = await MongoMemoryServer.create({
-        binary: {
-            version: "6.0.4",
-        },
-        instance: {
-            dbName: databaseName,
-        },
-    });
-
-    connection = await MongoClient.connect(mongoDBMemoryServer.getUri());
-}, 10000);
-
 beforeEach(async () => {
     process.env["DATABASE_NAME"] = databaseName;
     process.env["ITEM_COLLECTION_NAME"] = "Items";
-    process.env["MONGO_DB_URI"] = mongoDBMemoryServer.getUri();
-    process.env["AWS_ACCESS_KEY_ID"] = "test_access_key_id";
-    process.env["AWS_SECRET_ACCESS_KEY"] = "test_secret_access_key";
     process.env["TEST_ENV"] = "true";
 
     await clearItemsCollection();
@@ -63,21 +63,6 @@ test.each([
         "item collection name",
         "ITEM_COLLECTION_NAME",
         "Misconfigured: Item collection name not provided",
-    ],
-    [
-        "mongodb URI",
-        "MONGO_DB_URI",
-        "Misconfigured: URI for MongoDB not provided",
-    ],
-    [
-        "AWS access key ID",
-        "AWS_ACCESS_KEY_ID",
-        "Misconfigured: AWS Access Key ID not provided",
-    ],
-    [
-        "AWS secret access key",
-        "AWS_SECRET_ACCESS_KEY",
-        "Misconfigured: AWS Secret Access Key not provided",
     ],
 ])(
     "throws an error if %s configuration not provided",
@@ -106,7 +91,7 @@ describe("empty array handling", () => {
 
         await storeItem([]);
 
-        const itemsCollection = getItemsCollection();
+        const itemsCollection = await getItemsCollection();
         const items = await itemsCollection.find().toArray();
         expect(items).toHaveLength(0);
     });
@@ -138,7 +123,7 @@ describe.each([
 
         await storeItem(expected);
 
-        const itemsCollection = getItemsCollection();
+        const itemsCollection = await getItemsCollection();
         const items = await itemsCollection.find().toArray();
         expect(items).toHaveLength(items.length);
         expect(items).toEqual(expect.arrayContaining(expected));
@@ -153,12 +138,13 @@ test("removes any old entries prior to storing new items", async () => {
     await storeItem([oldItem]);
     await storeItem([newItem]);
 
-    const itemsCollection = getItemsCollection();
+    const itemsCollection = await getItemsCollection();
     const items = await itemsCollection.find().toArray();
     expect(items).toHaveLength(1);
     expect(items[0]).toEqual(newItem);
 });
 
 afterAll(async () => {
+    (await mockClient).close(true);
     await mongoDBMemoryServer.stop();
 });
