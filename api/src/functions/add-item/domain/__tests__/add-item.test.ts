@@ -17,9 +17,15 @@ const validItemWithReqs = createItem("item name 2", 1, 2, [
 ]);
 const validItems = [validItem, validItemWithReqs];
 
+const errorLogSpy = jest
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
+
 beforeEach(() => {
     mockStoreItem.mockReset();
     mockStoreItem.mockResolvedValue(true);
+
+    errorLogSpy.mockClear();
 });
 
 describe.each([
@@ -249,10 +255,6 @@ describe.each([
 ])(
     "handles invalid input (schema validation) given %s",
     (_: string, input: string) => {
-        beforeAll(() => {
-            jest.spyOn(console, "error").mockImplementation(() => undefined);
-        });
-
         test("does not store any items in database", async () => {
             try {
                 await addItem(input);
@@ -277,10 +279,6 @@ describe.each([
 describe("handles items with unknown item requirements", () => {
     const items: Items = [validItemWithReqs];
     const input = JSON.stringify(items);
-
-    beforeAll(() => {
-        jest.spyOn(console, "error").mockImplementation(() => undefined);
-    });
 
     test("does not store any items in database", async () => {
         try {
@@ -339,5 +337,20 @@ describe("error handling", () => {
 
         expect.assertions(1);
         await expect(addItem(input)).rejects.toEqual(expectedError);
+    });
+
+    test("logs the error message to console if an unhandled exception occurs while storing items", async () => {
+        const input = JSON.stringify(validItems);
+        const expectedError = new Error("test error");
+        mockStoreItem.mockRejectedValue(expectedError);
+
+        try {
+            await addItem(input);
+        } catch {
+            // Ignore
+        }
+
+        expect(errorLogSpy).toHaveBeenCalledTimes(1);
+        expect(errorLogSpy).toHaveBeenCalledWith(expectedError);
     });
 });

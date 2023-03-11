@@ -32,7 +32,12 @@ const addItem: AddItemPrimaryPort = async (items) => {
         }
     }
 
-    return storeItem(parsedItems);
+    try {
+        return await storeItem(parsedItems);
+    } catch (ex) {
+        console.error(ex);
+        throw ex;
+    }
 };
 
 export { addItem };
