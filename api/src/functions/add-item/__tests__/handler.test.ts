@@ -152,7 +152,9 @@ describe("handles valid item list create events", () => {
     });
 
     test("does not call domain if no content returned", async () => {
-        mockS3Client.on(GetObjectCommand).resolves({ Body: undefined });
+        const output = mock<GetObjectCommandOutput>();
+        output.Body = sdkStreamMixin(Readable.from([]));
+        mockS3Client.on(GetObjectCommand).resolves(output);
 
         await handler(event);
 
