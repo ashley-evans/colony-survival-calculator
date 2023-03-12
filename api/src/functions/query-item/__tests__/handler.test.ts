@@ -47,9 +47,11 @@ test.each([
     }
 );
 
-test("throws an error if an exception occurs while fetching item details", async () => {
-    const expectedError = new Error("test error");
-    mockQueryItem.mockRejectedValue(expectedError);
+test("throws a user friendly error if an exception occurs while fetching item details", async () => {
+    const expectedError = new Error(
+        "An error occurred while fetching item details, please try again."
+    );
+    mockQueryItem.mockRejectedValue(new Error("unhandled"));
 
     expect.assertions(1);
     await expect(handler(mockEvent)).rejects.toThrow(expectedError);
