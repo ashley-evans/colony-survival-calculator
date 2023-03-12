@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
-import { createItem } from "../../../../../test/index";
+import { createItem, createMemoryServer } from "../../../../../test/index";
 import type { Items } from "../../../../types";
 
 const databaseName = "TestDatabase";
@@ -10,15 +10,7 @@ const itemCollectionName = "Items";
 let mongoDBMemoryServer: MongoMemoryServer;
 
 jest.mock("@colony-survival-calculator/mongodb-client", async () => {
-    mongoDBMemoryServer = await MongoMemoryServer.create({
-        binary: {
-            version: "6.0.4",
-        },
-        instance: {
-            dbName: databaseName,
-        },
-    });
-
+    mongoDBMemoryServer = await createMemoryServer(databaseName);
     return MongoClient.connect(mongoDBMemoryServer.getUri());
 });
 
