@@ -9,7 +9,7 @@ const itemCollectionName = "Items";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
-jest.mock("../mongo-client", async () => {
+jest.mock("@colony-survival-calculator/mongodb-client", async () => {
     mongoDBMemoryServer = await MongoMemoryServer.create({
         binary: {
             version: "6.0.4",
@@ -22,7 +22,7 @@ jest.mock("../mongo-client", async () => {
     return MongoClient.connect(mongoDBMemoryServer.getUri());
 });
 
-import mockClient from "../mongo-client";
+import mockClient from "@colony-survival-calculator/mongodb-client";
 
 async function getItemsCollection() {
     const client = await mockClient;

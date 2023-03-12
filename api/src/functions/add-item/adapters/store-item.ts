@@ -1,4 +1,4 @@
-import client from "./mongo-client";
+import client from "@colony-survival-calculator/mongodb-client";
 
 import type { StoreItemPort } from "../interfaces/store-item-port";
 
