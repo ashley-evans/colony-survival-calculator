@@ -1,15 +1,19 @@
-type ItemInput {
-    name: String!
+type FarmSize {
+    width: Int!
+    height: Int!
 }
 
 type Item {
-    id: ID!
+    name: ID!
+    createTime: Float!
+    output: Int!
+    size: FarmSize
 }
 
-type Mutation {
-    addItem(input: ItemInput!): Item!
+type Query {
+    item: [Item]!
 }
 
 schema {
-    mutation: Mutation
+    query: Query
 }
