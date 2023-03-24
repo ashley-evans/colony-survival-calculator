@@ -88,6 +88,26 @@ resource "mongodbatlas_project_ip_access_list" "main" {
   cidr_block = "0.0.0.0/0"
 }
 
+resource "aws_appsync_graphql_api" "main" {
+  name                = "${local.resource_prefix}-api-${terraform.workspace}"
+  authentication_type = "AWS_IAM"
+
+  schema = file("${var.src_folder}/graphql/schema.graphql")
+}
+
+data "aws_iam_policy_document" "appsync_policy_document" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["appsync.amazonaws.com"]
+    }
+  }
+}
+
 data "archive_file" "add_item_lambda" {
   type = "zip"
 
@@ -253,4 +273,42 @@ resource "mongodbatlas_database_user" "query_item_lambda" {
     database_name   = local.mongodb_database_name
     collection_name = local.mongodb_item_collection_name
   }
+}
+
+resource "aws_iam_policy" "query_item_lambda_access" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["lambda:InvokeFunction"]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.query_item_lambda.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "query_item_lambda_access" {
+  assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
+  managed_policy_arns = [
+    aws_iam_policy.query_item_lambda_access.arn,
+  ]
+}
+
+resource "aws_appsync_datasource" "query_item_lambda" {
+  api_id           = aws_appsync_graphql_api.main.id
+  name             = "${replace(local.resource_prefix, "-", "_")}query_item_lambda_datasource_${terraform.workspace}"
+  service_role_arn = aws_iam_role.query_item_lambda_access.arn
+  type             = "AWS_LAMBDA"
+
+  lambda_config {
+    function_arn = aws_lambda_function.query_item_lambda.arn
+  }
+}
+
+resource "aws_appsync_resolver" "item" {
+  api_id      = aws_appsync_graphql_api.main.id
+  data_source = aws_appsync_datasource.query_item_lambda.name
+  type        = "Query"
+  field       = "item"
 }
