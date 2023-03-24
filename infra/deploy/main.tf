@@ -86,7 +86,8 @@ resource "aws_iam_role" "deploy_role" {
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
     "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
     "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
-    "arn:aws:iam::aws:policy/IAMFullAccess"
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    "arn:aws:iam::aws:policy/AWSAppSyncAdministrator"
   ]
 }
 
