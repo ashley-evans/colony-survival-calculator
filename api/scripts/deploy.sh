@@ -73,7 +73,7 @@ cp $script_parent_dir/lerna.dist.json $dist_dir/lerna.json
 cd $dist_dir && npx lerna bootstrap --ci -- --production
 
 echo "Bundle code for deployment..."
-cd $dist_dir && npx lerna exec -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --platform=node --target=$runtime --outfile=dist/index.js
+cd $dist_dir && npx lerna exec --scope="@colony-survival-calculator/*-function" -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --platform=node --target=$runtime --outfile=dist/index.js
 
 if [ $dryrun ]; then
     echo "Dry run deployment of UI for environment: $environment..."

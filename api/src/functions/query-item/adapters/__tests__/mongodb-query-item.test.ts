@@ -16,10 +16,9 @@ jest.mock("@colony-survival-calculator/mongodb-client", async () => {
 
 import mockClient from "@colony-survival-calculator/mongodb-client";
 
-async function getItemsCollection() {
-    const client = await mockClient;
-    const db = client.db(databaseName);
-    return db.collection(itemCollectionName);
+async function storeItems(items: Items) {
+    const { storeItem } = await import("../../../add-item/adapters/store-item");
+    await storeItem(items);
 }
 
 async function clearItemsCollection() {
@@ -63,32 +62,20 @@ test.each([
 
         expect.assertions(1);
         await expect(async () => {
-            await import("../store-item");
+            await import("../mongodb-query-item");
         }).rejects.toThrow(expectedError);
     }
 );
 
-describe("empty array handling", () => {
-    test("returns success if provided an empty array", async () => {
-        const { storeItem } = await import("../store-item");
+test("returns an empty array if no items are stored in the items collection", async () => {
+    const { queryItem } = await import("../mongodb-query-item");
 
-        const actual = await storeItem([]);
+    const actual = await queryItem();
 
-        expect(actual).toBe(true);
-    });
-
-    test("adds no items to the items collection", async () => {
-        const { storeItem } = await import("../store-item");
-
-        await storeItem([]);
-
-        const itemsCollection = await getItemsCollection();
-        const items = await itemsCollection.find().toArray();
-        expect(items).toHaveLength(0);
-    });
+    expect(actual).toEqual([]);
 });
 
-describe.each([
+test.each([
     [
         "a single item",
         [createItem("test item 1", 2, 3, [{ name: "test", amount: 1 }])],
@@ -100,40 +87,18 @@ describe.each([
             createItem("test item 2", 1, 4, [{ name: "world", amount: 3 }]),
         ],
     ],
-])("handles adding %s", (_: string, expected: Items) => {
-    test("returns success", async () => {
-        const { storeItem } = await import("../store-item");
+])(
+    "returns an array with all stored items given a %s is stored in the item collection",
+    async (_: string, expected: Items) => {
+        await storeItems(expected);
+        const { queryItem } = await import("../mongodb-query-item");
 
-        const actual = await storeItem(expected);
+        const actual = await queryItem();
 
-        expect(actual).toBe(true);
-    });
-
-    test("adds the provided item(s) to the item collection", async () => {
-        const { storeItem } = await import("../store-item");
-
-        await storeItem(expected);
-
-        const itemsCollection = await getItemsCollection();
-        const items = await itemsCollection.find().toArray();
-        expect(items).toHaveLength(items.length);
-        expect(items).toEqual(expect.arrayContaining(expected));
-    });
-});
-
-test("removes any old entries prior to storing new items", async () => {
-    const oldItem = createItem("old", 1, 2, []);
-    const newItem = createItem("new", 2, 3, []);
-    const { storeItem } = await import("../store-item");
-
-    await storeItem([oldItem]);
-    await storeItem([newItem]);
-
-    const itemsCollection = await getItemsCollection();
-    const items = await itemsCollection.find().toArray();
-    expect(items).toHaveLength(1);
-    expect(items[0]).toEqual(newItem);
-});
+        expect(actual).toHaveLength(expected.length);
+        expect(actual).toEqual(expect.arrayContaining(expected));
+    }
+);
 
 afterAll(async () => {
     (await mockClient).close(true);

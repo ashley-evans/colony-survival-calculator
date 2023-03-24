@@ -1,0 +1,9 @@
+{
+    "name": "@colony-survival-calculator/query-item-function",
+    "private": true,
+    "version": "0.0.0",
+    "dependencies": {
+        "@colony-survival-calculator/mongodb-client": "0.0.0",
+        "ajv": "8.12.0"
+    }
+}

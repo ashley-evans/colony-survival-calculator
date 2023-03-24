@@ -47,13 +47,13 @@ test.each([
 
         expect.assertions(1);
         await expect(async () => {
-            await import("../mongo-client");
+            await import("..");
         }).rejects.toThrow(expectedError);
     }
 );
 
 test("returns a mongo DB client", async () => {
-    const client = await (await import("../mongo-client")).default;
+    const client = await (await import("..")).default;
 
     expect(client).toBeInstanceOf(MongoClient);
 
