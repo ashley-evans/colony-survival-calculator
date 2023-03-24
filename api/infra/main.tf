@@ -56,6 +56,38 @@ resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
   acl = "private"
 }
 
+resource "aws_s3_object" "items_json_seed" {
+  bucket = aws_s3_bucket.api_bucket.id
+
+  key    = "${local.seed_file_key_prefix}items.json"
+  source = "${var.src_folder}/json/items.json"
+
+  etag = filemd5("${var.src_folder}/json/items.json")
+
+  depends_on = [aws_s3_bucket_notification.seed_notification]
+}
+
+data "mongodbatlas_roles_org_id" "main" {}
+
+resource "mongodbatlas_project" "main" {
+  name   = "${local.mongodb_org_prefix}${terraform.workspace}"
+  org_id = data.mongodbatlas_roles_org_id.main.org_id
+}
+
+resource "mongodbatlas_serverless_instance" "main" {
+  project_id = mongodbatlas_project.main.id
+  name       = "${local.resource_prefix}db-instance"
+
+  provider_settings_backing_provider_name = "AWS"
+  provider_settings_provider_name         = "SERVERLESS"
+  provider_settings_region_name           = replace(upper(var.region), "-", "_")
+}
+
+resource "mongodbatlas_project_ip_access_list" "main" {
+  project_id = mongodbatlas_project.main.id
+  cidr_block = "0.0.0.0/0"
+}
+
 data "archive_file" "add_item_lambda" {
   type = "zip"
 
@@ -151,38 +183,6 @@ resource "aws_s3_bucket_notification" "seed_notification" {
   depends_on = [aws_lambda_permission.allow_api_bucket_seed_execution]
 }
 
-resource "aws_s3_object" "items_json_seed" {
-  bucket = aws_s3_bucket.api_bucket.id
-
-  key    = "${local.seed_file_key_prefix}items.json"
-  source = "${var.src_folder}/json/items.json"
-
-  etag = filemd5("${var.src_folder}/json/items.json")
-
-  depends_on = [aws_s3_bucket_notification.seed_notification]
-}
-
-data "mongodbatlas_roles_org_id" "main" {}
-
-resource "mongodbatlas_project" "main" {
-  name   = "${local.mongodb_org_prefix}${terraform.workspace}"
-  org_id = data.mongodbatlas_roles_org_id.main.org_id
-}
-
-resource "mongodbatlas_serverless_instance" "main" {
-  project_id = mongodbatlas_project.main.id
-  name       = "${local.resource_prefix}db-instance"
-
-  provider_settings_backing_provider_name = "AWS"
-  provider_settings_provider_name         = "SERVERLESS"
-  provider_settings_region_name           = replace(upper(var.region), "-", "_")
-}
-
-resource "mongodbatlas_project_ip_access_list" "main" {
-  project_id = mongodbatlas_project.main.id
-  cidr_block = "0.0.0.0/0"
-}
-
 resource "mongodbatlas_database_user" "add_item_lambda" {
   username           = aws_iam_role.add_item_lambda.arn
   project_id         = mongodbatlas_project.main.id
@@ -191,6 +191,65 @@ resource "mongodbatlas_database_user" "add_item_lambda" {
 
   roles {
     role_name       = "readWrite"
+    database_name   = local.mongodb_database_name
+    collection_name = local.mongodb_item_collection_name
+  }
+}
+
+data "archive_file" "query_item_lambda" {
+  type = "zip"
+
+  source_dir  = "${var.dist_folder}/functions/query-item/dist"
+  output_path = "${var.dist_folder}/functions/query-item/query-item.zip"
+}
+
+resource "aws_s3_object" "query_item_lambda" {
+  bucket = aws_s3_bucket.api_bucket.id
+
+  key    = "query-item.zip"
+  source = data.archive_file.query_item_lambda.output_path
+
+  etag = filemd5(data.archive_file.query_item_lambda.output_path)
+}
+
+resource "aws_iam_role" "query_item_lambda" {
+  assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+}
+
+resource "aws_lambda_function" "query_item_lambda" {
+  function_name = "${local.resource_prefix}query-item-${terraform.workspace}"
+
+  s3_bucket = aws_s3_bucket.api_bucket.id
+  s3_key    = aws_s3_object.query_item_lambda.key
+
+  runtime       = var.runtime
+  handler       = "index.handler"
+  architectures = local.architectures
+
+  source_code_hash = data.archive_file.query_item_lambda.output_base64sha256
+
+  role = aws_iam_role.query_item_lambda.arn
+
+  environment {
+    variables = {
+      DATABASE_NAME        = local.mongodb_database_name
+      ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
+      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+    }
+  }
+}
+
+resource "mongodbatlas_database_user" "query_item_lambda" {
+  username           = aws_iam_role.query_item_lambda.arn
+  project_id         = mongodbatlas_project.main.id
+  auth_database_name = "$external"
+  aws_iam_type       = "ROLE"
+
+  roles {
+    role_name       = "read"
     database_name   = local.mongodb_database_name
     collection_name = local.mongodb_item_collection_name
   }
