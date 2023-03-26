@@ -5,7 +5,7 @@ import type {
     QueryRequirementArgs,
     Requirement as GraphQLRequirement,
 } from "../../../graphql/schema";
-import type { Requirement } from "../interfaces/query-requirements-primary-port";
+import type { Requirement } from "../../../types";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 
