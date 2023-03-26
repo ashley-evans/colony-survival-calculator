@@ -1,7 +1,10 @@
-import type { Requirement } from "../../../types";
+type RequiredWorkers = {
+    name: string;
+    workers: number;
+};
 
 interface QueryRequirementsPrimaryPort {
-    (name: string, amount: number): Promise<Requirement[]>;
+    (name: string, workers: number): Promise<RequiredWorkers[]>;
 }
 
-export type { QueryRequirementsPrimaryPort };
+export type { RequiredWorkers, QueryRequirementsPrimaryPort };

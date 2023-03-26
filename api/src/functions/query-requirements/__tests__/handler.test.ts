@@ -5,7 +5,7 @@ import type {
     QueryRequirementArgs,
     Requirement as GraphQLRequirement,
 } from "../../../graphql/schema";
-import type { Requirement } from "../../../types";
+import type { RequiredWorkers } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 
@@ -17,12 +17,12 @@ const mockQueryRequirements = queryRequirements as jest.Mock;
 
 function createMockEvent(
     name: string,
-    amount: number
+    workers: number
 ): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.arguments = {
         name,
-        amount,
+        workers,
     };
 
     return mockEvent;
@@ -47,19 +47,19 @@ test.each([
     [
         "multiple requirements received",
         [
-            { name: "test", amount: 2 },
-            { name: "test 2", amount: 5 },
+            { name: "test", workers: 2 },
+            { name: "test 2", workers: 5 },
         ],
         [
-            { name: "test", amount: 2 },
-            { name: "test 2", amount: 5 },
+            { name: "test", workers: 2 },
+            { name: "test 2", workers: 5 },
         ],
     ],
 ])(
     "returns all items received from domain given %s",
     async (
         _: string,
-        returned: Requirement[],
+        returned: RequiredWorkers[],
         expected: GraphQLRequirement[]
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);

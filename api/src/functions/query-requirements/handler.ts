@@ -6,9 +6,9 @@ const handler: GraphQLEventHandler<
     QueryRequirementArgs,
     Requirement[]
 > = async (event) => {
-    const { name, amount } = event.arguments;
+    const { name, workers } = event.arguments;
 
-    return await queryRequirements(name, amount);
+    return await queryRequirements(name, workers);
 };
 
 export { handler };

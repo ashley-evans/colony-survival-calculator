@@ -12,12 +12,12 @@ type Item {
 
 type Requirement {
     name: ID!
-    amount: Int!
+    workers: Int!
 }
 
 type Query {
     item(name: ID): [Item]!
-    requirement(name: ID!, amount: Int!): [Requirement]!
+    requirement(name: ID!, workers: Int!): [Requirement]!
 }
 
 schema {
