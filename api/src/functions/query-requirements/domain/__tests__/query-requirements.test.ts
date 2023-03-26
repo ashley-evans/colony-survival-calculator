@@ -110,7 +110,7 @@ test("returns requirement given item with a single requirement and no nested req
     expect(actual[0]?.workers).toBeCloseTo(7.5);
 });
 
-test("returns requirement given item with multiple requirements and no nested requirements", async () => {
+test("returns requirements given item with multiple requirements and no nested requirements", async () => {
     const requiredItem1 = createItem("required item 1", 3, 4, []);
     const requiredItem2 = createItem("required item 2", 4, 2, []);
     const item = createItem(validItemName, 2, 3, [
@@ -129,5 +129,55 @@ test("returns requirement given item with multiple requirements and no nested re
     expect(actual).toEqual([
         { name: requiredItem1.name, workers: 7.5 },
         { name: requiredItem2.name, workers: 30 },
+    ]);
+});
+
+test("returns requirements given item with single nested requirement", async () => {
+    const requiredItem2 = createItem("required item 2", 4, 2, []);
+    const requiredItem1 = createItem("required item 1", 3, 4, [
+        { name: requiredItem2.name, amount: 6 },
+    ]);
+    const item = createItem(validItemName, 2, 3, [
+        { name: requiredItem1.name, amount: 4 },
+    ]);
+    mockMongoDBQueryRequirements.mockResolvedValue([
+        item,
+        requiredItem1,
+        requiredItem2,
+    ]);
+
+    const actual = await queryRequirements(validItemName, validWorkers);
+
+    expect(actual).toHaveLength(2);
+    expect(actual).toEqual([
+        { name: requiredItem1.name, workers: 7.5 },
+        { name: requiredItem2.name, workers: 30 },
+    ]);
+});
+
+test("returns requirements given item with multiple different nested requirements", async () => {
+    const requiredItem3 = createItem("required item 3", 4, 2, []);
+    const requiredItem2 = createItem("required item 2", 4, 2, []);
+    const requiredItem1 = createItem("required item 1", 3, 4, [
+        { name: requiredItem2.name, amount: 6 },
+        { name: requiredItem3.name, amount: 4 },
+    ]);
+    const item = createItem(validItemName, 2, 3, [
+        { name: requiredItem1.name, amount: 4 },
+    ]);
+    mockMongoDBQueryRequirements.mockResolvedValue([
+        item,
+        requiredItem1,
+        requiredItem2,
+        requiredItem3,
+    ]);
+
+    const actual = await queryRequirements(validItemName, validWorkers);
+
+    expect(actual).toHaveLength(3);
+    expect(actual).toEqual([
+        { name: requiredItem1.name, workers: 7.5 },
+        { name: requiredItem2.name, workers: 30 },
+        { name: requiredItem3.name, workers: 20 },
     ]);
 });

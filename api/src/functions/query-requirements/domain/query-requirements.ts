@@ -12,6 +12,40 @@ const INVALID_WORKERS_ERROR =
 const UNKNOWN_ITEM_ERROR = "Unknown item provided";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
+function calculateRequirements(
+    inputItem: Item,
+    inputDesiredWorkers: number,
+    knownItems: Map<string, Item>
+): RequiredWorkers[] {
+    const requirements: RequiredWorkers[] = [];
+    for (const requirement of inputItem.requires) {
+        const requiredItem = knownItems.get(requirement.name);
+        if (!requiredItem) {
+            throw new Error(INTERNAL_SERVER_ERROR);
+        }
+
+        const requiredPerSecond = requirement.amount / inputItem.createTime;
+        const producedPerSecond = requiredItem.output / requiredItem.createTime;
+        const demandPerSecond = requiredPerSecond / producedPerSecond;
+        const requiredWorkers = demandPerSecond * inputDesiredWorkers;
+        requirements.push({
+            name: requirement.name,
+            workers: requiredWorkers,
+        });
+
+        if (requiredItem.requires.length > 0) {
+            const nestedRequirements = calculateRequirements(
+                requiredItem,
+                requiredWorkers,
+                knownItems
+            );
+            requirements.push(...nestedRequirements);
+        }
+    }
+
+    return requirements;
+}
+
 const queryRequirements: QueryRequirementsPrimaryPort = async (
     name: string,
     workers: number
@@ -39,23 +73,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    const totalRequirements: RequiredWorkers[] = [];
-    for (const requirement of inputItem.requires) {
-        const requiredItem = requirementMap.get(requirement.name);
-        if (!requiredItem) {
-            throw new Error(INTERNAL_SERVER_ERROR);
-        }
-
-        const requiredPerSecond = requirement.amount / inputItem.createTime;
-        const producedPerSecond = requiredItem.output / requiredItem.createTime;
-        const demandPerSecond = requiredPerSecond / producedPerSecond;
-        totalRequirements.push({
-            name: requirement.name,
-            workers: demandPerSecond * workers,
-        });
-    }
-
-    return totalRequirements;
+    return calculateRequirements(inputItem, workers, requirementMap);
 };
 
 export { queryRequirements };
