@@ -11,7 +11,7 @@ type Item {
 }
 
 type Query {
-    item: [Item]!
+    item(name: ID): [Item]!
 }
 
 schema {
