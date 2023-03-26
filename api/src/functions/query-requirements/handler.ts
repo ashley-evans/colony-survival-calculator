@@ -8,13 +8,7 @@ const handler: GraphQLEventHandler<
 > = async (event) => {
     const { name, amount } = event.arguments;
 
-    try {
-        return await queryRequirements(name, amount);
-    } catch {
-        throw new Error(
-            "An error occurred while fetching item requirements, please try again."
-        );
-    }
+    return await queryRequirements(name, amount);
 };
 
 export { handler };
