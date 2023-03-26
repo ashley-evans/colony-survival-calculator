@@ -1,6 +1,6 @@
 import client from "@colony-survival-calculator/mongodb-client";
-import type { Item } from "../../../types";
 
+import type { Item } from "../../../types";
 import type { QueryItemSecondaryPort } from "../interfaces/query-item-secondary-port";
 
 const databaseName = process.env["DATABASE_NAME"];
@@ -13,9 +13,14 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryItem: QueryItemSecondaryPort = async () => {
+const queryItem: QueryItemSecondaryPort = async (name?: string) => {
     const db = (await client).db(databaseName);
     const collection = db.collection<Item>(itemCollectionName);
+
+    if (name) {
+        return collection.find({ name }).toArray();
+    }
+
     return collection.find().toArray();
 };
 

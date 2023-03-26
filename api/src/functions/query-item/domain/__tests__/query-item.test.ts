@@ -17,11 +17,18 @@ beforeEach(() => {
     consoleErrorSpy.mockClear();
 });
 
-test("calls the secondary adapter to fetch all items", async () => {
-    await queryItem();
+test.each([
+    ["all items", "no item name provided", undefined],
+    ["a specific item", "an item name provided", "expected item name"],
+])(
+    "calls the secondary adapter to fetch %s given %s",
+    async (_: string, __: string, expected?: string) => {
+        await queryItem(expected);
 
-    expect(mockMongoDBQueryItem).toHaveBeenCalledTimes(1);
-});
+        expect(mockMongoDBQueryItem).toHaveBeenCalledTimes(1);
+        expect(mockMongoDBQueryItem).toHaveBeenCalledWith(expected);
+    }
+);
 
 test.each([
     ["none received", []],
