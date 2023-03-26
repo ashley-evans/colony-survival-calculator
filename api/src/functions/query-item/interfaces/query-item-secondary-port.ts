@@ -1,7 +1,7 @@
 import type { Items } from "../../../types";
 
 interface QueryItemSecondaryPort {
-    (): Promise<Items>;
+    (name?: string): Promise<Items>;
 }
 
 export type { QueryItemSecondaryPort };

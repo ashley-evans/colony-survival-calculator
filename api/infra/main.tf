@@ -89,7 +89,7 @@ resource "mongodbatlas_project_ip_access_list" "main" {
 }
 
 resource "aws_appsync_graphql_api" "main" {
-  name                = "${local.resource_prefix}-api-${terraform.workspace}"
+  name                = "${local.resource_prefix}api-${terraform.workspace}"
   authentication_type = "AWS_IAM"
 
   schema = file("${var.src_folder}/graphql/schema.graphql")

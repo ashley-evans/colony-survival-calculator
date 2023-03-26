@@ -100,6 +100,32 @@ test.each([
     }
 );
 
+test("returns only the specified item given an item name provided and multiple items in collection", async () => {
+    const expectedItemName = "expected test item 1";
+    const expected = createItem(expectedItemName, 2, 3, [
+        { name: "test", amount: 1 },
+    ]);
+    const stored = [createItem("another item", 3, 5, []), expected];
+    await storeItems(stored);
+    const { queryItem } = await import("../mongodb-query-item");
+
+    const actual = await queryItem(expectedItemName);
+
+    expect(actual).toHaveLength(1);
+    expect(actual[0]).toEqual(expected);
+});
+
+test("returns no items if no stored items match the provided item name in collection", async () => {
+    const stored = createItem("another item", 3, 5, []);
+    const expectedItemName = "expected test item 1";
+    await storeItems([stored]);
+    const { queryItem } = await import("../mongodb-query-item");
+
+    const actual = await queryItem(expectedItemName);
+
+    expect(actual).toHaveLength(0);
+});
+
 afterAll(async () => {
     (await mockClient).close(true);
     await mongoDBMemoryServer.stop();
