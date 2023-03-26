@@ -1,7 +1,4 @@
-import type {
-    QueryRequirementsPrimaryPort,
-    RequiredWorkers,
-} from "../interfaces/query-requirements-primary-port";
+import type { QueryRequirementsPrimaryPort } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
 import type { Item } from "../../../types";
 
@@ -15,9 +12,9 @@ const INTERNAL_SERVER_ERROR = "Internal server error";
 function calculateRequirements(
     inputItem: Item,
     inputDesiredWorkers: number,
-    knownItems: Map<string, Item>
-): RequiredWorkers[] {
-    const requirements: RequiredWorkers[] = [];
+    knownItems: Map<string, Item>,
+    results: Map<string, number>
+) {
     for (const requirement of inputItem.requires) {
         const requiredItem = knownItems.get(requirement.name);
         if (!requiredItem) {
@@ -28,22 +25,22 @@ function calculateRequirements(
         const producedPerSecond = requiredItem.output / requiredItem.createTime;
         const demandPerSecond = requiredPerSecond / producedPerSecond;
         const requiredWorkers = demandPerSecond * inputDesiredWorkers;
-        requirements.push({
-            name: requirement.name,
-            workers: requiredWorkers,
-        });
+
+        const existingRequirements = results.get(requirement.name);
+        results.set(
+            requirement.name,
+            (existingRequirements ?? 0) + requiredWorkers
+        );
 
         if (requiredItem.requires.length > 0) {
-            const nestedRequirements = calculateRequirements(
+            calculateRequirements(
                 requiredItem,
                 requiredWorkers,
-                knownItems
+                knownItems,
+                results
             );
-            requirements.push(...nestedRequirements);
         }
     }
-
-    return requirements;
 }
 
 const queryRequirements: QueryRequirementsPrimaryPort = async (
@@ -73,7 +70,9 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    return calculateRequirements(inputItem, workers, requirementMap);
+    const results = new Map<string, number>();
+    calculateRequirements(inputItem, workers, requirementMap, results);
+    return Array.from(results, ([name, workers]) => ({ name, workers }));
 };
 
 export { queryRequirements };

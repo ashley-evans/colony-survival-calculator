@@ -181,3 +181,31 @@ test("returns requirements given item with multiple different nested requirement
         { name: requiredItem3.name, workers: 20 },
     ]);
 });
+
+test("returns combined requirements given item with multiple nested requirements with common requirement", async () => {
+    const requiredItem3 = createItem("required item 3", 4, 2, []);
+    const requiredItem2 = createItem("required item 2", 4, 2, []);
+    const requiredItem1 = createItem("required item 1", 3, 4, [
+        { name: requiredItem2.name, amount: 6 },
+        { name: requiredItem3.name, amount: 4 },
+    ]);
+    const item = createItem(validItemName, 2, 3, [
+        { name: requiredItem1.name, amount: 4 },
+        { name: requiredItem3.name, amount: 2 },
+    ]);
+    mockMongoDBQueryRequirements.mockResolvedValue([
+        item,
+        requiredItem1,
+        requiredItem2,
+        requiredItem3,
+    ]);
+
+    const actual = await queryRequirements(validItemName, validWorkers);
+
+    expect(actual).toHaveLength(3);
+    expect(actual).toEqual([
+        { name: requiredItem1.name, workers: 7.5 },
+        { name: requiredItem2.name, workers: 30 },
+        { name: requiredItem3.name, workers: 30 },
+    ]);
+});
