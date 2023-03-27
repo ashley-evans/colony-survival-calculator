@@ -209,3 +209,13 @@ test("returns combined requirements given item with multiple nested requirements
         { name: requiredItem3.name, workers: 30 },
     ]);
 });
+
+test("throws an error if an unhandled exception occurs while fetching item requirements", async () => {
+    mockMongoDBQueryRequirements.mockRejectedValue(new Error("unhandled"));
+    const expectedError = new Error("Internal server error");
+
+    expect.assertions(1);
+    await expect(
+        queryRequirements(validItemName, validWorkers)
+    ).rejects.toThrow(expectedError);
+});

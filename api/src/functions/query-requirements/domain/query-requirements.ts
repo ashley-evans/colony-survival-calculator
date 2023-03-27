@@ -1,6 +1,6 @@
 import type { QueryRequirementsPrimaryPort } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
-import type { Item } from "../../../types";
+import type { Item, Items } from "../../../types";
 
 const INVALID_ITEM_NAME_ERROR =
     "Invalid item name provided, must be a non-empty string";
@@ -43,6 +43,14 @@ function calculateRequirements(
     }
 }
 
+async function getRequiredItemDetails(name: string): Promise<Items> {
+    try {
+        return await queryRequirementsDB(name);
+    } catch {
+        throw new Error(INTERNAL_SERVER_ERROR);
+    }
+}
+
 const queryRequirements: QueryRequirementsPrimaryPort = async (
     name: string,
     workers: number
@@ -55,7 +63,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
         throw new Error(INVALID_WORKERS_ERROR);
     }
 
-    const requirements = await queryRequirementsDB(name);
+    const requirements = await getRequiredItemDetails(name);
     if (requirements.length == 0) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
