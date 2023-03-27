@@ -38,7 +38,7 @@ async function clearItemsCollection() {
 
 beforeEach(async () => {
     process.env["DATABASE_NAME"] = databaseName;
-    process.env["ITEM_COLLECTION_NAME"] = "Items";
+    process.env["ITEM_COLLECTION_NAME"] = itemCollectionName;
 
     await clearItemsCollection();
 });
@@ -57,7 +57,6 @@ test.each([
 ])(
     "throws an error if %s configuration not provided",
     async (_: string, key: string, expectedError: string) => {
-        delete process.env["TEST_ENV"];
         delete process.env[key];
 
         expect.assertions(1);

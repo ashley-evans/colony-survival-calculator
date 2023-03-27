@@ -312,3 +312,100 @@ resource "aws_appsync_resolver" "item" {
   type        = "Query"
   field       = "item"
 }
+
+data "archive_file" "query_requirements_lambda" {
+  type = "zip"
+
+  source_dir  = "${var.dist_folder}/functions/query-requirements/dist"
+  output_path = "${var.dist_folder}/functions/query-requirements/query-requirements.zip"
+}
+
+resource "aws_s3_object" "query_requirements_lambda" {
+  bucket = aws_s3_bucket.api_bucket.id
+
+  key    = "query-requirements.zip"
+  source = data.archive_file.query_requirements_lambda.output_path
+
+  etag = filemd5(data.archive_file.query_requirements_lambda.output_path)
+}
+
+resource "aws_iam_role" "query_requirements_lambda" {
+  assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+}
+
+resource "aws_lambda_function" "query_requirements_lambda" {
+  function_name = "${local.resource_prefix}query-requirements-${terraform.workspace}"
+
+  s3_bucket = aws_s3_bucket.api_bucket.id
+  s3_key    = aws_s3_object.query_requirements_lambda.key
+
+  runtime       = var.runtime
+  handler       = "index.handler"
+  architectures = local.architectures
+
+  source_code_hash = data.archive_file.query_requirements_lambda.output_base64sha256
+
+  role = aws_iam_role.query_requirements_lambda.arn
+
+  environment {
+    variables = {
+      DATABASE_NAME        = local.mongodb_database_name
+      ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
+      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+    }
+  }
+}
+
+resource "mongodbatlas_database_user" "query_requirements_lambda" {
+  username           = aws_iam_role.query_requirements_lambda.arn
+  project_id         = mongodbatlas_project.main.id
+  auth_database_name = "$external"
+  aws_iam_type       = "ROLE"
+
+  roles {
+    role_name       = "read"
+    database_name   = local.mongodb_database_name
+    collection_name = local.mongodb_item_collection_name
+  }
+}
+
+resource "aws_iam_policy" "query_requirements_lambda_access" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["lambda:InvokeFunction"]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.query_requirements_lambda.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "query_requirements_lambda_access" {
+  assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
+  managed_policy_arns = [
+    aws_iam_policy.query_requirements_lambda_access.arn,
+  ]
+}
+
+resource "aws_appsync_datasource" "query_requirements_lambda" {
+  api_id           = aws_appsync_graphql_api.main.id
+  name             = "${replace(local.resource_prefix, "-", "_")}query_requirements_lambda_datasource_${terraform.workspace}"
+  service_role_arn = aws_iam_role.query_requirements_lambda_access.arn
+  type             = "AWS_LAMBDA"
+
+  lambda_config {
+    function_arn = aws_lambda_function.query_requirements_lambda.arn
+  }
+}
+
+resource "aws_appsync_resolver" "requirement" {
+  api_id      = aws_appsync_graphql_api.main.id
+  data_source = aws_appsync_datasource.query_requirements_lambda.name
+  type        = "Query"
+  field       = "requirement"
+}

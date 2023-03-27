@@ -10,8 +10,14 @@ type Item {
     size: FarmSize
 }
 
+type Requirement {
+    name: ID!
+    workers: Float!
+}
+
 type Query {
     item(name: ID): [Item]!
+    requirement(name: ID!, workers: Int!): [Requirement]!
 }
 
 schema {

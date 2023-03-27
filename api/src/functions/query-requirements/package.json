@@ -1,5 +1,5 @@
 {
-    "name": "@colony-survival-calculator/query-item-function",
+    "name": "@colony-survival-calculator/query-requirements-function",
     "private": true,
     "version": "0.0.0",
     "dependencies": {
