@@ -12,7 +12,7 @@ type Item {
 
 type Requirement {
     name: ID!
-    workers: Int!
+    workers: Float!
 }
 
 type Query {
