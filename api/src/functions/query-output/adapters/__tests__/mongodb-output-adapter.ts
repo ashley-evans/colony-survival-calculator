@@ -2,7 +2,6 @@ import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
-// import type { Items } from "../../../../types";
 
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
