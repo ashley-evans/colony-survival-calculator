@@ -21,7 +21,7 @@ const storeItem: StoreItemPort = async (items) => {
     const db = connection.db(databaseName);
     const collection = db.collection(itemCollectionName);
 
-    await collection.deleteMany();
+    await collection.deleteMany({});
     await collection.insertMany(items);
 
     return true;
