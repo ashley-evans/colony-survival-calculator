@@ -32,9 +32,12 @@ if [ -z $environment ]; then
     environment="dev"
 fi
 
-script_parent_dir=$(dirname "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")")
+script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+script_parent_dir="$(dirname "$script_dir")"
 repository_dir="$(dirname "$script_parent_dir")"
 infra_dir="$script_parent_dir/infra"
+
+$script_dir/create-env.sh -e $environment
 
 echo "Ensuring terraform is initialised..."
 
