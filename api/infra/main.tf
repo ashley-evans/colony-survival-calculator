@@ -571,3 +571,7 @@ resource "aws_cognito_identity_pool_roles_attachment" "main" {
 output "identity_pool_id" {
   value = aws_cognito_identity_pool.main.id
 }
+
+output "graphql_api_url" {
+  value = aws_appsync_graphql_api.main.uris["GRAPHQL"]
+}
