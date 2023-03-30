@@ -78,11 +78,25 @@ resource "aws_iam_policy" "ui_deploy_policy" {
   })
 }
 
+resource "aws_iam_policy" "api_deploy_policy" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["cognito-identity:*"]
+        Effect   = "Allow"
+        Resource = "arn:aws:cognito-identity:*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "deploy_role" {
   assume_role_policy = data.aws_iam_policy_document.deploy_policy_document.json
   managed_policy_arns = [
     aws_iam_policy.remote_state_read_write_policy.arn,
     aws_iam_policy.ui_deploy_policy.arn,
+    aws_iam_policy.api_deploy_policy.arn,
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
     "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
     "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
