@@ -506,3 +506,64 @@ resource "aws_appsync_resolver" "output" {
   type        = "Query"
   field       = "output"
 }
+
+resource "aws_cognito_identity_pool" "main" {
+  identity_pool_name               = "${local.resource_prefix}identity-pool-${terraform.workspace}"
+  allow_unauthenticated_identities = true
+}
+
+resource "aws_iam_policy" "unauthenticated_api_access" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "mobileanalytics:PutEvents",
+          "cognito-sync:*",
+          "cognito-identity:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["appsync:GraphQL"]
+        Effect   = "Allow"
+        Resource = "${aws_appsync_graphql_api.main.arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "unauthenticated_api_access" {
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["sts:AssumeRoleWithWebIdentity"]
+        Effect = "Allow"
+        Principal = {
+          Federated = "cognito-identity.amazonaws.com"
+        }
+        Condition = {
+          StringEquals = {
+            "cognito-identity.amazonaws.com:aud" = aws_cognito_identity_pool.main.id
+          }
+          "ForAnyValue:StringLike" = {
+            "cognito-identity.amazonaws.com:amr" = "unauthenticated"
+          }
+        }
+      },
+    ]
+  })
+  managed_policy_arns = [
+    aws_iam_policy.unauthenticated_api_access.arn,
+  ]
+}
+
+resource "aws_cognito_identity_pool_roles_attachment" "main" {
+  identity_pool_id = aws_cognito_identity_pool.main.id
+
+  roles = {
+    "unauthenticated" = aws_iam_role.unauthenticated_api_access.arn
+  }
+}
