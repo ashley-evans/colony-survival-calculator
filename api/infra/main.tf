@@ -567,3 +567,7 @@ resource "aws_cognito_identity_pool_roles_attachment" "main" {
     "unauthenticated" = aws_iam_role.unauthenticated_api_access.arn
   }
 }
+
+output "identity_pool_id" {
+  value = aws_cognito_identity_pool.main.id
+}
