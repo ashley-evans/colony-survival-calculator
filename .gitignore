@@ -20,3 +20,7 @@ dist
 
 lerna-debug.log
 *.lerna_backup
+
+# Environment Files
+
+.env
