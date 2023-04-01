@@ -238,6 +238,32 @@ describe("requirements rendering given requirements", () => {
             }
         }
     );
+
+    test("ceils workers value if the returned value is returned as decimal", async () => {
+        const actualWorkers = 3.14;
+        const expectedWorkers = "4";
+        server.use(
+            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+                return res.once(
+                    ctx.data({
+                        requirement: [
+                            { ...requirements[0], workers: actualWorkers },
+                        ],
+                    })
+                );
+            })
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: expectedWorkers,
+            })
+        ).toBeVisible();
+    });
 });
 
 describe("error handling", async () => {

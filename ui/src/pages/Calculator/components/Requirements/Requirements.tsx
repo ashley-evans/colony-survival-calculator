@@ -57,7 +57,7 @@ function Requirements({ selectedItemName, workers }: RequirementsProps) {
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
                             <NumberColumnCell>
-                                {requirement.workers}
+                                {Math.ceil(requirement.workers)}
                             </NumberColumnCell>
                         </tr>
                     ))}
