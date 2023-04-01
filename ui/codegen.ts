@@ -9,9 +9,6 @@ const config: CodegenConfig = {
         "src/graphql/__generated__/": {
             preset: "client",
             plugins: [],
-            config: {
-                enumsAsTypes: true,
-            },
             presetConfig: {
                 gqlTagName: "gql",
             },

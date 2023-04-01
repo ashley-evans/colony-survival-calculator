@@ -6,7 +6,8 @@ import {
     expectedOutputUnitLabel,
     expectedWorkerInputLabel,
 } from "./constants";
-import { Units } from "../../../../utils";
+import { OutputUnit } from "../../../../graphql/__generated__/graphql";
+import { OutputUnitSelectorMappings } from "../../utils";
 
 async function selectItemAndWorkers({
     itemName,
@@ -42,14 +43,17 @@ async function selectItemAndWorkers({
     });
 }
 
-async function selectOutputUnit(unit: Units) {
+async function selectOutputUnit(unit: OutputUnit) {
     const user = userEvent.setup();
     const unitComboBox = await screen.findByRole("combobox", {
         name: expectedOutputUnitLabel,
     });
 
     await act(async () => {
-        await user.selectOptions(unitComboBox, unit);
+        await user.selectOptions(
+            unitComboBox,
+            OutputUnitSelectorMappings[unit]
+        );
     });
 }
 
