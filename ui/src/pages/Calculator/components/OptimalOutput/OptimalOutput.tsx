@@ -24,9 +24,18 @@ function createOutputMessage(output: number, unit: OutputUnit): string {
 }
 
 function OptimalOutput({ itemName, workers, outputUnit }: OptimalOutputProps) {
-    const { data } = useQuery(GET_OPTIMAL_OUTPUT, {
+    const { data, error } = useQuery(GET_OPTIMAL_OUTPUT, {
         variables: { name: itemName, workers, unit: outputUnit },
     });
+
+    if (error) {
+        return (
+            <span role="alert">
+                An error occurred while calculating optimal output, please
+                change item/workers/output unit and try again.
+            </span>
+        );
+    }
 
     if (!data?.output) {
         return <></>;
