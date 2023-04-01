@@ -32,7 +32,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run format:check --since=origin/master
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run format:check --since="$previous_tag"
                     else
@@ -62,7 +62,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run lint --since=origin/master
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run lint --since="$previous_tag"
                     else
@@ -124,7 +124,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run validate --since=origin/master
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run validate --since="$previous_tag"
                     else
@@ -154,7 +154,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run build --since=origin/master
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run build --since="$previous_tag"
                     else
@@ -184,7 +184,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run test --since=origin/master
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run test --since="$previous_tag"
                     else
@@ -227,7 +227,7 @@ jobs:
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
                     lerna run deploy:plan --since=origin/master -- -e prod
                   else
-                    previous_tag=$(git tag | tail -n 1)
+                    previous_tag=$(git tag | sort -V | tail -n 1)
                     if [ -n "$previous_tag" ]; then
                       lerna run deploy:plan --since="$previous_tag" -- -e prod
                     else
