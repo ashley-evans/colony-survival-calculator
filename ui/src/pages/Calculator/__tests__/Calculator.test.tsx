@@ -6,16 +6,16 @@ import { setupServer } from "msw/node";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import { Item, Items } from "../../../types";
-import { Units, STATIC_ITEMS_PATH } from "../../../utils";
+import { STATIC_ITEMS_PATH } from "../../../utils";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import {
     selectItemAndWorkers,
-    selectOutputUnit,
     expectedRequirementsQueryName,
     expectedOutputUnitLabel,
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     expectedOutputPrefix,
+    expectedOutputQueryName,
 } from "./utils";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
@@ -80,6 +80,9 @@ const server = setupServer(
     }),
     graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
         return res(ctx.data({ requirement: [] }));
+    }),
+    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+        return res(ctx.data({ output: 5.2 }));
     })
 );
 
@@ -288,80 +291,6 @@ describe("worker input rendering", () => {
     });
 });
 
-describe("optimal output rendering", () => {
-    test("does not render any output message by default", async () => {
-        render(<Calculator />);
-        await screen.findByLabelText(expectedWorkerInputLabel, {
-            selector: "input",
-        });
-
-        expect(
-            screen.queryByText(expectedOutputPrefix, { exact: false })
-        ).not.toBeInTheDocument();
-    });
-
-    test("renders the optimal output given valid workers and default item selected", async () => {
-        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
-
-        render(<Calculator />);
-        await selectItemAndWorkers({ workers: 3 });
-
-        expect(await screen.findByText(expectedOutput)).toBeVisible();
-    });
-
-    test("renders the optimal output given multiple workers and non-default item selected", async () => {
-        const input = "5";
-        const expectedOutput = `${expectedOutputPrefix} 150 per minute`;
-
-        render(<Calculator />);
-        await selectItemAndWorkers({
-            itemName: VALID_ITEMS[1].name,
-            workers: input,
-        });
-
-        expect(await screen.findByText(expectedOutput)).toBeVisible();
-    });
-
-    test("clears output if workers is changed to invalid number", async () => {
-        const validInput = "3";
-        const invalidInput = "-1";
-        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
-
-        render(<Calculator />);
-        await selectItemAndWorkers({ workers: validInput });
-        await screen.findByText(expectedOutput);
-        await selectItemAndWorkers({ workers: invalidInput, clear: true });
-
-        expect(
-            screen.queryByText(expectedOutputPrefix, { exact: false })
-        ).not.toBeInTheDocument();
-    });
-
-    test("factors multiple output per create into optimal output", async () => {
-        const workers = "3";
-        const farmable = VALID_FARM_ABLES[0];
-        const expectedOutput = `${expectedOutputPrefix} 360 per minute`;
-
-        render(<Calculator />);
-        await selectItemAndWorkers({ itemName: farmable.name, workers });
-
-        expect(await screen.findByText(expectedOutput)).toBeVisible();
-    });
-
-    test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
-        const input = "4";
-        const expectedOutput = `${expectedOutputPrefix} ≈28.2 per minute`;
-
-        render(<Calculator />);
-        await selectItemAndWorkers({
-            itemName: CRAFT_ABLE_ITEMS[2].name,
-            workers: input,
-        });
-
-        expect(await screen.findByText(expectedOutput)).toBeVisible();
-    });
-});
-
 describe("optimal farm size note rendering", () => {
     const expectedNotePrefix = "Calculations use optimal farm size:";
 
@@ -386,57 +315,6 @@ describe("optimal farm size note rendering", () => {
             screen.queryByText(expectedNotePrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
-});
-
-describe("output unit selection", () => {
-    test("renders an output unit selector if static items exist", async () => {
-        render(<Calculator />);
-
-        expect(
-            await screen.findByRole("combobox", {
-                name: expectedOutputUnitLabel,
-            })
-        ).toBeVisible();
-    });
-
-    test("renders each valid output unit inside the unit selector", async () => {
-        render(<Calculator />);
-        await screen.findByRole("combobox", { name: expectedOutputUnitLabel });
-
-        for (const expected of Object.values(Units)) {
-            expect(
-                screen.getByRole("option", { name: expected })
-            ).toBeInTheDocument();
-        }
-    });
-
-    test("renders the minutes option in the unit selector as selected by default", async () => {
-        render(<Calculator />);
-
-        expect(
-            await screen.findByRole("option", {
-                name: Units.MINUTES,
-                selected: true,
-            })
-        ).toBeInTheDocument();
-    });
-
-    test.each([
-        ["one item per craft", VALID_ITEMS[1].name, 720],
-        ["multiple items per craft", VALID_FARM_ABLES[0].name, 2880],
-    ])(
-        "changing the unit to game days updates optimal output for items that create %s",
-        async (_: string, itemName: string, expected: number) => {
-            const workers = "2";
-            const expectedOutput = `${expectedOutputPrefix} ${expected} per game day`;
-
-            render(<Calculator />);
-            await selectItemAndWorkers({ itemName, workers });
-            await selectOutputUnit(Units.GAME_DAYS);
-
-            expect(await screen.findByText(expectedOutput)).toBeVisible();
-        }
-    );
 });
 
 afterAll(() => {

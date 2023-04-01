@@ -9,7 +9,11 @@ import { Requirement } from "../../../graphql/__generated__/graphql";
 import { STATIC_ITEMS_PATH } from "../../../utils";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
-import { selectItemAndWorkers, expectedRequirementsQueryName } from "./utils";
+import {
+    selectItemAndWorkers,
+    expectedRequirementsQueryName,
+    expectedOutputQueryName,
+} from "./utils";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
@@ -62,12 +66,18 @@ const validItems = [
     ...itemsWithoutRequirements,
 ];
 
+const expectedOutput = 150;
+const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
+
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
         return res(ctx.json(validItems));
     }),
     graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
         return res(ctx.data({ requirement: [requirements[0]] }));
+    }),
+    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+        return res(ctx.data({ output: expectedOutput }));
     })
 );
 
@@ -77,6 +87,7 @@ beforeAll(() => {
 
 beforeEach(() => {
     server.resetHandlers();
+    server.events.removeAllListeners();
 });
 
 test("queries requirements if item and workers inputted", async () => {
@@ -102,8 +113,6 @@ test("queries requirements if item and workers inputted", async () => {
 });
 
 describe("item w/o requirements handling", async () => {
-    const expectedOutputText = "Optimal output: 150 per minute";
-
     beforeEach(() => {
         server.use(
             graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
@@ -140,8 +149,6 @@ describe("item w/o requirements handling", async () => {
 });
 
 describe("response delay handling", () => {
-    const expectedOutputText = "Optimal output: 150 per minute";
-
     beforeEach(() => {
         server.use(
             graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
@@ -277,8 +284,6 @@ describe("requirements rendering given requirements", () => {
 });
 
 describe("error handling", async () => {
-    const expectedOutputText = "Optimal output: 150 per minute";
-
     beforeEach(() => {
         server.use(
             graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {

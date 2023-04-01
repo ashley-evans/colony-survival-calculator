@@ -1,27 +1,33 @@
 import React, { FormEvent } from "react";
 
-import { isUnit, Units } from "../../../../utils";
+import { OutputUnit } from "../../../../graphql/__generated__/graphql";
+import {
+    OutputUnitSelectorMappings,
+    OutputUnitSelectorReverseMappings,
+} from "../../utils";
 
 type ItemSelectorProps = {
-    onUnitChange: (unit: Units) => void;
+    onUnitChange: (unit: OutputUnit) => void;
 };
 
 function OutputUnitSelector({ onUnitChange }: ItemSelectorProps) {
     const handleUnitChange = (event: FormEvent<HTMLSelectElement>) => {
         const unit = event.currentTarget.value;
-        if (isUnit(unit)) {
-            onUnitChange(unit);
-        }
+        onUnitChange(OutputUnitSelectorReverseMappings[unit]);
     };
 
     return (
         <>
-            <label htmlFor="units-select" defaultValue={Units.MINUTES}>
-                Desired output units:
-            </label>
-            <select id="units-select" onChange={handleUnitChange}>
-                {Object.values(Units).map((unit) => (
-                    <option key={unit}>{unit}</option>
+            <label htmlFor="units-select">Desired output units:</label>
+            <select
+                id="units-select"
+                onChange={handleUnitChange}
+                defaultValue={OutputUnitSelectorMappings[OutputUnit.Minutes]}
+            >
+                {Object.values(OutputUnit).map((unit) => (
+                    <option key={unit}>
+                        {OutputUnitSelectorMappings[unit]}
+                    </option>
                 ))}
             </select>
         </>

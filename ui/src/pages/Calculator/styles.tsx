@@ -12,8 +12,3 @@ export const CalculatorContainer = styled.div`
 export const CalculatorHeader = styled.h2`
     margin-top: 0;
 `;
-
-export const DesiredOutputText = styled.span`
-    color: ${(props) => props.theme.color.primary.main};
-    font-weight: bold;
-`;
