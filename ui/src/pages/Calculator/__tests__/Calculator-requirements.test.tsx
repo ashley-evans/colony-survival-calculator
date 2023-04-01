@@ -80,6 +80,7 @@ beforeEach(() => {
 });
 
 test("queries requirements if item and workers inputted", async () => {
+    const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
         "POST",
@@ -90,10 +91,14 @@ test("queries requirements if item and workers inputted", async () => {
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectItemAndWorkers({
         itemName: itemWithSingleRequirement.name,
-        workers: 5,
+        workers: expectedWorkers,
     });
+    const [, body] = await expectedRequest;
 
-    await expect(expectedRequest).resolves.not.toThrowError();
+    expect(body?.variables).toEqual({
+        name: itemWithSingleRequirement.name,
+        workers: expectedWorkers,
+    });
 });
 
 describe("item w/o requirements handling", async () => {

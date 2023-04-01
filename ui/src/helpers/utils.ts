@@ -1,12 +1,16 @@
 import { DefaultBodyType, matchRequestUrl, MockedRequest } from "msw";
 import { SetupServer } from "msw/lib/node";
 
-async function getOperationName(
+type GraphQLOperationBody<Arguments> = {
+    operationName: string;
+    variables: Arguments;
+};
+
+async function getQueryDetails<Arguments>(
     req: MockedRequest<DefaultBodyType>
-): Promise<string | undefined> {
+): Promise<GraphQLOperationBody<Arguments> | undefined> {
     try {
-        const body = await req.json();
-        return body.operationName;
+        return await req.json();
     } catch {
         return undefined;
     }
@@ -15,10 +19,24 @@ async function getOperationName(
 function waitForRequest(
     server: SetupServer,
     method: string,
+    url: string
+): Promise<MockedRequest>;
+function waitForRequest<Arguments>(
+    server: SetupServer,
+    method: string,
     url: string,
     operationName?: string
-): Promise<MockedRequest> {
+): Promise<[MockedRequest, GraphQLOperationBody<Arguments> | undefined]>;
+function waitForRequest<Arguments>(
+    server: SetupServer,
+    method: string,
+    url: string,
+    operationName?: string
+): Promise<
+    MockedRequest | [MockedRequest, GraphQLOperationBody<Arguments> | undefined]
+> {
     let requestId = "";
+    let requestDetails: GraphQLOperationBody<Arguments> | undefined;
 
     return new Promise((resolve, reject) => {
         server.events.on("request:start", async (req) => {
@@ -28,18 +46,24 @@ function waitForRequest(
             const matchesUrl = matchRequestUrl(req.url, url).matches;
 
             let matchesOperationName = true;
+            let details: GraphQLOperationBody<Arguments> | undefined;
             if (operationName) {
-                const requestOperation = await getOperationName(req);
-                matchesOperationName = operationName === requestOperation;
+                details = await getQueryDetails<Arguments>(req);
+                matchesOperationName = operationName === details?.operationName;
             }
 
             if (matchesMethod && matchesUrl && matchesOperationName) {
                 requestId = req.id;
+                requestDetails = details;
             }
         });
 
         server.events.on("request:match", (req) => {
             if (req.id === requestId) {
+                if (requestDetails) {
+                    resolve([req, requestDetails]);
+                }
+
                 resolve(req);
             }
         });
