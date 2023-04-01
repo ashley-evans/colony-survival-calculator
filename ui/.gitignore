@@ -1,0 +1,7 @@
+# Environment Files
+
+.env
+
+# Generated Files
+
+src/graphql/__generated__/*

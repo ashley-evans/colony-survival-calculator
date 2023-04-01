@@ -85,12 +85,9 @@ function Calculator() {
                             )}
                         </DesiredOutputText>
                     ) : null}
-                    {workers != undefined &&
-                    selectedItem?.requires &&
-                    selectedItem.requires.length > 0 ? (
+                    {workers && selectedItem ? (
                         <Requirements
-                            items={items}
-                            selectedItem={selectedItem}
+                            selectedItemName={selectedItem.name}
                             workers={workers}
                         />
                     ) : null}

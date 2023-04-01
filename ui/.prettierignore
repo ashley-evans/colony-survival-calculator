@@ -5,6 +5,7 @@ node_modules
 # Generated files
 
 src/types/generated/*
+src/graphql/__generated__/*
 
 # Built files
 

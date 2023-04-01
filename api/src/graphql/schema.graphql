@@ -21,8 +21,8 @@ enum OutputUnit {
 }
 
 type Query {
-    item(name: ID): [Item]!
-    requirement(name: ID!, workers: Int!): [Requirement]!
+    item(name: ID): [Item!]!
+    requirement(name: ID!, workers: Int!): [Requirement!]!
     output(name: ID!, workers: Int!, unit: OutputUnit!): Float!
 }
 

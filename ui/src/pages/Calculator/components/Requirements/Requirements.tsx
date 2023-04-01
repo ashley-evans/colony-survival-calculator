@@ -1,6 +1,6 @@
 import React from "react";
+import { useQuery } from "@apollo/client";
 
-import { Items, Item, Requirement } from "../../../../types";
 import {
     RequirementsTable,
     TextColumnHeader,
@@ -8,29 +8,39 @@ import {
     NumberColumnHeader,
     NumberColumnCell,
 } from "./styles";
+import { gql } from "../../../../graphql/__generated__";
 
 type RequirementsProps = {
-    items: Items;
-    selectedItem: Item;
+    selectedItemName: string;
     workers: number;
 };
 
-function Requirements({ items, selectedItem, workers }: RequirementsProps) {
-    const itemMap: Record<string, Item | undefined> = Object.fromEntries(
-        items.map((item) => [item.name, item])
-    );
-
-    const calculateRequiredWorkers = (requirement: Requirement): number => {
-        const requiredItem = itemMap[requirement.name];
-        if (!requiredItem) {
-            throw new Error("Unknown required item");
+const GET_ITEM_REQUIREMENTS = gql(`
+    query GetItemRequirements($name: ID!, $workers: Int!) {
+        requirement(name: $name, workers: $workers) {
+            name
+            workers
         }
+    }
+`);
 
-        const createdInTime =
-            (selectedItem.createTime / requiredItem.createTime) *
-            requiredItem.output;
-        return Math.ceil((requirement.amount / createdInTime) * workers);
-    };
+function Requirements({ selectedItemName, workers }: RequirementsProps) {
+    const { loading, data, error } = useQuery(GET_ITEM_REQUIREMENTS, {
+        variables: { name: selectedItemName, workers },
+    });
+
+    if (error) {
+        return (
+            <span role="alert">
+                An error occurred while fetching requirements, please change
+                item/workers and try again.
+            </span>
+        );
+    }
+
+    if (loading || !data || data.requirement.length === 0) {
+        return <></>;
+    }
 
     return (
         <>
@@ -43,11 +53,11 @@ function Requirements({ items, selectedItem, workers }: RequirementsProps) {
                     </tr>
                 </thead>
                 <tbody>
-                    {selectedItem.requires.map((requirement) => (
+                    {data.requirement.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
                             <NumberColumnCell>
-                                {calculateRequiredWorkers(requirement)}
+                                {Math.ceil(requirement.workers)}
                             </NumberColumnCell>
                         </tr>
                     ))}

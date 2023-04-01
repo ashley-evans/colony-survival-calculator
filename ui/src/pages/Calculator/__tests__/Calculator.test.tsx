@@ -1,20 +1,22 @@
 import React from "react";
-import { screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { rest } from "msw";
+import { screen, waitFor } from "@testing-library/react";
+import { graphql, rest } from "msw";
 import { setupServer } from "msw/node";
-import { vi } from "vitest";
 
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import { Item, Items } from "../../../types";
 import { Units, STATIC_ITEMS_PATH } from "../../../utils";
-import { renderWithThemeProvider as render } from "../../../test/utils";
-
-const ITEM_SELECT_LABEL = "Item:";
-const WORKERS_INPUT_LABEL = "Workers:";
-const UNIT_SELECT_LABEL = "Desired output units:";
-const EXPECTED_OUTPUT_PREFIX = "Optimal output:";
+import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    selectItemAndWorkers,
+    selectOutputUnit,
+    expectedRequirementsQueryName,
+    expectedOutputUnitLabel,
+    expectedItemSelectLabel,
+    expectedWorkerInputLabel,
+    expectedOutputPrefix,
+} from "./utils";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
     {
@@ -75,6 +77,9 @@ const VALID_ITEMS: Items = [
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
         return res(ctx.json(VALID_ITEMS));
+    }),
+    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+        return res(ctx.data({ requirement: [] }));
     })
 );
 
@@ -135,7 +140,9 @@ describe("output selector", () => {
             render(<Calculator />);
 
             expect(
-                screen.queryByRole("combobox", { name: ITEM_SELECT_LABEL })
+                screen.queryByRole("combobox", {
+                    name: expectedItemSelectLabel,
+                })
             ).not.toBeInTheDocument();
         });
 
@@ -143,7 +150,7 @@ describe("output selector", () => {
             render(<Calculator />);
 
             expect(
-                screen.queryByLabelText(WORKERS_INPUT_LABEL, {
+                screen.queryByLabelText(expectedWorkerInputLabel, {
                     selector: "input",
                 })
             ).not.toBeInTheDocument();
@@ -154,7 +161,7 @@ describe("output selector", () => {
 
             expect(
                 screen.queryByRole("combobox", {
-                    name: UNIT_SELECT_LABEL,
+                    name: expectedOutputUnitLabel,
                 })
             ).not.toBeInTheDocument();
         });
@@ -186,7 +193,7 @@ describe("output selector", () => {
 
     test("renders each item returned as an option in the combo box", async () => {
         render(<Calculator />);
-        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         for (const expected of VALID_ITEMS) {
             expect(
@@ -208,13 +215,14 @@ describe("output selector", () => {
 });
 
 describe("worker input rendering", () => {
-    const expectedErrorMessage = "Invalid input, must be a positive number";
+    const expectedErrorMessage =
+        "Invalid input, must be a positive non-zero whole number";
 
     test("renders an input to enter the number of workers", async () => {
         render(<Calculator />);
 
         expect(
-            await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            await screen.findByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
             })
         );
@@ -222,49 +230,59 @@ describe("worker input rendering", () => {
 
     test("does not render an error message by default", async () => {
         render(<Calculator />);
-        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+        await screen.findByLabelText(expectedWorkerInputLabel, {
             selector: "input",
         });
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
-    test.each([
+    describe.each([
         ["negative", "-1"],
+        ["zero", "0"],
+        ["float", "1.1"],
         ["not a number", "test"],
+        ["number with invalid character suffix", "3-test"],
     ])(
         "renders invalid workers message if workers is %s",
-        async (_: string, input: string) => {
-            const user = userEvent.setup();
+        (_: string, input: string) => {
+            test("renders invalid workers message", async () => {
+                render(<Calculator />);
+                await selectItemAndWorkers({
+                    itemName: CRAFT_ABLE_ITEMS[0].name,
+                    workers: input,
+                });
 
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, input);
+                expect(await screen.findByRole("alert")).toHaveTextContent(
+                    expectedErrorMessage
+                );
+            });
 
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                expectedErrorMessage
-            );
+            test("does not render optimal output message", async () => {
+                render(<Calculator />);
+                await selectItemAndWorkers({
+                    itemName: CRAFT_ABLE_ITEMS[0].name,
+                    workers: input,
+                });
+
+                expect(
+                    screen.queryByText(expectedOutputPrefix, { exact: false })
+                ).not.toBeInTheDocument();
+            });
         }
     );
 
     test("clears error message after changing input to a valid input", async () => {
         const invalidInput = "Invalid";
         const validInput = "1";
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: CRAFT_ABLE_ITEMS[0].name,
+            workers: invalidInput,
         });
-        await user.type(workerInput, invalidInput);
         await screen.findByRole("alert");
-        await user.clear(workerInput);
-        await user.type(workerInput, validInput);
+        await selectItemAndWorkers({ workers: validInput, clear: true });
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
@@ -273,126 +291,72 @@ describe("worker input rendering", () => {
 describe("optimal output rendering", () => {
     test("does not render any output message by default", async () => {
         render(<Calculator />);
-        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+        await screen.findByLabelText(expectedWorkerInputLabel, {
             selector: "input",
         });
 
         expect(
-            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+            screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
 
-    test("renders zero output given zero workers", async () => {
-        const input = "0";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 0 per minute`;
-        const user = userEvent.setup();
+    test("renders the optimal output given valid workers and default item selected", async () => {
+        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.type(workerInput, input);
+        await selectItemAndWorkers({ workers: 3 });
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
-    test.each([
-        ["(whole)", "3", "90"],
-        ["(float)", "3.5", "105"],
-    ])(
-        "renders the optimal output given %s workers and default item selected",
-        async (_: string, input: string, expected: string) => {
-            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per minute`;
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, input);
-
-            expect(await screen.findByText(expectedOutput)).toBeVisible();
-        }
-    );
-
     test("renders the optimal output given multiple workers and non-default item selected", async () => {
         const input = "5";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 150 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} 150 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: VALID_ITEMS[1].name,
+            workers: input,
         });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            VALID_ITEMS[1].name
-        );
-        await user.type(workerInput, input);
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
     test("clears output if workers is changed to invalid number", async () => {
         const validInput = "3";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
-        const user = userEvent.setup();
+        const invalidInput = "-1";
+        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.type(workerInput, validInput);
+        await selectItemAndWorkers({ workers: validInput });
         await screen.findByText(expectedOutput);
-        await user.clear(workerInput);
+        await selectItemAndWorkers({ workers: invalidInput, clear: true });
 
         expect(
-            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+            screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
 
     test("factors multiple output per create into optimal output", async () => {
         const workers = "3";
         const farmable = VALID_FARM_ABLES[0];
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 360 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} 360 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            farmable.name
-        );
-        await user.type(workerInput, workers);
+        await selectItemAndWorkers({ itemName: farmable.name, workers });
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
     test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
         const input = "4";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ≈28.2 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} ≈28.2 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: CRAFT_ABLE_ITEMS[2].name,
+            workers: input,
         });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS[2].name
-        );
-        await user.type(workerInput, input);
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
@@ -404,31 +368,19 @@ describe("optimal farm size note rendering", () => {
     test("renders the optimal height and width of the farm if provided", async () => {
         const farmable = VALID_FARM_ABLES[0];
         const expectedMessage = `${expectedNotePrefix} ${farmable.size.width} x ${farmable.size.height}`;
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            farmable.name
-        );
+        await selectItemAndWorkers({ itemName: farmable.name });
 
         expect(await screen.findByText(expectedMessage)).toBeVisible();
     });
 
     test("does not render optimal farm size message if no size provided", async () => {
         const craft_able = CRAFT_ABLE_ITEMS[1];
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            craft_able.name
-        );
-        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
+        await selectItemAndWorkers({ itemName: craft_able.name });
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         expect(
             screen.queryByText(expectedNotePrefix, { exact: false })
@@ -442,14 +394,14 @@ describe("output unit selection", () => {
 
         expect(
             await screen.findByRole("combobox", {
-                name: UNIT_SELECT_LABEL,
+                name: expectedOutputUnitLabel,
             })
         ).toBeVisible();
     });
 
     test("renders each valid output unit inside the unit selector", async () => {
         render(<Calculator />);
-        await screen.findByRole("combobox", { name: UNIT_SELECT_LABEL });
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel });
 
         for (const expected of Object.values(Units)) {
             expect(
@@ -476,347 +428,15 @@ describe("output unit selection", () => {
         "changing the unit to game days updates optimal output for items that create %s",
         async (_: string, itemName: string, expected: number) => {
             const workers = "2";
-            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per game day`;
-            const user = userEvent.setup();
+            const expectedOutput = `${expectedOutputPrefix} ${expected} per game day`;
 
             render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                itemName
-            );
-            await user.type(workerInput, workers);
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: UNIT_SELECT_LABEL,
-                }),
-                Units.GAME_DAYS
-            );
+            await selectItemAndWorkers({ itemName, workers });
+            await selectOutputUnit(Units.GAME_DAYS);
 
             expect(await screen.findByText(expectedOutput)).toBeVisible();
         }
     );
-});
-
-describe("requirements rendering", () => {
-    const expectedRequirementsHeading = "Requirements:";
-    const expectedItemNameColumnName = "Item";
-    const expectedWorkerColumnName = "Workers";
-
-    test("renders the requirements section if an item with requirements and a number of workers are selected", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS_REQS[0].name
-        );
-        await user.type(workerInput, "5");
-
-        expect(
-            await screen.findByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).toBeVisible();
-        const requirementsTable = screen.getByRole("table");
-        expect(
-            within(requirementsTable).queryByRole("columnheader", {
-                name: expectedItemNameColumnName,
-            })
-        ).toBeInTheDocument();
-        expect(
-            within(requirementsTable).queryByRole("columnheader", {
-                name: expectedWorkerColumnName,
-            })
-        ).toBeInTheDocument();
-    });
-
-    test("does not render the requirements section if an item with no requirements is selected", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS[0].name
-        );
-        await user.type(workerInput, "5");
-
-        expect(
-            screen.queryByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).not.toBeInTheDocument();
-        expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    });
-
-    test("does not render the requirements section if no workers provided for item with requirements", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS_REQS[0].name
-        );
-
-        expect(
-            screen.queryByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).not.toBeInTheDocument();
-        expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    });
-
-    test("hides the requirements heading if worker input is changed to empty", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS_REQS[0].name
-        );
-        await user.type(workerInput, "5");
-        await screen.findByRole("heading", {
-            name: expectedRequirementsHeading,
-        });
-        await user.clear(workerInput);
-
-        expect(
-            screen.queryByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).not.toBeInTheDocument();
-        expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    });
-
-    describe.each([
-        [CRAFT_ABLE_ITEMS_REQS[0].name, CRAFT_ABLE_ITEMS[0].name, "7"],
-        [CRAFT_ABLE_ITEMS_REQS[1].name, CRAFT_ABLE_ITEMS[1].name, "2"],
-    ])(
-        "given an item with a single item requirement",
-        (
-            selectedItemName: string,
-            expectedItemName: string,
-            expectedAmountOfWorkers: string
-        ) => {
-            const amountOfWorkers = "5";
-
-            test("renders the name of the required item in the table body", async () => {
-                const user = userEvent.setup();
-
-                render(<Calculator />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.selectOptions(
-                    await screen.findByRole("combobox", {
-                        name: ITEM_SELECT_LABEL,
-                    }),
-                    selectedItemName
-                );
-                await user.type(workerInput, amountOfWorkers);
-                const requirementsTable = await screen.findByRole("table");
-
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: expectedItemName,
-                    })
-                );
-            });
-
-            test("renders the required amount of workers on the required item to satisfy the desired output", async () => {
-                const user = userEvent.setup();
-
-                render(<Calculator />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.selectOptions(
-                    await screen.findByRole("combobox", {
-                        name: ITEM_SELECT_LABEL,
-                    }),
-                    selectedItemName
-                );
-                await user.type(workerInput, amountOfWorkers);
-                const requirementsTable = await screen.findByRole("table");
-
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: expectedAmountOfWorkers,
-                    })
-                );
-            });
-        }
-    );
-
-    describe("given an item with multiple item requirements", () => {
-        const selectedItem = CRAFT_ABLE_ITEMS_REQS[2];
-        const amountOfWorkers = "8";
-
-        test("renders the name of each required item in the table body", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                selectedItem.name
-            );
-            await user.type(workerInput, amountOfWorkers);
-            const requirementsTable = await screen.findByRole("table");
-
-            for (const requirement of selectedItem.requires) {
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.name,
-                    })
-                );
-            }
-        });
-
-        test("renders the required amount of workers for each required item to satisfy the desired output", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                selectedItem.name
-            );
-            await user.type(workerInput, amountOfWorkers);
-            const requirementsTable = await screen.findByRole("table");
-
-            const item1Row = within(requirementsTable).getByRole("cell", {
-                name: selectedItem.requires[0].name,
-            }).parentElement as HTMLElement;
-            expect(within(item1Row).getByRole("cell", { name: "5" }));
-
-            const item2Row = within(requirementsTable).getByRole("cell", {
-                name: selectedItem.requires[1].name,
-            }).parentElement as HTMLElement;
-            expect(within(item2Row).getByRole("cell", { name: "2" }));
-        });
-    });
-
-    describe("given an item with an unknown requirement", () => {
-        beforeAll(() => {
-            vi.spyOn(console, "error").mockImplementation(() => undefined);
-        });
-
-        const invalidItemName = CRAFT_ABLE_ITEMS_MISSING_REQS[0].name;
-        const amountOfWorkers = "5";
-
-        test("does not render the requirements section", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                invalidItemName
-            );
-            await user.type(workerInput, amountOfWorkers);
-
-            expect(screen.queryByRole("table")).not.toBeInTheDocument();
-        });
-
-        test("does not render the optimal output calculation", async () => {
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                invalidItemName
-            );
-            await user.type(workerInput, amountOfWorkers);
-
-            expect(
-                screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
-            ).not.toBeInTheDocument();
-        });
-
-        test("renders unexpected requirement error message", async () => {
-            const expectedErrorMessage = "Error: Unknown required item";
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                invalidItemName
-            );
-            await user.type(workerInput, amountOfWorkers);
-
-            expect(
-                await screen.findByText(expectedErrorMessage)
-            ).toBeInTheDocument();
-        });
-    });
 });
 
 afterAll(() => {
