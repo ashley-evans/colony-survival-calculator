@@ -2,7 +2,6 @@ import React from "react";
 import { graphql, rest } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import { renderWithTestProviders as render } from "../../../test/utils";
 import { Item, Items } from "../../../types";
@@ -10,16 +9,12 @@ import { Requirement } from "../../../graphql/__generated__/graphql";
 import { STATIC_ITEMS_PATH } from "../../../utils";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
-import { act } from "react-dom/test-utils";
+import { selectItemAndWorkers, expectedRequirementsQueryName } from "./utils";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const expectedItemSelectLabel = "Item:";
-const expectedWorkerInputLabel = "Workers:";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
 const expectedWorkerColumnName = "Workers";
-
-const expectedRequirementsQueryName = "GetItemRequirements";
 
 const requirements: Requirement[] = [
     {
@@ -76,23 +71,6 @@ const server = setupServer(
     })
 );
 
-async function selectItemAndWorkers(itemName: string, workers: number) {
-    const user = userEvent.setup();
-    const workerInput = await screen.findByLabelText(expectedWorkerInputLabel, {
-        selector: "input",
-    });
-
-    await act(async () => {
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: expectedItemSelectLabel,
-            }),
-            itemWithSingleRequirement.name
-        );
-        await user.type(workerInput, workers.toString());
-    });
-}
-
 beforeAll(() => {
     server.listen();
 });
@@ -110,7 +88,10 @@ test("queries requirements if item and workers inputted", async () => {
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+    await selectItemAndWorkers({
+        itemName: itemWithSingleRequirement.name,
+        workers: 5,
+    });
 
     await expect(expectedRequest).resolves.not.toThrowError();
 });
@@ -128,7 +109,10 @@ describe("item w/o requirements handling", async () => {
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(
@@ -140,7 +124,10 @@ describe("item w/o requirements handling", async () => {
 
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
@@ -160,7 +147,10 @@ describe("response delay handling", () => {
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(
@@ -172,7 +162,10 @@ describe("response delay handling", () => {
 
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
@@ -182,7 +175,10 @@ describe("response delay handling", () => {
 describe("requirements rendering given requirements", () => {
     test("renders the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
 
         expect(
             await screen.findByRole("heading", {
@@ -193,7 +189,10 @@ describe("requirements rendering given requirements", () => {
 
     test("renders the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
 
         const requirementsTable = await screen.findByRole("table");
         expect(
@@ -221,7 +220,10 @@ describe("requirements rendering given requirements", () => {
             );
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+            await selectItemAndWorkers({
+                itemName: itemWithSingleRequirement.name,
+                workers: 5,
+            });
             const requirementsTable = await screen.findByRole("table");
 
             for (const requirement of expected) {
@@ -255,7 +257,10 @@ describe("requirements rendering given requirements", () => {
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         const requirementsTable = await screen.findByRole("table");
 
         expect(
@@ -282,7 +287,10 @@ describe("error handling", async () => {
             "An error occurred while fetching requirements, please change item/workers and try again.";
 
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
             expectedErrorMessage
@@ -291,7 +299,10 @@ describe("error handling", async () => {
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(
@@ -303,7 +314,10 @@ describe("error handling", async () => {
 
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
         await screen.findByText(expectedOutputText);
 
         expect(screen.queryByRole("table")).not.toBeInTheDocument();

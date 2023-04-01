@@ -1,7 +1,6 @@
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { rest } from "msw";
+import { graphql, rest } from "msw";
 import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../../helpers/utils";
@@ -9,11 +8,15 @@ import Calculator from "../Calculator";
 import { Item, Items } from "../../../types";
 import { Units, STATIC_ITEMS_PATH } from "../../../utils";
 import { renderWithTestProviders as render } from "../../../test/utils";
-
-const ITEM_SELECT_LABEL = "Item:";
-const WORKERS_INPUT_LABEL = "Workers:";
-const UNIT_SELECT_LABEL = "Desired output units:";
-const EXPECTED_OUTPUT_PREFIX = "Optimal output:";
+import {
+    selectItemAndWorkers,
+    selectOutputUnit,
+    expectedRequirementsQueryName,
+    expectedOutputUnitLabel,
+    expectedItemSelectLabel,
+    expectedWorkerInputLabel,
+    expectedOutputPrefix,
+} from "./utils";
 
 const VALID_FARM_ABLES: Required<Item>[] = [
     {
@@ -74,6 +77,9 @@ const VALID_ITEMS: Items = [
 const server = setupServer(
     rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
         return res(ctx.json(VALID_ITEMS));
+    }),
+    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+        return res(ctx.data({ requirement: [] }));
     })
 );
 
@@ -134,7 +140,9 @@ describe("output selector", () => {
             render(<Calculator />);
 
             expect(
-                screen.queryByRole("combobox", { name: ITEM_SELECT_LABEL })
+                screen.queryByRole("combobox", {
+                    name: expectedItemSelectLabel,
+                })
             ).not.toBeInTheDocument();
         });
 
@@ -142,7 +150,7 @@ describe("output selector", () => {
             render(<Calculator />);
 
             expect(
-                screen.queryByLabelText(WORKERS_INPUT_LABEL, {
+                screen.queryByLabelText(expectedWorkerInputLabel, {
                     selector: "input",
                 })
             ).not.toBeInTheDocument();
@@ -153,7 +161,7 @@ describe("output selector", () => {
 
             expect(
                 screen.queryByRole("combobox", {
-                    name: UNIT_SELECT_LABEL,
+                    name: expectedOutputUnitLabel,
                 })
             ).not.toBeInTheDocument();
         });
@@ -185,7 +193,7 @@ describe("output selector", () => {
 
     test("renders each item returned as an option in the combo box", async () => {
         render(<Calculator />);
-        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         for (const expected of VALID_ITEMS) {
             expect(
@@ -214,7 +222,7 @@ describe("worker input rendering", () => {
         render(<Calculator />);
 
         expect(
-            await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+            await screen.findByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
             })
         );
@@ -222,7 +230,7 @@ describe("worker input rendering", () => {
 
     test("does not render an error message by default", async () => {
         render(<Calculator />);
-        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+        await screen.findByLabelText(expectedWorkerInputLabel, {
             selector: "input",
         });
 
@@ -238,16 +246,11 @@ describe("worker input rendering", () => {
         "renders invalid workers message if workers is %s",
         (_: string, input: string) => {
             test("renders invalid workers message", async () => {
-                const user = userEvent.setup();
-
                 render(<Calculator />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.type(workerInput, input);
+                await selectItemAndWorkers({
+                    itemName: CRAFT_ABLE_ITEMS[0].name,
+                    workers: input,
+                });
 
                 expect(await screen.findByRole("alert")).toHaveTextContent(
                     expectedErrorMessage
@@ -255,19 +258,14 @@ describe("worker input rendering", () => {
             });
 
             test("does not render optimal output message", async () => {
-                const user = userEvent.setup();
-
                 render(<Calculator />);
-                const workerInput = await screen.findByLabelText(
-                    WORKERS_INPUT_LABEL,
-                    {
-                        selector: "input",
-                    }
-                );
-                await user.type(workerInput, input);
+                await selectItemAndWorkers({
+                    itemName: CRAFT_ABLE_ITEMS[0].name,
+                    workers: input,
+                });
 
                 expect(
-                    screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+                    screen.queryByText(expectedOutputPrefix, { exact: false })
                 ).not.toBeInTheDocument();
             });
         }
@@ -276,16 +274,14 @@ describe("worker input rendering", () => {
     test("clears error message after changing input to a valid input", async () => {
         const invalidInput = "Invalid";
         const validInput = "1";
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: CRAFT_ABLE_ITEMS[0].name,
+            workers: invalidInput,
         });
-        await user.type(workerInput, invalidInput);
         await screen.findByRole("alert");
-        await user.clear(workerInput);
-        await user.type(workerInput, validInput);
+        await selectItemAndWorkers({ workers: validInput, clear: true });
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
@@ -294,103 +290,72 @@ describe("worker input rendering", () => {
 describe("optimal output rendering", () => {
     test("does not render any output message by default", async () => {
         render(<Calculator />);
-        await screen.findByLabelText(WORKERS_INPUT_LABEL, {
+        await screen.findByLabelText(expectedWorkerInputLabel, {
             selector: "input",
         });
 
         expect(
-            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+            screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
 
     test("renders the optimal output given valid workers and default item selected", async () => {
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.type(workerInput, "3");
+        await selectItemAndWorkers({ workers: 3 });
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
     test("renders the optimal output given multiple workers and non-default item selected", async () => {
         const input = "5";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 150 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} 150 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: VALID_ITEMS[1].name,
+            workers: input,
         });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            VALID_ITEMS[1].name
-        );
-        await user.type(workerInput, input);
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
     test("clears output if workers is changed to invalid number", async () => {
         const validInput = "3";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
-        const user = userEvent.setup();
+        const invalidInput = "-1";
+        const expectedOutput = `${expectedOutputPrefix} 90 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.type(workerInput, validInput);
+        await selectItemAndWorkers({ workers: validInput });
         await screen.findByText(expectedOutput);
-        await user.clear(workerInput);
+        await selectItemAndWorkers({ workers: invalidInput, clear: true });
 
         expect(
-            screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+            screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
     });
 
     test("factors multiple output per create into optimal output", async () => {
         const workers = "3";
         const farmable = VALID_FARM_ABLES[0];
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 360 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} 360 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
-        });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            farmable.name
-        );
-        await user.type(workerInput, workers);
+        await selectItemAndWorkers({ itemName: farmable.name, workers });
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
 
     test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
         const input = "4";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ≈28.2 per minute`;
-        const user = userEvent.setup();
+        const expectedOutput = `${expectedOutputPrefix} ≈28.2 per minute`;
 
         render(<Calculator />);
-        const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
-            selector: "input",
+        await selectItemAndWorkers({
+            itemName: CRAFT_ABLE_ITEMS[2].name,
+            workers: input,
         });
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            CRAFT_ABLE_ITEMS[2].name
-        );
-        await user.type(workerInput, input);
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
@@ -402,31 +367,19 @@ describe("optimal farm size note rendering", () => {
     test("renders the optimal height and width of the farm if provided", async () => {
         const farmable = VALID_FARM_ABLES[0];
         const expectedMessage = `${expectedNotePrefix} ${farmable.size.width} x ${farmable.size.height}`;
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            farmable.name
-        );
+        await selectItemAndWorkers({ itemName: farmable.name });
 
         expect(await screen.findByText(expectedMessage)).toBeVisible();
     });
 
     test("does not render optimal farm size message if no size provided", async () => {
         const craft_able = CRAFT_ABLE_ITEMS[1];
-        const user = userEvent.setup();
 
         render(<Calculator />);
-        await user.selectOptions(
-            await screen.findByRole("combobox", {
-                name: ITEM_SELECT_LABEL,
-            }),
-            craft_able.name
-        );
-        await screen.findByRole("combobox", { name: ITEM_SELECT_LABEL });
+        await selectItemAndWorkers({ itemName: craft_able.name });
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         expect(
             screen.queryByText(expectedNotePrefix, { exact: false })
@@ -440,14 +393,14 @@ describe("output unit selection", () => {
 
         expect(
             await screen.findByRole("combobox", {
-                name: UNIT_SELECT_LABEL,
+                name: expectedOutputUnitLabel,
             })
         ).toBeVisible();
     });
 
     test("renders each valid output unit inside the unit selector", async () => {
         render(<Calculator />);
-        await screen.findByRole("combobox", { name: UNIT_SELECT_LABEL });
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel });
 
         for (const expected of Object.values(Units)) {
             expect(
@@ -474,29 +427,11 @@ describe("output unit selection", () => {
         "changing the unit to game days updates optimal output for items that create %s",
         async (_: string, itemName: string, expected: number) => {
             const workers = "2";
-            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per game day`;
-            const user = userEvent.setup();
+            const expectedOutput = `${expectedOutputPrefix} ${expected} per game day`;
 
             render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: ITEM_SELECT_LABEL,
-                }),
-                itemName
-            );
-            await user.type(workerInput, workers);
-            await user.selectOptions(
-                await screen.findByRole("combobox", {
-                    name: UNIT_SELECT_LABEL,
-                }),
-                Units.GAME_DAYS
-            );
+            await selectItemAndWorkers({ itemName, workers });
+            await selectOutputUnit(Units.GAME_DAYS);
 
             expect(await screen.findByText(expectedOutput)).toBeVisible();
         }
