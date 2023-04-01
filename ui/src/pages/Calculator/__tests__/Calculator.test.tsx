@@ -242,6 +242,7 @@ describe("worker input rendering", () => {
         ["zero", "0"],
         ["float", "1.1"],
         ["not a number", "test"],
+        ["number with invalid character suffix", "3-test"],
     ])(
         "renders invalid workers message if workers is %s",
         (_: string, input: string) => {

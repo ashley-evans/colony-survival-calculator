@@ -8,7 +8,7 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
 
     const handleWorkerChange = (event: FormEvent<HTMLInputElement>) => {
-        const input = parseFloat(event.currentTarget.value);
+        const input = Number(event.currentTarget.value);
         if (isNaN(input) || input <= 0 || input % 1 !== 0) {
             setIsInvalid(true);
             onWorkerChange(undefined);
