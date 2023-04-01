@@ -222,6 +222,44 @@ test("clears the optimal output message if the workers is changed to an invalid 
     ).not.toBeInTheDocument();
 });
 
+describe("error handling", async () => {
+    beforeEach(() => {
+        server.use(
+            graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+                return res.once(ctx.errors([{ message: "Error Message" }]));
+            })
+        );
+    });
+
+    test("renders an error message if an error occurs while fetching optimal output", async () => {
+        const expectedErrorMessage =
+            "An error occurred while calculating optimal output, please change item/workers/output unit and try again.";
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: item.name,
+            workers: 5,
+        });
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(
+            expectedErrorMessage
+        );
+    });
+
+    test("does not render the optimal output message if an error occurs while fetching optimal output", async () => {
+        render(<Calculator />);
+        await selectItemAndWorkers({
+            itemName: item.name,
+            workers: 5,
+        });
+        await screen.findByRole("alert");
+
+        expect(
+            screen.queryByText(expectedOutputPrefix, { exact: false })
+        ).not.toBeInTheDocument();
+    });
+});
+
 afterAll(() => {
     server.close();
 });
