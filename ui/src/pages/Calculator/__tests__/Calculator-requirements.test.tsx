@@ -121,7 +121,7 @@ describe("item w/o requirements handling", async () => {
     beforeEach(() => {
         server.use(
             graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                return res(ctx.data({ requirement: [] }));
+                return res.once(ctx.data({ requirement: [] }));
             })
         );
     });
@@ -153,7 +153,7 @@ describe("response delay handling", () => {
     beforeEach(() => {
         server.use(
             graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                return res(ctx.delay("infinite"));
+                return res.once(ctx.delay("infinite"));
             })
         );
     });
@@ -216,7 +216,7 @@ describe("requirements rendering given requirements", () => {
         async (_: string, expected: Requirement[]) => {
             server.use(
                 graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                    return res(ctx.data({ requirement: expected }));
+                    return res.once(ctx.data({ requirement: expected }));
                 })
             );
 
@@ -238,6 +238,50 @@ describe("requirements rendering given requirements", () => {
             }
         }
     );
+});
+
+describe("error handling", async () => {
+    const expectedOutputText = "Optimal output: 150 per minute";
+
+    beforeEach(() => {
+        server.use(
+            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+                return res.once(ctx.errors([{ message: "Error Message" }]));
+            })
+        );
+    });
+
+    test("renders an error message if an error occurs while fetching requirements", async () => {
+        const expectedErrorMessage =
+            "An error occurred while fetching requirements, please change item/workers and try again.";
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+
+        expect(await screen.findByRole("alert")).toHaveTextContent(
+            expectedErrorMessage
+        );
+    });
+
+    test("does not render the requirements section header", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await screen.findByText(expectedOutputText);
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedRequirementsHeading,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render the requirements table", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers(itemWithSingleRequirement.name, 5);
+        await screen.findByText(expectedOutputText);
+
+        expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    });
 });
 
 afterAll(() => {
