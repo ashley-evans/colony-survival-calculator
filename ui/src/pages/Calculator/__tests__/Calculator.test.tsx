@@ -207,7 +207,8 @@ describe("output selector", () => {
 });
 
 describe("worker input rendering", () => {
-    const expectedErrorMessage = "Invalid input, must be a positive number";
+    const expectedErrorMessage =
+        "Invalid input, must be a positive non-zero whole number";
 
     test("renders an input to enter the number of workers", async () => {
         render(<Calculator />);
@@ -228,26 +229,47 @@ describe("worker input rendering", () => {
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
-    test.each([
+    describe.each([
         ["negative", "-1"],
+        ["zero", "0"],
+        ["float", "1.1"],
         ["not a number", "test"],
     ])(
         "renders invalid workers message if workers is %s",
-        async (_: string, input: string) => {
-            const user = userEvent.setup();
+        (_: string, input: string) => {
+            test("renders invalid workers message", async () => {
+                const user = userEvent.setup();
 
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, input);
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.type(workerInput, input);
 
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                expectedErrorMessage
-            );
+                expect(await screen.findByRole("alert")).toHaveTextContent(
+                    expectedErrorMessage
+                );
+            });
+
+            test("does not render optimal output message", async () => {
+                const user = userEvent.setup();
+
+                render(<Calculator />);
+                const workerInput = await screen.findByLabelText(
+                    WORKERS_INPUT_LABEL,
+                    {
+                        selector: "input",
+                    }
+                );
+                await user.type(workerInput, input);
+
+                expect(
+                    screen.queryByText(EXPECTED_OUTPUT_PREFIX, { exact: false })
+                ).not.toBeInTheDocument();
+            });
         }
     );
 
@@ -281,41 +303,18 @@ describe("optimal output rendering", () => {
         ).not.toBeInTheDocument();
     });
 
-    test("renders zero output given zero workers", async () => {
-        const input = "0";
-        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 0 per minute`;
+    test("renders the optimal output given valid workers and default item selected", async () => {
+        const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} 90 per minute`;
         const user = userEvent.setup();
 
         render(<Calculator />);
         const workerInput = await screen.findByLabelText(WORKERS_INPUT_LABEL, {
             selector: "input",
         });
-        await user.type(workerInput, input);
+        await user.type(workerInput, "3");
 
         expect(await screen.findByText(expectedOutput)).toBeVisible();
     });
-
-    test.each([
-        ["(whole)", "3", "90"],
-        ["(float)", "3.5", "105"],
-    ])(
-        "renders the optimal output given %s workers and default item selected",
-        async (_: string, input: string, expected: string) => {
-            const expectedOutput = `${EXPECTED_OUTPUT_PREFIX} ${expected} per minute`;
-            const user = userEvent.setup();
-
-            render(<Calculator />);
-            const workerInput = await screen.findByLabelText(
-                WORKERS_INPUT_LABEL,
-                {
-                    selector: "input",
-                }
-            );
-            await user.type(workerInput, input);
-
-            expect(await screen.findByText(expectedOutput)).toBeVisible();
-        }
-    );
 
     test("renders the optimal output given multiple workers and non-default item selected", async () => {
         const input = "5";
