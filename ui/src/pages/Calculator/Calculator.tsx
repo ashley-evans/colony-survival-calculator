@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Ajv from "ajv";
+import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
 
-import { Item, Items } from "../../types";
-import ItemsSchema from "../../schemas/items.json";
 import ItemSelector from "./components/ItemSelector";
 import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
@@ -12,38 +9,68 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { CalculatorContainer, CalculatorHeader } from "./styles";
 import { OutputUnit } from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
+import { gql } from "../../graphql/__generated__";
 
-const ajv = new Ajv();
-const validateItems = ajv.compile<Items>(ItemsSchema);
+const GET_ITEM_NAMES_QUERY = gql(`
+    query GetItemNames {
+        item {
+            name
+        }
+    }
+`);
+
+const GET_ITEM_DETAILS_QUERY = gql(`
+    query GetItemDetails($name: ID!) {
+        item(name: $name) {
+            size {
+                width
+                height
+            }
+        }
+    }
+`);
 
 function Calculator() {
-    const [items, setItems] = useState<Items>([]);
-    const [selectedItem, setSelectedItem] = useState<Item>();
+    const {
+        loading: itemNamesLoading,
+        data: itemNameData,
+        error: itemNameError,
+    } = useQuery(GET_ITEM_NAMES_QUERY);
+    const [selectedItem, setSelectedItem] = useState<string>();
+    const { data: itemDetailsData, error: itemDetailsError } = useQuery(
+        GET_ITEM_DETAILS_QUERY,
+        {
+            variables: { name: selectedItem ?? "" },
+            skip: !selectedItem,
+        }
+    );
+
     const [workers, setWorkers] = useState<number>();
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
         OutputUnit.Minutes
     );
-    const [error, setError] = useState<string>();
 
-    useEffect(() => {
-        axios.get<unknown>("json/items.json").then(({ data }) => {
-            if (Array.isArray(data) && data.length > 0 && validateItems(data)) {
-                setItems(data);
-                setSelectedItem(data[0]);
-            } else {
-                setError("Unable to fetch known items");
-            }
-        });
-    }, []);
+    if (itemNamesLoading) {
+        return (
+            <CalculatorContainer>
+                <span>Loading items...</span>
+            </CalculatorContainer>
+        );
+    }
 
-    const itemKeys = Object.keys(items);
+    if (!selectedItem && itemNameData?.item[0]) {
+        setSelectedItem(itemNameData.item[0].name);
+    }
+
+    const networkError = itemNameError || itemDetailsError;
+
     return (
         <CalculatorContainer>
             <CalculatorHeader>Desired output:</CalculatorHeader>
-            {itemKeys.length > 0 ? (
+            {itemNameData?.item && itemNameData.item.length > 0 ? (
                 <>
                     <ItemSelector
-                        items={items}
+                        items={itemNameData.item}
                         onItemChange={setSelectedItem}
                     />
                     <WorkerInput onWorkerChange={setWorkers} />
@@ -52,29 +79,37 @@ function Calculator() {
             ) : null}
             <ErrorBoundary>
                 <>
-                    {selectedItem?.size ? (
+                    {itemDetailsData?.item[0]?.size ? (
                         <span>
                             Calculations use optimal farm size:{" "}
-                            {selectedItem.size.width} x{" "}
-                            {selectedItem.size.height}
+                            {itemDetailsData?.item[0].size.width} x{" "}
+                            {itemDetailsData?.item[0].size.height}
                         </span>
                     ) : null}
-                    {workers != undefined && selectedItem && !error ? (
+                    {workers != undefined && selectedItem ? (
                         <OptimalOutput
-                            itemName={selectedItem.name}
+                            itemName={selectedItem}
                             workers={workers}
                             outputUnit={selectedOutputUnit}
                         />
                     ) : null}
                     {workers && selectedItem ? (
                         <Requirements
-                            selectedItemName={selectedItem.name}
+                            selectedItemName={selectedItem}
                             workers={workers}
                         />
                     ) : null}
                 </>
             </ErrorBoundary>
-            {error ? <span role="alert">Error: {error}</span> : null}
+            {itemNameData?.item && itemNameData.item.length < 1 ? (
+                <span role="alert">Unable to fetch known items</span>
+            ) : null}
+            {networkError ? (
+                <span role="alert">
+                    An error occurred fetching item details, please refresh the
+                    page and try again.
+                </span>
+            ) : null}
         </CalculatorContainer>
     );
 }

@@ -1,13 +1,14 @@
 import React from "react";
-import { graphql, rest } from "msw";
+import { graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen } from "@testing-library/react";
 
 import { renderWithTestProviders as render } from "../../../test/utils";
-import { STATIC_ITEMS_PATH } from "../../../utils";
-import { Item } from "../../../types";
 import { waitForRequest } from "../../../helpers/utils";
 import {
+    ItemName,
+    expectedItemDetailsQueryName,
+    expectedItemNameQueryName,
     expectedOutputPrefix,
     expectedOutputQueryName,
     expectedRequirementsQueryName,
@@ -18,16 +19,14 @@ import Calculator from "../Calculator";
 import { OutputUnit } from "../../../graphql/__generated__/graphql";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const item: Item = {
-    name: "Item 1",
-    createTime: 2,
-    output: 1,
-    requires: [],
-};
+const item: ItemName = { name: "Item 1" };
 
 const server = setupServer(
-    rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
-        return res(ctx.json([item]));
+    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
+        return res(ctx.data({ item: [item] }));
+    }),
+    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
+        return res(ctx.data({ item: [] }));
     }),
     graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
         return res(ctx.data({ requirement: [] }));

@@ -1,12 +1,15 @@
 import { screen, within } from "@testing-library/react";
-import { rest } from "msw";
+import { graphql } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
 import router from "../router";
 import { renderWithRouterProvider } from "../../test/utils";
-import { Items } from "../../types";
-import { STATIC_ITEMS_PATH } from "../../utils";
+import {
+    ItemName,
+    expectedItemDetailsQueryName,
+    expectedItemNameQueryName,
+} from "../../pages/Calculator/__tests__/utils";
 
 const EXPECTED_CALCULATOR_HEADER = "Desired output:";
 const EXPECTED_CALCULATOR_ITEM_LABEL = "Item:";
@@ -18,13 +21,14 @@ const EXPECTED_REPOSITORY_URL =
 const EXPECTED_DARK_THEME_BUTTON_LABEL = "Change to dark theme";
 const EXPECTED_LIGHT_THEME_BUTTON_LABEL = "Change to light theme";
 
-const ITEMS: Items = [
-    { name: "Test Item 1", createTime: 2, output: 1, requires: [] },
-];
+const item: ItemName = { name: "Item 1" };
 
 const server = setupServer(
-    rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
-        return res(ctx.json(ITEMS));
+    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
+        return res(ctx.data({ item: [item] }));
+    }),
+    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
+        return res(ctx.data({ item: [] }));
     })
 );
 
