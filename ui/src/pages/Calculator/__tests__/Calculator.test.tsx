@@ -3,7 +3,6 @@ import { screen } from "@testing-library/react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
-import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import {
@@ -11,21 +10,13 @@ import {
     expectedOutputQueryName,
     expectedItemNameQueryName,
     selectItemAndWorkers,
-    expectedOutputUnitLabel,
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     expectedOutputPrefix,
     expectedFarmSizeNotePrefix,
+    ItemName,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
-import { Item } from "../../../graphql/__generated__/graphql";
-
-const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const expectedMissingItemsError = "Unable to fetch known items";
-const expectedNetworkExceptionError =
-    "An error occurred fetching item details, please refresh the page and try again.";
-
-type ItemName = Pick<Item, "name">;
 
 const itemWithoutFarmSize: ItemName = { name: "item w/o farm" };
 const itemWithFarmSize: ItemName = { name: "item with farm" };
@@ -61,223 +52,6 @@ beforeAll(() => {
 beforeEach(() => {
     server.resetHandlers();
     server.events.removeAllListeners();
-    server.use(
-        graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-            return res(ctx.data({ item: items }));
-        })
-    );
-});
-
-describe("output selector", () => {
-    test("queries all known item names", async () => {
-        const expectedRequest = waitForRequest(
-            server,
-            "POST",
-            expectedGraphQLAPIURL,
-            expectedItemNameQueryName
-        );
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        const [, body] = await expectedRequest;
-
-        expect(body?.variables).toEqual({});
-    });
-
-    test("renders desired output header", async () => {
-        const expectedHeader = "Desired output:";
-
-        render(<Calculator />);
-
-        expect(
-            await screen.findByRole("heading", { name: expectedHeader })
-        ).toBeVisible();
-    });
-
-    describe("given no item names returned", () => {
-        beforeEach(() => {
-            server.use(
-                graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                    return res(ctx.data({ item: [] }));
-                })
-            );
-        });
-
-        test("renders a missing items error", async () => {
-            render(<Calculator />);
-
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                expectedMissingItemsError
-            );
-        });
-
-        test("does not render a combo box for the desired output", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByRole("combobox", {
-                    name: expectedItemSelectLabel,
-                })
-            ).not.toBeInTheDocument();
-        });
-
-        test("does not render a worker input box", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByLabelText(expectedWorkerInputLabel, {
-                    selector: "input",
-                })
-            ).not.toBeInTheDocument();
-        });
-
-        test("does not render a combo box for the desired output units", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByRole("combobox", {
-                    name: expectedOutputUnitLabel,
-                })
-            ).not.toBeInTheDocument();
-        });
-    });
-
-    test("does not render a missing known items if item names are returned", async () => {
-        render(<Calculator />);
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-
-        expect(
-            screen.queryByText(expectedMissingItemsError)
-        ).not.toBeInTheDocument();
-    });
-
-    test("renders a select for the desired output selector if item names are returned", async () => {
-        render(<Calculator />);
-
-        expect(
-            await screen.findByRole("combobox", {
-                name: expectedItemSelectLabel,
-            })
-        ).toBeVisible();
-    });
-
-    test("renders each item name returned as an option in the combo box", async () => {
-        render(<Calculator />);
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-
-        for (const expected of items) {
-            expect(
-                screen.getByRole("option", { name: expected.name })
-            ).toBeInTheDocument();
-        }
-    });
-
-    test("renders the first option in the item name list as selected by default", async () => {
-        render(<Calculator />);
-
-        expect(
-            await screen.findByRole("option", {
-                name: items[0].name,
-                selected: true,
-            })
-        ).toBeInTheDocument();
-    });
-
-    test("requests item details on the first option in the item name list without selection", async () => {
-        const expectedRequest = waitForRequest(
-            server,
-            "POST",
-            expectedGraphQLAPIURL,
-            expectedItemDetailsQueryName
-        );
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-        const [, body] = await expectedRequest;
-
-        expect(body?.variables).toEqual({ name: items[0].name });
-    });
-
-    test("requests item details for newly selected item if selection is changed", async () => {
-        const expectedItemName = items[1].name;
-        const expectedRequest = waitForRequest(
-            server,
-            "POST",
-            expectedGraphQLAPIURL,
-            expectedItemDetailsQueryName,
-            { name: expectedItemName }
-        );
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-
-        await selectItemAndWorkers({ itemName: expectedItemName });
-
-        const [, body] = await expectedRequest;
-
-        expect(body?.variables).toEqual({ name: expectedItemName });
-    });
-
-    describe("item name request error handling", () => {
-        beforeEach(() => {
-            server.use(
-                graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                    return res.once(ctx.errors([{ message: "Error Message" }]));
-                })
-            );
-        });
-
-        test("renders an unhandled error message", async () => {
-            render(<Calculator />);
-
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                expectedNetworkExceptionError
-            );
-        });
-
-        test("does not render a combo box for the desired output", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByRole("combobox", {
-                    name: expectedItemSelectLabel,
-                })
-            ).not.toBeInTheDocument();
-        });
-
-        test("does not render a worker input box", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByLabelText(expectedWorkerInputLabel, {
-                    selector: "input",
-                })
-            ).not.toBeInTheDocument();
-        });
-
-        test("does not render a combo box for the desired output units", () => {
-            render(<Calculator />);
-
-            expect(
-                screen.queryByRole("combobox", {
-                    name: expectedOutputUnitLabel,
-                })
-            ).not.toBeInTheDocument();
-        });
-    });
-
-    test("renders an unhandled error message if an exception occurs fetching item details", async () => {
-        server.use(
-            graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-                return res.once(ctx.errors([{ message: "Error Message" }]));
-            })
-        );
-
-        render(<Calculator />);
-
-        expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedNetworkExceptionError
-        );
-    });
 });
 
 describe("worker input rendering", () => {

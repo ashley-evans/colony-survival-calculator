@@ -1,18 +1,19 @@
 import React from "react";
-import { graphql, rest } from "msw";
+import { graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within } from "@testing-library/react";
 
 import { renderWithTestProviders as render } from "../../../test/utils";
-import { Item, Items } from "../../../types";
 import { Requirement } from "../../../graphql/__generated__/graphql";
-import { STATIC_ITEMS_PATH } from "../../../utils";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
     expectedRequirementsQueryName,
     expectedOutputQueryName,
+    ItemName,
+    expectedItemNameQueryName,
+    expectedItemDetailsQueryName,
 } from "./utils";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
@@ -22,56 +23,33 @@ const expectedWorkerColumnName = "Workers";
 
 const requirements: Requirement[] = [
     {
-        name: "Item 2",
+        name: "Required Item 1",
         workers: 20,
     },
     {
-        name: "Item 3",
+        name: "Required Item 2",
         workers: 40,
     },
 ];
-const itemsWithoutRequirements: Items = [
-    {
-        name: requirements[0].name,
-        createTime: 5,
-        output: 2,
-        requires: [],
-    },
-    {
-        name: requirements[1].name,
-        createTime: 5,
-        output: 2,
-        requires: [],
-    },
-];
-const itemWithSingleRequirement: Item = {
-    name: "Item 1",
-    createTime: 2,
-    output: 1,
-    requires: [{ name: requirements[0].name, amount: 3 }],
+
+const itemWithSingleRequirement: ItemName = {
+    name: "Item w/ single requirement",
 };
-const itemWithMultipleRequirements: Item = {
-    name: "Item 4",
-    createTime: 2,
-    output: 1,
-    requires: [
-        { name: requirements[0].name, amount: 3 },
-        { name: requirements[1].name, amount: 5 },
-    ],
+const itemWithMultipleRequirements: ItemName = {
+    name: "Item w/ multiple requirements",
 };
 
-const validItems = [
-    itemWithSingleRequirement,
-    itemWithMultipleRequirements,
-    ...itemsWithoutRequirements,
-];
+const items = [itemWithSingleRequirement, itemWithMultipleRequirements];
 
 const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
 
 const server = setupServer(
-    rest.get(STATIC_ITEMS_PATH, (_, res, ctx) => {
-        return res(ctx.json(validItems));
+    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
+        return res(ctx.data({ item: items }));
+    }),
+    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
+        return res(ctx.data({ item: [] }));
     }),
     graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
         return res(ctx.data({ requirement: [requirements[0]] }));

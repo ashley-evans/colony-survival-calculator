@@ -10,28 +10,44 @@ import {
     ApolloProvider,
     HttpLink,
     InMemoryCache,
+    NormalizedCacheObject,
 } from "@apollo/client";
+
+const defaultGraphQLURL = "https://localhost:3000/graphql";
+
+function createApolloClient(
+    apiURL: string
+): ApolloClient<NormalizedCacheObject> {
+    const httpLink = new HttpLink({ uri: apiURL });
+    return new ApolloClient({
+        link: httpLink,
+        cache: new InMemoryCache(),
+    });
+}
 
 function renderWithRouterProvider(
     routerProps: RouterProviderProps,
-    route = "/"
+    route = "/",
+    apiURL = defaultGraphQLURL
 ) {
+    const client = createApolloClient(apiURL);
     routerProps.router.navigate(route);
+
     return {
         user: userEvent.setup(),
-        ...render(<RouterProvider {...routerProps} />),
+        ...render(
+            <ApolloProvider client={client}>
+                <RouterProvider {...routerProps} />
+            </ApolloProvider>
+        ),
     };
 }
 
 function renderWithTestProviders(
     children: ReactElement,
-    apiURL = "https://localhost:3000/graphql"
+    apiURL = defaultGraphQLURL
 ) {
-    const httpLink = new HttpLink({ uri: apiURL });
-    const client = new ApolloClient({
-        link: httpLink,
-        cache: new InMemoryCache(),
-    });
+    const client = createApolloClient(apiURL);
 
     return {
         ...render(
