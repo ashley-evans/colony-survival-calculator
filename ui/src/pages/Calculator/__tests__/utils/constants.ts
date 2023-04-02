@@ -3,6 +3,7 @@ const expectedOutputQueryName = "GetOptimalOutput";
 const expectedItemNameQueryName = "GetItemNames";
 const expectedItemDetailsQueryName = "GetItemDetails";
 
+const expectedDesiredOutputHeader = "Desired output:";
 const expectedItemSelectLabel = "Item:";
 const expectedWorkerInputLabel = "Workers:";
 const expectedOutputUnitLabel = "Desired output units:";
@@ -14,6 +15,7 @@ export {
     expectedOutputQueryName,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
+    expectedDesiredOutputHeader,
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     expectedOutputUnitLabel,

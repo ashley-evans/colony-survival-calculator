@@ -31,8 +31,11 @@ const GET_ITEM_DETAILS_QUERY = gql(`
 `);
 
 function Calculator() {
-    const { data: itemNameData, error: itemNameError } =
-        useQuery(GET_ITEM_NAMES_QUERY);
+    const {
+        loading: itemNamesLoading,
+        data: itemNameData,
+        error: itemNameError,
+    } = useQuery(GET_ITEM_NAMES_QUERY);
     const [selectedItem, setSelectedItem] = useState<string>();
     const { data: itemDetailsData, error: itemDetailsError } = useQuery(
         GET_ITEM_DETAILS_QUERY,
@@ -46,6 +49,14 @@ function Calculator() {
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
         OutputUnit.Minutes
     );
+
+    if (itemNamesLoading) {
+        return (
+            <CalculatorContainer>
+                <span>Loading items...</span>
+            </CalculatorContainer>
+        );
+    }
 
     if (!selectedItem && itemNameData?.item[0]) {
         setSelectedItem(itemNameData.item[0].name);

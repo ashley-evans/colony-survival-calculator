@@ -15,6 +15,7 @@ import {
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     ItemName,
+    expectedDesiredOutputHeader,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 
@@ -69,13 +70,72 @@ test("queries all known item names", async () => {
 });
 
 test("renders desired output header", async () => {
-    const expectedHeader = "Desired output:";
-
     render(<Calculator />);
 
     expect(
-        await screen.findByRole("heading", { name: expectedHeader })
+        await screen.findByRole("heading", {
+            name: expectedDesiredOutputHeader,
+        })
     ).toBeVisible();
+});
+
+describe("handles item loading", () => {
+    const expectedMessage = "Loading items...";
+
+    beforeEach(() => {
+        server.use(
+            graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
+                return res(ctx.delay("infinite"));
+            })
+        );
+    });
+
+    test("renders a loading message...", async () => {
+        render(<Calculator />);
+
+        expect(await screen.findByText(expectedMessage)).toBeVisible();
+    });
+
+    test("does not render the desired output header", async () => {
+        render(<Calculator />);
+        await screen.findByText(expectedMessage);
+
+        expect(
+            screen.queryByRole("heading", {
+                name: expectedDesiredOutputHeader,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render a combo box for the desired output", () => {
+        render(<Calculator />);
+
+        expect(
+            screen.queryByRole("combobox", {
+                name: expectedItemSelectLabel,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render a worker input box", () => {
+        render(<Calculator />);
+
+        expect(
+            screen.queryByLabelText(expectedWorkerInputLabel, {
+                selector: "input",
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render a combo box for the desired output units", () => {
+        render(<Calculator />);
+
+        expect(
+            screen.queryByRole("combobox", {
+                name: expectedOutputUnitLabel,
+            })
+        ).not.toBeInTheDocument();
+    });
 });
 
 describe("given no item names returned", () => {
