@@ -98,9 +98,9 @@ test("throws an error if more than one details are returned from database", asyn
 });
 
 test.each([
-    [OutputUnit.GAME_DAYS, 2, 3, 5400],
+    [OutputUnit.GAME_DAYS, 2, 3, 3262.5],
     [OutputUnit.MINUTES, 2, 3, 450],
-    [OutputUnit.GAME_DAYS, 8.5, 1, 423.53],
+    [OutputUnit.GAME_DAYS, 8.5, 1, 255.88],
     [OutputUnit.MINUTES, 8.5, 1, 35.29],
 ])(
     "returns the expected output for an item in %s given item create time of: %s and amount created: %s with 5 workers",
