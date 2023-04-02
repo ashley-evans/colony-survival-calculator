@@ -17,9 +17,7 @@
         "lint:packages": "npmPkgJsonLint .",
         "test": "vitest run",
         "test:watch": "vitest watch",
-        "generate:json-schema-types": "json2ts -i 'src/schemas/*.json' -o src/types/generated/",
-        "generate:graphql-schema-types": "npx graphql-codegen --config ./codegen.ts",
-        "generate": "npm run generate:json-schema-types && npm run generate:graphql-schema-types",
+        "generate": "npx graphql-codegen --config ./codegen.ts",
         "postinstall": "npm run generate"
     },
     "resolutions": {
@@ -54,7 +52,6 @@
         "@vitejs/plugin-react": "^3.1.0",
         "eslint-plugin-react": "^7.32.1",
         "jsdom": "^21.1.0",
-        "json-schema-to-typescript": "^11.0.3",
         "msw": "^1.1.0",
         "vite": "^4.1.4",
         "vitest": "^0.28.5"
