@@ -25,13 +25,15 @@ function waitForRequest<Arguments>(
     server: SetupServer,
     method: string,
     url: string,
-    operationName?: string
+    operationName?: string,
+    requiredArguments?: Arguments
 ): Promise<[MockedRequest, GraphQLOperationBody<Arguments> | undefined]>;
 function waitForRequest<Arguments>(
     server: SetupServer,
     method: string,
     url: string,
-    operationName?: string
+    operationName?: string,
+    requiredArguments?: Arguments
 ): Promise<
     MockedRequest | [MockedRequest, GraphQLOperationBody<Arguments> | undefined]
 > {
@@ -46,13 +48,25 @@ function waitForRequest<Arguments>(
             const matchesUrl = matchRequestUrl(req.url, url).matches;
 
             let matchesOperationName = true;
+            let matchesArguments = true;
             let details: GraphQLOperationBody<Arguments> | undefined;
             if (operationName) {
                 details = await getQueryDetails<Arguments>(req);
                 matchesOperationName = operationName === details?.operationName;
+
+                if (requiredArguments) {
+                    matchesArguments =
+                        JSON.stringify(requiredArguments) ==
+                        JSON.stringify(details?.variables);
+                }
             }
 
-            if (matchesMethod && matchesUrl && matchesOperationName) {
+            if (
+                matchesMethod &&
+                matchesUrl &&
+                matchesOperationName &&
+                matchesArguments
+            ) {
                 requestId = req.id;
                 requestDetails = details;
             }
