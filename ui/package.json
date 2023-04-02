@@ -31,7 +31,6 @@
         "@fortawesome/free-solid-svg-icons": "6.3.0",
         "@fortawesome/react-fontawesome": "0.2.0",
         "aws-appsync-auth-link": "3.0.7",
-        "axios": "1.2.3",
         "graphql": "16.6.0",
         "normalize.css": "8.0.1",
         "react": "18.2.0",
