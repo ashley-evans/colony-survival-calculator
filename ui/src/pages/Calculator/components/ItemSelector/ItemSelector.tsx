@@ -1,26 +1,26 @@
 import React, { FormEvent } from "react";
 
-import { Item, Items } from "../../../../types";
+import { Item } from "../../../../graphql/__generated__/graphql";
+
+type ItemNames = Pick<Item, "name">[];
 
 type ItemSelectorProps = {
-    items: Items;
-    onItemChange: (item: Item) => void;
+    items: ItemNames;
+    onItemChange: (item: string) => void;
 };
 
 function ItemSelector({ items, onItemChange }: ItemSelectorProps) {
-    const itemMap = Object.fromEntries(items.map((item) => [item.name, item]));
-
     const handleItemChange = (event: FormEvent<HTMLSelectElement>) => {
         const name = event.currentTarget.value;
-        onItemChange(itemMap[name]);
+        onItemChange(name);
     };
 
     return (
         <>
             <label htmlFor="output-select">Item:</label>
             <select id="output-select" onChange={handleItemChange}>
-                {Object.keys(itemMap).map((name) => (
-                    <option key={name}>{name}</option>
+                {Object.values(items).map((item) => (
+                    <option key={item.name}>{item.name}</option>
                 ))}
             </select>
         </>
