@@ -44,6 +44,12 @@
                     "additionalProperties": false
                 }
             },
+            "minimumTool": {
+                "$ref": "#/definitions/tools"
+            },
+            "maximumTool": {
+                "$ref": "#/definitions/tools"
+            },
             "size": {
                 "description": "Optimal size of crafting area, only provided for farms",
                 "type": "object",
@@ -63,7 +69,30 @@
                 "additionalProperties": false
             }
         },
-        "required": ["name", "createTime", "output", "requires"],
+        "required": [
+            "name",
+            "createTime",
+            "output",
+            "requires",
+            "minimumTool",
+            "maximumTool"
+        ],
         "additionalProperties": false
+    },
+    "definitions": {
+        "tools": {
+            "title": "Tools",
+            "description": "A level of tool that can be used to create items in Colony Survival",
+            "type": "string",
+            "tsEnumNames": [
+                "none",
+                "stone",
+                "copper",
+                "iron",
+                "bronze",
+                "steel"
+            ],
+            "enum": ["none", "stone", "copper", "iron", "bronze", "steel"]
+        }
     }
 }
