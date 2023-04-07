@@ -25,6 +25,15 @@ function createApolloClient(
     });
 }
 
+function wrapWithApolloProvider(
+    children: ReactElement,
+    apiURL = defaultGraphQLURL
+) {
+    const client = createApolloClient(apiURL);
+
+    return <ApolloProvider client={client}>{children}</ApolloProvider>;
+}
+
 function renderWithRouterProvider(
     routerProps: RouterProviderProps,
     route = "/",
@@ -47,15 +56,18 @@ function renderWithTestProviders(
     children: ReactElement,
     apiURL = defaultGraphQLURL
 ) {
-    const client = createApolloClient(apiURL);
-
     return {
         ...render(
-            <ApolloProvider client={client}>
-                <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
-            </ApolloProvider>
+            wrapWithApolloProvider(
+                <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>,
+                apiURL
+            )
         ),
     };
 }
 
-export { renderWithRouterProvider, renderWithTestProviders };
+export {
+    wrapWithApolloProvider,
+    renderWithRouterProvider,
+    renderWithTestProviders,
+};

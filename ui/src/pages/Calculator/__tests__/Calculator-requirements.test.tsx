@@ -82,9 +82,9 @@ test("queries requirements if item and workers inputted", async () => {
         itemName: itemWithSingleRequirement.name,
         workers: expectedWorkers,
     });
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({
+    expect(matchedRequestDetails.variables).toEqual({
         name: itemWithSingleRequirement.name,
         workers: expectedWorkers,
     });

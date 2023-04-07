@@ -1,10 +1,15 @@
-import React from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
 
 import { gql } from "../../../../graphql/__generated__";
 import { OutputUnit } from "../../../../graphql/__generated__/graphql";
 import { DesiredOutputText } from "./styles";
-import { OutputUnitDisplayMappings, roundOutput } from "../../utils";
+import {
+    DEFAULT_DEBOUNCE,
+    OutputUnitDisplayMappings,
+    roundOutput,
+} from "../../utils";
+import { useDebounce } from "use-debounce";
 
 type OptimalOutputProps = {
     itemName: string;
@@ -24,9 +29,19 @@ function createOutputMessage(output: number, unit: OutputUnit): string {
 }
 
 function OptimalOutput({ itemName, workers, outputUnit }: OptimalOutputProps) {
-    const { data, error } = useQuery(GET_OPTIMAL_OUTPUT, {
-        variables: { name: itemName, workers, unit: outputUnit },
-    });
+    const [getOptimalOutput, { data, error }] =
+        useLazyQuery(GET_OPTIMAL_OUTPUT);
+    const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
+
+    useEffect(() => {
+        getOptimalOutput({
+            variables: {
+                name: itemName,
+                workers: debouncedWorkers,
+                unit: outputUnit,
+            },
+        });
+    }, [itemName, debouncedWorkers, outputUnit]);
 
     if (error) {
         return (

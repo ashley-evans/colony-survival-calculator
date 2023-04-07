@@ -6,6 +6,15 @@ type GraphQLOperationBody<Arguments> = {
     variables: Arguments;
 };
 
+type RequestListenerResponse = {
+    matchedRequest: MockedRequest;
+};
+
+type RequestListenerResponseWithDetails<Arguments> = RequestListenerResponse & {
+    matchedRequestDetails: GraphQLOperationBody<Arguments>;
+    detailsUpToMatch: GraphQLOperationBody<Arguments>[];
+};
+
 async function getQueryDetails<Arguments>(
     req: MockedRequest<DefaultBodyType>
 ): Promise<GraphQLOperationBody<Arguments> | undefined> {
@@ -20,14 +29,14 @@ function waitForRequest(
     server: SetupServer,
     method: string,
     url: string
-): Promise<MockedRequest>;
+): Promise<RequestListenerResponse>;
 function waitForRequest<Arguments>(
     server: SetupServer,
     method: string,
     url: string,
     operationName?: string,
     requiredArguments?: Arguments
-): Promise<[MockedRequest, GraphQLOperationBody<Arguments> | undefined]>;
+): Promise<RequestListenerResponseWithDetails<Arguments>>;
 function waitForRequest<Arguments>(
     server: SetupServer,
     method: string,
@@ -35,8 +44,9 @@ function waitForRequest<Arguments>(
     operationName?: string,
     requiredArguments?: Arguments
 ): Promise<
-    MockedRequest | [MockedRequest, GraphQLOperationBody<Arguments> | undefined]
+    RequestListenerResponse | RequestListenerResponseWithDetails<Arguments>
 > {
+    const matchingRequestDetails: GraphQLOperationBody<Arguments>[] = [];
     let requestId = "";
     let requestDetails: GraphQLOperationBody<Arguments> | undefined;
 
@@ -54,10 +64,12 @@ function waitForRequest<Arguments>(
                 details = await getQueryDetails<Arguments>(req);
                 matchesOperationName = operationName === details?.operationName;
 
-                if (requiredArguments) {
+                if (requiredArguments && details) {
                     matchesArguments =
                         JSON.stringify(requiredArguments) ==
-                        JSON.stringify(details?.variables);
+                        JSON.stringify(details.variables);
+
+                    matchingRequestDetails.push(details);
                 }
             }
 
@@ -74,11 +86,22 @@ function waitForRequest<Arguments>(
 
         server.events.on("request:match", (req) => {
             if (req.id === requestId) {
+                const result: RequestListenerResponse = {
+                    matchedRequest: req,
+                };
+
                 if (requestDetails) {
-                    resolve([req, requestDetails]);
+                    resolve({
+                        ...result,
+                        matchedRequestDetails: requestDetails,
+                        detailsUpToMatch: matchingRequestDetails.slice(
+                            0,
+                            matchingRequestDetails.length - 1
+                        ),
+                    });
                 }
 
-                resolve(req);
+                resolve(result);
             }
         });
 
