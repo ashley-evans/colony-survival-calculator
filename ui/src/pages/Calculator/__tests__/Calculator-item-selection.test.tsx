@@ -64,9 +64,9 @@ test("queries all known item names", async () => {
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({});
+    expect(matchedRequestDetails.variables).toEqual({});
 });
 
 test("renders desired output header", async () => {
@@ -237,9 +237,9 @@ test("requests item details on the first option in the item name list without se
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({ name: items[0].name });
+    expect(matchedRequestDetails.variables).toEqual({ name: items[0].name });
 });
 
 test("requests item details for newly selected item if selection is changed", async () => {
@@ -254,12 +254,12 @@ test("requests item details for newly selected item if selection is changed", as
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-
     await selectItemAndWorkers({ itemName: expectedItemName });
+    const { matchedRequestDetails } = await expectedRequest;
 
-    const [, body] = await expectedRequest;
-
-    expect(body?.variables).toEqual({ name: expectedItemName });
+    expect(matchedRequestDetails.variables).toEqual({
+        name: expectedItemName,
+    });
 });
 
 describe("item name request error handling", () => {

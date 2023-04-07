@@ -1,5 +1,6 @@
-import React from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
+import { useDebounce } from "use-debounce";
 
 import {
     RequirementsTable,
@@ -9,6 +10,7 @@ import {
     NumberColumnCell,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
+import { DEFAULT_DEBOUNCE } from "../../utils";
 
 type RequirementsProps = {
     selectedItemName: string;
@@ -25,9 +27,22 @@ const GET_ITEM_REQUIREMENTS = gql(`
 `);
 
 function Requirements({ selectedItemName, workers }: RequirementsProps) {
-    const { loading, data, error } = useQuery(GET_ITEM_REQUIREMENTS, {
-        variables: { name: selectedItemName, workers },
-    });
+    const [getItemRequirements, { loading, data, error }] = useLazyQuery(
+        GET_ITEM_REQUIREMENTS,
+        {
+            variables: { name: selectedItemName, workers },
+        }
+    );
+    const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
+
+    useEffect(() => {
+        getItemRequirements({
+            variables: {
+                name: selectedItemName,
+                workers: debouncedWorkers,
+            },
+        });
+    }, [selectedItemName, debouncedWorkers]);
 
     if (error) {
         return (

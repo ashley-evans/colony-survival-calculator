@@ -1,9 +1,18 @@
 import React from "react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
-import { screen, within } from "@testing-library/react";
+import {
+    screen,
+    within,
+    render as rtlRender,
+    act,
+} from "@testing-library/react";
+import { vi } from "vitest";
 
-import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    renderWithTestProviders as render,
+    wrapWithTestProviders,
+} from "../../../test/utils";
 import { Requirement } from "../../../graphql/__generated__/graphql";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
@@ -15,6 +24,7 @@ import {
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
 } from "./utils";
+import Requirements from "../components/Requirements";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
@@ -82,9 +92,9 @@ test("queries requirements if item and workers inputted", async () => {
         itemName: itemWithSingleRequirement.name,
         workers: expectedWorkers,
     });
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({
+    expect(matchedRequestDetails.variables).toEqual({
         name: itemWithSingleRequirement.name,
         workers: expectedWorkers,
     });
@@ -309,6 +319,63 @@ describe("error handling", async () => {
         await screen.findByText(expectedOutputText);
 
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    });
+});
+
+describe("debounces requirement requests", () => {
+    beforeAll(() => {
+        vi.useFakeTimers();
+    });
+
+    test("only requests requirements every 500ms on worker change", async () => {
+        const expectedItemName = "test item";
+        const expectedLastRequest = waitForRequest(
+            server,
+            "POST",
+            expectedGraphQLAPIURL,
+            expectedRequirementsQueryName,
+            { name: expectedItemName, workers: 3 }
+        );
+
+        const { rerender } = rtlRender(
+            wrapWithTestProviders(
+                <Requirements
+                    selectedItemName={expectedItemName}
+                    workers={1}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <Requirements
+                    selectedItemName={expectedItemName}
+                    workers={2}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <Requirements
+                    selectedItemName={expectedItemName}
+                    workers={3}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
+        const { detailsUpToMatch } = await expectedLastRequest;
+
+        expect(detailsUpToMatch).not.toContainEqual(
+            expect.objectContaining({ workers: 2 })
+        );
+    });
+
+    afterAll(() => {
+        vi.useRealTimers();
     });
 });
 

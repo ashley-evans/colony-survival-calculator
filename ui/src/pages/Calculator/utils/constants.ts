@@ -1,0 +1,3 @@
+const DEFAULT_DEBOUNCE = 500;
+
+export { DEFAULT_DEBOUNCE };

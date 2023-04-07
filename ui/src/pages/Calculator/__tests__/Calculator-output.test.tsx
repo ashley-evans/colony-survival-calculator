@@ -1,9 +1,13 @@
 import React from "react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
-import { screen } from "@testing-library/react";
+import { act, screen, render as rtlRender } from "@testing-library/react";
+import { vi } from "vitest";
 
-import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    renderWithTestProviders as render,
+    wrapWithTestProviders,
+} from "../../../test/utils";
 import { waitForRequest } from "../../../helpers/utils";
 import {
     ItemName,
@@ -15,8 +19,10 @@ import {
     selectItemAndWorkers,
     selectOutputUnit,
 } from "./utils";
-import Calculator from "../Calculator";
 import { OutputUnit } from "../../../graphql/__generated__/graphql";
+
+import Calculator from "../Calculator";
+import OptimalOutput from "../components/OptimalOutput";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
@@ -83,9 +89,9 @@ test("queries optimal output if item and workers inputted with default unit sele
         itemName: item.name,
         workers: expectedWorkers,
     });
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({
+    expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
@@ -107,9 +113,9 @@ test("queries optimal output if item annd workers inputted with non-default unit
         itemName: item.name,
         workers: expectedWorkers,
     });
-    const [, body] = await expectedRequest;
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(body?.variables).toEqual({
+    expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
         unit: OutputUnit.GameDays,
@@ -256,6 +262,67 @@ describe("error handling", async () => {
         expect(
             screen.queryByText(expectedOutputPrefix, { exact: false })
         ).not.toBeInTheDocument();
+    });
+});
+
+describe("debounces optimal output requests", () => {
+    beforeAll(() => {
+        vi.useFakeTimers();
+    });
+
+    test("only requests optimal output every 500ms on worker change", async () => {
+        const expectedItemName = "test item";
+        const expectedOutputUnit = OutputUnit.GameDays;
+        const expectedLastRequest = waitForRequest(
+            server,
+            "POST",
+            expectedGraphQLAPIURL,
+            expectedOutputQueryName,
+            { name: expectedItemName, workers: 3, unit: expectedOutputUnit }
+        );
+
+        const { rerender } = rtlRender(
+            wrapWithTestProviders(
+                <OptimalOutput
+                    itemName={expectedItemName}
+                    workers={1}
+                    outputUnit={expectedOutputUnit}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <OptimalOutput
+                    itemName={expectedItemName}
+                    workers={2}
+                    outputUnit={expectedOutputUnit}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <OptimalOutput
+                    itemName={expectedItemName}
+                    workers={3}
+                    outputUnit={expectedOutputUnit}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
+        const { detailsUpToMatch } = await expectedLastRequest;
+
+        expect(detailsUpToMatch).not.toContainEqual(
+            expect.objectContaining({ workers: 2 })
+        );
+    });
+
+    afterAll(() => {
+        vi.useRealTimers();
     });
 });
 
