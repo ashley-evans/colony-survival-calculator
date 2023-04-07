@@ -6,7 +6,7 @@ import { vi } from "vitest";
 
 import {
     renderWithTestProviders as render,
-    wrapWithApolloProvider,
+    wrapWithTestProviders,
 } from "../../../test/utils";
 import { waitForRequest } from "../../../helpers/utils";
 import {
@@ -282,7 +282,7 @@ describe("debounces optimal output requests", () => {
         );
 
         const { rerender } = rtlRender(
-            wrapWithApolloProvider(
+            wrapWithTestProviders(
                 <OptimalOutput
                     itemName={expectedItemName}
                     workers={1}
@@ -292,7 +292,7 @@ describe("debounces optimal output requests", () => {
             )
         );
         rerender(
-            wrapWithApolloProvider(
+            wrapWithTestProviders(
                 <OptimalOutput
                     itemName={expectedItemName}
                     workers={2}
@@ -302,7 +302,7 @@ describe("debounces optimal output requests", () => {
             )
         );
         rerender(
-            wrapWithApolloProvider(
+            wrapWithTestProviders(
                 <OptimalOutput
                     itemName={expectedItemName}
                     workers={3}

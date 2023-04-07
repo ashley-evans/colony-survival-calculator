@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
+import { useDebounce } from "use-debounce";
 
 import { gql } from "../../../../graphql/__generated__";
 import { OutputUnit } from "../../../../graphql/__generated__/graphql";
@@ -9,7 +10,6 @@ import {
     OutputUnitDisplayMappings,
     roundOutput,
 } from "../../utils";
-import { useDebounce } from "use-debounce";
 
 type OptimalOutputProps = {
     itemName: string;
