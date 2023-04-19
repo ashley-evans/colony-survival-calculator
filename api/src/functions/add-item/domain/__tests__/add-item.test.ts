@@ -1,4 +1,4 @@
-import type { Items } from "../../../../types";
+import { Items, Tools } from "../../../../types";
 import { createItem } from "../../../../../test";
 
 import { storeItem } from "../../adapters/store-item";
@@ -11,10 +11,24 @@ const mockStoreItem = storeItem as jest.Mock;
 
 import { addItem } from "../add-item";
 
-const validItem = createItem("item name 1", 2, 3, [], 10, 2);
-const validItemWithReqs = createItem("item name 2", 1, 2, [
-    { name: "item name 1", amount: 2 },
-]);
+const validItem = createItem(
+    "item name 1",
+    2,
+    3,
+    [],
+    Tools.none,
+    Tools.none,
+    10,
+    2
+);
+const validItemWithReqs = createItem(
+    "item name 2",
+    1,
+    2,
+    [{ name: "item name 1", amount: 2 }],
+    Tools.none,
+    Tools.none
+);
 const validItems = [validItem, validItemWithReqs];
 
 const errorLogSpy = jest
@@ -38,6 +52,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -48,6 +64,8 @@ describe.each([
                 name: "test",
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -59,6 +77,8 @@ describe.each([
                 createTime: "test",
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -70,6 +90,8 @@ describe.each([
                 createTime: -1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -80,6 +102,8 @@ describe.each([
                 name: "test",
                 createTime: 2,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -91,6 +115,8 @@ describe.each([
                 createTime: 1,
                 output: "test",
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -102,6 +128,8 @@ describe.each([
                 createTime: 1,
                 output: -1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -112,6 +140,8 @@ describe.each([
                 name: "test",
                 createTime: 2,
                 output: 1,
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -123,6 +153,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: "test",
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -134,6 +166,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: ["test"],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -145,6 +179,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ amount: 1 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -156,12 +192,16 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ name: "wibble" }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
             {
                 name: "wibble",
                 createTime: 1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -173,12 +213,16 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ name: "wibble", amount: "test" }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
             {
                 name: "wibble",
                 createTime: 1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -191,6 +235,8 @@ describe.each([
                 output: 1,
                 requires: [],
                 size: "wibble",
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -205,6 +251,8 @@ describe.each([
                 size: {
                     height: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -220,6 +268,8 @@ describe.each([
                     width: "test",
                     height: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -234,6 +284,8 @@ describe.each([
                 size: {
                     width: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -249,6 +301,74 @@ describe.each([
                     width: 1,
                     height: "test",
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with a missing minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an unknown minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: "unknown",
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with a missing maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an unknown maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: Tools.none,
+                maximumTool: "unknown",
             },
         ]),
     ],

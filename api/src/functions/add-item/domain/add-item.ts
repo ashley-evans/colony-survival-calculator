@@ -6,6 +6,7 @@ import { storeItem } from "../adapters/store-item";
 import type { AddItemPrimaryPort } from "../interfaces/add-item-primary-port";
 
 const ajv = new Ajv();
+ajv.addKeyword("tsEnumNames");
 const validateItems = ajv.compile<Items>(ItemsSchema);
 
 function parseItems(input: string): Items {
@@ -17,7 +18,10 @@ function parseItems(input: string): Items {
             throw validateItems.errors;
         }
     } catch (ex) {
-        throw `Validation Error: ${ex}`;
+        const errorContent =
+            ex instanceof Error ? ex.message : JSON.stringify(ex);
+
+        throw `Validation Error: ${errorContent}`;
     }
 }
 
