@@ -12,24 +12,24 @@ const mockStoreItem = storeItem as jest.Mock;
 import { addItem } from "../add-item";
 import { Item } from "../../../../graphql/schema";
 
-const validItem = createItem(
-    "item name 1",
-    2,
-    3,
-    [],
-    Tools.none,
-    Tools.none,
-    10,
-    2
-);
-const validItemWithReqs = createItem(
-    "item name 2",
-    1,
-    2,
-    [{ name: "item name 1", amount: 2 }],
-    Tools.none,
-    Tools.none
-);
+const validItem = createItem({
+    name: "item name 1",
+    createTime: 2,
+    output: 3,
+    requirements: [],
+    minimumTool: Tools.none,
+    maximumTool: Tools.none,
+    width: 10,
+    height: 2,
+});
+const validItemWithReqs = createItem({
+    name: "item name 2",
+    createTime: 1,
+    output: 2,
+    requirements: [{ name: "item name 1", amount: 2 }],
+    minimumTool: Tools.none,
+    maximumTool: Tools.none,
+});
 const validItems = [validItem, validItemWithReqs];
 
 const errorLogSpy = jest
@@ -405,27 +405,62 @@ describe.each([
     ],
     [
         "invalid min/max tool combination (none above stone)",
-        createItem("test item", 1, 2, [], Tools.stone, Tools.none),
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.stone,
+            maximumTool: Tools.none,
+        }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
         "invalid min/max tool combination (stone above copper)",
-        createItem("test item", 1, 2, [], Tools.copper, Tools.stone),
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.copper,
+            maximumTool: Tools.stone,
+        }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
         "invalid min/max tool combination (copper above iron)",
-        createItem("test item", 1, 2, [], Tools.iron, Tools.copper),
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.iron,
+            maximumTool: Tools.copper,
+        }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
         "invalid min/max tool combination (iron above bronze)",
-        createItem("test item", 1, 2, [], Tools.bronze, Tools.iron),
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.bronze,
+            maximumTool: Tools.iron,
+        }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
         "invalid min/max tool combination (bronze above steel)",
-        createItem("test item", 1, 2, [], Tools.steel, Tools.bronze),
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.steel,
+            maximumTool: Tools.bronze,
+        }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
 ])("handles item with %s", (_: string, item: Item, expectedError: string) => {

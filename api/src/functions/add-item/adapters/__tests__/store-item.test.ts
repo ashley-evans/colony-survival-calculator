@@ -92,35 +92,35 @@ describe.each([
     [
         "a single item",
         [
-            createItem(
-                "test item 1",
-                2,
-                3,
-                [{ name: "test", amount: 1 }],
-                Tools.none,
-                Tools.steel
-            ),
+            createItem({
+                name: "test item 1",
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: "test", amount: 1 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.steel,
+            }),
         ],
     ],
     [
         "multiple items",
         [
-            createItem(
-                "test item 1",
-                2,
-                3,
-                [{ name: "test", amount: 1 }],
-                Tools.copper,
-                Tools.bronze
-            ),
-            createItem(
-                "test item 2",
-                1,
-                4,
-                [{ name: "world", amount: 3 }],
-                Tools.none,
-                Tools.steel
-            ),
+            createItem({
+                name: "test item 1",
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: "test", amount: 1 }],
+                minimumTool: Tools.copper,
+                maximumTool: Tools.bronze,
+            }),
+            createItem({
+                name: "test item 2",
+                createTime: 1,
+                output: 4,
+                requirements: [{ name: "world", amount: 3 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.steel,
+            }),
         ],
     ],
 ])("handles adding %s", (_: string, expected: Items) => {
@@ -145,8 +145,22 @@ describe.each([
 });
 
 test("removes any old entries prior to storing new items", async () => {
-    const oldItem = createItem("old", 1, 2, [], Tools.none, Tools.none);
-    const newItem = createItem("new", 2, 3, [], Tools.bronze, Tools.steel);
+    const oldItem = createItem({
+        name: "old",
+        createTime: 1,
+        output: 2,
+        requirements: [],
+        minimumTool: Tools.none,
+        maximumTool: Tools.none,
+    });
+    const newItem = createItem({
+        name: "new",
+        createTime: 2,
+        output: 3,
+        requirements: [],
+        minimumTool: Tools.bronze,
+        maximumTool: Tools.steel,
+    });
     const { storeItem } = await import("../store-item");
 
     await storeItem([oldItem]);

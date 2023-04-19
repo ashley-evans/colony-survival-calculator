@@ -7,34 +7,25 @@ function createRequirements(name: string, amount: number): Requirement {
     };
 }
 
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements,
-    minimumTool: Tools,
-    maximumTool: Tools
-): Item;
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements,
-    minimumTool: Tools,
-    maximumTool: Tools,
-    width: number,
-    height: number
-): Item;
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements,
-    minimumTool: Tools = Tools.none,
-    maximumTool: Tools = Tools.none,
-    width?: number,
-    height?: number
-): Item {
+function createItem({
+    name,
+    createTime,
+    output,
+    requirements,
+    minimumTool = Tools.none,
+    maximumTool = Tools.none,
+    width,
+    height,
+}: {
+    name: string;
+    createTime: number;
+    output: number;
+    requirements: Requirements;
+    minimumTool?: Tools;
+    maximumTool?: Tools;
+    width?: number;
+    height?: number;
+}): Item {
     return {
         name,
         createTime,

@@ -78,7 +78,12 @@ test("returns an empty array if no items are stored in the items collection", as
 });
 
 test("returns only the specified item if only that item is stored in the items collection", async () => {
-    const stored = createItem(validItemName, 2, 3, []);
+    const stored = createItem({
+        name: validItemName,
+        createTime: 2,
+        output: 3,
+        requirements: [],
+    });
     await storeItems([{ ...stored }]);
     const { queryRequirements } = await import(
         "../mongodb-requirements-adapter"
@@ -94,78 +99,179 @@ test.each([
     [
         "an item with a single requirement and no nested requirements",
         [
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-            ]),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [{ name: "required item 1", amount: 4 }],
+            }),
         ],
         [
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-            ]),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [{ name: "required item 1", amount: 4 }],
+            }),
         ],
     ],
     [
         "an item with multiple requirements and no nested requirements",
         [
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-                { name: "required item 2", amount: 5 },
-            ]),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [
+                    { name: "required item 1", amount: 4 },
+                    { name: "required item 2", amount: 5 },
+                ],
+            }),
         ],
         [
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-                { name: "required item 2", amount: 5 },
-            ]),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [
+                    { name: "required item 1", amount: 4 },
+                    { name: "required item 2", amount: 5 },
+                ],
+            }),
         ],
     ],
     [
         "an item with multiple requirements and other unrelated items stored",
         [
-            createItem("unrelated item", 3, 2, [
-                { name: "required item 1", amount: 2 },
-            ]),
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-                { name: "required item 2", amount: 5 },
-            ]),
+            createItem({
+                name: "unrelated item",
+                createTime: 3,
+                output: 2,
+                requirements: [{ name: "required item 1", amount: 2 }],
+            }),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [
+                    { name: "required item 1", amount: 4 },
+                    { name: "required item 2", amount: 5 },
+                ],
+            }),
         ],
         [
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, []),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-                { name: "required item 2", amount: 5 },
-            ]),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [
+                    { name: "required item 1", amount: 4 },
+                    { name: "required item 2", amount: 5 },
+                ],
+            }),
         ],
     ],
     [
         "an item with multiple nested requirements",
         [
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, [
-                { name: "required item 2", amount: 5 },
-            ]),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-            ]),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [{ name: "required item 2", amount: 5 }],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [{ name: "required item 1", amount: 4 }],
+            }),
         ],
         [
-            createItem("required item 2", 3, 4, []),
-            createItem("required item 1", 1, 2, [
-                { name: "required item 2", amount: 5 },
-            ]),
-            createItem(validItemName, 2, 4, [
-                { name: "required item 1", amount: 4 },
-            ]),
+            createItem({
+                name: "required item 2",
+                createTime: 3,
+                output: 4,
+                requirements: [],
+            }),
+            createItem({
+                name: "required item 1",
+                createTime: 1,
+                output: 2,
+                requirements: [{ name: "required item 2", amount: 5 }],
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [{ name: "required item 1", amount: 4 }],
+            }),
         ],
     ],
 ])(

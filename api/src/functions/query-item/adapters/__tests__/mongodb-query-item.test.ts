@@ -77,13 +77,30 @@ test("returns an empty array if no items are stored in the items collection", as
 test.each([
     [
         "a single item",
-        [createItem("test item 1", 2, 3, [{ name: "test", amount: 1 }])],
+        [
+            createItem({
+                name: "test item 1",
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: "test", amount: 1 }],
+            }),
+        ],
     ],
     [
         "multiple items",
         [
-            createItem("test item 1", 2, 3, [{ name: "test", amount: 1 }]),
-            createItem("test item 2", 1, 4, [{ name: "world", amount: 3 }]),
+            createItem({
+                name: "test item 1",
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: "test", amount: 1 }],
+            }),
+            createItem({
+                name: "test item 2",
+                createTime: 1,
+                output: 4,
+                requirements: [{ name: "world", amount: 3 }],
+            }),
         ],
     ],
 ])(
@@ -101,10 +118,21 @@ test.each([
 
 test("returns only the specified item given an item name provided and multiple items in collection", async () => {
     const expectedItemName = "expected test item 1";
-    const expected = createItem(expectedItemName, 2, 3, [
-        { name: "test", amount: 1 },
-    ]);
-    const stored = [createItem("another item", 3, 5, []), expected];
+    const expected = createItem({
+        name: expectedItemName,
+        createTime: 2,
+        output: 3,
+        requirements: [{ name: "test", amount: 1 }],
+    });
+    const stored = [
+        createItem({
+            name: "another item",
+            createTime: 3,
+            output: 5,
+            requirements: [],
+        }),
+        expected,
+    ];
     await storeItems(stored);
     const { queryItem } = await import("../mongodb-query-item");
 
@@ -115,7 +143,12 @@ test("returns only the specified item given an item name provided and multiple i
 });
 
 test("returns no items if no stored items match the provided item name in collection", async () => {
-    const stored = createItem("another item", 3, 5, []);
+    const stored = createItem({
+        name: "another item",
+        createTime: 3,
+        output: 5,
+        requirements: [],
+    });
     const expectedItemName = "expected test item 1";
     await storeItems([stored]);
     const { queryItem } = await import("../mongodb-query-item");
