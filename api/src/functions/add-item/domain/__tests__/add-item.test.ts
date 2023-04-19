@@ -10,6 +10,7 @@ jest.mock("../../adapters/store-item", () => ({
 const mockStoreItem = storeItem as jest.Mock;
 
 import { addItem } from "../add-item";
+import { Item } from "../../../../graphql/schema";
 
 const validItem = createItem(
     "item name 1",
@@ -396,9 +397,39 @@ describe.each([
     }
 );
 
-describe("handles items with unknown item requirements", () => {
-    const items: Items = [validItemWithReqs];
-    const input = JSON.stringify(items);
+describe.each([
+    [
+        "unknown item requirements",
+        validItemWithReqs,
+        "Missing requirement: item name 1 in item name 2",
+    ],
+    [
+        "invalid min/max tool combination (none above stone)",
+        createItem("test item", 1, 2, [], Tools.stone, Tools.none),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (stone above copper)",
+        createItem("test item", 1, 2, [], Tools.copper, Tools.stone),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (copper above iron)",
+        createItem("test item", 1, 2, [], Tools.iron, Tools.copper),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (iron above bronze)",
+        createItem("test item", 1, 2, [], Tools.bronze, Tools.iron),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (bronze above steel)",
+        createItem("test item", 1, 2, [], Tools.steel, Tools.bronze),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+])("handles item with %s", (_: string, item: Item, expectedError: string) => {
+    const input = JSON.stringify([item]);
 
     test("does not store any items in database", async () => {
         try {
@@ -411,12 +442,8 @@ describe("handles items with unknown item requirements", () => {
     });
 
     test("throws a validation error", async () => {
-        const expectedError = "Missing requirement:";
-
         expect.assertions(1);
-        await expect(addItem(input)).rejects.toEqual(
-            expect.stringContaining(expectedError)
-        );
+        await expect(addItem(input)).rejects.toThrowError(expectedError);
     });
 });
 
