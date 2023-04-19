@@ -2,7 +2,7 @@ import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
-import type { Items } from "../../../../types";
+import { Items, Tools } from "../../../../types";
 
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
@@ -91,13 +91,36 @@ describe("empty array handling", () => {
 describe.each([
     [
         "a single item",
-        [createItem("test item 1", 2, 3, [{ name: "test", amount: 1 }])],
+        [
+            createItem(
+                "test item 1",
+                2,
+                3,
+                [{ name: "test", amount: 1 }],
+                Tools.none,
+                Tools.steel
+            ),
+        ],
     ],
     [
         "multiple items",
         [
-            createItem("test item 1", 2, 3, [{ name: "test", amount: 1 }]),
-            createItem("test item 2", 1, 4, [{ name: "world", amount: 3 }]),
+            createItem(
+                "test item 1",
+                2,
+                3,
+                [{ name: "test", amount: 1 }],
+                Tools.copper,
+                Tools.bronze
+            ),
+            createItem(
+                "test item 2",
+                1,
+                4,
+                [{ name: "world", amount: 3 }],
+                Tools.none,
+                Tools.steel
+            ),
         ],
     ],
 ])("handles adding %s", (_: string, expected: Items) => {
@@ -122,8 +145,8 @@ describe.each([
 });
 
 test("removes any old entries prior to storing new items", async () => {
-    const oldItem = createItem("old", 1, 2, []);
-    const newItem = createItem("new", 2, 3, []);
+    const oldItem = createItem("old", 1, 2, [], Tools.none, Tools.none);
+    const newItem = createItem("new", 2, 3, [], Tools.bronze, Tools.steel);
     const { storeItem } = await import("../store-item");
 
     await storeItem([oldItem]);
