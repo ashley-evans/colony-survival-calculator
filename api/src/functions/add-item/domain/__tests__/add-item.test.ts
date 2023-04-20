@@ -1,4 +1,4 @@
-import type { Items } from "../../../../types";
+import { Items, Tools } from "../../../../types";
 import { createItem } from "../../../../../test";
 
 import { storeItem } from "../../adapters/store-item";
@@ -10,11 +10,26 @@ jest.mock("../../adapters/store-item", () => ({
 const mockStoreItem = storeItem as jest.Mock;
 
 import { addItem } from "../add-item";
+import { Item } from "../../../../graphql/schema";
 
-const validItem = createItem("item name 1", 2, 3, [], 10, 2);
-const validItemWithReqs = createItem("item name 2", 1, 2, [
-    { name: "item name 1", amount: 2 },
-]);
+const validItem = createItem({
+    name: "item name 1",
+    createTime: 2,
+    output: 3,
+    requirements: [],
+    minimumTool: Tools.none,
+    maximumTool: Tools.none,
+    width: 10,
+    height: 2,
+});
+const validItemWithReqs = createItem({
+    name: "item name 2",
+    createTime: 1,
+    output: 2,
+    requirements: [{ name: "item name 1", amount: 2 }],
+    minimumTool: Tools.none,
+    maximumTool: Tools.none,
+});
 const validItems = [validItem, validItemWithReqs];
 
 const errorLogSpy = jest
@@ -38,6 +53,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -48,6 +65,8 @@ describe.each([
                 name: "test",
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -59,6 +78,8 @@ describe.each([
                 createTime: "test",
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -70,6 +91,8 @@ describe.each([
                 createTime: -1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -80,6 +103,8 @@ describe.each([
                 name: "test",
                 createTime: 2,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -91,6 +116,8 @@ describe.each([
                 createTime: 1,
                 output: "test",
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -102,6 +129,8 @@ describe.each([
                 createTime: 1,
                 output: -1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -112,6 +141,8 @@ describe.each([
                 name: "test",
                 createTime: 2,
                 output: 1,
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -123,6 +154,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: "test",
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -134,6 +167,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: ["test"],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -145,6 +180,8 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ amount: 1 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -156,12 +193,16 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ name: "wibble" }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
             {
                 name: "wibble",
                 createTime: 1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -173,12 +214,16 @@ describe.each([
                 createTime: 2,
                 output: 1,
                 requires: [{ name: "wibble", amount: "test" }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
             {
                 name: "wibble",
                 createTime: 1,
                 output: 1,
                 requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -191,6 +236,8 @@ describe.each([
                 output: 1,
                 requires: [],
                 size: "wibble",
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -205,6 +252,8 @@ describe.each([
                 size: {
                     height: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -220,6 +269,8 @@ describe.each([
                     width: "test",
                     height: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -234,6 +285,8 @@ describe.each([
                 size: {
                     width: 1,
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
             },
         ]),
     ],
@@ -249,6 +302,74 @@ describe.each([
                     width: 1,
                     height: "test",
                 },
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with a missing minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an unknown minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: "unknown",
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with a missing maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an unknown maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 1,
+                },
+                minimumTool: Tools.none,
+                maximumTool: "unknown",
             },
         ]),
     ],
@@ -276,9 +397,74 @@ describe.each([
     }
 );
 
-describe("handles items with unknown item requirements", () => {
-    const items: Items = [validItemWithReqs];
-    const input = JSON.stringify(items);
+describe.each([
+    [
+        "unknown item requirements",
+        validItemWithReqs,
+        "Missing requirement: item name 1 in item name 2",
+    ],
+    [
+        "invalid min/max tool combination (none above stone)",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.stone,
+            maximumTool: Tools.none,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (stone above copper)",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.copper,
+            maximumTool: Tools.stone,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (copper above iron)",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.iron,
+            maximumTool: Tools.copper,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (iron above bronze)",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.bronze,
+            maximumTool: Tools.iron,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid min/max tool combination (bronze above steel)",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: Tools.steel,
+            maximumTool: Tools.bronze,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+])("handles item with %s", (_: string, item: Item, expectedError: string) => {
+    const input = JSON.stringify([item]);
 
     test("does not store any items in database", async () => {
         try {
@@ -291,12 +477,8 @@ describe("handles items with unknown item requirements", () => {
     });
 
     test("throws a validation error", async () => {
-        const expectedError = "Missing requirement:";
-
         expect.assertions(1);
-        await expect(addItem(input)).rejects.toEqual(
-            expect.stringContaining(expectedError)
-        );
+        await expect(addItem(input)).rejects.toThrowError(expectedError);
     });
 });
 

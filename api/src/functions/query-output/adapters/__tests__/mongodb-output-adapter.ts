@@ -81,15 +81,32 @@ test.each([
     [
         "only relevant item details",
         "only one item stored in database",
-        [createItem(validItemName, 5, 3, [])],
+        [
+            createItem({
+                name: validItemName,
+                createTime: 5,
+                output: 3,
+                requirements: [],
+            }),
+        ],
         [{ createTime: 5, output: 3 }],
     ],
     [
         "only relevant item details",
         "multiple items stored in database",
         [
-            createItem(validItemName, 5, 3, []),
-            createItem("another item", 2, 1, []),
+            createItem({
+                name: validItemName,
+                createTime: 5,
+                output: 3,
+                requirements: [],
+            }),
+            createItem({
+                name: "another item",
+                createTime: 2,
+                output: 1,
+                requirements: [],
+            }),
         ],
         [{ createTime: 5, output: 3 }],
     ],
@@ -97,8 +114,18 @@ test.each([
         "nothing",
         "no relevant items stored in database",
         [
-            createItem("another item", 2, 1, []),
-            createItem("yet another item", 5, 3, []),
+            createItem({
+                name: "another item",
+                createTime: 2,
+                output: 1,
+                requirements: [],
+            }),
+            createItem({
+                name: "yet another item",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+            }),
         ],
         [],
     ],

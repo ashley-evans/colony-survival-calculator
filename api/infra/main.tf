@@ -64,7 +64,7 @@ resource "aws_s3_object" "items_json_seed" {
 
   etag = filemd5("${var.src_folder}/json/items.json")
 
-  depends_on = [aws_s3_bucket_notification.seed_notification]
+  depends_on = [aws_s3_bucket_notification.seed_notification, aws_lambda_function.add_item_lambda]
 }
 
 data "mongodbatlas_roles_org_id" "main" {}

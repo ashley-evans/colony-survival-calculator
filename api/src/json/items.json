@@ -3,7 +3,9 @@
         "name": "Berry",
         "createTime": 8.5,
         "output": 1,
-        "requires": []
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none"
     },
     {
         "name": "Berry Meal",
@@ -14,13 +16,17 @@
                 "name": "Berry",
                 "amount": 8
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "none"
     },
     {
         "name": "Wheat",
         "createTime": 1440,
         "output": 100,
         "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
         "size": {
             "width": 10,
             "height": 10
@@ -31,6 +37,8 @@
         "createTime": 720,
         "output": 44,
         "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
         "size": {
             "width": 3,
             "height": 33
@@ -45,13 +53,17 @@
                 "name": "Log",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "steel"
     },
     {
         "name": "Clay",
         "createTime": 20,
         "output": 1,
-        "requires": []
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel"
     },
     {
         "name": "Empty Pot",
@@ -66,7 +78,9 @@
                 "name": "Planks",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "copper"
     },
     {
         "name": "Pot of Flour",
@@ -81,7 +95,9 @@
                 "name": "Empty Pot",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "none"
     },
     {
         "name": "Firewood",
@@ -92,7 +108,9 @@
                 "name": "Planks",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "steel"
     },
     {
         "name": "Pot of Water",
@@ -103,7 +121,9 @@
                 "name": "Empty Pot",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "none"
     },
     {
         "name": "Bread",
@@ -122,6 +142,8 @@
                 "name": "Pot of Water",
                 "amount": 1
             }
-        ]
+        ],
+        "minimumTool": "none",
+        "maximumTool": "steel"
     }
 ]

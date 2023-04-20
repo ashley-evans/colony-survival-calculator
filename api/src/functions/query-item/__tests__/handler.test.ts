@@ -64,13 +64,40 @@ test.each([
     ["none received", []],
     [
         "multiple received w/ no farm sizes",
-        [createItem("test 1", 1, 3, []), createItem("test 2", 4, 6, [])],
+        [
+            createItem({
+                name: "test 1",
+                createTime: 1,
+                output: 3,
+                requirements: [],
+            }),
+            createItem({
+                name: "test 2",
+                createTime: 4,
+                output: 6,
+                requirements: [],
+            }),
+        ],
     ],
     [
         "multiple received w/ farm sizes",
         [
-            createItem("test 1", 1, 3, [], 1, 2),
-            createItem("test 2", 4, 6, [], 3, 4),
+            createItem({
+                name: "test 1",
+                createTime: 1,
+                output: 3,
+                requirements: [],
+                width: 1,
+                height: 2,
+            }),
+            createItem({
+                name: "test 2",
+                createTime: 4,
+                output: 6,
+                requirements: [],
+                width: 3,
+                height: 4,
+            }),
         ],
     ],
 ])(

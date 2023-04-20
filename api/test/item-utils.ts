@@ -1,4 +1,4 @@
-import type { Item, Requirement, Requirements } from "../src/types";
+import { Item, Requirement, Requirements, Tools } from "../src/types";
 
 function createRequirements(name: string, amount: number): Requirement {
     return {
@@ -7,34 +7,33 @@ function createRequirements(name: string, amount: number): Requirement {
     };
 }
 
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements
-): Item;
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements,
-    width: number,
-    height: number
-): Item;
-function createItem(
-    name: string,
-    createTime: number,
-    output: number,
-    requirements: Requirements,
-    width?: number,
-    height?: number
-): Item {
+function createItem({
+    name,
+    createTime,
+    output,
+    requirements,
+    minimumTool = Tools.none,
+    maximumTool = Tools.none,
+    width,
+    height,
+}: {
+    name: string;
+    createTime: number;
+    output: number;
+    requirements: Requirements;
+    minimumTool?: Tools;
+    maximumTool?: Tools;
+    width?: number;
+    height?: number;
+}): Item {
     return {
         name,
         createTime,
         output,
         requires: requirements,
         ...(width && height ? { size: { width, height } } : {}),
+        minimumTool,
+        maximumTool,
     };
 }
 
