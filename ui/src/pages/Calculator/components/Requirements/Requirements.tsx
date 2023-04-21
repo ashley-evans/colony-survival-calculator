@@ -10,28 +10,31 @@ import {
     NumberColumnCell,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
+import { Tools } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
 
 type RequirementsProps = {
     selectedItemName: string;
     workers: number;
+    maxAvailableTool?: Tools;
 };
 
 const GET_ITEM_REQUIREMENTS = gql(`
-    query GetItemRequirements($name: ID!, $workers: Int!) {
-        requirement(name: $name, workers: $workers) {
+    query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools) {
+        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool) {
             name
             workers
         }
     }
 `);
 
-function Requirements({ selectedItemName, workers }: RequirementsProps) {
+function Requirements({
+    selectedItemName,
+    workers,
+    maxAvailableTool,
+}: RequirementsProps) {
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
-        GET_ITEM_REQUIREMENTS,
-        {
-            variables: { name: selectedItemName, workers },
-        }
+        GET_ITEM_REQUIREMENTS
     );
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
 
@@ -40,9 +43,10 @@ function Requirements({ selectedItemName, workers }: RequirementsProps) {
             variables: {
                 name: selectedItemName,
                 workers: debouncedWorkers,
+                maxAvailableTool,
             },
         });
-    }, [selectedItemName, debouncedWorkers]);
+    }, [selectedItemName, debouncedWorkers, maxAvailableTool]);
 
     if (error) {
         return (

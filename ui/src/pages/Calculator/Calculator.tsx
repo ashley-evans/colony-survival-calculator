@@ -101,6 +101,7 @@ function Calculator() {
                         <Requirements
                             selectedItemName={selectedItem}
                             workers={workers}
+                            maxAvailableTool={selectedTool}
                         />
                     ) : null}
                 </>
