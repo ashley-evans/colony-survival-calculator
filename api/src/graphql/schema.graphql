@@ -20,10 +20,24 @@ enum OutputUnit {
     GAME_DAYS
 }
 
+enum Tools {
+    NONE
+    STONE
+    COPPER
+    IRON
+    BRONZE
+    STEEL
+}
+
 type Query {
     item(name: ID): [Item!]!
     requirement(name: ID!, workers: Int!): [Requirement!]!
-    output(name: ID!, workers: Int!, unit: OutputUnit!): Float!
+    output(
+        name: ID!
+        workers: Int!
+        unit: OutputUnit!
+        maxAvailableTool: Tools
+    ): Float!
 }
 
 schema {
