@@ -7,9 +7,10 @@ import OutputUnitSelector from "./components/OutputUnitSelector";
 import Requirements from "./components/Requirements";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { CalculatorContainer, CalculatorHeader } from "./styles";
-import { OutputUnit } from "../../graphql/__generated__/graphql";
+import { OutputUnit, Tools } from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
+import ToolSelector from "./components/ToolSelector";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -46,6 +47,7 @@ function Calculator() {
     );
 
     const [workers, setWorkers] = useState<number>();
+    const [selectedTool, setSelectedTool] = useState<Tools>();
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
         OutputUnit.Minutes
     );
@@ -74,6 +76,7 @@ function Calculator() {
                         onItemChange={setSelectedItem}
                     />
                     <WorkerInput onWorkerChange={setWorkers} />
+                    <ToolSelector onToolChange={setSelectedTool} />
                     <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
                 </>
             ) : null}
@@ -91,12 +94,14 @@ function Calculator() {
                             itemName={selectedItem}
                             workers={workers}
                             outputUnit={selectedOutputUnit}
+                            maxAvailableTool={selectedTool}
                         />
                     ) : null}
                     {workers && selectedItem ? (
                         <Requirements
                             selectedItemName={selectedItem}
                             workers={workers}
+                            maxAvailableTool={selectedTool}
                         />
                     ) : null}
                 </>

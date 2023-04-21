@@ -7,6 +7,7 @@ const expectedDesiredOutputHeader = "Desired output:";
 const expectedItemSelectLabel = "Item:";
 const expectedWorkerInputLabel = "Workers:";
 const expectedOutputUnitLabel = "Desired output units:";
+const expectedToolSelectLabel = "Tools:";
 const expectedOutputPrefix = "Optimal output:";
 const expectedFarmSizeNotePrefix = "Calculations use optimal farm size:";
 
@@ -19,6 +20,7 @@ export {
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     expectedOutputUnitLabel,
+    expectedToolSelectLabel,
     expectedOutputPrefix,
     expectedFarmSizeNotePrefix,
 };

@@ -16,6 +16,7 @@ import {
     expectedWorkerInputLabel,
     ItemName,
     expectedDesiredOutputHeader,
+    expectedToolSelectLabel,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 
@@ -155,8 +156,9 @@ describe("given no item names returned", () => {
         );
     });
 
-    test("does not render a combo box for the desired output", () => {
+    test("does not render a combo box for the desired output", async () => {
         render(<Calculator />);
+        await screen.findByRole("alert");
 
         expect(
             screen.queryByRole("combobox", {
@@ -165,8 +167,9 @@ describe("given no item names returned", () => {
         ).not.toBeInTheDocument();
     });
 
-    test("does not render a worker input box", () => {
+    test("does not render a worker input box", async () => {
         render(<Calculator />);
+        await screen.findByRole("alert");
 
         expect(
             screen.queryByLabelText(expectedWorkerInputLabel, {
@@ -175,8 +178,20 @@ describe("given no item names returned", () => {
         ).not.toBeInTheDocument();
     });
 
-    test("does not render a combo box for the desired output units", () => {
+    test("does not render a select for tools", async () => {
         render(<Calculator />);
+        await screen.findByRole("alert");
+
+        expect(
+            screen.queryByRole("combobox", {
+                name: expectedToolSelectLabel,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render a combo box for the desired output units", async () => {
+        render(<Calculator />);
+        await screen.findByRole("alert");
 
         expect(
             screen.queryByRole("combobox", {
@@ -322,4 +337,8 @@ test("renders an unhandled error message if an exception occurs fetching item de
     expect(await screen.findByRole("alert")).toHaveTextContent(
         expectedNetworkExceptionError
     );
+});
+
+afterAll(() => {
+    server.close();
 });
