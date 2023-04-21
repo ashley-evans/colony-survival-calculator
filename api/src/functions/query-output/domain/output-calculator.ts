@@ -1,3 +1,4 @@
+import { ToolModifierValues } from "../../../common/modifiers";
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../interfaces/output-database-port";
@@ -12,15 +13,6 @@ const UNKNOWN_ITEM_ERROR = "Unknown item provided";
 const TOOL_LEVEL_ERROR_PREFIX =
     "Unable to create item with available tools, minimum tool is:";
 const INTERNAL_SERVER_ERROR = "Internal server error";
-
-const toolValues = new Map<Tools, number>([
-    [Tools.none, 1],
-    [Tools.stone, 2],
-    [Tools.copper, 4],
-    [Tools.iron, 5.3],
-    [Tools.bronze, 6.15],
-    [Tools.steel, 8],
-]);
 
 async function getItemOutputDetails(
     name: string
@@ -38,22 +30,14 @@ async function getItemOutputDetails(
 }
 
 function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
-    const minimumToolModifier = toolValues.get(minimum);
-    const availableToolModifier = toolValues.get(available);
-    if (!minimumToolModifier || !availableToolModifier) {
-        throw new Error(INTERNAL_SERVER_ERROR);
-    }
-
+    const minimumToolModifier = ToolModifierValues[minimum];
+    const availableToolModifier = ToolModifierValues[available];
     return availableToolModifier >= minimumToolModifier;
 }
 
 function getMaxToolModifier(maximum: Tools, available: Tools): number {
-    const maximumToolModifier = toolValues.get(maximum);
-    const availableToolModifier = toolValues.get(available);
-    if (!maximumToolModifier || !availableToolModifier) {
-        throw new Error(INTERNAL_SERVER_ERROR);
-    }
-
+    const maximumToolModifier = ToolModifierValues[maximum];
+    const availableToolModifier = ToolModifierValues[available];
     return availableToolModifier > maximumToolModifier
         ? maximumToolModifier
         : availableToolModifier;

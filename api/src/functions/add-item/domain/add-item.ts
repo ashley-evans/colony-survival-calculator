@@ -1,22 +1,14 @@
 import Ajv from "ajv";
 
 import ItemsSchema from "../../../json/schemas/items.json";
-import { Items, Tools } from "../../../types";
+import { Items } from "../../../types";
 import { storeItem } from "../adapters/store-item";
 import type { AddItemPrimaryPort } from "../interfaces/add-item-primary-port";
+import { ToolModifierValues } from "../../../common/modifiers";
 
 const ajv = new Ajv();
 ajv.addKeyword("tsEnumNames");
 const validateItems = ajv.compile<Items>(ItemsSchema);
-
-const toolValues = new Map<Tools, number>([
-    [Tools.none, 1],
-    [Tools.stone, 2],
-    [Tools.copper, 4],
-    [Tools.iron, 5.3],
-    [Tools.bronze, 6.15],
-    [Tools.steel, 8],
-]);
 
 function parseItems(input: string): Items {
     try {
@@ -49,13 +41,10 @@ function validateRequirements(items: Items): void {
 
 function validateTools(items: Items): void {
     for (const item of items) {
-        const minToolValue = toolValues.get(item.minimumTool);
-        const maxToolValue = toolValues.get(item.maximumTool);
-        if (!minToolValue || !maxToolValue) {
-            throw new Error(
-                `Unable to validate item: ${item.name} tools, unknown hierarchy for tools: ${item.minimumTool}/${item.maximumTool}`
-            );
-        } else if (minToolValue > maxToolValue) {
+        ToolModifierValues;
+        const minToolValue = ToolModifierValues[item.minimumTool];
+        const maxToolValue = ToolModifierValues[item.maximumTool];
+        if (minToolValue > maxToolValue) {
             throw new Error(
                 `Invalid item: ${item.name}, minimum tool is better than maximum tool`
             );
