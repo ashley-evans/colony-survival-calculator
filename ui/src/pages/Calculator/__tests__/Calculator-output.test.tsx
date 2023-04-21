@@ -98,7 +98,7 @@ test("queries optimal output if item and workers inputted with default unit sele
     });
 });
 
-test("queries optimal output if item annd workers inputted with non-default unit selected", async () => {
+test("queries optimal output if item and workers inputted with non-default unit selected", async () => {
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,

@@ -10,9 +10,13 @@ import {
     expectedOutputQueryName,
     expectedRequirementsQueryName,
     expectedToolSelectLabel,
+    selectItemAndWorkers,
+    selectTool,
 } from "./utils";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import Calculator from "../Calculator";
+import { waitForRequest } from "../../../helpers/utils";
+import { OutputUnit, Tools } from "../../../graphql/__generated__/graphql";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
@@ -72,6 +76,57 @@ test("renders none as the selected tool by default", async () => {
     expect(
         within(toolSelect).getByRole("option", { name: "None", selected: true })
     ).toBeVisible();
+});
+
+test("queries optimal output with provided tool if non default selected", async () => {
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedOutputQueryName
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectTool(Tools.Steel);
+    await selectItemAndWorkers({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+    const { matchedRequestDetails } = await expectedRequest;
+
+    expect(matchedRequestDetails.variables).toEqual({
+        name: item.name,
+        workers: expectedWorkers,
+        unit: OutputUnit.Minutes,
+        maxAvailableTool: Tools.Steel,
+    });
+});
+
+test("queries optimal output again if tool is changed after first query", async () => {
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedOutputQueryName,
+        {
+            name: item.name,
+            workers: expectedWorkers,
+            unit: OutputUnit.Minutes,
+            maxAvailableTool: Tools.Copper,
+        }
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectTool(Tools.Steel);
+    await selectItemAndWorkers({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+    await selectTool(Tools.Copper);
+
+    await expect(expectedRequest).resolves.not.toThrow();
 });
 
 afterAll(() => {

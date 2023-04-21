@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/client";
 import { useDebounce } from "use-debounce";
 
 import { gql } from "../../../../graphql/__generated__";
-import { OutputUnit } from "../../../../graphql/__generated__/graphql";
+import { OutputUnit, Tools } from "../../../../graphql/__generated__/graphql";
 import { DesiredOutputText } from "./styles";
 import {
     DEFAULT_DEBOUNCE,
@@ -15,11 +15,12 @@ type OptimalOutputProps = {
     itemName: string;
     workers: number;
     outputUnit: OutputUnit;
+    maxAvailableTool?: Tools;
 };
 
 const GET_OPTIMAL_OUTPUT = gql(`
-    query GetOptimalOutput($name: ID!, $workers: Int!, $unit: OutputUnit!) {
-        output(name: $name, workers: $workers, unit: $unit)
+    query GetOptimalOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: Tools) {
+        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool)
     }
 `);
 
@@ -28,7 +29,12 @@ function createOutputMessage(output: number, unit: OutputUnit): string {
     return `Optimal output: ${roundOutput(output)} per ${unitDisplayString}`;
 }
 
-function OptimalOutput({ itemName, workers, outputUnit }: OptimalOutputProps) {
+function OptimalOutput({
+    itemName,
+    workers,
+    outputUnit,
+    maxAvailableTool,
+}: OptimalOutputProps) {
     const [getOptimalOutput, { data, error }] =
         useLazyQuery(GET_OPTIMAL_OUTPUT);
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
@@ -39,9 +45,10 @@ function OptimalOutput({ itemName, workers, outputUnit }: OptimalOutputProps) {
                 name: itemName,
                 workers: debouncedWorkers,
                 unit: outputUnit,
+                maxAvailableTool,
             },
         });
-    }, [itemName, debouncedWorkers, outputUnit]);
+    }, [itemName, debouncedWorkers, outputUnit, maxAvailableTool]);
 
     if (error) {
         return (

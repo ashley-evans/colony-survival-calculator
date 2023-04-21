@@ -4,10 +4,11 @@ import userEvent from "@testing-library/user-event";
 import {
     expectedItemSelectLabel,
     expectedOutputUnitLabel,
+    expectedToolSelectLabel,
     expectedWorkerInputLabel,
 } from "./constants";
-import { OutputUnit } from "../../../../graphql/__generated__/graphql";
-import { OutputUnitSelectorMappings } from "../../utils";
+import { OutputUnit, Tools } from "../../../../graphql/__generated__/graphql";
+import { OutputUnitSelectorMappings, ToolSelectorMappings } from "../../utils";
 
 async function selectItemAndWorkers({
     itemName,
@@ -57,4 +58,15 @@ async function selectOutputUnit(unit: OutputUnit) {
     });
 }
 
-export { selectItemAndWorkers, selectOutputUnit };
+async function selectTool(tool: Tools) {
+    const user = userEvent.setup();
+    const toolSelect = await screen.findByRole("combobox", {
+        name: expectedToolSelectLabel,
+    });
+
+    await act(async () => {
+        await user.selectOptions(toolSelect, ToolSelectorMappings[tool]);
+    });
+}
+
+export { selectItemAndWorkers, selectOutputUnit, selectTool };
