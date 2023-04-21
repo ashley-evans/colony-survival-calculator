@@ -1,7 +1,10 @@
 import type { QueryRequirementsPrimaryPort } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
 import { Item, Items, Tools } from "../../../types";
-import { isAvailableToolSufficient } from "../../../common/modifiers";
+import {
+    getMaxToolModifier,
+    isAvailableToolSufficient,
+} from "../../../common/modifiers";
 
 const INVALID_ITEM_NAME_ERROR =
     "Invalid item name provided, must be a non-empty string";
@@ -19,6 +22,13 @@ function calculateRequirements(
     maxAvailableTool: Tools,
     results: Map<string, number>
 ) {
+    const inputItemModifier = getMaxToolModifier(
+        inputItem.maximumTool,
+        maxAvailableTool
+    );
+    const inputItemModifiedCreateTime =
+        inputItem.createTime / inputItemModifier;
+
     for (const requirement of inputItem.requires) {
         const requiredItem = knownItems.get(requirement.name);
         if (!requiredItem) {
@@ -36,7 +46,8 @@ function calculateRequirements(
             );
         }
 
-        const requiredPerSecond = requirement.amount / inputItem.createTime;
+        const requiredPerSecond =
+            requirement.amount / inputItemModifiedCreateTime;
         const producedPerSecond = requiredItem.output / requiredItem.createTime;
         const demandPerSecond = requiredPerSecond / producedPerSecond;
         const requiredWorkers = demandPerSecond * inputDesiredWorkers;

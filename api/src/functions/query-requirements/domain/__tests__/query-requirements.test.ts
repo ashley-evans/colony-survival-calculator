@@ -2,6 +2,7 @@ import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem } from "../../../../../test";
 import { Tools } from "../../../../types";
+import { RequiredWorkers } from "../../interfaces/query-requirements-primary-port";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: jest.fn(),
@@ -376,4 +377,81 @@ describe("handles tool modifiers", () => {
             ).rejects.toThrow(expectedError);
         }
     );
+
+    test.each([
+        [Tools.none, 5],
+        [Tools.stone, 10],
+        [Tools.copper, 20],
+        [Tools.iron, 26.5],
+        [Tools.bronze, 30.75],
+        [Tools.steel, 40],
+    ])(
+        "returns expected workers for requirement given item with applicable tool: %s and requirement with no tools",
+        async (provided: Tools, expectedWorkers: number) => {
+            const requiredItemName = "another item";
+            const requiredItem = createItem({
+                name: requiredItemName,
+                createTime: 2,
+                output: 3,
+                requirements: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            });
+            const item = createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: requiredItem.name, amount: 3 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.steel,
+            });
+            mockMongoDBQueryRequirements.mockResolvedValue([
+                item,
+                requiredItem,
+            ]);
+
+            const actual = await queryRequirements(
+                validItemName,
+                validWorkers,
+                provided
+            );
+            const requirement = actual.find(
+                (value) => value.name === requiredItemName
+            ) as RequiredWorkers;
+
+            expect(requirement.workers).toBeCloseTo(expectedWorkers);
+        }
+    );
+
+    test("returns required workers to satisfy input item given tool better than applicable to input item", async () => {
+        const requiredItemName = "another item";
+        const requiredItem = createItem({
+            name: requiredItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [],
+            minimumTool: Tools.none,
+            maximumTool: Tools.none,
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 3 }],
+            minimumTool: Tools.none,
+            maximumTool: Tools.copper,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
+
+        const actual = await queryRequirements(
+            validItemName,
+            validWorkers,
+            Tools.steel
+        );
+        const requirement = actual.find(
+            (value) => value.name === requiredItemName
+        ) as RequiredWorkers;
+
+        expect(requirement.workers).toBeCloseTo(20);
+    });
 });

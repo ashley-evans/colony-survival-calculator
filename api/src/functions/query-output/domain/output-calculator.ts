@@ -1,5 +1,5 @@
 import {
-    ToolModifierValues,
+    getMaxToolModifier,
     isAvailableToolSufficient,
 } from "../../../common/modifiers";
 import { Tools } from "../../../types";
@@ -30,14 +30,6 @@ async function getItemOutputDetails(
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
-}
-
-function getMaxToolModifier(maximum: Tools, available: Tools): number {
-    const maximumToolModifier = ToolModifierValues[maximum];
-    const availableToolModifier = ToolModifierValues[available];
-    return availableToolModifier > maximumToolModifier
-        ? maximumToolModifier
-        : availableToolModifier;
 }
 
 const calculateOutput: QueryOutputPrimaryPort = async (

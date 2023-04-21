@@ -15,4 +15,12 @@ function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
     return availableToolModifier >= minimumToolModifier;
 }
 
-export { ToolModifierValues, isAvailableToolSufficient };
+function getMaxToolModifier(maximum: Tools, available: Tools): number {
+    const maximumToolModifier = ToolModifierValues[maximum];
+    const availableToolModifier = ToolModifierValues[available];
+    return availableToolModifier > maximumToolModifier
+        ? maximumToolModifier
+        : availableToolModifier;
+}
+
+export { ToolModifierValues, isAvailableToolSufficient, getMaxToolModifier };
