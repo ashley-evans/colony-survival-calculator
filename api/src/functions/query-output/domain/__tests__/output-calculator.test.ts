@@ -181,4 +181,19 @@ describe("tool modifiers", () => {
             expect(actual).toBeCloseTo(expected);
         }
     );
+
+    test("returns output for max applicable tool for item if provided tool is better than max", async () => {
+        const expected = 1800;
+        const details = createItemOutputDetails(2, 3, Tools.none, Tools.copper);
+        mockQueryOutputDetails.mockResolvedValue([details]);
+
+        const actual = await calculateOutput(
+            validItemName,
+            validWorkers,
+            OutputUnit.MINUTES,
+            Tools.steel
+        );
+
+        expect(actual).toBeCloseTo(expected);
+    });
 });

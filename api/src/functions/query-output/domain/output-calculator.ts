@@ -51,13 +51,16 @@ function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
     return availableToolModifier >= minimumToolModifier;
 }
 
-function getMaxToolModifier(available: Tools): number {
+function getMaxToolModifier(maximum: Tools, available: Tools): number {
+    const maximumToolModifier = toolValues.get(maximum);
     const availableToolModifier = toolValues.get(available);
-    if (!availableToolModifier) {
+    if (!maximumToolModifier || !availableToolModifier) {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
 
-    return availableToolModifier;
+    return availableToolModifier > maximumToolModifier
+        ? maximumToolModifier
+        : availableToolModifier;
 }
 
 function calculateOptimalOutput(
@@ -103,7 +106,10 @@ const calculateOutput: QueryOutputPrimaryPort = async (
             );
         }
 
-        const toolModifier = getMaxToolModifier(maxAvailableTool);
+        const toolModifier = getMaxToolModifier(
+            outputDetails.maximumTool,
+            maxAvailableTool
+        );
         return calculateOptimalOutput(
             outputDetails.output,
             outputDetails.createTime,
