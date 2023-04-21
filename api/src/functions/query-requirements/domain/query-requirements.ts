@@ -16,12 +16,24 @@ function calculateRequirements(
     inputItem: Item,
     inputDesiredWorkers: number,
     knownItems: Map<string, Item>,
+    maxAvailableTool: Tools,
     results: Map<string, number>
 ) {
     for (const requirement of inputItem.requires) {
         const requiredItem = knownItems.get(requirement.name);
         if (!requiredItem) {
             throw new Error(INTERNAL_SERVER_ERROR);
+        }
+
+        if (
+            !isAvailableToolSufficient(
+                requiredItem.minimumTool,
+                maxAvailableTool
+            )
+        ) {
+            throw new Error(
+                `${TOOL_LEVEL_ERROR_PREFIX} ${requiredItem.minimumTool}`
+            );
         }
 
         const requiredPerSecond = requirement.amount / inputItem.createTime;
@@ -40,6 +52,7 @@ function calculateRequirements(
                 requiredItem,
                 requiredWorkers,
                 knownItems,
+                maxAvailableTool,
                 results
             );
         }
@@ -87,7 +100,13 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
     }
 
     const results = new Map<string, number>();
-    calculateRequirements(inputItem, workers, requirementMap, results);
+    calculateRequirements(
+        inputItem,
+        workers,
+        requirementMap,
+        maxAvailableTool,
+        results
+    );
     return Array.from(results, ([name, workers]) => ({ name, workers }));
 };
 

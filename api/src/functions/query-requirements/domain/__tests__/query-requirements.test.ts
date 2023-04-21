@@ -338,4 +338,42 @@ describe("handles tool modifiers", () => {
             ).rejects.toThrow(expectedError);
         }
     );
+
+    test.each([
+        ["stone min, none provided", Tools.stone, Tools.none],
+        ["copper min, stone provided", Tools.copper, Tools.stone],
+        ["iron min, copper provided", Tools.iron, Tools.copper],
+        ["bronze min, iron provided", Tools.bronze, Tools.iron],
+        ["steel min, bronze provided", Tools.steel, Tools.bronze],
+    ])(
+        "throws an error if the provided tool is less the minimum requirement for any item's requirements (%s)",
+        async (_: string, minimum: Tools, provided: Tools) => {
+            const requiredItem = createItem({
+                name: "another item",
+                createTime: 2,
+                output: 3,
+                requirements: [],
+                minimumTool: minimum,
+                maximumTool: Tools.steel,
+            });
+            const item = createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 3,
+                requirements: [{ name: requiredItem.name, amount: 3 }],
+                minimumTool: Tools.none,
+                maximumTool: Tools.steel,
+            });
+            mockMongoDBQueryRequirements.mockResolvedValue([
+                item,
+                requiredItem,
+            ]);
+            const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
+
+            expect.assertions(1);
+            await expect(
+                queryRequirements(validItemName, validWorkers, provided)
+            ).rejects.toThrow(expectedError);
+        }
+    );
 });
