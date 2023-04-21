@@ -454,4 +454,68 @@ describe("handles tool modifiers", () => {
 
         expect(requirement.workers).toBeCloseTo(20);
     });
+
+    test("reduces required workers for requirement if tool provided is applicable to requirement and not input item", async () => {
+        const requiredItemName = "another item";
+        const requiredItem = createItem({
+            name: requiredItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [],
+            minimumTool: Tools.none,
+            maximumTool: Tools.steel,
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 3 }],
+            minimumTool: Tools.none,
+            maximumTool: Tools.none,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
+
+        const actual = await queryRequirements(
+            validItemName,
+            validWorkers,
+            Tools.steel
+        );
+        const requirement = actual.find(
+            (value) => value.name === requiredItemName
+        ) as RequiredWorkers;
+
+        expect(requirement.workers).toBeCloseTo(0.625);
+    });
+
+    test("reduces required workers for required item to max applicable to requirement given better tool applicable to only requirement", async () => {
+        const requiredItemName = "another item";
+        const requiredItem = createItem({
+            name: requiredItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [],
+            minimumTool: Tools.none,
+            maximumTool: Tools.copper,
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 3 }],
+            minimumTool: Tools.none,
+            maximumTool: Tools.none,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
+
+        const actual = await queryRequirements(
+            validItemName,
+            validWorkers,
+            Tools.steel
+        );
+        const requirement = actual.find(
+            (value) => value.name === requiredItemName
+        ) as RequiredWorkers;
+
+        expect(requirement.workers).toBeCloseTo(1.25);
+    });
 });

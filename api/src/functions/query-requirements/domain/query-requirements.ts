@@ -46,9 +46,16 @@ function calculateRequirements(
             );
         }
 
+        const requiredItemModifier = getMaxToolModifier(
+            requiredItem.maximumTool,
+            maxAvailableTool
+        );
+
         const requiredPerSecond =
             requirement.amount / inputItemModifiedCreateTime;
-        const producedPerSecond = requiredItem.output / requiredItem.createTime;
+        const producedPerSecond =
+            requiredItem.output /
+            (requiredItem.createTime / requiredItemModifier);
         const demandPerSecond = requiredPerSecond / producedPerSecond;
         const requiredWorkers = demandPerSecond * inputDesiredWorkers;
 
