@@ -1,12 +1,15 @@
 import type { QueryRequirementsPrimaryPort } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
-import type { Item, Items } from "../../../types";
+import { Item, Items, Tools } from "../../../types";
+import { isAvailableToolSufficient } from "../../../common/modifiers";
 
 const INVALID_ITEM_NAME_ERROR =
     "Invalid item name provided, must be a non-empty string";
 const INVALID_WORKERS_ERROR =
     "Invalid number of workers provided, must be a positive number";
 const UNKNOWN_ITEM_ERROR = "Unknown item provided";
+const TOOL_LEVEL_ERROR_PREFIX =
+    "Unable to create item with available tools, minimum tool is:";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
 function calculateRequirements(
@@ -53,7 +56,8 @@ async function getRequiredItemDetails(name: string): Promise<Items> {
 
 const queryRequirements: QueryRequirementsPrimaryPort = async (
     name: string,
-    workers: number
+    workers: number,
+    maxAvailableTool: Tools = Tools.none
 ) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
@@ -76,6 +80,10 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
     const inputItem = requirementMap.get(name);
     if (!inputItem) {
         throw new Error(UNKNOWN_ITEM_ERROR);
+    }
+
+    if (!isAvailableToolSufficient(inputItem.minimumTool, maxAvailableTool)) {
+        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${inputItem.minimumTool}`);
     }
 
     const results = new Map<string, number>();

@@ -9,4 +9,10 @@ const ToolModifierValues: Readonly<Record<Tools, number>> = {
     [Tools.steel]: 8,
 };
 
-export { ToolModifierValues };
+function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
+    const minimumToolModifier = ToolModifierValues[minimum];
+    const availableToolModifier = ToolModifierValues[available];
+    return availableToolModifier >= minimumToolModifier;
+}
+
+export { ToolModifierValues, isAvailableToolSufficient };

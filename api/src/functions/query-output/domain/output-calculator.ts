@@ -1,4 +1,7 @@
-import { ToolModifierValues } from "../../../common/modifiers";
+import {
+    ToolModifierValues,
+    isAvailableToolSufficient,
+} from "../../../common/modifiers";
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../interfaces/output-database-port";
@@ -27,12 +30,6 @@ async function getItemOutputDetails(
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
-}
-
-function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
-    const minimumToolModifier = ToolModifierValues[minimum];
-    const availableToolModifier = ToolModifierValues[available];
-    return availableToolModifier >= minimumToolModifier;
 }
 
 function getMaxToolModifier(maximum: Tools, available: Tools): number {

@@ -1,6 +1,7 @@
 import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem } from "../../../../../test";
+import { Tools } from "../../../../types";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: jest.fn(),
@@ -308,4 +309,33 @@ test("throws an error if an unhandled exception occurs while fetching item requi
     await expect(
         queryRequirements(validItemName, validWorkers)
     ).rejects.toThrow(expectedError);
+});
+
+describe("handles tool modifiers", () => {
+    test.each([
+        ["stone min, none provided", Tools.stone, Tools.none],
+        ["copper min, stone provided", Tools.copper, Tools.stone],
+        ["iron min, copper provided", Tools.iron, Tools.copper],
+        ["bronze min, iron provided", Tools.bronze, Tools.iron],
+        ["steel min, bronze provided", Tools.steel, Tools.bronze],
+    ])(
+        "throws an error if the provided tool is less the minimum requirement for the specified item (%s)",
+        async (_: string, minimum: Tools, provided: Tools) => {
+            const item = createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 3,
+                requirements: [],
+                minimumTool: minimum,
+                maximumTool: Tools.steel,
+            });
+            mockMongoDBQueryRequirements.mockResolvedValue([item]);
+            const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
+
+            expect.assertions(1);
+            await expect(
+                queryRequirements(validItemName, validWorkers, provided)
+            ).rejects.toThrow(expectedError);
+        }
+    );
 });

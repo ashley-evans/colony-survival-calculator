@@ -124,7 +124,7 @@ test.each([
     }
 );
 
-describe("tool modifiers", () => {
+describe("handles tool modifiers", () => {
     test.each([
         ["stone min, none provided", Tools.stone, Tools.none],
         ["copper min, stone provided", Tools.copper, Tools.stone],
@@ -136,7 +136,6 @@ describe("tool modifiers", () => {
         async (_: string, minimum: Tools, provided: Tools) => {
             const details = createItemOutputDetails(2, 3, minimum, Tools.steel);
             mockQueryOutputDetails.mockResolvedValue([details]);
-
             const expectedError = new Error(
                 `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`
             );
