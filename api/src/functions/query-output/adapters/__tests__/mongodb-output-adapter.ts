@@ -14,7 +14,7 @@ jest.mock("@colony-survival-calculator/mongodb-client", async () => {
 });
 
 import mockClient from "@colony-survival-calculator/mongodb-client";
-import type { Items } from "../../../../types";
+import { Items, Tools } from "../../../../types";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 
 const validItemName = "test item";
@@ -87,9 +87,18 @@ test.each([
                 createTime: 5,
                 output: 3,
                 requirements: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.copper,
             }),
         ],
-        [{ createTime: 5, output: 3 }],
+        [
+            {
+                createTime: 5,
+                output: 3,
+                minimumTool: Tools.none,
+                maximumTool: Tools.copper,
+            },
+        ],
     ],
     [
         "only relevant item details",
@@ -100,15 +109,26 @@ test.each([
                 createTime: 5,
                 output: 3,
                 requirements: [],
+                minimumTool: Tools.copper,
+                maximumTool: Tools.steel,
             }),
             createItem({
                 name: "another item",
                 createTime: 2,
                 output: 1,
                 requirements: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.steel,
             }),
         ],
-        [{ createTime: 5, output: 3 }],
+        [
+            {
+                createTime: 5,
+                output: 3,
+                minimumTool: Tools.copper,
+                maximumTool: Tools.steel,
+            },
+        ],
     ],
     [
         "nothing",

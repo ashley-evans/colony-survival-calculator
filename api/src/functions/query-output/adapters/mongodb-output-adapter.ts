@@ -22,7 +22,13 @@ const queryOutputDetails: OutputDatabasePort = async (name) => {
 
     return collection
         .find<Item>({ name })
-        .project<ItemOutputDetails>({ _id: 0, createTime: 1, output: 1 })
+        .project<ItemOutputDetails>({
+            _id: 0,
+            createTime: 1,
+            output: 1,
+            minimumTool: 1,
+            maximumTool: 1,
+        })
         .toArray();
 };
 

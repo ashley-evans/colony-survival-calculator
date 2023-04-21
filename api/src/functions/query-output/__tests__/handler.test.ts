@@ -3,7 +3,12 @@ import { mock } from "jest-mock-extended";
 
 import { handler } from "../handler";
 import { calculateOutput } from "../domain/output-calculator";
-import type { OutputUnit, QueryOutputArgs } from "../../../graphql/schema";
+import type {
+    OutputUnit,
+    QueryOutputArgs,
+    Tools,
+} from "../../../graphql/schema";
+import { Tools as SchemaTools } from "../../../types";
 
 jest.mock("../domain/output-calculator", () => ({
     calculateOutput: jest.fn(),
@@ -14,13 +19,15 @@ const mockCalculateOutput = calculateOutput as jest.Mock;
 function createMockEvent(
     name: string,
     workers: number,
-    unit: OutputUnit
+    unit: OutputUnit,
+    maxAvailableTool?: Tools
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
         name,
         workers,
         unit,
+        maxAvailableTool: maxAvailableTool ?? null,
     };
 
     return mockEvent;
@@ -40,16 +47,49 @@ beforeEach(() => {
     mockCalculateOutput.mockReset();
 });
 
-test("calls the domain to calculate output given a valid event", async () => {
+test("calls the domain to calculate output given a valid event w/o tool", async () => {
     await handler(validEvent);
 
     expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
     expect(mockCalculateOutput).toHaveBeenCalledWith(
         expectedItemName,
         expectedWorkers,
-        expectedUnit
+        expectedUnit,
+        undefined
     );
 });
+
+test.each<[Tools, SchemaTools]>([
+    ["NONE", SchemaTools.none],
+    ["STONE", SchemaTools.stone],
+    ["COPPER", SchemaTools.copper],
+    ["IRON", SchemaTools.iron],
+    ["BRONZE", SchemaTools.bronze],
+    ["STEEL", SchemaTools.steel],
+])(
+    "calls the domain to calculate output given a valid event w/ %s tool",
+    async (provided: Tools, expectedTool: SchemaTools) => {
+        const expectedItemName = "another test item";
+        const expectedWorkers = 2;
+        const expectedUnit = "MINUTES";
+        const event = createMockEvent(
+            expectedItemName,
+            expectedWorkers,
+            expectedUnit,
+            provided
+        );
+
+        await handler(event);
+
+        expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
+        expect(mockCalculateOutput).toHaveBeenCalledWith(
+            expectedItemName,
+            expectedWorkers,
+            expectedUnit,
+            expectedTool
+        );
+    }
+);
 
 test("returns the calculated output", async () => {
     const expected = 5;

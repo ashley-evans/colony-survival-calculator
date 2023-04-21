@@ -1,3 +1,5 @@
+import { ToolModifierValues } from "../../../common/modifiers";
+import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
@@ -8,6 +10,8 @@ const INVALID_ITEM_NAME_ERROR =
 const INVALID_WORKERS_ERROR =
     "Invalid number of workers provided, must be a positive number";
 const UNKNOWN_ITEM_ERROR = "Unknown item provided";
+const TOOL_LEVEL_ERROR_PREFIX =
+    "Unable to create item with available tools, minimum tool is:";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
 async function getItemOutputDetails(
@@ -25,7 +29,26 @@ async function getItemOutputDetails(
     }
 }
 
-const calculateOutput: QueryOutputPrimaryPort = async (name, workers, unit) => {
+function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
+    const minimumToolModifier = ToolModifierValues[minimum];
+    const availableToolModifier = ToolModifierValues[available];
+    return availableToolModifier >= minimumToolModifier;
+}
+
+function getMaxToolModifier(maximum: Tools, available: Tools): number {
+    const maximumToolModifier = ToolModifierValues[maximum];
+    const availableToolModifier = ToolModifierValues[available];
+    return availableToolModifier > maximumToolModifier
+        ? maximumToolModifier
+        : availableToolModifier;
+}
+
+const calculateOutput: QueryOutputPrimaryPort = async (
+    name,
+    workers,
+    unit,
+    maxAvailableTool = Tools.none
+) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
     }
@@ -39,7 +62,21 @@ const calculateOutput: QueryOutputPrimaryPort = async (name, workers, unit) => {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    const outputPerSecond = outputDetails.output / outputDetails.createTime;
+    if (
+        !isAvailableToolSufficient(outputDetails.minimumTool, maxAvailableTool)
+    ) {
+        throw new Error(
+            `${TOOL_LEVEL_ERROR_PREFIX} ${outputDetails.minimumTool}`
+        );
+    }
+
+    const toolModifier = getMaxToolModifier(
+        outputDetails.maximumTool,
+        maxAvailableTool
+    );
+
+    const outputPerSecond =
+        outputDetails.output / (outputDetails.createTime / toolModifier);
     const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
     return outputPerWorker * workers;
 };
