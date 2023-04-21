@@ -152,4 +152,33 @@ describe("tool modifiers", () => {
             ).rejects.toThrow(expectedError);
         }
     );
+
+    test.each([
+        [Tools.none, 450],
+        [Tools.stone, 900],
+        [Tools.copper, 1800],
+        [Tools.iron, 2385],
+        [Tools.bronze, 2767.5],
+        [Tools.steel, 3600],
+    ])(
+        "returns the expected output for item given applicable tool: %s",
+        async (provided: Tools, expected: number) => {
+            const details = createItemOutputDetails(
+                2,
+                3,
+                Tools.none,
+                Tools.steel
+            );
+            mockQueryOutputDetails.mockResolvedValue([details]);
+
+            const actual = await calculateOutput(
+                validItemName,
+                validWorkers,
+                OutputUnit.MINUTES,
+                provided
+            );
+
+            expect(actual).toBeCloseTo(expected);
+        }
+    );
 });

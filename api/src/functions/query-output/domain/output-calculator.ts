@@ -1,7 +1,10 @@
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../interfaces/output-database-port";
-import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
+import type {
+    OutputUnit,
+    QueryOutputPrimaryPort,
+} from "../interfaces/query-output-primary-port";
 import OutputUnitSecondMappings from "../utils/OutputUnitSecondMapping";
 
 const INVALID_ITEM_NAME_ERROR =
@@ -13,24 +16,15 @@ const TOOL_LEVEL_ERROR_PREFIX =
     "Unable to create item with available tools, minimum tool is:";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
+const defaultModififer = 1;
 const toolValues = new Map<Tools, number>([
-    [Tools.none, 1],
+    [Tools.none, defaultModififer],
     [Tools.stone, 2],
     [Tools.copper, 4],
     [Tools.iron, 5.3],
     [Tools.bronze, 6.15],
     [Tools.steel, 8],
 ]);
-
-function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
-    const minimumToolModifier = toolValues.get(minimum);
-    const availableToolModifier = toolValues.get(available);
-    if (!minimumToolModifier || !availableToolModifier) {
-        throw new Error(INTERNAL_SERVER_ERROR);
-    }
-
-    return availableToolModifier > minimumToolModifier;
-}
 
 async function getItemOutputDetails(
     name: string
@@ -45,6 +39,37 @@ async function getItemOutputDetails(
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
+}
+
+function isAvailableToolSufficient(minimum: Tools, available: Tools): boolean {
+    const minimumToolModifier = toolValues.get(minimum);
+    const availableToolModifier = toolValues.get(available);
+    if (!minimumToolModifier || !availableToolModifier) {
+        throw new Error(INTERNAL_SERVER_ERROR);
+    }
+
+    return availableToolModifier >= minimumToolModifier;
+}
+
+function getMaxToolModifier(available: Tools): number {
+    const availableToolModifier = toolValues.get(available);
+    if (!availableToolModifier) {
+        throw new Error(INTERNAL_SERVER_ERROR);
+    }
+
+    return availableToolModifier;
+}
+
+function calculateOptimalOutput(
+    outputPerCreate: number,
+    createTime: number,
+    workers: number,
+    unit: OutputUnit,
+    toolModifier: number = defaultModififer
+): number {
+    const outputPerSecond = outputPerCreate / (createTime / toolModifier);
+    const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
+    return outputPerWorker * workers;
 }
 
 const calculateOutput: QueryOutputPrimaryPort = async (
@@ -67,20 +92,33 @@ const calculateOutput: QueryOutputPrimaryPort = async (
     }
 
     if (maxAvailableTool) {
-        const sufficientTool = isAvailableToolSufficient(
-            outputDetails.minimumTool,
-            maxAvailableTool
-        );
-        if (!sufficientTool) {
+        if (
+            !isAvailableToolSufficient(
+                outputDetails.minimumTool,
+                maxAvailableTool
+            )
+        ) {
             throw new Error(
                 `${TOOL_LEVEL_ERROR_PREFIX} ${outputDetails.minimumTool}`
             );
         }
+
+        const toolModifier = getMaxToolModifier(maxAvailableTool);
+        return calculateOptimalOutput(
+            outputDetails.output,
+            outputDetails.createTime,
+            workers,
+            unit,
+            toolModifier
+        );
     }
 
-    const outputPerSecond = outputDetails.output / outputDetails.createTime;
-    const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
-    return outputPerWorker * workers;
+    return calculateOptimalOutput(
+        outputDetails.output,
+        outputDetails.createTime,
+        workers,
+        unit
+    );
 };
 
 export { calculateOutput };
