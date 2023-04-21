@@ -10,6 +10,7 @@ import { CalculatorContainer, CalculatorHeader } from "./styles";
 import { OutputUnit } from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
+import ToolSelector from "./components/ToolSelector";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -74,6 +75,7 @@ function Calculator() {
                         onItemChange={setSelectedItem}
                     />
                     <WorkerInput onWorkerChange={setWorkers} />
+                    <ToolSelector />
                     <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
                 </>
             ) : null}
