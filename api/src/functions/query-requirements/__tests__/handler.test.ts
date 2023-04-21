@@ -4,10 +4,12 @@ import { mock } from "jest-mock-extended";
 import type {
     QueryRequirementArgs,
     Requirement as GraphQLRequirement,
+    Tools,
 } from "../../../graphql/schema";
 import type { RequiredWorkers } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
+import { Tools as SchemaTools } from "../../../types";
 
 jest.mock("../domain/query-requirements", () => ({
     queryRequirements: jest.fn(),
@@ -17,18 +19,24 @@ const mockQueryRequirements = queryRequirements as jest.Mock;
 
 function createMockEvent(
     name: string,
-    workers: number
+    workers: number,
+    maxAvailableTool?: Tools
 ): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.arguments = {
         name,
         workers,
+        maxAvailableTool: maxAvailableTool ?? null,
     };
 
     return mockEvent;
 }
 
-test("calls the domain to fetch requirements for provided item", async () => {
+beforeEach(() => {
+    mockQueryRequirements.mockReset();
+});
+
+test("calls the domain to fetch requirements for provided event w/o tool modifier", async () => {
     const expectedItemName = "test name";
     const expectedAmount = 4;
     const event = createMockEvent(expectedItemName, expectedAmount);
@@ -38,9 +46,39 @@ test("calls the domain to fetch requirements for provided item", async () => {
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith(
         expectedItemName,
-        expectedAmount
+        expectedAmount,
+        undefined
     );
 });
+
+test.each<[Tools, SchemaTools]>([
+    ["NONE", SchemaTools.none],
+    ["STONE", SchemaTools.stone],
+    ["COPPER", SchemaTools.copper],
+    ["IRON", SchemaTools.iron],
+    ["BRONZE", SchemaTools.bronze],
+    ["STEEL", SchemaTools.steel],
+])(
+    "calls the domain to fetch requirements for provided event w/ %s tool modifier",
+    async (provided: Tools, expectedTool: SchemaTools) => {
+        const expectedItemName = "test name";
+        const expectedAmount = 4;
+        const event = createMockEvent(
+            expectedItemName,
+            expectedAmount,
+            provided
+        );
+
+        await handler(event);
+
+        expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+        expect(mockQueryRequirements).toHaveBeenCalledWith(
+            expectedItemName,
+            expectedAmount,
+            expectedTool
+        );
+    }
+);
 
 test.each([
     ["no requirements received", [], []],

@@ -31,7 +31,11 @@ enum Tools {
 
 type Query {
     item(name: ID): [Item!]!
-    requirement(name: ID!, workers: Int!): [Requirement!]!
+    requirement(
+        name: ID!
+        workers: Int!
+        maxAvailableTool: Tools
+    ): [Requirement!]!
     output(
         name: ID!
         workers: Int!
