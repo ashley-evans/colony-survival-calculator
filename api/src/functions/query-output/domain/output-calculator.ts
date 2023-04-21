@@ -1,10 +1,7 @@
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../interfaces/output-database-port";
-import type {
-    OutputUnit,
-    QueryOutputPrimaryPort,
-} from "../interfaces/query-output-primary-port";
+import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
 import OutputUnitSecondMappings from "../utils/OutputUnitSecondMapping";
 
 const INVALID_ITEM_NAME_ERROR =
@@ -16,9 +13,8 @@ const TOOL_LEVEL_ERROR_PREFIX =
     "Unable to create item with available tools, minimum tool is:";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
-const defaultModififer = 1;
 const toolValues = new Map<Tools, number>([
-    [Tools.none, defaultModififer],
+    [Tools.none, 1],
     [Tools.stone, 2],
     [Tools.copper, 4],
     [Tools.iron, 5.3],
@@ -63,23 +59,11 @@ function getMaxToolModifier(maximum: Tools, available: Tools): number {
         : availableToolModifier;
 }
 
-function calculateOptimalOutput(
-    outputPerCreate: number,
-    createTime: number,
-    workers: number,
-    unit: OutputUnit,
-    toolModifier: number = defaultModififer
-): number {
-    const outputPerSecond = outputPerCreate / (createTime / toolModifier);
-    const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
-    return outputPerWorker * workers;
-}
-
 const calculateOutput: QueryOutputPrimaryPort = async (
     name,
     workers,
     unit,
-    maxAvailableTool
+    maxAvailableTool = Tools.none
 ) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
@@ -94,37 +78,23 @@ const calculateOutput: QueryOutputPrimaryPort = async (
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    if (maxAvailableTool) {
-        if (
-            !isAvailableToolSufficient(
-                outputDetails.minimumTool,
-                maxAvailableTool
-            )
-        ) {
-            throw new Error(
-                `${TOOL_LEVEL_ERROR_PREFIX} ${outputDetails.minimumTool}`
-            );
-        }
-
-        const toolModifier = getMaxToolModifier(
-            outputDetails.maximumTool,
-            maxAvailableTool
-        );
-        return calculateOptimalOutput(
-            outputDetails.output,
-            outputDetails.createTime,
-            workers,
-            unit,
-            toolModifier
+    if (
+        !isAvailableToolSufficient(outputDetails.minimumTool, maxAvailableTool)
+    ) {
+        throw new Error(
+            `${TOOL_LEVEL_ERROR_PREFIX} ${outputDetails.minimumTool}`
         );
     }
 
-    return calculateOptimalOutput(
-        outputDetails.output,
-        outputDetails.createTime,
-        workers,
-        unit
+    const toolModifier = getMaxToolModifier(
+        outputDetails.maximumTool,
+        maxAvailableTool
     );
+
+    const outputPerSecond =
+        outputDetails.output / (outputDetails.createTime / toolModifier);
+    const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
+    return outputPerWorker * workers;
 };
 
 export { calculateOutput };
