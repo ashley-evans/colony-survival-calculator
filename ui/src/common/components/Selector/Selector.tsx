@@ -10,6 +10,7 @@ interface SelectorProps<Item> extends UseSelectProps<Item> {
     itemToDisplayText: (item: Item) => string;
     defaultSelectedItem: Item;
     palette?: ColorPallettes;
+    className?: string;
 }
 
 function Selector<Item>({
@@ -19,6 +20,7 @@ function Selector<Item>({
     labelText,
     defaultSelectedItem,
     palette = "secondary",
+    className,
 }: SelectorProps<Item>) {
     const {
         isOpen,
@@ -33,7 +35,7 @@ function Selector<Item>({
     });
 
     return (
-        <Container pallette={palette}>
+        <Container pallette={palette} className={className}>
             <label {...getLabelProps()}>{labelText}</label>
             <ToggleButton {...getToggleButtonProps()} pallette={palette}>
                 <span>
