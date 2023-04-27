@@ -32,3 +32,5 @@ declare module "styled-components" {
         };
     }
 }
+
+export type { KeyColor };

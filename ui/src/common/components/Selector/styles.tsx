@@ -1,20 +1,25 @@
 import styled, { css } from "styled-components";
+import { ColorPallettes } from "../../types";
 
-export const Container = styled.div`
+type CommonProps = {
+    pallette: ColorPallettes;
+};
+
+export const Container = styled.div<CommonProps>`
     position: relative;
     display: flex;
     flex-direction: column;
-    color: ${({ theme }) => theme.color.secondary.on_container};
+    color: ${({ theme, pallette }) => theme.color[pallette].on_container};
 `;
 
-export const ToggleButton = styled.div`
-    ${({ theme }) => css`
-        background-color: ${theme.color.secondary.container};
-        border: 1px solid ${theme.color.secondary.container};
+export const ToggleButton = styled.div<CommonProps>`
+    ${({ theme, pallette }) => css`
+        background-color: ${theme.color[pallette].container};
+        border: 1px solid ${theme.color[pallette].container};
 
         :hover,
         :focus-within {
-            border-color: ${theme.color.secondary.on_container};
+            border-color: ${theme.color[pallette].on_container};
         }
     `};
 
@@ -25,11 +30,11 @@ export const ToggleButton = styled.div`
 
 type MenuProps = {
     isOpen: boolean;
-};
+} & CommonProps;
 
 export const Menu = styled.div<MenuProps>`
-    ${({ theme, isOpen }) => css`
-        background-color: ${theme.color.secondary.container};
+    ${({ theme, isOpen, pallette }) => css`
+        background-color: ${theme.color[pallette].container};
         display: ${!isOpen ? "none" : "inline-block"};
     `};
 
@@ -42,10 +47,10 @@ export const Menu = styled.div<MenuProps>`
     list-style-type: none;
 `;
 
-export const Item = styled.li`
-    ${({ theme }) => css`
+export const Item = styled.li<CommonProps>`
+    ${({ theme, pallette }) => css`
         :hover {
-            background-color: ${theme.color.secondary.outline};
+            background-color: ${theme.color[pallette].outline};
         }
     `};
 

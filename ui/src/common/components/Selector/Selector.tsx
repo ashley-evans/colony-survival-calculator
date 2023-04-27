@@ -2,12 +2,14 @@ import React from "react";
 import { useSelect, UseSelectProps } from "downshift";
 
 import { Container, Item, Menu, ToggleButton } from "./styles";
+import { ColorPallettes } from "../..";
 
 interface SelectorProps<Item> extends UseSelectProps<Item> {
     labelText: string;
     itemToKey: (item: Item, index: number) => string;
     itemToDisplayText: (item: Item) => string;
     defaultSelectedItem: Item;
+    palette?: ColorPallettes;
 }
 
 function Selector<Item>({
@@ -16,6 +18,7 @@ function Selector<Item>({
     itemToDisplayText,
     labelText,
     defaultSelectedItem,
+    palette = "secondary",
 }: SelectorProps<Item>) {
     const {
         isOpen,
@@ -30,22 +33,23 @@ function Selector<Item>({
     });
 
     return (
-        <Container>
+        <Container pallette={palette}>
             <label {...getLabelProps()}>{labelText}</label>
-            <ToggleButton {...getToggleButtonProps()}>
+            <ToggleButton {...getToggleButtonProps()} pallette={palette}>
                 <span>
                     {itemToDisplayText(
                         selectedItem ? selectedItem : defaultSelectedItem
                     )}
                 </span>
             </ToggleButton>
-            <Menu {...getMenuProps()} isOpen={isOpen}>
+            <Menu {...getMenuProps()} isOpen={isOpen} pallette={palette}>
                 {isOpen ? (
                     <>
                         {items.map((item, index) => (
                             <Item
                                 key={itemToKey(item, index)}
                                 {...getItemProps({ item, index })}
+                                pallette={palette}
                             >
                                 {itemToDisplayText(item)}
                             </Item>
