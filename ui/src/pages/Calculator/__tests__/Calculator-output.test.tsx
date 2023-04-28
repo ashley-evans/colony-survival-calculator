@@ -126,6 +126,17 @@ test("queries optimal output if item and workers inputted with non-default unit 
     });
 });
 
+test("renders the clear input button if workers inputted", async () => {
+    const expectedClearLabel = "Clear worker input";
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectItemAndWorkers({ workers: 5 });
+
+    expect(
+        await screen.findByRole("button", { name: expectedClearLabel })
+    ).toBeVisible();
+});
+
 test("does not render the optimal output message if output has not been received yet", async () => {
     server.use(
         graphql.query(expectedOutputQueryName, (_, res, ctx) => {
