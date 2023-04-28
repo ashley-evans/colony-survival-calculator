@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+
 import { ColorPallettes } from "../../types";
 
 type CommonProps = {
@@ -9,11 +10,11 @@ export const Container = styled.div<CommonProps>`
     position: relative;
     display: flex;
     flex-direction: column;
-    color: ${({ theme, pallette }) => theme.color[pallette].on_container};
 `;
 
 export const ToggleButton = styled.div<CommonProps>`
     ${({ theme, pallette }) => css`
+        color: ${theme.color[pallette].on_container};
         background-color: ${theme.color[pallette].container};
         border: 1px solid ${theme.color[pallette].container};
 
@@ -34,6 +35,7 @@ type MenuProps = {
 
 export const Menu = styled.div<MenuProps>`
     ${({ theme, isOpen, pallette }) => css`
+        color: ${theme.color[pallette].on_container};
         background-color: ${theme.color[pallette].container};
         display: ${!isOpen ? "none" : "inline-block"};
     `};
