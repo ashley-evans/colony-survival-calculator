@@ -39,8 +39,13 @@ async function clearInput({ label }: { label: string }): Promise<void> {
     });
 }
 
-function isValid(value: unknown): value is number {
-    return !isNaN(Number(value));
+function parseValue(value: unknown): number {
+    const parsed = Number(value);
+    if (isNaN(parsed)) {
+        throw new Error();
+    }
+
+    return parsed;
 }
 
 beforeEach(() => {
@@ -51,7 +56,7 @@ test("renders an input with the provided label text", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
@@ -69,20 +74,20 @@ test("calls the provided on change handler if a valid input is entered", async (
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
     await typeValue({ label: expectedLabelText, value: expectedValue });
 
-    expect(mockOnChangeHandler).toHaveBeenCalledWith(expectedValue);
+    expect(mockOnChangeHandler).toHaveBeenLastCalledWith(Number(expectedValue));
 });
 
 test("renders the provided error message if an invalid input is entered", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
         />
@@ -98,7 +103,7 @@ test("does not render an error message by default", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
         />
@@ -114,7 +119,7 @@ test("does not render an error message if invalid input is entered with no error
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
@@ -127,7 +132,7 @@ test("sets the input to invalid if an invalid input is entered", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
@@ -144,7 +149,7 @@ test("does not set the input to invalid by default", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
@@ -160,7 +165,7 @@ test("clears invalid state after changing input to valid input", async () => {
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
         />
     );
@@ -185,7 +190,7 @@ test("clears error message if provided after changing input to valid input", asy
     render(
         <Input
             label={expectedLabelText}
-            isValid={isValid}
+            parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
         />
@@ -197,4 +202,17 @@ test("clears error message if provided after changing input to valid input", asy
     await clearInput({ label: expectedLabelText });
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
+
+test("provides undefined to change handler if invalid input is provided", async () => {
+    render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: invalidInput });
+
+    expect(mockOnChangeHandler).toHaveBeenLastCalledWith(undefined);
 });

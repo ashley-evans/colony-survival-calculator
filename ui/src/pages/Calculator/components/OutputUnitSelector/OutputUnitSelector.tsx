@@ -2,7 +2,7 @@ import React from "react";
 
 import { OutputUnit } from "../../../../graphql/__generated__/graphql";
 import { OutputUnitSelectorMappings } from "../../utils";
-import Selector from "../../../../common/components/Selector";
+import { Selector } from "../../../../common/components";
 
 type ItemSelectorProps = {
     onUnitChange: (unit: OutputUnit) => void;

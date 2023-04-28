@@ -2,7 +2,7 @@ import React from "react";
 
 import { Tools } from "../../../../graphql/__generated__/graphql";
 import { ToolSelectorMappings } from "../../utils";
-import Selector from "../../../../common/components/Selector";
+import { Selector } from "../../../../common/components";
 
 type ToolSelectorProps = {
     onToolChange: (unit: Tools) => void;

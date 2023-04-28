@@ -3,8 +3,8 @@ import { Container, LabelContainer } from "./styles";
 
 type InputProps<Type> = Pick<HTMLAttributes<HTMLInputElement>, "inputMode"> & {
     label: string;
-    onChange: (value: Type) => void;
-    isValid: (value: unknown) => value is Type;
+    onChange: (value?: Type) => void;
+    parseValue: (value: unknown) => Type;
     errorMessage?: string;
     className?: string;
 };
@@ -12,7 +12,7 @@ type InputProps<Type> = Pick<HTMLAttributes<HTMLInputElement>, "inputMode"> & {
 function Input<Type>({
     label,
     onChange,
-    isValid,
+    parseValue,
     errorMessage,
     inputMode,
     className,
@@ -21,11 +21,13 @@ function Input<Type>({
 
     const handleChange = (event: FormEvent<HTMLInputElement>) => {
         const input = event.currentTarget.value;
-        if (isValid(input)) {
-            onChange(input);
+        try {
+            const parsedValue = parseValue(input);
+            onChange(parsedValue);
             setIsInvalid(false);
-        } else {
+        } catch {
             setIsInvalid(true);
+            onChange(undefined);
         }
     };
 

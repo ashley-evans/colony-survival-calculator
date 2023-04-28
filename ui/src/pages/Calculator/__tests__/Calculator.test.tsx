@@ -65,7 +65,7 @@ describe("worker input rendering", () => {
             await screen.findByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
             })
-        );
+        ).toBeVisible();
     });
 
     test("does not render an error message by default", async () => {

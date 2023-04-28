@@ -1,38 +1,29 @@
-import React, { FormEvent, useState } from "react";
-import { Container } from "./styles";
+import React from "react";
+
+import { Input } from "../../../../common/components";
 
 type ItemSelectorProps = {
     onWorkerChange: (workers?: number) => void;
 };
 
 function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
-    const [isInvalid, setIsInvalid] = useState<boolean>(false);
-
-    const handleWorkerChange = (event: FormEvent<HTMLInputElement>) => {
-        const input = Number(event.currentTarget.value);
-        if (isNaN(input) || input <= 0 || input % 1 !== 0) {
-            setIsInvalid(true);
-            onWorkerChange(undefined);
-        } else {
-            setIsInvalid(false);
-            onWorkerChange(input);
+    const parseValue = (value: unknown): number => {
+        const input = Number(value);
+        if (!isNaN(input) && input > 0 && input % 1 === 0) {
+            return input;
         }
+
+        throw new Error();
     };
 
     return (
-        <Container>
-            <label htmlFor="worker-input">Workers:</label>
-            <input
-                id="worker-input"
-                inputMode="numeric"
-                onChange={handleWorkerChange}
-            ></input>
-            {isInvalid ? (
-                <span role="alert">
-                    Invalid input, must be a positive non-zero whole number
-                </span>
-            ) : null}
-        </Container>
+        <Input
+            label="Workers:"
+            parseValue={parseValue}
+            onChange={onWorkerChange}
+            errorMessage="Invalid input, must be a positive non-zero whole number"
+            inputMode="numeric"
+        />
     );
 }
 
