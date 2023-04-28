@@ -1,13 +1,13 @@
 import styled, { css } from "styled-components";
-
-import { ColorPallettes } from "../../types";
 import {
     FontAwesomeIcon,
     FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
 
+import { ColorPalettes } from "../../types";
+
 type CommonProps = {
-    pallette: ColorPallettes;
+    palette: ColorPalettes;
 };
 
 export const Container = styled.div<CommonProps>`
@@ -17,14 +17,14 @@ export const Container = styled.div<CommonProps>`
 `;
 
 export const ToggleButton = styled.div<CommonProps>`
-    ${({ theme, pallette }) => css`
-        color: ${theme.color[pallette].on_container};
-        background-color: ${theme.color[pallette].container};
-        border: 1px solid ${theme.color[pallette].container};
+    ${({ theme, palette }) => css`
+        color: ${theme.color[palette].on_container};
+        background-color: ${theme.color[palette].container};
+        border: 1px solid ${theme.color[palette].container};
 
         :hover,
         :focus-within {
-            border-color: ${theme.color[pallette].on_container};
+            border-color: ${theme.color[palette].on_container};
         }
     `};
 
@@ -58,9 +58,9 @@ type MenuProps = {
 } & CommonProps;
 
 export const Menu = styled.div<MenuProps>`
-    ${({ theme, isOpen, pallette }) => css`
-        color: ${theme.color[pallette].on_container};
-        background-color: ${theme.color[pallette].container};
+    ${({ theme, isOpen, palette }) => css`
+        color: ${theme.color[palette].on_container};
+        background-color: ${theme.color[palette].container};
         display: ${!isOpen ? "none" : "inline-block"};
     `};
 
@@ -74,9 +74,9 @@ export const Menu = styled.div<MenuProps>`
 `;
 
 export const Item = styled.li<CommonProps>`
-    ${({ theme, pallette }) => css`
+    ${({ theme, palette }) => css`
         :hover {
-            background-color: ${theme.color[pallette].outline};
+            background-color: ${theme.color[palette].outline};
         }
     `};
 

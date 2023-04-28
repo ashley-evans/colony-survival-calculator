@@ -5,6 +5,6 @@ type KeyColorKeys<T> = {
     [K in keyof T]: T[K] extends KeyColor ? K : never;
 }[keyof T];
 
-type ColorPallettes = KeyColorKeys<DefaultTheme["color"]>;
+type ColorPalettes = KeyColorKeys<DefaultTheme["color"]>;
 
-export type { ColorPallettes };
+export type { ColorPalettes };

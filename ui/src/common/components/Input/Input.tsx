@@ -1,11 +1,14 @@
 import React, { FormEvent, HTMLAttributes, useState } from "react";
-import { Container, LabelContainer } from "./styles";
+
+import { Container, LabelContainer, Input as StyledInput } from "./styles";
+import { ColorPalettes } from "../..";
 
 type InputProps<Type> = Pick<HTMLAttributes<HTMLInputElement>, "inputMode"> & {
     label: string;
     onChange: (value?: Type) => void;
     parseValue: (value: unknown) => Type;
     errorMessage?: string;
+    palette?: ColorPalettes;
     className?: string;
 };
 
@@ -15,6 +18,7 @@ function Input<Type>({
     parseValue,
     errorMessage,
     inputMode,
+    palette = "secondary",
     className,
 }: InputProps<Type>) {
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
@@ -35,10 +39,11 @@ function Input<Type>({
         <Container className={className}>
             <LabelContainer>
                 {label}
-                <input
+                <StyledInput
                     inputMode={inputMode}
                     onChange={handleChange}
                     aria-invalid={isInvalid}
+                    palette={palette}
                 />
             </LabelContainer>
             {isInvalid && errorMessage ? (
