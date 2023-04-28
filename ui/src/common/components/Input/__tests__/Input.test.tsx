@@ -8,6 +8,7 @@ import Input from "..";
 
 const expectedLabelText = "Label:";
 const expectedErrorMessage = "A test error message";
+const expectedClearLabel = "Clear button label";
 const invalidInput = "test";
 const mockOnChangeHandler = vi.fn();
 
@@ -215,4 +216,46 @@ test("provides undefined to change handler if invalid input is provided", async 
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
     expect(mockOnChangeHandler).toHaveBeenLastCalledWith(undefined);
+});
+
+test("renders a clear input button with the provided label if specified and value entered", async () => {
+    render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+            clearIconLabel={expectedClearLabel}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: "1" });
+
+    expect(
+        await screen.findByRole("button", { name: expectedClearLabel })
+    ).toBeVisible();
+});
+
+test("does not render a clear input button if no label is specified and value entered", async () => {
+    render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: "1" });
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+});
+
+test("does not render a clear input button if no value entered and label is specified", async () => {
+    render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+            clearIconLabel={expectedClearLabel}
+        />
+    );
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
 });
