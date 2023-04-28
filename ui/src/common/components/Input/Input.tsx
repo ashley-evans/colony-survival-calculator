@@ -30,22 +30,27 @@ function Input<Type>({
     palette = "secondary",
     className,
 }: InputProps<Type>) {
-    const [hasValue, setHasValue] = useState<boolean>(false);
+    const [value, setValue] = useState<string>("");
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const inputID = useId();
 
-    const handleChange = (event: FormEvent<HTMLInputElement>) => {
+    const handleInputChange = (event: FormEvent<HTMLInputElement>) => {
         const input = event.currentTarget.value;
+        setValue(input);
+
         try {
             const parsedValue = parseValue(input);
             onChange(parsedValue);
             setIsInvalid(false);
-            setHasValue(true);
         } catch {
-            setHasValue(false);
             setIsInvalid(true);
             onChange(undefined);
         }
+    };
+
+    const handleInputClear = () => {
+        setValue("");
+        onChange(undefined);
     };
 
     return (
@@ -55,15 +60,17 @@ function Input<Type>({
                 <StyledInput
                     id={inputID}
                     inputMode={inputMode}
-                    onChange={handleChange}
+                    value={value}
+                    onChange={handleInputChange}
                     aria-invalid={isInvalid}
                     palette={palette}
                 />
-                {clearIconLabel && hasValue ? (
+                {clearIconLabel && value ? (
                     <IconContainer
                         role="button"
                         aria-label={clearIconLabel}
                         tabIndex={0}
+                        onClick={handleInputClear}
                     >
                         <FontAwesomeIcon icon={faTimes} role="button" />
                     </IconContainer>
