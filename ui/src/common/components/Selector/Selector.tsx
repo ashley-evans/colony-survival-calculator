@@ -9,7 +9,7 @@ import {
     ToggleButton,
     ToggleIndicatorIcon,
 } from "./styles";
-import { ColorPallettes } from "../..";
+import { ColorPalettes } from "../..";
 
 interface SelectorProps<Item> extends Pick<UseSelectProps<Item>, "items"> {
     labelText: string;
@@ -17,7 +17,7 @@ interface SelectorProps<Item> extends Pick<UseSelectProps<Item>, "items"> {
     itemToDisplayText: (item: Item) => string;
     defaultSelectedItem: Item;
     onSelectedItemChange?: (item?: Item) => void;
-    palette?: ColorPallettes;
+    palette?: ColorPalettes;
     className?: string;
 }
 
@@ -51,9 +51,9 @@ function Selector<Item>({
     });
 
     return (
-        <Container pallette={palette} className={className}>
+        <Container palette={palette} className={className}>
             <label {...getLabelProps()}>{labelText}</label>
-            <ToggleButton {...getToggleButtonProps()} pallette={palette}>
+            <ToggleButton {...getToggleButtonProps()} palette={palette}>
                 <span>
                     {itemToDisplayText(
                         selectedItem ? selectedItem : defaultSelectedItem
@@ -61,14 +61,14 @@ function Selector<Item>({
                 </span>
                 <ToggleIndicatorIcon icon={faChevronDown} selected={isOpen} />
             </ToggleButton>
-            <Menu {...getMenuProps()} isOpen={isOpen} pallette={palette}>
+            <Menu {...getMenuProps()} isOpen={isOpen} palette={palette}>
                 {isOpen ? (
                     <>
                         {items.map((item, index) => (
                             <Item
                                 key={itemToKey(item, index)}
                                 {...getItemProps({ item, index })}
-                                pallette={palette}
+                                palette={palette}
                             >
                                 {itemToDisplayText(item)}
                             </Item>

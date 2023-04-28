@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Item } from "../../../../graphql/__generated__/graphql";
-import Selector from "../../../../common/components/Selector";
+import { Selector } from "../../../../common/components";
 
 type ItemName = Pick<Item, "name">;
 
