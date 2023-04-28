@@ -33,7 +33,6 @@ export const ToggleButton = styled.div<CommonProps>`
     align-items: center;
     padding: 0.5rem;
     border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
 `;
 
 interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
