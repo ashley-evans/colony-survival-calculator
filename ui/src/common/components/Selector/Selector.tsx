@@ -1,27 +1,35 @@
 import React from "react";
-import { useSelect, UseSelectProps } from "downshift";
+import { useSelect, UseSelectProps, UseSelectStateChange } from "downshift";
 
 import { Container, Item, Menu, ToggleButton } from "./styles";
 import { ColorPallettes } from "../..";
 
-interface SelectorProps<Item> extends UseSelectProps<Item> {
+interface SelectorProps<Item> extends Pick<UseSelectProps<Item>, "items"> {
     labelText: string;
     itemToKey: (item: Item, index: number) => string;
     itemToDisplayText: (item: Item) => string;
     defaultSelectedItem: Item;
+    onSelectedItemChange?: (item?: Item) => void;
     palette?: ColorPallettes;
     className?: string;
 }
 
 function Selector<Item>({
     items,
+    labelText,
     itemToKey,
     itemToDisplayText,
-    labelText,
     defaultSelectedItem,
+    onSelectedItemChange,
     palette = "secondary",
     className,
 }: SelectorProps<Item>) {
+    const handleSelectedItemChange = (changes: UseSelectStateChange<Item>) => {
+        if (onSelectedItemChange) {
+            onSelectedItemChange(changes.selectedItem ?? undefined);
+        }
+    };
+
     const {
         isOpen,
         selectedItem,
@@ -32,6 +40,7 @@ function Selector<Item>({
     } = useSelect({
         items,
         defaultSelectedItem,
+        onSelectedItemChange: handleSelectedItemChange,
     });
 
     return (

@@ -1,6 +1,7 @@
 import React from "react";
 import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 
 import Selector from "..";
 import { renderWithTestProviders as render } from "../../../../test/utils";
@@ -185,4 +186,26 @@ it("updates the selected item in the option list after a different item is selec
             selected: false,
         })
     ).toBeVisible();
+});
+
+test("calls the provided on change function when an item is selected", async () => {
+    const mockOnItemChange = vi.fn();
+    const expectedItem = items[1];
+
+    render(
+        <Selector
+            items={items}
+            labelText={expectedLabelText}
+            defaultSelectedItem={items[0]}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+            onSelectedItemChange={mockOnItemChange}
+        />
+    );
+    await clickSelect(expectedLabelText);
+    await clickOption(expectedItem.name);
+    await screen.findByText(expectedItem.name);
+
+    expect(mockOnItemChange).toHaveBeenCalledTimes(1);
+    expect(mockOnItemChange).toHaveBeenCalledWith(expectedItem);
 });
