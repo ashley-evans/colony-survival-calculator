@@ -1,36 +1,30 @@
-import React, { FormEvent } from "react";
+import React from "react";
 
 import { OutputUnit } from "../../../../graphql/__generated__/graphql";
-import {
-    OutputUnitSelectorMappings,
-    OutputUnitSelectorReverseMappings,
-} from "../../utils";
+import { OutputUnitSelectorMappings } from "../../utils";
+import Selector from "../../../../common/components/Selector";
 
 type ItemSelectorProps = {
     onUnitChange: (unit: OutputUnit) => void;
 };
 
+const outputUnits = Object.values(OutputUnit);
+
 function OutputUnitSelector({ onUnitChange }: ItemSelectorProps) {
-    const handleUnitChange = (event: FormEvent<HTMLSelectElement>) => {
-        const unit = event.currentTarget.value;
-        onUnitChange(OutputUnitSelectorReverseMappings[unit]);
+    const handleUnitChange = (selectedUnit?: OutputUnit) => {
+        if (selectedUnit) onUnitChange(selectedUnit);
     };
 
     return (
-        <>
-            <label htmlFor="units-select">Desired output units:</label>
-            <select
-                id="units-select"
-                onChange={handleUnitChange}
-                defaultValue={OutputUnitSelectorMappings[OutputUnit.Minutes]}
-            >
-                {Object.values(OutputUnit).map((unit) => (
-                    <option key={unit}>
-                        {OutputUnitSelectorMappings[unit]}
-                    </option>
-                ))}
-            </select>
-        </>
+        <Selector
+            items={outputUnits}
+            itemToKey={(unit) => unit}
+            itemToDisplayText={(unit) => OutputUnitSelectorMappings[unit]}
+            labelText="Desired output units:"
+            defaultSelectedItem={outputUnits[1]}
+            onSelectedItemChange={handleUnitChange}
+            palette="secondary"
+        />
     );
 }
 

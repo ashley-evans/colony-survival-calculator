@@ -1,33 +1,30 @@
-import React, { FormEvent } from "react";
+import React from "react";
 
 import { Tools } from "../../../../graphql/__generated__/graphql";
 import { ToolSelectorMappings } from "../../utils";
+import Selector from "../../../../common/components/Selector";
 
 type ToolSelectorProps = {
     onToolChange: (unit: Tools) => void;
 };
 
+const tools = Object.values(Tools);
+
 function ToolSelector({ onToolChange }: ToolSelectorProps) {
-    const handleToolChange = (event: FormEvent<HTMLSelectElement>) => {
-        const selected = event.currentTarget.value as Tools;
-        onToolChange(selected);
+    const handleToolChange = (selectedTool?: Tools) => {
+        if (selectedTool) onToolChange(selectedTool);
     };
 
     return (
-        <>
-            <label htmlFor="tool-select">Tools:</label>
-            <select
-                id="tool-select"
-                defaultValue={Tools.None}
-                onChange={handleToolChange}
-            >
-                {Object.values(Tools).map((tool) => (
-                    <option key={tool} value={tool}>
-                        {ToolSelectorMappings[tool]}
-                    </option>
-                ))}
-            </select>
-        </>
+        <Selector
+            items={tools}
+            itemToKey={(tool) => tool}
+            itemToDisplayText={(tool) => ToolSelectorMappings[tool]}
+            labelText="Tools:"
+            defaultSelectedItem={tools[3]}
+            onSelectedItemChange={handleToolChange}
+            palette="secondary"
+        />
     );
 }
 

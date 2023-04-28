@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from "react";
+import { Container } from "./styles";
 
 type ItemSelectorProps = {
     onWorkerChange: (workers?: number) => void;
@@ -19,7 +20,7 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
     };
 
     return (
-        <>
+        <Container>
             <label htmlFor="worker-input">Workers:</label>
             <input
                 id="worker-input"
@@ -31,7 +32,7 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
                     Invalid input, must be a positive non-zero whole number
                 </span>
             ) : null}
-        </>
+        </Container>
     );
 }
 

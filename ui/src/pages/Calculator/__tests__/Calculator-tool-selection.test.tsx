@@ -1,7 +1,7 @@
 import React from "react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
-import { screen, within } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 
 import {
     ItemName,
@@ -10,6 +10,7 @@ import {
     expectedOutputQueryName,
     expectedRequirementsQueryName,
     expectedToolSelectLabel,
+    openSelectMenu,
     selectItemAndWorkers,
     selectTool,
 } from "./utils";
@@ -57,24 +58,18 @@ test.each(["None", "Stone", "Copper", "Iron", "Bronze", "Steel"])(
     "renders the %s tool option in the tool selector",
     async (tool: string) => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        const toolSelect = await screen.findByRole("combobox", {
-            name: expectedToolSelectLabel,
-        });
+        await openSelectMenu({ selectLabel: expectedToolSelectLabel });
 
-        expect(
-            within(toolSelect).getByRole("option", { name: tool })
-        ).toBeInTheDocument();
+        expect(await screen.findByRole("option", { name: tool })).toBeVisible();
     }
 );
 
 test("renders none as the selected tool by default", async () => {
     render(<Calculator />);
-    const toolSelect = await screen.findByRole("combobox", {
-        name: expectedToolSelectLabel,
-    });
+    await openSelectMenu({ selectLabel: expectedToolSelectLabel });
 
     expect(
-        within(toolSelect).getByRole("option", { name: "None", selected: true })
+        await screen.findByRole("option", { name: "None", selected: true })
     ).toBeVisible();
 });
 
