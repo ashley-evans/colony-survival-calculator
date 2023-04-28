@@ -1,29 +1,30 @@
-import React, { FormEvent } from "react";
+import React from "react";
 
 import { Item } from "../../../../graphql/__generated__/graphql";
+import Selector from "../../../../common/components/Selector";
 
-type ItemNames = Pick<Item, "name">[];
+type ItemName = Pick<Item, "name">;
 
 type ItemSelectorProps = {
-    items: ItemNames;
+    items: ItemName[];
     onItemChange: (item: string) => void;
 };
 
 function ItemSelector({ items, onItemChange }: ItemSelectorProps) {
-    const handleItemChange = (event: FormEvent<HTMLSelectElement>) => {
-        const name = event.currentTarget.value;
-        onItemChange(name);
+    const handleItemChange = (selectedItem?: ItemName) => {
+        if (selectedItem) onItemChange(selectedItem.name);
     };
 
     return (
-        <>
-            <label htmlFor="output-select">Item:</label>
-            <select id="output-select" onChange={handleItemChange}>
-                {Object.values(items).map((item) => (
-                    <option key={item.name}>{item.name}</option>
-                ))}
-            </select>
-        </>
+        <Selector
+            items={items}
+            itemToKey={(item) => item.name}
+            itemToDisplayText={(item) => item.name}
+            labelText="Item:"
+            defaultSelectedItem={items[0]}
+            onSelectedItemChange={handleItemChange}
+            palette="secondary"
+        />
     );
 }
 

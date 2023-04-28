@@ -4,11 +4,10 @@ export const CalculatorContainer = styled.div`
     display: flex;
     flex-direction: column;
 
-    * {
-        margin-bottom: 0.75rem;
-    }
+    row-gap: 0.75rem;
 `;
 
 export const CalculatorHeader = styled.h2`
-    margin-top: 0;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
 `;

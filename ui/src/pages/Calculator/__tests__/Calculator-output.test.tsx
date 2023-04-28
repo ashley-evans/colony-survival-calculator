@@ -15,7 +15,9 @@ import {
     expectedItemNameQueryName,
     expectedOutputPrefix,
     expectedOutputQueryName,
+    expectedOutputUnitLabel,
     expectedRequirementsQueryName,
+    openSelectMenu,
     selectItemAndWorkers,
     selectOutputUnit,
 } from "./utils";
@@ -55,17 +57,19 @@ test.each(["Minutes", "Game days"])(
     "renders the %s option in the output unit selector",
     async (unit: string) => {
         render(<Calculator />, expectedGraphQLAPIURL);
+        await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
 
         expect(
             await screen.findByRole("option", {
                 name: unit,
             })
-        ).toBeInTheDocument();
+        ).toBeVisible();
     }
 );
 
 test("selects the Minutes option by default", async () => {
     render(<Calculator />, expectedGraphQLAPIURL);
+    await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
 
     expect(
         await screen.findByRole("option", {

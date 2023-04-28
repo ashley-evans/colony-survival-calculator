@@ -10,13 +10,14 @@ import {
     expectedRequirementsQueryName,
     expectedOutputQueryName,
     expectedItemNameQueryName,
-    selectItemAndWorkers,
     expectedOutputUnitLabel,
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     ItemName,
     expectedDesiredOutputHeader,
     expectedToolSelectLabel,
+    openSelectMenu,
+    selectOption,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 
@@ -222,24 +223,25 @@ test("renders a select for the desired output selector if item names are returne
 
 test("renders each item name returned as an option in the combo box", async () => {
     render(<Calculator />);
-    await screen.findByRole("combobox", { name: expectedItemSelectLabel });
+    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
 
     for (const expected of items) {
         expect(
             screen.getByRole("option", { name: expected.name })
-        ).toBeInTheDocument();
+        ).toBeVisible();
     }
 });
 
 test("renders the first option in the item name list as selected by default", async () => {
     render(<Calculator />);
+    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
 
     expect(
         await screen.findByRole("option", {
             name: items[0].name,
             selected: true,
         })
-    ).toBeInTheDocument();
+    ).toBeVisible();
 });
 
 test("requests item details on the first option in the item name list without selection", async () => {
@@ -268,8 +270,10 @@ test("requests item details for newly selected item if selection is changed", as
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-    await selectItemAndWorkers({ itemName: expectedItemName });
+    await selectOption({
+        selectLabel: expectedItemSelectLabel,
+        optionName: expectedItemName,
+    });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({

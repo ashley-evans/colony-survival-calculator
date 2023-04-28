@@ -5,6 +5,7 @@ type KeyColor = {
     on_main: string;
     container: string;
     on_container: string;
+    outline: string;
 };
 
 type SurfaceTone = {
@@ -21,14 +22,15 @@ declare module "styled-components" {
             primary: KeyColor;
             secondary: KeyColor;
             tertiary: KeyColor;
-            error: KeyColor;
+            error: Omit<KeyColor, "outline">;
             background: SurfaceTone;
             surface: SurfaceTone;
             surface_variant: SurfaceTone;
-            outline: string;
         };
         typography: {
             family: string;
         };
     }
 }
+
+export type { KeyColor };

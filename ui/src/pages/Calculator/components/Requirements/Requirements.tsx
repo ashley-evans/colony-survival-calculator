@@ -8,6 +8,7 @@ import {
     TextColumnCell,
     NumberColumnHeader,
     NumberColumnCell,
+    Header,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
 import { Tools } from "../../../../graphql/__generated__/graphql";
@@ -63,7 +64,7 @@ function Requirements({
 
     return (
         <>
-            <h2>Requirements:</h2>
+            <Header>Requirements:</Header>
             <RequirementsTable>
                 <thead>
                     <tr>

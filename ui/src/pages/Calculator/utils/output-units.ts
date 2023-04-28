@@ -10,14 +10,4 @@ const OutputUnitSelectorMappings: Readonly<Record<OutputUnit, string>> = {
     [OutputUnit.GameDays]: "Game days",
 };
 
-const OutputUnitSelectorReverseMappings: Readonly<Record<string, OutputUnit>> =
-    {
-        Minutes: OutputUnit.Minutes,
-        "Game days": OutputUnit.GameDays,
-    };
-
-export {
-    OutputUnitDisplayMappings,
-    OutputUnitSelectorMappings,
-    OutputUnitSelectorReverseMappings,
-};
+export { OutputUnitDisplayMappings, OutputUnitSelectorMappings };
