@@ -1,6 +1,10 @@
 import styled, { css } from "styled-components";
 
 import { ColorPallettes } from "../../types";
+import {
+    FontAwesomeIcon,
+    FontAwesomeIconProps,
+} from "@fortawesome/react-fontawesome";
 
 type CommonProps = {
     pallette: ColorPallettes;
@@ -24,9 +28,30 @@ export const ToggleButton = styled.div<CommonProps>`
         }
     `};
 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0.5rem;
     border-radius: 0.25rem;
     margin-bottom: 0.5rem;
+`;
+
+interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
+    selected: boolean;
+}
+
+export const ToggleIndicatorIcon = styled(
+    FontAwesomeIcon
+)<ToggleIndicatorIconProps>`
+    ${({ selected }) => {
+        if (selected) {
+            return css`
+                transform: scaleY(-1);
+            `;
+        }
+    }}
+
+    transition: all 0.2s ease-in;
 `;
 
 type MenuProps = {

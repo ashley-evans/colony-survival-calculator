@@ -1,7 +1,14 @@
 import React from "react";
 import { useSelect, UseSelectProps, UseSelectStateChange } from "downshift";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-import { Container, Item, Menu, ToggleButton } from "./styles";
+import {
+    Container,
+    Item,
+    Menu,
+    ToggleButton,
+    ToggleIndicatorIcon,
+} from "./styles";
 import { ColorPallettes } from "../..";
 
 interface SelectorProps<Item> extends Pick<UseSelectProps<Item>, "items"> {
@@ -52,6 +59,7 @@ function Selector<Item>({
                         selectedItem ? selectedItem : defaultSelectedItem
                     )}
                 </span>
+                <ToggleIndicatorIcon icon={faChevronDown} selected={isOpen} />
             </ToggleButton>
             <Menu {...getMenuProps()} isOpen={isOpen} pallette={palette}>
                 {isOpen ? (
