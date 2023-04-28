@@ -23,6 +23,7 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
             onChange={onWorkerChange}
             errorMessage="Invalid input, must be a positive non-zero whole number"
             inputMode="numeric"
+            clearIconLabel="Clear worker input"
         />
     );
 }

@@ -7,9 +7,11 @@ export const Container = styled.div`
     flex-direction: column;
 `;
 
-export const LabelContainer = styled.label`
+export const InputContainer = styled.div`
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    position: relative;
 `;
 
 type InputProps = {
@@ -41,4 +43,17 @@ export const Input = styled.input<InputProps>`
     padding: 0.5rem;
     border-radius: 0.25rem;
     outline: none;
+`;
+
+export const IconContainer = styled.span`
+    ${({ theme }) => css`
+        :hover,
+        :focus {
+            color: ${theme.color.error.main};
+        }
+    `}
+
+    position: absolute;
+    right: 0.7rem;
+    cursor: pointer;
 `;
