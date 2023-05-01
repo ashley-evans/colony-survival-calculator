@@ -50,6 +50,33 @@
             "maximumTool": {
                 "$ref": "#/definitions/tools"
             },
+            "optionalOutputs": {
+                "description": "Optional outputs that can be created at the same time as this item",
+                "type": "array",
+                "items": {
+                    "title": "OptionalOutput",
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "description": "The name of the optional output item",
+                            "type": "string"
+                        },
+                        "amount": {
+                            "description": "The amount of the optional output produced",
+                            "type": "number",
+                            "minimum": 1
+                        },
+                        "likelihood": {
+                            "description": "The likelihood this optional output item will be produced",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "maximum": 1
+                        }
+                    },
+                    "required": ["name", "amount", "likelihood"],
+                    "additionalProperties": false
+                }
+            },
             "size": {
                 "description": "Optimal size of crafting area, only provided for farms",
                 "type": "object",
