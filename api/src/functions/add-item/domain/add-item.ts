@@ -39,6 +39,23 @@ function validateRequirements(items: Items): void {
     }
 }
 
+function validateOptionalOutputs(items: Items): void {
+    const itemMap = new Set<string>(items.map((item) => item.name));
+    for (const item of items) {
+        if (!item.optionalOutputs) {
+            continue;
+        }
+
+        for (const optionalOutput of item.optionalOutputs) {
+            if (!itemMap.has(optionalOutput.name)) {
+                throw new Error(
+                    `Missing optional output: ${optionalOutput.name} in ${item.name}`
+                );
+            }
+        }
+    }
+}
+
 function validateTools(items: Items): void {
     for (const item of items) {
         ToolModifierValues;
@@ -55,6 +72,7 @@ function validateTools(items: Items): void {
 const addItem: AddItemPrimaryPort = async (items) => {
     const parsedItems = parseItems(items);
     validateRequirements(parsedItems);
+    validateOptionalOutputs(parsedItems);
     validateTools(parsedItems);
 
     try {

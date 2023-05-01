@@ -1,5 +1,5 @@
 import { Items, Tools } from "../../../../types";
-import { createItem } from "../../../../../test";
+import { createItem, createOptionalOutput } from "../../../../../test";
 
 import { storeItem } from "../../adapters/store-item";
 
@@ -30,7 +30,21 @@ const validItemWithReqs = createItem({
     minimumTool: Tools.none,
     maximumTool: Tools.none,
 });
-const validItems = [validItem, validItemWithReqs];
+const validItemWithOptionalOutputs = createItem({
+    name: "test item",
+    createTime: 1,
+    output: 1,
+    requirements: [],
+    optionalOutputs: [
+        createOptionalOutput({
+            name: "item name 1",
+            amount: 1,
+            likelihood: 0.5,
+        }),
+    ],
+});
+
+const validItems = [validItem, validItemWithReqs, validItemWithOptionalOutputs];
 
 const errorLogSpy = jest
     .spyOn(console, "error")
@@ -651,6 +665,23 @@ describe.each([
         "unknown item requirements",
         validItemWithReqs,
         "Missing requirement: item name 1 in item name 2",
+    ],
+    [
+        "unknown optional output item",
+        createItem({
+            name: "test item",
+            createTime: 1,
+            output: 1,
+            requirements: [],
+            optionalOutputs: [
+                createOptionalOutput({
+                    name: "test optional item",
+                    amount: 1,
+                    likelihood: 0.5,
+                }),
+            ],
+        }),
+        "Missing optional output: test optional item in test item",
     ],
     [
         "invalid min/max tool combination (none above stone)",

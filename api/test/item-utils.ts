@@ -13,11 +13,15 @@ function createRequirements(name: string, amount: number): Requirement {
     };
 }
 
-function createOptionalOutput(
-    name: string,
-    amount: number,
-    likelihood: number
-): OptionalOutput {
+function createOptionalOutput({
+    name,
+    amount,
+    likelihood,
+}: {
+    name: string;
+    amount: number;
+    likelihood: number;
+}): OptionalOutput {
     return {
         name,
         amount,
@@ -54,7 +58,7 @@ function createItem({
         ...(width && height ? { size: { width, height } } : {}),
         minimumTool,
         maximumTool,
-        ...(optionalOutputs ? optionalOutputs : {}),
+        ...(optionalOutputs ? { optionalOutputs } : {}),
     };
 }
 
