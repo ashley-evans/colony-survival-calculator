@@ -373,6 +373,255 @@ describe.each([
             },
         ]),
     ],
+    [
+        "an item with an optional output that is missing a name",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        amount: 1,
+                        likelihood: 0.5,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that is missing an output amount",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        likelihood: 0.5,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has a non-numeric output amount",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: "test",
+                        likelihood: 0.5,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has an output amount less than one",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 0,
+                        likelihood: 0.5,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that is missing an output likelihood",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 5,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has a non-numeric output likelihood",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 2,
+                        likelihood: "test",
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has output likelihood less than zero",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 2,
+                        likelihood: -1,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has output likelihood equal to zero",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 2,
+                        likelihood: 0,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with an optional output that has output likelihood greater than one",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                optionalOutput: [
+                    {
+                        name: "wibble",
+                        amount: 2,
+                        likelihood: 2,
+                    },
+                ],
+            },
+            {
+                name: "wibble",
+                createTime: 1,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
 ])(
     "handles invalid input (schema validation) given %s",
     (_: string, input: string) => {
