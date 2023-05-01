@@ -1,9 +1,31 @@
-import { Item, Requirement, Requirements, Tools } from "../src/types";
+import {
+    Item,
+    OptionalOutput,
+    Requirement,
+    Requirements,
+    Tools,
+} from "../src/types";
 
 function createRequirements(name: string, amount: number): Requirement {
     return {
         name,
         amount,
+    };
+}
+
+function createOptionalOutput({
+    name,
+    amount,
+    likelihood,
+}: {
+    name: string;
+    amount: number;
+    likelihood: number;
+}): OptionalOutput {
+    return {
+        name,
+        amount,
+        likelihood,
     };
 }
 
@@ -14,6 +36,7 @@ function createItem({
     requirements,
     minimumTool = Tools.none,
     maximumTool = Tools.none,
+    optionalOutputs,
     width,
     height,
 }: {
@@ -23,6 +46,7 @@ function createItem({
     requirements: Requirements;
     minimumTool?: Tools;
     maximumTool?: Tools;
+    optionalOutputs?: OptionalOutput[];
     width?: number;
     height?: number;
 }): Item {
@@ -34,7 +58,8 @@ function createItem({
         ...(width && height ? { size: { width, height } } : {}),
         minimumTool,
         maximumTool,
+        ...(optionalOutputs ? { optionalOutputs } : {}),
     };
 }
 
-export { createItem, createRequirements };
+export { createItem, createRequirements, createOptionalOutput };

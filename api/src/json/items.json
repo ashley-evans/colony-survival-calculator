@@ -144,6 +144,13 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "steel"
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            {
+                "name": "Empty Pot",
+                "amount": 2,
+                "likelihood": 0.95
+            }
+        ]
     }
 ]
