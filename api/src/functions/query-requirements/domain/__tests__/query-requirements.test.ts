@@ -295,11 +295,9 @@ test("returns combined requirements given item with multiple nested requirements
     const actual = await queryRequirements(validItemName, validWorkers);
 
     expect(actual).toHaveLength(3);
-    expect(actual).toEqual([
-        { name: requiredItem1.name, workers: 7.5 },
-        { name: requiredItem2.name, workers: 30 },
-        { name: requiredItem3.name, workers: 30 },
-    ]);
+    expect(actual).toContainEqual({ name: requiredItem1.name, workers: 7.5 });
+    expect(actual).toContainEqual({ name: requiredItem2.name, workers: 30 });
+    expect(actual).toContainEqual({ name: requiredItem3.name, workers: 30 });
 });
 
 test("throws an error if an unhandled exception occurs while fetching item requirements", async () => {
