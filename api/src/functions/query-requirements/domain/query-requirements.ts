@@ -2,7 +2,7 @@ import GLPK, { LP, Result } from "glpk.js";
 
 import type { QueryRequirementsPrimaryPort } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
-import { Item, Items, Tools } from "../../../types";
+import { Item, Items, OptionalOutput, Tools } from "../../../types";
 import {
     getMaxToolModifier,
     isAvailableToolSufficient,
@@ -24,6 +24,12 @@ type Constraint = LP["subjectTo"][number];
 type ObjectiveVariable = LP["objective"]["vars"][number];
 type ResultVariables = Result["result"]["vars"];
 type DemandingItemDetails = Omit<Item, "requires"> & { requiredAmount: number };
+type OutputDetails = Pick<Item, "output" | "createTime" | "maximumTool"> &
+    Partial<Pick<OptionalOutput, "likelihood">>;
+type IOItemDetails = {
+    demanding: DemandingItemDetails[];
+    outputting: OutputDetails[];
+};
 
 async function getRequiredItemDetails(name: string): Promise<Items> {
     try {
@@ -50,27 +56,57 @@ function convertRequirementsToMap(requirements: Items): Map<string, Item> {
     return requirementMap;
 }
 
-function convertRequirementsToDemandMap(
-    requirements: Items
-): Map<string, DemandingItemDetails[]> {
-    const demandMap = new Map<string, DemandingItemDetails[]>();
-    for (const requirement of requirements) {
-        for (const demand of requirement.requires) {
-            const existingDemands = demandMap.get(demand.name);
-            if (existingDemands) {
-                existingDemands.push({
-                    ...requirement,
+function convertItemsToIOMap(items: Items): Map<string, IOItemDetails> {
+    const outputMap = new Map<string, IOItemDetails>();
+    for (const item of items) {
+        const itemIODetails = outputMap.get(item.name);
+        if (itemIODetails) {
+            itemIODetails.outputting.push({ ...item });
+        } else {
+            outputMap.set(item.name, { demanding: [], outputting: [item] });
+        }
+
+        item.optionalOutputs?.forEach((optionalOutput) => {
+            const optionalOutputIODetails = outputMap.get(optionalOutput.name);
+            if (optionalOutputIODetails) {
+                optionalOutputIODetails.outputting.push({
+                    createTime: item.createTime,
+                    maximumTool: item.maximumTool,
+                    output: optionalOutput.amount,
+                    likelihood: optionalOutput.likelihood,
+                });
+            } else {
+                outputMap.set(optionalOutput.name, {
+                    demanding: [],
+                    outputting: [
+                        {
+                            createTime: item.createTime,
+                            maximumTool: item.maximumTool,
+                            output: optionalOutput.amount,
+                            likelihood: optionalOutput.likelihood,
+                        },
+                    ],
+                });
+            }
+        });
+
+        for (const demand of item.requires) {
+            const requirementIODetails = outputMap.get(demand.name);
+            if (requirementIODetails) {
+                requirementIODetails.demanding.push({
+                    ...item,
                     requiredAmount: demand.amount,
                 });
             } else {
-                demandMap.set(demand.name, [
-                    { ...requirement, requiredAmount: demand.amount },
-                ]);
+                outputMap.set(demand.name, {
+                    demanding: [{ ...item, requiredAmount: demand.amount }],
+                    outputting: [],
+                });
             }
         }
     }
 
-    return demandMap;
+    return outputMap;
 }
 
 function calculateCreateTime(
@@ -102,32 +138,37 @@ function createLinearProgram(
     const constraints: Constraint[] = [outputWorkersConstraint];
     const objectiveVariables: ObjectiveVariable[] = [];
 
-    const demandMap = convertRequirementsToDemandMap(requirements);
-    for (const [demandName, demandingItems] of Array.from(demandMap)) {
-        const demandedItem = availableItems.get(demandName);
-        if (!demandedItem) {
+    const ioMap = convertItemsToIOMap(requirements);
+    for (const [itemName, itemIOs] of Array.from(ioMap)) {
+        if (!availableItems.has(itemName)) {
             throw new Error(INTERNAL_SERVER_ERROR);
         }
 
-        const demandedItemCreateTime = calculateCreateTime(
-            demandedItem,
-            maxAvailableTool
-        );
-
-        objectiveVariables.push({ name: demandedItem.name, coef: 1 });
-
+        objectiveVariables.push({ name: itemName, coef: 1 });
         const overallDemandConstraint: Constraint = {
-            name: `${demandedItem.name}-overall-demand`,
-            vars: [
-                {
-                    name: demandedItem.name,
-                    coef: demandedItem.output / demandedItemCreateTime,
-                },
-            ],
+            name: `${itemName}-overall-demand`,
+            vars: [],
             bnds: { type: glpk.GLP_LO, lb: 0, ub: 0 },
         };
 
-        for (const demandingItem of demandingItems) {
+        let totalOutputItemCoef = 0;
+        for (const outputtingItem of itemIOs.outputting) {
+            const outputtingItemCreateTime = calculateCreateTime(
+                outputtingItem,
+                maxAvailableTool
+            );
+
+            totalOutputItemCoef +=
+                (outputtingItem.output / outputtingItemCreateTime) *
+                (outputtingItem.likelihood ?? 1);
+        }
+
+        overallDemandConstraint.vars.push({
+            name: itemName,
+            coef: totalOutputItemCoef,
+        });
+
+        for (const demandingItem of itemIOs.demanding) {
             const demandingItemCreateTime = calculateCreateTime(
                 demandingItem,
                 maxAvailableTool

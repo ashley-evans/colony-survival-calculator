@@ -517,3 +517,71 @@ describe("handles tool modifiers", () => {
         expect(requirement.workers).toBeCloseTo(1.25);
     });
 });
+
+describe("optional output requirement impact", () => {
+    test("factors optional output given item with single requirement that is also optional output", async () => {
+        const requiredItem1 = createItem({
+            name: "required item 1",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem1.name, amount: 2 }],
+            optionalOutputs: [
+                { name: requiredItem1.name, amount: 1, likelihood: 0.5 },
+            ],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem1]);
+
+        const actual = await queryRequirements(validItemName, validWorkers);
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem1.name);
+        expect(actual[0]?.workers).toBeCloseTo(3.157);
+    });
+
+    test("factors optional output given item with nested requirement that is top level optional output", async () => {
+        const requiredItem2 = createItem({
+            name: "required item 2",
+            createTime: 4,
+            output: 2,
+            requirements: [],
+        });
+        const requiredItem1 = createItem({
+            name: "required item 1",
+            createTime: 3,
+            output: 4,
+            requirements: [{ name: requiredItem2.name, amount: 6 }],
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem1.name, amount: 4 }],
+            optionalOutputs: [
+                { name: requiredItem2.name, amount: 2, likelihood: 0.5 },
+            ],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            item,
+            requiredItem1,
+            requiredItem2,
+        ]);
+
+        const actual = await queryRequirements(validItemName, validWorkers);
+
+        expect(actual).toHaveLength(2);
+        expect(actual).toContainEqual({
+            name: requiredItem1.name,
+            workers: 7.5,
+        });
+        expect(actual).toContainEqual({
+            name: requiredItem2.name,
+            workers: 15,
+        });
+    });
+});
