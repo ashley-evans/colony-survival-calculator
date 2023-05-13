@@ -1,6 +1,13 @@
 import React, { MouseEventHandler, useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { useDebounce } from "use-debounce";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    IconDefinition,
+    faSort,
+    faSortAsc,
+    faSortDesc,
+} from "@fortawesome/free-solid-svg-icons";
 
 import {
     RequirementsTable,
@@ -21,12 +28,19 @@ type RequirementsProps = {
     maxAvailableTool?: Tools;
 };
 
-const sortDirectionMap: { [key in ValidSortDirections]: ValidSortDirections } =
-    {
-        none: "descending",
-        descending: "ascending",
-        ascending: "none",
-    };
+const sortDirectionOrderMap: {
+    [key in ValidSortDirections]: ValidSortDirections;
+} = {
+    none: "descending",
+    descending: "ascending",
+    ascending: "none",
+};
+
+const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
+    none: faSort,
+    descending: faSortDesc,
+    ascending: faSortAsc,
+};
 
 const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools) {
@@ -52,7 +66,7 @@ function Requirements({
 
     const changeWorkerSortDirection: MouseEventHandler = (event) => {
         event.stopPropagation();
-        setWorkerSortDirection(sortDirectionMap[workerSortDirection]);
+        setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
     };
 
     useEffect(() => {
@@ -89,8 +103,13 @@ function Requirements({
                             text-align="end"
                             aria-sort={workerSortDirection}
                             onClick={changeWorkerSortDirection}
+                            tabIndex={0}
                         >
                             <button>Workers</button>
+                            <FontAwesomeIcon
+                                icon={sortDirectionIconMap[workerSortDirection]}
+                                aria-hidden="true"
+                            />
                         </SortableHeader>
                     </tr>
                 </thead>

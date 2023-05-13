@@ -40,6 +40,7 @@ export const SortableHeader = styled.th<SortableHeaderProps>`
     button {
         border: none;
         background: none;
+        margin-right: 0.2rem;
     }
 `;
 
