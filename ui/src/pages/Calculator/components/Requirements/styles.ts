@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Header = styled.h2`
     margin-bottom: 0rem;
@@ -28,8 +28,19 @@ export const TextColumnHeader = styled.th`
     text-align: start;
 `;
 
-export const NumberColumnHeader = styled.th`
-    text-align: end;
+type SortableHeaderProps = {
+    "text-align": "start" | "end";
+};
+
+export const SortableHeader = styled.th<SortableHeaderProps>`
+    ${({ "text-align": textAlign }) => css`
+        text-align: ${textAlign};
+    `}
+
+    button {
+        border: none;
+        background: none;
+    }
 `;
 
 export const TextColumnCell = styled.td`

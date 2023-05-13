@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { useDebounce } from "use-debounce";
 
@@ -6,19 +6,27 @@ import {
     RequirementsTable,
     TextColumnHeader,
     TextColumnCell,
-    NumberColumnHeader,
     NumberColumnCell,
     Header,
+    SortableHeader,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
 import { Tools } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
 
+type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
     selectedItemName: string;
     workers: number;
     maxAvailableTool?: Tools;
 };
+
+const sortDirectionMap: { [key in ValidSortDirections]: ValidSortDirections } =
+    {
+        none: "descending",
+        descending: "ascending",
+        ascending: "none",
+    };
 
 const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools) {
@@ -37,7 +45,15 @@ function Requirements({
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
         GET_ITEM_REQUIREMENTS
     );
+    const [workerSortDirection, setWorkerSortDirection] =
+        useState<ValidSortDirections>("none");
+
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
+
+    const changeWorkerSortDirection: MouseEventHandler = (event) => {
+        event.stopPropagation();
+        setWorkerSortDirection(sortDirectionMap[workerSortDirection]);
+    };
 
     useEffect(() => {
         getItemRequirements({
@@ -69,7 +85,13 @@ function Requirements({
                 <thead>
                     <tr>
                         <TextColumnHeader>Item</TextColumnHeader>
-                        <NumberColumnHeader>Workers</NumberColumnHeader>
+                        <SortableHeader
+                            text-align="end"
+                            aria-sort={workerSortDirection}
+                            onClick={changeWorkerSortDirection}
+                        >
+                            <button>Workers</button>
+                        </SortableHeader>
                     </tr>
                 </thead>
                 <tbody>

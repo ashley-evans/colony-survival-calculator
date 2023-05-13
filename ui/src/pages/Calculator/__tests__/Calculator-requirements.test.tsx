@@ -6,7 +6,9 @@ import {
     within,
     render as rtlRender,
     act,
+    waitFor,
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import {
@@ -206,6 +208,70 @@ describe("requirements rendering given requirements", () => {
             })
         ).toBeVisible();
     });
+
+    test("renders the workers column sort button", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
+
+        const requirementsTable = await screen.findByRole("table");
+        expect(
+            within(requirementsTable).getByRole("button", {
+                name: expectedWorkerColumnName,
+            })
+        ).toBeVisible();
+    });
+
+    test("sets the worker column as unsorted (default sort) by default", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
+
+        const requirementsTable = await screen.findByRole("table");
+        const workersColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            { name: expectedWorkerColumnName }
+        );
+        expect(workersColumnHeader).toHaveAttribute("aria-sort", "none");
+    });
+
+    test.each([
+        ["once", "descending", 1],
+        ["twice", "ascending", 2],
+        ["three times", "none", 3],
+    ])(
+        "pressing the worker column header %s sets the worker column sort to %s",
+        async (_: string, expectedOrder: string, numberOfClicks: number) => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: itemWithSingleRequirement.name,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedWorkerColumnName }
+            );
+            for (let i = 0; i < numberOfClicks; i++) {
+                await act(async () => {
+                    await user.click(workersColumnHeader);
+                });
+            }
+
+            await waitFor(() =>
+                expect(workersColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    expectedOrder
+                )
+            );
+        }
+    );
 
     test.each([
         ["a single requirement", [requirements[0]]],
