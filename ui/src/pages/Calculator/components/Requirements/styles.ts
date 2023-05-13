@@ -29,18 +29,27 @@ export const TextColumnHeader = styled.th`
 `;
 
 type SortableHeaderProps = {
-    "text-align": "start" | "end";
+    "item-alignment": "start" | "end";
 };
 
 export const SortableHeader = styled.th<SortableHeaderProps>`
-    ${({ "text-align": textAlign }) => css`
-        text-align: ${textAlign};
+    display: flex;
+
+    ${({ "item-alignment": itemAlignment, theme }) => css`
+        justify-content: ${itemAlignment};
+        align-items: center;
+
+        button {
+            color: ${theme.color.surface.on_main};
+        }
     `}
 
     button {
         border: none;
         background: none;
-        margin-right: 0.2rem;
+        margin-right: 0.5rem;
+        font-weight: bold;
+        padding: 0;
     }
 `;
 

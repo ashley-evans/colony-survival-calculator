@@ -100,7 +100,7 @@ function Requirements({
                     <tr>
                         <TextColumnHeader>Item</TextColumnHeader>
                         <SortableHeader
-                            text-align="end"
+                            item-alignment="end"
                             aria-sort={workerSortDirection}
                             onClick={changeWorkerSortDirection}
                             tabIndex={0}
