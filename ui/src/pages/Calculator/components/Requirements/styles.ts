@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Header = styled.h2`
     margin-bottom: 0rem;
@@ -28,8 +28,29 @@ export const TextColumnHeader = styled.th`
     text-align: start;
 `;
 
-export const NumberColumnHeader = styled.th`
-    text-align: end;
+type SortableHeaderProps = {
+    "item-alignment": "start" | "end";
+};
+
+export const SortableHeader = styled.th<SortableHeaderProps>`
+    display: flex;
+
+    ${({ "item-alignment": itemAlignment, theme }) => css`
+        justify-content: ${itemAlignment};
+        align-items: center;
+
+        button {
+            color: ${theme.color.surface.on_main};
+        }
+    `}
+
+    button {
+        border: none;
+        background: none;
+        margin-right: 0.5rem;
+        font-weight: bold;
+        padding: 0;
+    }
 `;
 
 export const TextColumnCell = styled.td`

@@ -6,7 +6,9 @@ import {
     within,
     render as rtlRender,
     act,
+    waitFor,
 } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import {
@@ -207,6 +209,70 @@ describe("requirements rendering given requirements", () => {
         ).toBeVisible();
     });
 
+    test("renders the workers column sort button", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
+
+        const requirementsTable = await screen.findByRole("table");
+        expect(
+            within(requirementsTable).getByRole("button", {
+                name: expectedWorkerColumnName,
+            })
+        ).toBeVisible();
+    });
+
+    test("sets the worker column as unsorted (default sort) by default", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: itemWithSingleRequirement.name,
+            workers: 5,
+        });
+
+        const requirementsTable = await screen.findByRole("table");
+        const workersColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            { name: expectedWorkerColumnName }
+        );
+        expect(workersColumnHeader).toHaveAttribute("aria-sort", "none");
+    });
+
+    test.each([
+        ["once", "descending", 1],
+        ["twice", "ascending", 2],
+        ["three times", "none", 3],
+    ])(
+        "pressing the worker column header %s sets the worker column sort to %s",
+        async (_: string, expectedOrder: string, numberOfClicks: number) => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: itemWithSingleRequirement.name,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedWorkerColumnName }
+            );
+            for (let i = 0; i < numberOfClicks; i++) {
+                await act(async () => {
+                    await user.click(workersColumnHeader);
+                });
+            }
+
+            await waitFor(() =>
+                expect(workersColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    expectedOrder
+                )
+            );
+        }
+    );
+
     test.each([
         ["a single requirement", [requirements[0]]],
         ["multiple requirements", requirements],
@@ -269,6 +335,90 @@ describe("requirements rendering given requirements", () => {
             })
         ).toBeVisible();
     });
+
+    test.each([
+        [
+            "descending",
+            [
+                { name: "test item 1", workers: 1 },
+                { name: "test item 2", workers: 2 },
+            ],
+            [
+                { name: "test item 2", workers: 2 },
+                { name: "test item 1", workers: 1 },
+            ],
+            1,
+        ],
+        [
+            "ascending",
+            [
+                { name: "test item 1", workers: 2 },
+                { name: "test item 2", workers: 1 },
+            ],
+            [
+                { name: "test item 2", workers: 1 },
+                { name: "test item 1", workers: 2 },
+            ],
+            2,
+        ],
+        [
+            "default",
+            [
+                { name: "test item 1", workers: 1 },
+                { name: "test item 2", workers: 2 },
+            ],
+            [
+                { name: "test item 1", workers: 1 },
+                { name: "test item 2", workers: 2 },
+            ],
+            3,
+        ],
+    ])(
+        "displays the items in %s order by workers if workers column is sorted in that order",
+        async (
+            _: string,
+            unsorted: Requirement[],
+            sorted: Requirement[],
+            numberOfClicks: number
+        ) => {
+            server.use(
+                graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+                    return res.once(ctx.data({ requirement: unsorted }));
+                })
+            );
+
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: itemWithSingleRequirement.name,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedWorkerColumnName }
+            );
+            for (let i = 0; i < numberOfClicks; i++) {
+                await act(async () => {
+                    await user.click(workersColumnHeader);
+                });
+            }
+            const requirementRows = await within(
+                requirementsTable
+            ).findAllByRole("row");
+
+            for (let i = 0; i < sorted.length; i++) {
+                const currentRow = requirementRows[i + 1];
+                expect(
+                    within(currentRow).getByText(sorted[i].name)
+                ).toBeVisible();
+                expect(
+                    within(currentRow).getByText(sorted[i].workers)
+                ).toBeVisible();
+            }
+        }
+    );
 });
 
 describe("error handling", async () => {
