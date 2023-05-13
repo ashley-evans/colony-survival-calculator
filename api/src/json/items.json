@@ -22,7 +22,7 @@
     },
     {
         "name": "Wheat",
-        "createTime": 1440,
+        "createTime": 870,
         "output": 100,
         "requires": [],
         "minimumTool": "none",
@@ -34,7 +34,7 @@
     },
     {
         "name": "Log",
-        "createTime": 720,
+        "createTime": 435,
         "output": 44,
         "requires": [],
         "minimumTool": "none",
