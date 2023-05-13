@@ -18,7 +18,7 @@ import {
     SortableHeader,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
-import { Tools } from "../../../../graphql/__generated__/graphql";
+import { Requirement, Tools } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
 
 type ValidSortDirections = "none" | "ascending" | "descending";
@@ -50,6 +50,21 @@ const GET_ITEM_REQUIREMENTS = gql(`
         }
     }
 `);
+
+function sortByWorkers(
+    requirements: Readonly<Requirement[]>,
+    order: ValidSortDirections
+): Requirement[] {
+    const reference = [...requirements];
+    switch (order) {
+        case "descending":
+            return reference.sort((a, b) => b.workers - a.workers);
+        case "ascending":
+            return reference.sort((a, b) => a.workers - b.workers);
+        default:
+            return reference;
+    }
+}
 
 function Requirements({
     selectedItemName,
@@ -92,6 +107,8 @@ function Requirements({
         return <></>;
     }
 
+    const sortedWorkers = sortByWorkers(data.requirement, workerSortDirection);
+
     return (
         <>
             <Header>Requirements:</Header>
@@ -114,7 +131,7 @@ function Requirements({
                     </tr>
                 </thead>
                 <tbody>
-                    {data.requirement.map((requirement) => (
+                    {sortedWorkers.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
                             <NumberColumnCell>
