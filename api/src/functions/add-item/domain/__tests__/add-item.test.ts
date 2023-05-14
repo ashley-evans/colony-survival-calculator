@@ -69,6 +69,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -81,6 +82,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -94,6 +96,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -107,6 +110,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -119,6 +123,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -132,6 +137,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -145,6 +151,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -157,6 +164,7 @@ describe.each([
                 output: 1,
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -170,6 +178,7 @@ describe.each([
                 requires: "test",
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -183,6 +192,7 @@ describe.each([
                 requires: ["test"],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -196,6 +206,7 @@ describe.each([
                 requires: [{ amount: 1 }],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -209,6 +220,7 @@ describe.each([
                 requires: [{ name: "wibble" }],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
             {
                 name: "wibble",
@@ -217,6 +229,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -230,6 +243,7 @@ describe.each([
                 requires: [{ name: "wibble", amount: "test" }],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
             {
                 name: "wibble",
@@ -238,6 +252,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -252,6 +267,7 @@ describe.each([
                 size: "wibble",
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -268,6 +284,7 @@ describe.each([
                 },
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -285,6 +302,7 @@ describe.each([
                 },
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -301,6 +319,7 @@ describe.each([
                 },
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -318,6 +337,7 @@ describe.each([
                 },
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -334,6 +354,7 @@ describe.each([
                     height: 1,
                 },
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -351,6 +372,7 @@ describe.each([
                 },
                 minimumTool: "unknown",
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -367,6 +389,7 @@ describe.each([
                     height: 1,
                 },
                 minimumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -384,6 +407,7 @@ describe.each([
                 },
                 minimumTool: Tools.none,
                 maximumTool: "unknown",
+                creator: "test creator",
             },
         ]),
     ],
@@ -397,7 +421,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         amount: 1,
                         likelihood: 0.5,
@@ -411,6 +436,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -424,7 +450,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         likelihood: 0.5,
@@ -438,6 +465,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -451,7 +479,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: "test",
@@ -466,6 +495,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -479,7 +509,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 0,
@@ -494,6 +525,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -507,7 +539,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 5,
@@ -521,6 +554,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -534,7 +568,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 2,
@@ -549,6 +584,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -562,7 +598,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 2,
@@ -577,6 +614,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -590,7 +628,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 2,
@@ -605,6 +644,7 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
             },
         ]),
     ],
@@ -618,7 +658,8 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
-                optionalOutput: [
+                creator: "test creator",
+                optionalOutputs: [
                     {
                         name: "wibble",
                         amount: 2,
@@ -633,6 +674,34 @@ describe.each([
                 requires: [],
                 minimumTool: Tools.none,
                 maximumTool: Tools.none,
+                creator: "test creator",
+            },
+        ]),
+    ],
+    [
+        "an item with a missing creator name",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            },
+        ]),
+    ],
+    [
+        "an item with a invalid creator name",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+                creator: 1,
             },
         ]),
     ],
@@ -650,12 +719,8 @@ describe.each([
         });
 
         test("throws a validation error", async () => {
-            const expectedError = "Validation Error:";
-
             expect.assertions(1);
-            await expect(addItem(input)).rejects.toEqual(
-                expect.stringContaining(expectedError)
-            );
+            await expect(addItem(input)).rejects.toMatchSnapshot();
         });
     }
 );
