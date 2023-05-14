@@ -36,6 +36,7 @@ function createItem({
     requirements,
     minimumTool = Tools.none,
     maximumTool = Tools.none,
+    creator = `${name}-creator`,
     optionalOutputs,
     width,
     height,
@@ -46,6 +47,7 @@ function createItem({
     requirements: Requirements;
     minimumTool?: Tools;
     maximumTool?: Tools;
+    creator?: string;
     optionalOutputs?: OptionalOutput[];
     width?: number;
     height?: number;
@@ -54,6 +56,7 @@ function createItem({
         name,
         createTime,
         output,
+        creator,
         requires: requirements,
         ...(width && height ? { size: { width, height } } : {}),
         minimumTool,

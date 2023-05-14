@@ -99,6 +99,7 @@ describe.each([
                 requirements: [{ name: "test", amount: 1 }],
                 minimumTool: Tools.none,
                 maximumTool: Tools.steel,
+                creator: "Test Creator 1",
             }),
         ],
     ],
@@ -112,6 +113,7 @@ describe.each([
                 requirements: [{ name: "test", amount: 1 }],
                 minimumTool: Tools.copper,
                 maximumTool: Tools.bronze,
+                creator: "Test Creator 1",
             }),
             createItem({
                 name: "test item 2",
@@ -120,6 +122,7 @@ describe.each([
                 requirements: [{ name: "world", amount: 3 }],
                 minimumTool: Tools.none,
                 maximumTool: Tools.steel,
+                creator: "Test Creator 2",
             }),
         ],
     ],

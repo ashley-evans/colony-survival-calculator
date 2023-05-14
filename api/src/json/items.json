@@ -5,7 +5,8 @@
         "output": 1,
         "requires": [],
         "minimumTool": "none",
-        "maximumTool": "none"
+        "maximumTool": "none",
+        "creator": "Berry farmer"
     },
     {
         "name": "Berry Meal",
@@ -18,7 +19,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "none"
+        "maximumTool": "none",
+        "creator": "Berry farmer"
     },
     {
         "name": "Wheat",
@@ -27,6 +29,7 @@
         "requires": [],
         "minimumTool": "none",
         "maximumTool": "none",
+        "creator": "Wheat farmer",
         "size": {
             "width": 10,
             "height": 10
@@ -39,6 +42,7 @@
         "requires": [],
         "minimumTool": "none",
         "maximumTool": "none",
+        "creator": "Forester",
         "size": {
             "width": 3,
             "height": 33
@@ -55,7 +59,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "steel"
+        "maximumTool": "steel",
+        "creator": "Woodcutter"
     },
     {
         "name": "Clay",
@@ -63,7 +68,8 @@
         "output": 1,
         "requires": [],
         "minimumTool": "none",
-        "maximumTool": "steel"
+        "maximumTool": "steel",
+        "creator": "Miner"
     },
     {
         "name": "Empty Pot",
@@ -80,7 +86,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "copper"
+        "maximumTool": "copper",
+        "creator": "Potter"
     },
     {
         "name": "Pot of Flour",
@@ -97,7 +104,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "none"
+        "maximumTool": "none",
+        "creator": "Grinder"
     },
     {
         "name": "Firewood",
@@ -110,7 +118,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "steel"
+        "maximumTool": "steel",
+        "creator": "Woodcutter"
     },
     {
         "name": "Pot of Water",
@@ -123,7 +132,8 @@
             }
         ],
         "minimumTool": "none",
-        "maximumTool": "none"
+        "maximumTool": "none",
+        "creator": "Water gatherer"
     },
     {
         "name": "Bread",
@@ -145,6 +155,7 @@
         ],
         "minimumTool": "none",
         "maximumTool": "steel",
+        "creator": "Cook",
         "optionalOutputs": [
             {
                 "name": "Empty Pot",

@@ -50,6 +50,10 @@
             "maximumTool": {
                 "$ref": "#/definitions/tools"
             },
+            "creator": {
+                "description": "The name of the individual that produces this item",
+                "type": "string"
+            },
             "optionalOutputs": {
                 "description": "Optional outputs that can be created at the same time as this item",
                 "type": "array",
@@ -102,7 +106,8 @@
             "output",
             "requires",
             "minimumTool",
-            "maximumTool"
+            "maximumTool",
+            "creator"
         ],
         "additionalProperties": false
     },
