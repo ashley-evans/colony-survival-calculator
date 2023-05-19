@@ -80,12 +80,12 @@ echo "Run post-build scripts..."
 cd $dist_dir && npx lerna exec --scope="@colony-survival-calculator/*-function" -- bash -c 'cd . && test -f post-build.sh && ./post-build.sh || true'
 
 if [ $dryrun ]; then
-    echo "Dry run deployment of UI for environment: $environment..."
+    echo "Dry run deployment of API for environment: $environment..."
     terraform -chdir="$infra_dir" plan -var-file="$infra_dir/$environment.tfvars"
 elif [ $teardown ]; then
-    echo "Tearing down UI for environment: $environment..."
+    echo "Tearing down API for environment: $environment..."
     terraform -chdir="$infra_dir" apply -var-file="$infra_dir/$environment.tfvars" -destroy
 else
-    echo "Deploying UI for environment: $environment..."
+    echo "Deploying API for environment: $environment..."
     terraform -chdir="$infra_dir" apply -auto-approve -var-file="$infra_dir/$environment.tfvars"
 fi
