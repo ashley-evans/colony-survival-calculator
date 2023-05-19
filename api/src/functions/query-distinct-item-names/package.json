@@ -1,5 +1,5 @@
 {
-    "name": "@colony-survival-calculator/query-distinct-item-names",
+    "name": "@colony-survival-calculator/query-distinct-item-names-function",
     "private": true,
     "version": "0.0.0",
     "dependencies": {
