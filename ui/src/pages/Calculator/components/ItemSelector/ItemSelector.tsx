@@ -1,25 +1,22 @@
 import React from "react";
 
-import { Item } from "../../../../graphql/__generated__/graphql";
 import { Selector } from "../../../../common/components";
 
-type ItemName = Pick<Item, "name">;
-
 type ItemSelectorProps = {
-    items: ItemName[];
+    items: string[];
     onItemChange: (item: string) => void;
 };
 
 function ItemSelector({ items, onItemChange }: ItemSelectorProps) {
-    const handleItemChange = (selectedItem?: ItemName) => {
-        if (selectedItem) onItemChange(selectedItem.name);
+    const handleItemChange = (selectedItem?: string) => {
+        if (selectedItem) onItemChange(selectedItem);
     };
 
     return (
         <Selector
             items={items}
-            itemToKey={(item) => item.name}
-            itemToDisplayText={(item) => item.name}
+            itemToKey={(item) => item}
+            itemToDisplayText={(item) => item}
             labelText="Item:"
             defaultSelectedItem={items[0]}
             onSelectedItemChange={handleItemChange}

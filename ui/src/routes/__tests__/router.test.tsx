@@ -25,7 +25,7 @@ const item: ItemName = { name: "Item 1" };
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: [item] }));
+        return res(ctx.data({ distinctItemNames: [item.name] }));
     }),
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
