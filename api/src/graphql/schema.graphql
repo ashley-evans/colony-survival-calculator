@@ -30,6 +30,7 @@ enum Tools {
 }
 
 type Query {
+    distinctItemNames: [String!]!
     item(name: ID): [Item!]!
     requirement(
         name: ID!
