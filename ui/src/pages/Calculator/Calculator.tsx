@@ -14,9 +14,7 @@ import ToolSelector from "./components/ToolSelector";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
-        item {
-            name
-        }
+        distinctItemNames
     }
 `);
 
@@ -60,8 +58,8 @@ function Calculator() {
         );
     }
 
-    if (!selectedItem && itemNameData?.item[0]) {
-        setSelectedItem(itemNameData.item[0].name);
+    if (!selectedItem && itemNameData?.distinctItemNames[0]) {
+        setSelectedItem(itemNameData.distinctItemNames[0]);
     }
 
     const networkError = itemNameError || itemDetailsError;
@@ -69,10 +67,11 @@ function Calculator() {
     return (
         <CalculatorContainer>
             <CalculatorHeader>Desired output:</CalculatorHeader>
-            {itemNameData?.item && itemNameData.item.length > 0 ? (
+            {itemNameData?.distinctItemNames &&
+            itemNameData.distinctItemNames.length > 0 ? (
                 <>
                     <ItemSelector
-                        items={itemNameData.item}
+                        items={itemNameData.distinctItemNames}
                         onItemChange={setSelectedItem}
                     />
                     <WorkerInput onWorkerChange={setWorkers} />
@@ -106,7 +105,8 @@ function Calculator() {
                     ) : null}
                 </>
             </ErrorBoundary>
-            {itemNameData?.item && itemNameData.item.length < 1 ? (
+            {itemNameData?.distinctItemNames &&
+            itemNameData.distinctItemNames.length < 1 ? (
                 <span role="alert">Unable to fetch known items</span>
             ) : null}
             {networkError ? (

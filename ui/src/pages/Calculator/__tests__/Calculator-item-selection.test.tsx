@@ -30,7 +30,9 @@ const items: ItemName[] = [{ name: "Item 1" }, { name: "Item 2" }];
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: items }));
+        return res(
+            ctx.data({ distinctItemNames: items.map((item) => item.name) })
+        );
     }),
     graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
         return res(ctx.data({ item: [] }));
@@ -52,7 +54,9 @@ beforeEach(() => {
     server.events.removeAllListeners();
     server.use(
         graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-            return res(ctx.data({ item: items }));
+            return res(
+                ctx.data({ distinctItemNames: items.map((item) => item.name) })
+            );
         })
     );
 });
@@ -144,7 +148,7 @@ describe("given no item names returned", () => {
     beforeEach(() => {
         server.use(
             graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                return res(ctx.data({ item: [] }));
+                return res(ctx.data({ distinctItemNames: [] }));
             })
         );
     });

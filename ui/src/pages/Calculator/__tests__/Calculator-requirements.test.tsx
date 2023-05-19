@@ -58,7 +58,9 @@ const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: items }));
+        return res(
+            ctx.data({ distinctItemNames: items.map((item) => item.name) })
+        );
     }),
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
