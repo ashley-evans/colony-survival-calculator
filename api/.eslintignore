@@ -2,6 +2,10 @@
 
 node_modules
 
+# jest
+
+jest.config.js
+
 # Generated files
 
 schema.d.ts
