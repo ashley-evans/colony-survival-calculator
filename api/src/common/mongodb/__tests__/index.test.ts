@@ -1,8 +1,15 @@
-import { MongoClient } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import * as TE from "fp-ts/lib/TaskEither";
+import * as T from "fp-ts/lib/Task";
+import { pipe } from "fp-ts/lib/function";
 
-const databaseName = "TestDatabase";
+import connectToMongoDB from "..";
 
+const validAccessKeyID = "valid access key id";
+const validSecretAccessKey = "valid secret access key";
+const validTestEnv = "true";
+
+// eslint-disable-next-line functional/no-let
 let mongoDBMemoryServer: MongoMemoryServer;
 
 beforeAll(async () => {
@@ -11,53 +18,72 @@ beforeAll(async () => {
             version: "6.0.4",
         },
         instance: {
-            dbName: databaseName,
+            dbName: "test database",
         },
     });
 });
 
-beforeEach(async () => {
-    process.env["MONGO_DB_URI"] = mongoDBMemoryServer.getUri();
-    process.env["AWS_ACCESS_KEY_ID"] = "test_access_key_id";
-    process.env["AWS_SECRET_ACCESS_KEY"] = "test_secret_access_key";
-    process.env["TEST_ENV"] = "true";
-});
-
 test.each([
     [
-        "mongodb URI",
-        "MONGO_DB_URI",
+        "mongoDB URI",
+        {
+            accessKeyID: validAccessKeyID,
+            secretAccessKey: validSecretAccessKey,
+            testEnvironment: validTestEnv,
+        },
         "Misconfigured: URI for MongoDB not provided",
     ],
     [
-        "AWS access key ID",
-        "AWS_ACCESS_KEY_ID",
+        "AWS Access Key ID",
+        {
+            uri: "test",
+            secretAccessKey: validSecretAccessKey,
+            testEnvironment: validTestEnv,
+        },
         "Misconfigured: AWS Access Key ID not provided",
     ],
     [
-        "AWS secret access key",
-        "AWS_SECRET_ACCESS_KEY",
+        "AWS Secret Access Key",
+        {
+            uri: "test",
+            accessKeyID: validAccessKeyID,
+            testEnvironment: validTestEnv,
+        },
         "Misconfigured: AWS Secret Access Key not provided",
     ],
 ])(
-    "throws an error if %s configuration not provided",
-    async (_: string, key: string, expectedError: string) => {
-        delete process.env["TEST_ENV"];
-        delete process.env[key];
+    "returns an error if %s not provided",
+    async (
+        _: string,
+        input: Parameters<typeof connectToMongoDB>[0],
+        expectedErrorMessage: string
+    ) => {
+        const expectedError = new Error(expectedErrorMessage);
 
-        expect.assertions(1);
-        await expect(async () => {
-            await import("..");
-        }).rejects.toThrow(expectedError);
+        const actual = await connectToMongoDB(input)();
+
+        expect(actual).toEqualLeft(expectedError);
     }
 );
 
-test("returns a mongo DB client", async () => {
-    const client = await (await import("..")).default;
+test("returns a mongoDB client if provided valid inputs", async () => {
+    const uri = mongoDBMemoryServer.getUri();
 
-    expect(client).toBeInstanceOf(MongoClient);
+    const actual = await pipe(
+        connectToMongoDB({
+            uri,
+            accessKeyID: validAccessKeyID,
+            secretAccessKey: validSecretAccessKey,
+            testEnvironment: validTestEnv,
+        }),
+        TE.fold(
+            () => T.of(undefined),
+            (client) => T.of(client)
+        )
+    )();
 
-    await client.close();
+    expect(actual).toBeDefined();
+    await actual?.close();
 });
 
 afterAll(async () => {
