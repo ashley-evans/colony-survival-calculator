@@ -19,8 +19,8 @@ const GET_ITEM_NAMES_QUERY = gql(`
 `);
 
 const GET_ITEM_DETAILS_QUERY = gql(`
-    query GetItemDetails($name: ID!) {
-        item(name: $name) {
+    query GetItemDetails($filters: ItemsFilters!) {
+        item(filters: $filters) {
             size {
                 width
                 height
@@ -39,7 +39,7 @@ function Calculator() {
     const { data: itemDetailsData, error: itemDetailsError } = useQuery(
         GET_ITEM_DETAILS_QUERY,
         {
-            variables: { name: selectedItem ?? "" },
+            variables: { filters: { name: selectedItem } },
             skip: !selectedItem,
         }
     );
