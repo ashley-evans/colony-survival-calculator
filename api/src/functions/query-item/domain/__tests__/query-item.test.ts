@@ -26,15 +26,30 @@ beforeEach(() => {
 
 const expectedItemName = "expected item name";
 const expectedMinimumCreators = 1;
+const expectedCreator = "expected item creator";
 
 describe("field queries", () => {
     test.each([
-        ["all items", "no field filters provided", undefined, undefined],
+        [
+            "all items",
+            "no field filters provided",
+            undefined,
+            undefined,
+            undefined,
+        ],
         [
             "a specific item",
             "an item name provided",
             { name: expectedItemName },
             expectedItemName,
+            undefined,
+        ],
+        [
+            "a specific creator",
+            "a creator provided",
+            { creator: expectedCreator },
+            undefined,
+            expectedCreator,
         ],
     ])(
         "queries the database via fields to fetch %s given %s",
@@ -42,12 +57,16 @@ describe("field queries", () => {
             _: string,
             __: string,
             filters: QueryFilters | undefined,
-            expected: string | undefined
+            expectedItemName: string | undefined,
+            expectedCreator: string | undefined
         ) => {
             await queryItem(filters);
 
             expect(mockQueryItemByField).toHaveBeenCalledTimes(1);
-            expect(mockQueryItemByField).toHaveBeenCalledWith(expected);
+            expect(mockQueryItemByField).toHaveBeenCalledWith(
+                expectedItemName,
+                expectedCreator
+            );
         }
     );
 
@@ -133,6 +152,7 @@ describe("creator count queries", () => {
             { minimumCreators: expectedMinimumCreators },
             expectedMinimumCreators,
             undefined,
+            undefined,
         ],
         [
             "a minimum creator count filter is provided w/ an item name",
@@ -142,6 +162,17 @@ describe("creator count queries", () => {
             },
             expectedMinimumCreators,
             expectedItemName,
+            undefined,
+        ],
+        [
+            "a minimum creator count filter is provided w/ a creator",
+            {
+                minimumCreators: expectedMinimumCreators,
+                creator: expectedCreator,
+            },
+            expectedMinimumCreators,
+            undefined,
+            expectedCreator,
         ],
     ])(
         "queries the database via creator count given %s",
@@ -149,14 +180,16 @@ describe("creator count queries", () => {
             _: string,
             filters: QueryFilters | undefined,
             expectedMinimumCreators: number,
-            expectedItemName: string | undefined
+            expectedItemName: string | undefined,
+            expectedCreator: string | undefined
         ) => {
             await queryItem(filters);
 
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledTimes(1);
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledWith(
                 expectedMinimumCreators,
-                expectedItemName
+                expectedItemName,
+                expectedCreator
             );
         }
     );

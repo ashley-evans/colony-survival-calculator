@@ -14,11 +14,12 @@ const queryItem: QueryItemPrimaryPort = async (
         if (filters?.minimumCreators) {
             return await queryItemByCreatorCount(
                 filters.minimumCreators,
-                filters.name
+                filters.name,
+                filters.creator
             );
         }
 
-        return await queryItemByField(filters?.name);
+        return await queryItemByField(filters?.name, filters?.creator);
     } catch (ex) {
         console.error(ex);
         throw ex;
