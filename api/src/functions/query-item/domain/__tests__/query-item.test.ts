@@ -2,6 +2,7 @@ import { queryItem as mongoDBQueryItem } from "../../adapters/mongodb-query-item
 import { queryItem } from "../query-item";
 import type { Items } from "../../../../types";
 import { createItem } from "../../../../../test";
+import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
 jest.mock("../../adapters/mongodb-query-item", () => ({
     queryItem: jest.fn(),
@@ -17,13 +18,25 @@ beforeEach(() => {
     consoleErrorSpy.mockClear();
 });
 
+const expectedItemName = "expected item name";
+
 test.each([
-    ["all items", "no item name provided", undefined],
-    ["a specific item", "an item name provided", "expected item name"],
+    ["all items", "no filters provided", undefined, undefined],
+    [
+        "a specific item",
+        "an item name provided",
+        { name: expectedItemName },
+        expectedItemName,
+    ],
 ])(
     "calls the secondary adapter to fetch %s given %s",
-    async (_: string, __: string, expected?: string) => {
-        await queryItem(expected);
+    async (
+        _: string,
+        __: string,
+        filters: QueryFilters | undefined,
+        expected: string | undefined
+    ) => {
+        await queryItem(filters);
 
         expect(mockMongoDBQueryItem).toHaveBeenCalledTimes(1);
         expect(mockMongoDBQueryItem).toHaveBeenCalledWith(expected);

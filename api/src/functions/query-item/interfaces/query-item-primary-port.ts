@@ -1,7 +1,12 @@
 import type { Items } from "../../../types";
 
+type QueryFilters = {
+    name?: string | undefined;
+    minimumCreators?: number | undefined;
+};
+
 interface QueryItemPrimaryPort {
-    (name?: string): Promise<Items>;
+    (filters?: QueryFilters): Promise<Items>;
 }
 
-export type { QueryItemPrimaryPort };
+export type { QueryItemPrimaryPort, QueryFilters };

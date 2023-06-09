@@ -6,6 +6,7 @@ import { queryItem } from "../domain/query-item";
 import type { Items } from "../../../types";
 import { createItem } from "../../../../test";
 import type { ItemsFilters, QueryItemArgs } from "../../../graphql/schema";
+import { QueryFilters } from "../interfaces/query-item-primary-port";
 
 jest.mock("../domain/query-item", () => ({
     queryItem: jest.fn(),
@@ -13,9 +14,13 @@ jest.mock("../domain/query-item", () => ({
 
 const mockQueryItem = queryItem as jest.Mock;
 
-function createFilters(itemName?: string): ItemsFilters {
+function createFilters(
+    itemName?: string,
+    minimumCreators?: number
+): ItemsFilters {
     return {
         name: itemName ?? null,
+        minimumCreators: minimumCreators ?? null,
     };
 }
 
@@ -31,9 +36,16 @@ function createMockEvent(
 }
 
 const expectedItemName = "test item";
+const expectedMinimumCreators = 2;
 const mockEventWithoutFilters = createMockEvent();
 const mockEventWithEmptyFilters = createMockEvent(createFilters());
 const mockEventWithItemName = createMockEvent(createFilters(expectedItemName));
+const mockEventWithMinimumCreators = createMockEvent(
+    createFilters(undefined, expectedMinimumCreators)
+);
+const mockEventWithAllFilters = createMockEvent(
+    createFilters(expectedItemName, expectedMinimumCreators)
+);
 
 beforeEach(() => {
     mockQueryItem.mockReset();
@@ -50,13 +62,25 @@ test.each([
         "all known items",
         "no item name specified in filter",
         mockEventWithEmptyFilters,
-        undefined,
+        { name: undefined },
     ],
     [
         "a specific item",
-        "a item name specified",
+        "an item name specified in filter",
         mockEventWithItemName,
-        expectedItemName,
+        { name: expectedItemName },
+    ],
+    [
+        "all known items with a minimum number of creators",
+        "a minimum number of creators specified in filter",
+        mockEventWithMinimumCreators,
+        { minimumCreators: expectedMinimumCreators },
+    ],
+    [
+        "a specific item with a minimum number of creators",
+        "an item name and minimum number of creators specified in filter",
+        mockEventWithAllFilters,
+        { name: expectedItemName, minimumCreators: expectedMinimumCreators },
     ],
 ])(
     "calls the domain to fetch %s given an event with %s",
@@ -64,7 +88,7 @@ test.each([
         _: string,
         __: string,
         event: AppSyncResolverEvent<QueryItemArgs>,
-        expected?: string
+        expected: QueryFilters | undefined
     ) => {
         await handler(event);
 
