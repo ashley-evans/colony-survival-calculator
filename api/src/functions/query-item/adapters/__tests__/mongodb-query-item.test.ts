@@ -163,6 +163,62 @@ describe("field queries", () => {
         expect(actual[0]).toEqual(expected);
     });
 
+    test("returns only items related to specified creator given multiple items from different creators in collection", async () => {
+        const expectedCreator = "test item creator";
+        const expected = createItem({
+            name: "test item",
+            createTime: 2,
+            output: 2,
+            requirements: [],
+            creator: expectedCreator,
+        });
+        const stored = [
+            createItem({
+                name: "another item",
+                createTime: 3,
+                output: 5,
+                requirements: [],
+            }),
+            expected,
+        ];
+        await storeItems(stored);
+        const { queryItemByField } = await import("../mongodb-query-item");
+
+        const actual = await queryItemByField(undefined, expectedCreator);
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]).toEqual(expected);
+    });
+
+    test("returns only specific item created by specific creator if both item name and creator provided", async () => {
+        const expectedItemName = "test item";
+        const expectedCreator = "test item creator";
+        const expected = createItem({
+            name: expectedItemName,
+            createTime: 2,
+            output: 2,
+            requirements: [],
+            creator: expectedCreator,
+        });
+        const stored = [
+            createItem({
+                name: expectedItemName,
+                createTime: 3,
+                output: 5,
+                requirements: [],
+                creator: "a different creator",
+            }),
+            expected,
+        ];
+        await storeItems(stored);
+        const { queryItemByField } = await import("../mongodb-query-item");
+
+        const actual = await queryItemByField(undefined, expectedCreator);
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]).toEqual(expected);
+    });
+
     test("returns no items if no stored items match the provided item name in collection", async () => {
         const stored = createItem({
             name: "another item",
@@ -170,11 +226,25 @@ describe("field queries", () => {
             output: 5,
             requirements: [],
         });
-        const expectedItemName = "expected test item 1";
         await storeItems([stored]);
         const { queryItemByField } = await import("../mongodb-query-item");
 
-        const actual = await queryItemByField(expectedItemName);
+        const actual = await queryItemByField("unknown item");
+
+        expect(actual).toHaveLength(0);
+    });
+
+    test("returns no items if no stored items are created by provided creator in collection", async () => {
+        const stored = createItem({
+            name: "another item",
+            createTime: 3,
+            output: 5,
+            requirements: [],
+        });
+        await storeItems([stored]);
+        const { queryItemByField } = await import("../mongodb-query-item");
+
+        const actual = await queryItemByField(undefined, "unknown creator");
 
         expect(actual).toHaveLength(0);
     });
