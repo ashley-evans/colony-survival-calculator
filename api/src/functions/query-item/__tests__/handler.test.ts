@@ -5,7 +5,7 @@ import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
 import type { Items } from "../../../types";
 import { createItem } from "../../../../test";
-import type { QueryItemArgs } from "../../../graphql/schema";
+import type { ItemsFilters, QueryItemArgs } from "../../../graphql/schema";
 
 jest.mock("../domain/query-item", () => ({
     queryItem: jest.fn(),
@@ -13,20 +13,27 @@ jest.mock("../domain/query-item", () => ({
 
 const mockQueryItem = queryItem as jest.Mock;
 
+function createFilters(itemName?: string): ItemsFilters {
+    return {
+        name: itemName ?? null,
+    };
+}
+
 function createMockEvent(
-    itemName?: string
+    filters?: ItemsFilters
 ): AppSyncResolverEvent<QueryItemArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryItemArgs>>();
     mockEvent.arguments = {
-        name: itemName ?? null,
+        filters: filters ?? null,
     };
 
     return mockEvent;
 }
 
 const expectedItemName = "test item";
-const mockEventWithoutItemName = createMockEvent();
-const mockEventWithItemName = createMockEvent(expectedItemName);
+const mockEventWithoutFilters = createMockEvent();
+const mockEventWithEmptyFilters = createMockEvent(createFilters());
+const mockEventWithItemName = createMockEvent(createFilters(expectedItemName));
 
 beforeEach(() => {
     mockQueryItem.mockReset();
@@ -35,8 +42,14 @@ beforeEach(() => {
 test.each([
     [
         "all known items",
-        "no item specified",
-        mockEventWithoutItemName,
+        "no filters specified",
+        mockEventWithoutFilters,
+        undefined,
+    ],
+    [
+        "all known items",
+        "no item name specified in filter",
+        mockEventWithEmptyFilters,
         undefined,
     ],
     [
@@ -105,7 +118,7 @@ test.each([
     async (_: string, received: Items) => {
         mockQueryItem.mockResolvedValue(received);
 
-        const actual = await handler(mockEventWithoutItemName);
+        const actual = await handler(mockEventWithoutFilters);
 
         expect(actual).toHaveLength(received.length);
         expect(actual).toEqual(expect.arrayContaining(received));
@@ -119,7 +132,7 @@ test("throws a user friendly error if an exception occurs while fetching item de
     mockQueryItem.mockRejectedValue(new Error("unhandled"));
 
     expect.assertions(1);
-    await expect(handler(mockEventWithoutItemName)).rejects.toThrow(
+    await expect(handler(mockEventWithoutFilters)).rejects.toThrow(
         expectedError
     );
 });

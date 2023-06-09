@@ -29,9 +29,13 @@ enum Tools {
     STEEL
 }
 
+input ItemsFilters {
+    name: ID
+}
+
 type Query {
     distinctItemNames: [String!]!
-    item(name: ID): [Item!]!
+    item(filters: ItemsFilters): [Item!]!
     requirement(
         name: ID!
         workers: Int!
