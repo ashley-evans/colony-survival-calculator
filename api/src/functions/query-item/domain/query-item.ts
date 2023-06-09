@@ -1,4 +1,7 @@
-import { queryItem as mongoDBQueryItem } from "../adapters/mongodb-query-item";
+import {
+    queryItemByCreatorCount,
+    queryItemByField,
+} from "../adapters/mongodb-query-item";
 import type {
     QueryFilters,
     QueryItemPrimaryPort,
@@ -8,7 +11,14 @@ const queryItem: QueryItemPrimaryPort = async (
     filters: QueryFilters | undefined
 ) => {
     try {
-        return await mongoDBQueryItem(filters?.name);
+        if (filters?.minimumCreators) {
+            return await queryItemByCreatorCount(
+                filters.minimumCreators,
+                filters.name
+            );
+        }
+
+        return await queryItemByField(filters?.name);
     } catch (ex) {
         console.error(ex);
         throw ex;
