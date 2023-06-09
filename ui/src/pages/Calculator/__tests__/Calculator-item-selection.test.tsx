@@ -260,7 +260,9 @@ test("requests item details on the first option in the item name list without se
     await screen.findByRole("combobox", { name: expectedItemSelectLabel });
     const { matchedRequestDetails } = await expectedRequest;
 
-    expect(matchedRequestDetails.variables).toEqual({ name: items[0].name });
+    expect(matchedRequestDetails.variables).toEqual({
+        filters: { name: items[0].name },
+    });
 });
 
 test("requests item details for newly selected item if selection is changed", async () => {
@@ -270,7 +272,7 @@ test("requests item details for newly selected item if selection is changed", as
         "POST",
         expectedGraphQLAPIURL,
         expectedItemDetailsQueryName,
-        { name: expectedItemName }
+        { filters: { name: expectedItemName } }
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -281,7 +283,7 @@ test("requests item details for newly selected item if selection is changed", as
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: expectedItemName,
+        filters: { name: expectedItemName },
     });
 });
 

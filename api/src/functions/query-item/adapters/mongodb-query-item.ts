@@ -1,7 +1,11 @@
 import client from "@colony-survival-calculator/mongodb-client";
+import { Document } from "mongodb";
 
 import type { Item } from "../../../types";
-import type { QueryItemSecondaryPort } from "../interfaces/query-item-secondary-port";
+import type {
+    QueryItemByCreatorCountSecondaryPort,
+    QueryItemByFieldSecondaryPort,
+} from "../interfaces/query-item-secondary-port";
 
 const databaseName = process.env["DATABASE_NAME"];
 if (!databaseName) {
@@ -13,7 +17,7 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryItem: QueryItemSecondaryPort = async (name?: string) => {
+const queryItemByField: QueryItemByFieldSecondaryPort = async (name) => {
     const db = (await client).db(databaseName);
     const collection = db.collection<Item>(itemCollectionName);
 
@@ -24,4 +28,50 @@ const queryItem: QueryItemSecondaryPort = async (name?: string) => {
     return collection.find().toArray();
 };
 
-export { queryItem };
+const queryItemByCreatorCount: QueryItemByCreatorCountSecondaryPort = async (
+    minimumCreators,
+    name
+) => {
+    const db = (await client).db(databaseName);
+    const collection = db.collection<Item>(itemCollectionName);
+    const pipeline: Document[] = [
+        {
+            $group: {
+                _id: "$name",
+                recipes: {
+                    $addToSet: "$$ROOT",
+                },
+                recipeCount: {
+                    $sum: 1,
+                },
+            },
+        },
+        {
+            $match: {
+                recipeCount: {
+                    $gte: minimumCreators,
+                },
+            },
+        },
+        {
+            $unwind: {
+                path: "$recipes",
+            },
+        },
+        {
+            $replaceRoot: {
+                newRoot: "$recipes",
+            },
+        },
+    ];
+
+    if (name) {
+        pipeline.unshift({ $match: { name } });
+    }
+
+    const items = collection.aggregate<Item>(pipeline);
+
+    return items.toArray();
+};
+
+export { queryItemByField, queryItemByCreatorCount };

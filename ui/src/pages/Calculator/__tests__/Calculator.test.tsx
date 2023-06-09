@@ -32,7 +32,8 @@ const server = setupServer(
         );
     }),
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
-        const { name } = req.variables;
+        const { filters } = req.variables;
+        const { name } = filters;
         if (name === itemWithFarmSize.name) {
             return res(ctx.data({ item: [expectedFarmSizeDetails] }));
         }

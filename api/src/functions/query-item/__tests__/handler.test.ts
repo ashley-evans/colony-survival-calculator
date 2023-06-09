@@ -5,7 +5,8 @@ import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
 import type { Items } from "../../../types";
 import { createItem } from "../../../../test";
-import type { QueryItemArgs } from "../../../graphql/schema";
+import type { ItemsFilters, QueryItemArgs } from "../../../graphql/schema";
+import { QueryFilters } from "../interfaces/query-item-primary-port";
 
 jest.mock("../domain/query-item", () => ({
     queryItem: jest.fn(),
@@ -13,20 +14,38 @@ jest.mock("../domain/query-item", () => ({
 
 const mockQueryItem = queryItem as jest.Mock;
 
+function createFilters(
+    itemName?: string,
+    minimumCreators?: number
+): ItemsFilters {
+    return {
+        name: itemName ?? null,
+        minimumCreators: minimumCreators ?? null,
+    };
+}
+
 function createMockEvent(
-    itemName?: string
+    filters?: ItemsFilters
 ): AppSyncResolverEvent<QueryItemArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryItemArgs>>();
     mockEvent.arguments = {
-        name: itemName ?? null,
+        filters: filters ?? null,
     };
 
     return mockEvent;
 }
 
 const expectedItemName = "test item";
-const mockEventWithoutItemName = createMockEvent();
-const mockEventWithItemName = createMockEvent(expectedItemName);
+const expectedMinimumCreators = 2;
+const mockEventWithoutFilters = createMockEvent();
+const mockEventWithEmptyFilters = createMockEvent(createFilters());
+const mockEventWithItemName = createMockEvent(createFilters(expectedItemName));
+const mockEventWithMinimumCreators = createMockEvent(
+    createFilters(undefined, expectedMinimumCreators)
+);
+const mockEventWithAllFilters = createMockEvent(
+    createFilters(expectedItemName, expectedMinimumCreators)
+);
 
 beforeEach(() => {
     mockQueryItem.mockReset();
@@ -35,15 +54,33 @@ beforeEach(() => {
 test.each([
     [
         "all known items",
-        "no item specified",
-        mockEventWithoutItemName,
+        "no filters specified",
+        mockEventWithoutFilters,
         undefined,
     ],
     [
+        "all known items",
+        "no item name specified in filter",
+        mockEventWithEmptyFilters,
+        { name: undefined },
+    ],
+    [
         "a specific item",
-        "a item name specified",
+        "an item name specified in filter",
         mockEventWithItemName,
-        expectedItemName,
+        { name: expectedItemName },
+    ],
+    [
+        "all known items with a minimum number of creators",
+        "a minimum number of creators specified in filter",
+        mockEventWithMinimumCreators,
+        { minimumCreators: expectedMinimumCreators },
+    ],
+    [
+        "a specific item with a minimum number of creators",
+        "an item name and minimum number of creators specified in filter",
+        mockEventWithAllFilters,
+        { name: expectedItemName, minimumCreators: expectedMinimumCreators },
     ],
 ])(
     "calls the domain to fetch %s given an event with %s",
@@ -51,7 +88,7 @@ test.each([
         _: string,
         __: string,
         event: AppSyncResolverEvent<QueryItemArgs>,
-        expected?: string
+        expected: QueryFilters | undefined
     ) => {
         await handler(event);
 
@@ -105,7 +142,7 @@ test.each([
     async (_: string, received: Items) => {
         mockQueryItem.mockResolvedValue(received);
 
-        const actual = await handler(mockEventWithoutItemName);
+        const actual = await handler(mockEventWithoutFilters);
 
         expect(actual).toHaveLength(received.length);
         expect(actual).toEqual(expect.arrayContaining(received));
@@ -119,7 +156,7 @@ test("throws a user friendly error if an exception occurs while fetching item de
     mockQueryItem.mockRejectedValue(new Error("unhandled"));
 
     expect.assertions(1);
-    await expect(handler(mockEventWithoutItemName)).rejects.toThrow(
+    await expect(handler(mockEventWithoutFilters)).rejects.toThrow(
         expectedError
     );
 });

@@ -1,7 +1,14 @@
 import type { Items } from "../../../types";
 
-interface QueryItemSecondaryPort {
+interface QueryItemByFieldSecondaryPort {
     (name?: string): Promise<Items>;
 }
 
-export type { QueryItemSecondaryPort };
+interface QueryItemByCreatorCountSecondaryPort {
+    (minimumCreators: number, name?: string): Promise<Items>;
+}
+
+export type {
+    QueryItemByFieldSecondaryPort,
+    QueryItemByCreatorCountSecondaryPort,
+};

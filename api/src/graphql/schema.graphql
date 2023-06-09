@@ -7,6 +7,7 @@ type Item {
     name: ID!
     createTime: Float!
     output: Int!
+    creator: String!
     size: FarmSize
 }
 
@@ -29,9 +30,14 @@ enum Tools {
     STEEL
 }
 
+input ItemsFilters {
+    name: ID
+    minimumCreators: Int
+}
+
 type Query {
     distinctItemNames: [String!]!
-    item(name: ID): [Item!]!
+    item(filters: ItemsFilters): [Item!]!
     requirement(
         name: ID!
         workers: Int!
