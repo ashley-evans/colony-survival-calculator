@@ -5,7 +5,7 @@ interface QueryItemByFieldSecondaryPort {
 }
 
 interface QueryItemByCreatorCountSecondaryPort {
-    (minimumCreators: number, name?: string, creator?: string): Promise<Items>;
+    (minimumCreators: number, name?: string): Promise<Items>;
 }
 
 export type {
