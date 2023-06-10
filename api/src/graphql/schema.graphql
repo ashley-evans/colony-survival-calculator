@@ -33,6 +33,7 @@ enum Tools {
 input ItemsFilters {
     name: ID
     minimumCreators: Int
+    creator: String
 }
 
 type Query {

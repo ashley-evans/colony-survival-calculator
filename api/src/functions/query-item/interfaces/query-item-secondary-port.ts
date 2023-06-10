@@ -1,7 +1,7 @@
 import type { Items } from "../../../types";
 
 interface QueryItemByFieldSecondaryPort {
-    (name?: string): Promise<Items>;
+    (name?: string, creator?: string): Promise<Items>;
 }
 
 interface QueryItemByCreatorCountSecondaryPort {

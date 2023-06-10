@@ -9,6 +9,7 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
               name: event.arguments.filters.name ?? undefined,
               minimumCreators:
                   event.arguments.filters.minimumCreators ?? undefined,
+              creator: event.arguments.filters.creator ?? undefined,
           }
         : undefined;
 

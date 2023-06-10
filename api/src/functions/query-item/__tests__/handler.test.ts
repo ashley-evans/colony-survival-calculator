@@ -16,11 +16,13 @@ const mockQueryItem = queryItem as jest.Mock;
 
 function createFilters(
     itemName?: string,
-    minimumCreators?: number
+    minimumCreators?: number,
+    creator?: string
 ): ItemsFilters {
     return {
         name: itemName ?? null,
         minimumCreators: minimumCreators ?? null,
+        creator: creator ?? null,
     };
 }
 
@@ -37,14 +39,18 @@ function createMockEvent(
 
 const expectedItemName = "test item";
 const expectedMinimumCreators = 2;
+const expectedCreator = "test item creator";
 const mockEventWithoutFilters = createMockEvent();
 const mockEventWithEmptyFilters = createMockEvent(createFilters());
 const mockEventWithItemName = createMockEvent(createFilters(expectedItemName));
 const mockEventWithMinimumCreators = createMockEvent(
     createFilters(undefined, expectedMinimumCreators)
 );
+const mockEventWithCreator = createMockEvent(
+    createFilters(undefined, undefined, expectedCreator)
+);
 const mockEventWithAllFilters = createMockEvent(
-    createFilters(expectedItemName, expectedMinimumCreators)
+    createFilters(expectedItemName, expectedMinimumCreators, expectedCreator)
 );
 
 beforeEach(() => {
@@ -77,10 +83,20 @@ test.each([
         { minimumCreators: expectedMinimumCreators },
     ],
     [
-        "a specific item with a minimum number of creators",
-        "an item name and minimum number of creators specified in filter",
+        "all known items created by a specific creator",
+        "a creator name specified in filter",
+        mockEventWithCreator,
+        { creator: expectedCreator },
+    ],
+    [
+        "a specific item w/ a specific creator that can be produced by a min number of creators",
+        "an item name, creator, and minimum number of creators specified in filter",
         mockEventWithAllFilters,
-        { name: expectedItemName, minimumCreators: expectedMinimumCreators },
+        {
+            name: expectedItemName,
+            minimumCreators: expectedMinimumCreators,
+            creator: expectedCreator,
+        },
     ],
 ])(
     "calls the domain to fetch %s given an event with %s",

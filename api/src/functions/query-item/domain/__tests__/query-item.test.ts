@@ -26,15 +26,30 @@ beforeEach(() => {
 
 const expectedItemName = "expected item name";
 const expectedMinimumCreators = 1;
+const expectedCreator = "expected item creator";
 
 describe("field queries", () => {
     test.each([
-        ["all items", "no field filters provided", undefined, undefined],
+        [
+            "all items",
+            "no field filters provided",
+            undefined,
+            undefined,
+            undefined,
+        ],
         [
             "a specific item",
             "an item name provided",
             { name: expectedItemName },
             expectedItemName,
+            undefined,
+        ],
+        [
+            "a specific creator",
+            "a creator provided",
+            { creator: expectedCreator },
+            undefined,
+            expectedCreator,
         ],
     ])(
         "queries the database via fields to fetch %s given %s",
@@ -42,12 +57,16 @@ describe("field queries", () => {
             _: string,
             __: string,
             filters: QueryFilters | undefined,
-            expected: string | undefined
+            expectedItemName: string | undefined,
+            expectedCreator: string | undefined
         ) => {
             await queryItem(filters);
 
             expect(mockQueryItemByField).toHaveBeenCalledTimes(1);
-            expect(mockQueryItemByField).toHaveBeenCalledWith(expected);
+            expect(mockQueryItemByField).toHaveBeenCalledWith(
+                expectedItemName,
+                expectedCreator
+            );
         }
     );
 
@@ -214,5 +233,31 @@ describe("creator count queries", () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
         expect(consoleErrorSpy).toHaveBeenCalledWith(expectedError);
+    });
+
+    test("throws an error if a minimum creator filter is provided with a creator name filter", async () => {
+        const expectedError = new Error(
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator name"
+        );
+
+        expect.assertions(1);
+        await expect(
+            queryItem({ minimumCreators: 1, creator: "test creator" })
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("logs an error message to console if a minimum creator filter is provided with a creator name filter", async () => {
+        const expectedError = new Error(
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator name"
+        );
+
+        try {
+            await queryItem({ minimumCreators: 1, creator: "test creator" });
+        } catch {
+            // Ignore
+        }
+
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expectedError.message);
     });
 });
