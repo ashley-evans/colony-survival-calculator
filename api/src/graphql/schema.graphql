@@ -30,10 +30,15 @@ enum Tools {
     STEEL
 }
 
+type OptimalFilter {
+    maxAvailableTool: Tools
+}
+
 input ItemsFilters {
     name: ID
     minimumCreators: Int
     creator: String
+    optimal: OptimalFilter
 }
 
 type Query {

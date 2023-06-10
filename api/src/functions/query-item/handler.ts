@@ -1,15 +1,29 @@
+import { ToolSchemaMap } from "../../common/modifiers";
 import type { Item, QueryItemArgs } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { queryItem } from "./domain/query-item";
-import { QueryFilters } from "./interfaces/query-item-primary-port";
-
+import {
+    OptimalFilter,
+    QueryFilters,
+} from "./interfaces/query-item-primary-port";
 const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
+    const { name, minimumCreators, creator, optimal } =
+        event.arguments.filters ?? {};
+
+    const optimalFilter: OptimalFilter | undefined = optimal
+        ? {
+              maxAvailableTool: optimal.maxAvailableTool
+                  ? ToolSchemaMap[optimal.maxAvailableTool]
+                  : undefined,
+          }
+        : undefined;
+
     const filters: QueryFilters | undefined = event.arguments.filters
         ? {
-              name: event.arguments.filters.name ?? undefined,
-              minimumCreators:
-                  event.arguments.filters.minimumCreators ?? undefined,
-              creator: event.arguments.filters.creator ?? undefined,
+              name: name ?? undefined,
+              minimumCreators: minimumCreators ?? undefined,
+              creator: creator ?? undefined,
+              optimal: optimalFilter,
           }
         : undefined;
 
