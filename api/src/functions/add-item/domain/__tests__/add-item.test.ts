@@ -827,6 +827,57 @@ describe.each([
     });
 });
 
+describe("duplicate item and creator name combination handling", () => {
+    const itemName = "test item";
+    const creatorName = "test creator";
+    const items: Items = [
+        createItem({
+            name: itemName,
+            createTime: 2,
+            output: 1,
+            requirements: [],
+            creator: creatorName,
+        }),
+        createItem({
+            name: itemName,
+            createTime: 4,
+            output: 2,
+            requirements: [],
+            creator: "different creator",
+        }),
+        createItem({
+            name: itemName,
+            createTime: 4,
+            output: 2,
+            requirements: [],
+            creator: creatorName,
+        }),
+        createItem({
+            name: "another item",
+            createTime: 1,
+            output: 3,
+            requirements: [],
+        }),
+    ];
+    const input = JSON.stringify(items);
+    const expectedError = `Items provided with same name: ${itemName} and creator: ${creatorName}`;
+
+    test("does not store any items in database", async () => {
+        try {
+            await addItem(input);
+        } catch {
+            // Ignore
+        }
+
+        expect(storeItem).not.toHaveBeenCalled();
+    });
+
+    test("throws a validation error", async () => {
+        expect.assertions(1);
+        await expect(addItem(input)).rejects.toThrowError(expectedError);
+    });
+});
+
 describe.each([
     ["a single item", [validItem]],
     ["multiple items", validItems],

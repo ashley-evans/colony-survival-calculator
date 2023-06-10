@@ -69,11 +69,28 @@ function validateTools(items: Items): void {
     }
 }
 
+function validateCreators(items: Items): void {
+    const itemMap = new Map<string, Set<string>>();
+    for (const item of items) {
+        const creatorSet = itemMap.get(item.name);
+        if (!creatorSet) {
+            itemMap.set(item.name, new Set([item.creator]));
+        } else if (creatorSet.has(item.creator)) {
+            throw new Error(
+                `Items provided with same name: ${item.name} and creator: ${item.creator}`
+            );
+        } else {
+            creatorSet.add(item.creator);
+        }
+    }
+}
+
 const addItem: AddItemPrimaryPort = async (items) => {
     const parsedItems = parseItems(items);
     validateRequirements(parsedItems);
     validateOptionalOutputs(parsedItems);
     validateTools(parsedItems);
+    validateCreators(parsedItems);
 
     try {
         return await storeItem(parsedItems);
