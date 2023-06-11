@@ -6,6 +6,7 @@ import { queryItem } from "../domain/query-item";
 import { Tools as DomainTools, type Items } from "../../../types";
 import { createItem } from "../../../../test";
 import type {
+    Item,
     ItemsFilters,
     OptimalFilter,
     QueryItemArgs,
@@ -141,6 +142,8 @@ test.each([
         event: AppSyncResolverEvent<QueryItemArgs>,
         expected: QueryFilters | undefined
     ) => {
+        mockQueryItem.mockResolvedValue([]);
+
         await handler(event);
 
         expect(mockQueryItem).toHaveBeenCalledTimes(1);
@@ -149,7 +152,7 @@ test.each([
 );
 
 test.each([
-    ["none received", []],
+    ["none received", [], []],
     [
         "multiple received w/ no farm sizes",
         [
@@ -158,13 +161,39 @@ test.each([
                 createTime: 1,
                 output: 3,
                 requirements: [],
+                creator: "test 1 creator",
+                minimumTool: DomainTools.none,
+                maximumTool: DomainTools.steel,
             }),
             createItem({
                 name: "test 2",
                 createTime: 4,
                 output: 6,
                 requirements: [],
+                creator: "test 2 creator",
+                minimumTool: DomainTools.copper,
+                maximumTool: DomainTools.bronze,
             }),
+        ],
+        [
+            {
+                name: "test 1",
+                createTime: 1,
+                output: 3,
+                requires: [],
+                creator: "test 1 creator",
+                minimumTool: "NONE" as Tools,
+                maximumTool: "STEEL" as Tools,
+            },
+            {
+                name: "test 2",
+                createTime: 4,
+                output: 6,
+                requires: [],
+                creator: "test 2 creator",
+                minimumTool: "COPPER" as Tools,
+                maximumTool: "BRONZE" as Tools,
+            },
         ],
     ],
     [
@@ -177,6 +206,9 @@ test.each([
                 requirements: [],
                 width: 1,
                 height: 2,
+                creator: "test 1 creator",
+                minimumTool: DomainTools.none,
+                maximumTool: DomainTools.steel,
             }),
             createItem({
                 name: "test 2",
@@ -185,18 +217,49 @@ test.each([
                 requirements: [],
                 width: 3,
                 height: 4,
+                creator: "test 2 creator",
+                minimumTool: DomainTools.copper,
+                maximumTool: DomainTools.bronze,
             }),
+        ],
+        [
+            {
+                name: "test 1",
+                createTime: 1,
+                output: 3,
+                requires: [],
+                size: {
+                    width: 1,
+                    height: 2,
+                },
+                creator: "test 1 creator",
+                minimumTool: "NONE" as Tools,
+                maximumTool: "STEEL" as Tools,
+            },
+            {
+                name: "test 2",
+                createTime: 4,
+                output: 6,
+                requires: [],
+                size: {
+                    width: 3,
+                    height: 4,
+                },
+                creator: "test 2 creator",
+                minimumTool: "COPPER" as Tools,
+                maximumTool: "BRONZE" as Tools,
+            },
         ],
     ],
 ])(
     "returns all items retrieved from domain given %s",
-    async (_: string, received: Items) => {
+    async (_: string, received: Items, expected: Item[]) => {
         mockQueryItem.mockResolvedValue(received);
 
         const actual = await handler(mockEventWithoutFilters);
 
         expect(actual).toHaveLength(received.length);
-        expect(actual).toEqual(expect.arrayContaining(received));
+        expect(actual).toEqual(expect.arrayContaining(expected));
     }
 );
 

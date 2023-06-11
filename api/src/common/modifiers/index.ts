@@ -19,6 +19,15 @@ const ToolSchemaMap: Record<GraphQLSchemaTools, JSONSchemaTools> = {
     STEEL: JSONSchemaTools.steel,
 };
 
+const GraphQLToolsSchemaMap: Record<JSONSchemaTools, GraphQLSchemaTools> = {
+    [JSONSchemaTools.none]: "NONE",
+    [JSONSchemaTools.stone]: "STONE",
+    [JSONSchemaTools.copper]: "COPPER",
+    [JSONSchemaTools.iron]: "IRON",
+    [JSONSchemaTools.bronze]: "BRONZE",
+    [JSONSchemaTools.steel]: "STEEL",
+};
+
 function isAvailableToolSufficient(
     minimum: JSONSchemaTools,
     available: JSONSchemaTools
@@ -41,6 +50,7 @@ function getMaxToolModifier(
 
 export {
     ToolSchemaMap,
+    GraphQLToolsSchemaMap,
     ToolModifierValues,
     isAvailableToolSufficient,
     getMaxToolModifier,

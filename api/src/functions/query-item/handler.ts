@@ -1,4 +1,4 @@
-import { ToolSchemaMap } from "../../common/modifiers";
+import { GraphQLToolsSchemaMap, ToolSchemaMap } from "../../common/modifiers";
 import type { Item, QueryItemArgs } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { queryItem } from "./domain/query-item";
@@ -28,8 +28,13 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
         : undefined;
 
     try {
-        return await queryItem(filters);
-    } catch {
+        const items = await queryItem(filters);
+        return items.map(({ maximumTool, minimumTool, ...rest }) => ({
+            maximumTool: GraphQLToolsSchemaMap[maximumTool],
+            minimumTool: GraphQLToolsSchemaMap[minimumTool],
+            ...rest,
+        }));
+    } catch (ex) {
         throw new Error(
             "An error occurred while fetching item details, please try again."
         );

@@ -8,6 +8,8 @@ type Item {
     createTime: Float!
     output: Int!
     creator: String!
+    minimumTool: Tools!
+    maximumTool: Tools!
     size: FarmSize
 }
 
