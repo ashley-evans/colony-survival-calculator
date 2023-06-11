@@ -59,7 +59,7 @@ function getMaxOutput(
     unit: OutputUnit,
     maxAvailableTool: Tools
 ): number {
-    let currentMaximum = 0;
+    let maximumOutputPerSecond = 0;
     for (const item of items) {
         const toolModifier = getMaxToolModifier(
             item.maximumTool,
@@ -67,16 +67,14 @@ function getMaxOutput(
         );
 
         const outputPerSecond = item.output / (item.createTime / toolModifier);
-        const outputPerWorker =
-            OutputUnitSecondMappings[unit] * outputPerSecond;
-        const totalOutput = outputPerWorker * workers;
-
-        if (currentMaximum < totalOutput) {
-            currentMaximum = totalOutput;
+        if (maximumOutputPerSecond < outputPerSecond) {
+            maximumOutputPerSecond = outputPerSecond;
         }
     }
 
-    return currentMaximum;
+    const outputPerWorker =
+        OutputUnitSecondMappings[unit] * maximumOutputPerSecond;
+    return outputPerWorker * workers;
 }
 
 const calculateOutput: QueryOutputPrimaryPort = async (
