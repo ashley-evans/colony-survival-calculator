@@ -89,19 +89,6 @@ test("throws an error if an unhandled exception occurs while fetching item requi
     ).rejects.toThrow(expectedError);
 });
 
-test("throws an error if more than one details are returned from database", async () => {
-    mockQueryOutputDetails.mockResolvedValue([
-        createItemOutputDetails(1, 2),
-        createItemOutputDetails(2, 3),
-    ]);
-    const expectedError = new Error("Internal server error");
-
-    expect.assertions(1);
-    await expect(
-        calculateOutput(validItemName, validWorkers, OutputUnit.MINUTES)
-    ).rejects.toThrow(expectedError);
-});
-
 test.each([
     [OutputUnit.GAME_DAYS, 2, 3, 3262.5],
     [OutputUnit.MINUTES, 2, 3, 450],
@@ -194,5 +181,80 @@ describe("handles tool modifiers", () => {
         );
 
         expect(actual).toBeCloseTo(expected);
+    });
+});
+
+describe("multiple recipe handling", () => {
+    test("returns maximum output when an item has more than one recipe", async () => {
+        const expected = 3600;
+        const recipes = [
+            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
+            createItemOutputDetails(1, 3, Tools.none, Tools.copper),
+        ];
+        mockQueryOutputDetails.mockResolvedValue(recipes);
+
+        const actual = await calculateOutput(
+            validItemName,
+            validWorkers,
+            OutputUnit.MINUTES,
+            Tools.steel
+        );
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("factors max available tool into max output calculation given recipe w/ lower base output but higher modified", async () => {
+        const expected = 1800;
+        const recipes = [
+            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
+            createItemOutputDetails(1, 3, Tools.none, Tools.stone),
+        ];
+        mockQueryOutputDetails.mockResolvedValue(recipes);
+
+        const actual = await calculateOutput(
+            validItemName,
+            validWorkers,
+            OutputUnit.MINUTES,
+            Tools.steel
+        );
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("ignores more optimal recipes if cannot be created by provided max tool", async () => {
+        const expected = 450;
+        const recipes = [
+            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
+            createItemOutputDetails(1, 3, Tools.stone, Tools.stone),
+        ];
+        mockQueryOutputDetails.mockResolvedValue(recipes);
+
+        const actual = await calculateOutput(
+            validItemName,
+            validWorkers,
+            OutputUnit.MINUTES,
+            Tools.none
+        );
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
+        const recipes = [
+            createItemOutputDetails(2, 3, Tools.copper, Tools.copper),
+            createItemOutputDetails(1, 3, Tools.stone, Tools.stone),
+        ];
+        mockQueryOutputDetails.mockResolvedValue(recipes);
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${Tools.stone}`;
+
+        expect.assertions(1);
+        await expect(
+            calculateOutput(
+                validItemName,
+                validWorkers,
+                OutputUnit.MINUTES,
+                Tools.none
+            )
+        ).rejects.toThrow(expectedError);
     });
 });

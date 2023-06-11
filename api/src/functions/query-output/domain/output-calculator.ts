@@ -1,11 +1,15 @@
 import {
+    ToolModifierValues,
     getMaxToolModifier,
     isAvailableToolSufficient,
 } from "../../../common/modifiers";
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
-import type { ItemOutputDetails } from "../interfaces/output-database-port";
-import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
+import { ItemOutputDetails } from "../interfaces/output-database-port";
+import type {
+    OutputUnit,
+    QueryOutputPrimaryPort,
+} from "../interfaces/query-output-primary-port";
 import OutputUnitSecondMappings from "../utils/OutputUnitSecondMapping";
 
 const INVALID_ITEM_NAME_ERROR =
@@ -19,17 +23,60 @@ const INTERNAL_SERVER_ERROR = "Internal server error";
 
 async function getItemOutputDetails(
     name: string
-): Promise<ItemOutputDetails | undefined> {
+): Promise<ItemOutputDetails[]> {
     try {
-        const details = await queryOutputDetails(name);
-        if (details.length > 1) {
-            throw new Error();
-        }
-
-        return details[0];
+        return await queryOutputDetails(name);
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
+}
+
+function filterCreatableItems(
+    items: ItemOutputDetails[],
+    maxAvailableTool: Tools
+): ItemOutputDetails[] {
+    return items.filter(({ minimumTool }) =>
+        isAvailableToolSufficient(minimumTool, maxAvailableTool)
+    );
+}
+
+function getMinimumToolRequired(items: ItemOutputDetails[]): Tools {
+    let minimum = Tools.steel;
+    for (const item of items) {
+        if (
+            ToolModifierValues[item.minimumTool] < ToolModifierValues[minimum]
+        ) {
+            minimum = item.minimumTool;
+        }
+    }
+
+    return minimum;
+}
+
+function getMaxOutput(
+    items: ItemOutputDetails[],
+    workers: number,
+    unit: OutputUnit,
+    maxAvailableTool: Tools
+): number {
+    let currentMaximum = 0;
+    for (const item of items) {
+        const toolModifier = getMaxToolModifier(
+            item.maximumTool,
+            maxAvailableTool
+        );
+
+        const outputPerSecond = item.output / (item.createTime / toolModifier);
+        const outputPerWorker =
+            OutputUnitSecondMappings[unit] * outputPerSecond;
+        const totalOutput = outputPerWorker * workers;
+
+        if (currentMaximum < totalOutput) {
+            currentMaximum = totalOutput;
+        }
+    }
+
+    return currentMaximum;
 }
 
 const calculateOutput: QueryOutputPrimaryPort = async (
@@ -47,27 +94,20 @@ const calculateOutput: QueryOutputPrimaryPort = async (
     }
 
     const outputDetails = await getItemOutputDetails(name);
-    if (!outputDetails) {
+    if (outputDetails.length === 0) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    if (
-        !isAvailableToolSufficient(outputDetails.minimumTool, maxAvailableTool)
-    ) {
-        throw new Error(
-            `${TOOL_LEVEL_ERROR_PREFIX} ${outputDetails.minimumTool}`
-        );
-    }
-
-    const toolModifier = getMaxToolModifier(
-        outputDetails.maximumTool,
+    const creatableRecipes = filterCreatableItems(
+        outputDetails,
         maxAvailableTool
     );
+    if (creatableRecipes.length === 0) {
+        const minimumTool = getMinimumToolRequired(outputDetails);
+        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${minimumTool}`);
+    }
 
-    const outputPerSecond =
-        outputDetails.output / (outputDetails.createTime / toolModifier);
-    const outputPerWorker = OutputUnitSecondMappings[unit] * outputPerSecond;
-    return outputPerWorker * workers;
+    return getMaxOutput(creatableRecipes, workers, unit, maxAvailableTool);
 };
 
 export { calculateOutput };
