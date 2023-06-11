@@ -30,7 +30,7 @@ enum Tools {
     STEEL
 }
 
-type OptimalFilter {
+input OptimalFilter {
     maxAvailableTool: Tools
 }
 
