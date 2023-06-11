@@ -725,7 +725,7 @@ describe("multiple recipe handling", () => {
         expect(actual[0]?.workers).toBeCloseTo(7.5);
     });
 
-    test("throws an error if an item cannot be created by any recipe", async () => {
+    test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
         const requiredItem = createItem({
             name: "required item",
             createTime: 3,
