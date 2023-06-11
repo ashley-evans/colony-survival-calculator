@@ -63,6 +63,20 @@
         "creator": "Woodcutter"
     },
     {
+        "name": "Planks",
+        "createTime": 50,
+        "output": 4,
+        "requires": [
+            {
+                "name": "Log",
+                "amount": 1
+            }
+        ],
+        "minimumTool": "none",
+        "maximumTool": "stone",
+        "creator": "Tinkerer"
+    },
+    {
         "name": "Clay",
         "createTime": 20,
         "output": 1,

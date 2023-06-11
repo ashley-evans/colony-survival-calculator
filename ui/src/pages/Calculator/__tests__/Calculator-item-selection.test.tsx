@@ -261,7 +261,7 @@ test("requests item details on the first option in the item name list without se
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        filters: { name: items[0].name },
+        filters: { name: items[0].name, optimal: { maxAvailableTool: "NONE" } },
     });
 });
 
@@ -272,7 +272,12 @@ test("requests item details for newly selected item if selection is changed", as
         "POST",
         expectedGraphQLAPIURL,
         expectedItemDetailsQueryName,
-        { filters: { name: expectedItemName } }
+        {
+            filters: {
+                name: expectedItemName,
+                optimal: { maxAvailableTool: "NONE" },
+            },
+        }
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -283,7 +288,10 @@ test("requests item details for newly selected item if selection is changed", as
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        filters: { name: expectedItemName },
+        filters: {
+            name: expectedItemName,
+            optimal: { maxAvailableTool: "NONE" },
+        },
     });
 });
 

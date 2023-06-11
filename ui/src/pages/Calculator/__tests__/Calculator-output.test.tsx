@@ -99,6 +99,7 @@ test("queries optimal output if item and workers inputted with default unit sele
         name: item.name,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
+        maxAvailableTool: "NONE",
     });
 });
 
@@ -123,6 +124,7 @@ test("queries optimal output if item and workers inputted with non-default unit 
         name: item.name,
         workers: expectedWorkers,
         unit: OutputUnit.GameDays,
+        maxAvailableTool: "NONE",
     });
 });
 

@@ -30,6 +30,12 @@ const GET_ITEM_DETAILS_QUERY = gql(`
 `);
 
 function Calculator() {
+    const [workers, setWorkers] = useState<number>();
+    const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
+    const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
+        OutputUnit.Minutes
+    );
+
     const {
         loading: itemNamesLoading,
         data: itemNameData,
@@ -39,15 +45,14 @@ function Calculator() {
     const { data: itemDetailsData, error: itemDetailsError } = useQuery(
         GET_ITEM_DETAILS_QUERY,
         {
-            variables: { filters: { name: selectedItem } },
+            variables: {
+                filters: {
+                    name: selectedItem,
+                    optimal: { maxAvailableTool: selectedTool },
+                },
+            },
             skip: !selectedItem,
         }
-    );
-
-    const [workers, setWorkers] = useState<number>();
-    const [selectedTool, setSelectedTool] = useState<Tools>();
-    const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
-        OutputUnit.Minutes
     );
 
     if (itemNamesLoading) {
