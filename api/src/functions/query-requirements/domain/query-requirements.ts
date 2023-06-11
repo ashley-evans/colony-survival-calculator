@@ -13,6 +13,11 @@ import {
     TOOL_LEVEL_ERROR_PREFIX,
     UNKNOWN_ITEM_ERROR,
 } from "./errors";
+import {
+    filterByMinimumTool,
+    filterByOptimal,
+    getLowestRequiredTool,
+} from "./item-utils";
 
 const glpk = GLPK();
 
@@ -23,14 +28,6 @@ async function getRequiredItemDetails(name: string): Promise<Items> {
         return await queryRequirementsDB(name);
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
-    }
-}
-
-function hasRequiredTools(items: Items, maxAvailableTool: Tools) {
-    for (const item of items) {
-        if (!isAvailableToolSufficient(item.minimumTool, maxAvailableTool)) {
-            throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${item.minimumTool}`);
-        }
     }
 }
 
@@ -66,12 +63,19 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    hasRequiredTools(requirements, maxAvailableTool);
+    const lowestToolRequired = getLowestRequiredTool(
+        filterByMinimumTool(requirements)
+    );
+    if (!isAvailableToolSufficient(lowestToolRequired, maxAvailableTool)) {
+        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${lowestToolRequired}`);
+    }
+
+    const optimalRequirements = filterByOptimal(requirements, maxAvailableTool);
     const program = createRequirementsLinearProgram(
         glpk,
         name,
         workers,
-        requirements,
+        optimalRequirements,
         maxAvailableTool
     );
 

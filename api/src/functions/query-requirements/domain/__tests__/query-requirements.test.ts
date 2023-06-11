@@ -376,6 +376,33 @@ describe("handles tool modifiers", () => {
         }
     );
 
+    test("throws an error with lowest required tool in message given multiple items w/ unmet tool requirements", async () => {
+        const expectedMinimumTool = Tools.iron;
+        const requiredItem = createItem({
+            name: "another item",
+            createTime: 2,
+            output: 3,
+            requirements: [],
+            minimumTool: Tools.stone,
+            maximumTool: Tools.steel,
+        });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 3 }],
+            minimumTool: Tools.iron,
+            maximumTool: Tools.steel,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([requiredItem, item]);
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${expectedMinimumTool}`;
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements(validItemName, validWorkers)
+        ).rejects.toThrow(expectedError);
+    });
+
     test.each([
         [Tools.none, 5],
         [Tools.stone, 10],
@@ -583,5 +610,156 @@ describe("optional output requirement impact", () => {
             name: requiredItem2.name,
             workers: 15,
         });
+    });
+});
+
+describe("multiple recipe handling", () => {
+    test("uses the recipe with most output when an item has more than one creator", async () => {
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 1",
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements(validItemName, validWorkers);
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(15);
+    });
+
+    test("factors max available tool into most output calculation when given item w/ lower base output but higher modified", async () => {
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 1",
+            maximumTool: Tools.stone,
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+            maximumTool: Tools.steel,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements(
+            validItemName,
+            validWorkers,
+            Tools.steel
+        );
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(60);
+    });
+
+    test("ignores more optimal recipe if cannot be created by provided max tool", async () => {
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 1",
+            maximumTool: Tools.stone,
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 6,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+            minimumTool: Tools.steel,
+            maximumTool: Tools.steel,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements(validItemName, validWorkers);
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(7.5);
+    });
+
+    test("throws an error if an item cannot be created by any recipe", async () => {
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 1",
+            maximumTool: Tools.stone,
+            minimumTool: Tools.stone,
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 6,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+            minimumTool: Tools.steel,
+            maximumTool: Tools.steel,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${Tools.stone}`;
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements(validItemName, validWorkers)
+        ).rejects.toThrow(expectedError);
     });
 });

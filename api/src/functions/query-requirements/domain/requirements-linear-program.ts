@@ -1,8 +1,8 @@
 import { GLPK, LP } from "glpk.js";
 
 import { Item, Items, OptionalOutput, Tools } from "../../../types";
-import { getMaxToolModifier } from "../../../common/modifiers";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
+import { calculateCreateTime } from "./item-utils";
 
 type Constraint = LP["subjectTo"][number];
 type ObjectiveVariable = LP["objective"]["vars"][number];
@@ -13,14 +13,6 @@ type IOItemDetails = {
     demanding: DemandingItemDetails[];
     outputting: OutputDetails[];
 };
-
-function calculateCreateTime(
-    item: Pick<Item, "maximumTool" | "createTime">,
-    availableTool: Tools
-) {
-    const toolModifier = getMaxToolModifier(item.maximumTool, availableTool);
-    return item.createTime / toolModifier;
-}
 
 function convertRequirementsToMap(requirements: Items): Map<string, Item> {
     const requirementMap = new Map<string, Item>();
