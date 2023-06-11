@@ -101,6 +101,7 @@ test("queries requirements if item and workers inputted", async () => {
     expect(matchedRequestDetails.variables).toEqual({
         name: itemWithSingleRequirement.name,
         workers: expectedWorkers,
+        maxAvailableTool: "NONE",
     });
 });
 
