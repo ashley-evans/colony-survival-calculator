@@ -50,12 +50,6 @@ resource "aws_s3_bucket_public_access_block" "lambda_bucket_public_access_block"
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
-  bucket = aws_s3_bucket.api_bucket.id
-
-  acl = "private"
-}
-
 resource "aws_s3_object" "items_json_seed" {
   bucket = aws_s3_bucket.api_bucket.id
 
@@ -180,6 +174,8 @@ resource "aws_lambda_function" "add_item_lambda" {
       MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
     }
   }
+
+  depends_on = [mongodbatlas_project_ip_access_list.main]
 }
 
 resource "aws_lambda_permission" "allow_api_bucket_seed_execution" {
