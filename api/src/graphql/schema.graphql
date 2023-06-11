@@ -8,6 +8,8 @@ type Item {
     createTime: Float!
     output: Int!
     creator: String!
+    minimumTool: Tools!
+    maximumTool: Tools!
     size: FarmSize
 }
 
@@ -30,10 +32,15 @@ enum Tools {
     STEEL
 }
 
+input OptimalFilter {
+    maxAvailableTool: Tools
+}
+
 input ItemsFilters {
     name: ID
     minimumCreators: Int
     creator: String
+    optimal: OptimalFilter
 }
 
 type Query {

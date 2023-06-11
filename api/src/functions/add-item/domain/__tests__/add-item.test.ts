@@ -1,4 +1,4 @@
-import { Items, Tools } from "../../../../types";
+import { Items, Item, Tools } from "../../../../types";
 import { createItem, createOptionalOutput } from "../../../../../test";
 
 import { storeItem } from "../../adapters/store-item";
@@ -10,7 +10,6 @@ jest.mock("../../adapters/store-item", () => ({
 const mockStoreItem = storeItem as jest.Mock;
 
 import { addItem } from "../add-item";
-import { Item } from "../../../../graphql/schema";
 
 const validItem = createItem({
     name: "item name 1",

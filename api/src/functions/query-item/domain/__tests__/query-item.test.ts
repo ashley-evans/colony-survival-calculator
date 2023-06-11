@@ -3,7 +3,7 @@ import {
     queryItemByCreatorCount,
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
-import type { Items } from "../../../../types";
+import { Tools, type Items } from "../../../../types";
 import { createItem } from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
@@ -111,7 +111,7 @@ describe("field queries", () => {
             ],
         ],
     ])(
-        "returns all items retrieved by field query given %s",
+        "returns all items retrieved by field query given %s (no optimal filter provided)",
         async (_: string, received: Items) => {
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -121,6 +121,160 @@ describe("field queries", () => {
             expect(actual).toEqual(expect.arrayContaining(received));
         }
     );
+
+    describe("optimal filter handling", () => {
+        test("returns only the item with highest output with no tools given multiple recipes for single item (no max tool specified in filter)", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 5,
+                requirements: [],
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 5,
+                    output: 2,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({ optimal: {} });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns only the items with highest output given multiple items with multiple recipes (no max tool specified in filter)", async () => {
+            const itemName1 = "item 1";
+            const itemName2 = "item 2";
+            const expected = [
+                createItem({
+                    name: itemName1,
+                    createTime: 1,
+                    output: 5,
+                    requirements: [],
+                }),
+                createItem({
+                    name: itemName2,
+                    createTime: 3,
+                    output: 10,
+                    requirements: [],
+                }),
+            ];
+            const received = [
+                ...expected,
+                createItem({
+                    name: itemName1,
+                    createTime: 5,
+                    output: 2,
+                    requirements: [],
+                }),
+                createItem({
+                    name: itemName2,
+                    createTime: 10,
+                    output: 12,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({ optimal: {} });
+
+            expect(actual).toHaveLength(expected.length);
+            expect(actual).toEqual(expect.arrayContaining(expected));
+        });
+
+        test("returns item with highest output (due to better possible tool) given multiple recipes and no tool specified", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 5,
+                requirements: [],
+                maximumTool: Tools.steel,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 8,
+                    requirements: [],
+                    maximumTool: Tools.copper,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({ optimal: {} });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns item with highest output given items that cannot utilize max tool available", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                maximumTool: Tools.steel,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    maximumTool: Tools.copper,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: { maxAvailableTool: Tools.steel },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("ignores any item that cannot be created by provided tool even if optimal", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    minimumTool: Tools.steel,
+                    maximumTool: Tools.steel,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: { maxAvailableTool: Tools.none },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+    });
 
     test("throws an error if an exception occurs while fetching item details by field", async () => {
         const expectedError = new Error("test error");
@@ -233,6 +387,171 @@ describe("creator count queries", () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
         expect(consoleErrorSpy).toHaveBeenCalledWith(expectedError);
+    });
+
+    describe("optimal filter handling", () => {
+        test("returns only the item with highest output with no tools given multiple recipes for single item (no max tool specified in filter)", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 5,
+                requirements: [],
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 5,
+                    output: 2,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByCreatorCount.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                minimumCreators: 2,
+                optimal: {},
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns only the items with highest output given multiple items with multiple recipes (no max tool specified in filter)", async () => {
+            const itemName1 = "item 1";
+            const itemName2 = "item 2";
+            const expected = [
+                createItem({
+                    name: itemName1,
+                    createTime: 1,
+                    output: 5,
+                    requirements: [],
+                }),
+                createItem({
+                    name: itemName2,
+                    createTime: 3,
+                    output: 10,
+                    requirements: [],
+                }),
+            ];
+            const received = [
+                ...expected,
+                createItem({
+                    name: itemName1,
+                    createTime: 5,
+                    output: 2,
+                    requirements: [],
+                }),
+                createItem({
+                    name: itemName2,
+                    createTime: 10,
+                    output: 12,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByCreatorCount.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                minimumCreators: 2,
+                optimal: {},
+            });
+
+            expect(actual).toHaveLength(expected.length);
+            expect(actual).toEqual(expect.arrayContaining(expected));
+        });
+
+        test("returns item with highest output (due to better possible tool) given multiple recipes and no tool specified", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 5,
+                requirements: [],
+                maximumTool: Tools.steel,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 8,
+                    requirements: [],
+                    maximumTool: Tools.copper,
+                }),
+            ];
+            mockQueryItemByCreatorCount.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                minimumCreators: 2,
+                optimal: {},
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns item with highest output given items that cannot utilize max tool available", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                maximumTool: Tools.steel,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    maximumTool: Tools.copper,
+                }),
+            ];
+            mockQueryItemByCreatorCount.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                minimumCreators: 2,
+                optimal: { maxAvailableTool: Tools.steel },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("ignores any item that cannot be created by provided tool even if optimal", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: Tools.none,
+                maximumTool: Tools.none,
+            });
+            const received = [
+                expected,
+                createItem({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    minimumTool: Tools.steel,
+                    maximumTool: Tools.steel,
+                }),
+            ];
+            mockQueryItemByCreatorCount.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                minimumCreators: 2,
+                optimal: { maxAvailableTool: Tools.none },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
     });
 
     test("throws an error if a minimum creator filter is provided with a creator name filter", async () => {
