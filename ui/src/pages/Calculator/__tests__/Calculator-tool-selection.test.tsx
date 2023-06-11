@@ -177,6 +177,59 @@ test("queries requirements again if tool is changed after first query", async ()
     await expect(expectedRequest).resolves.not.toThrow();
 });
 
+test("queries item details with provided tool if non default selected", async () => {
+    const expectedTool = Tools.Steel;
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedItemDetailsQueryName,
+        {
+            filters: {
+                name: item.name,
+                optimal: { maxAvailableTool: expectedTool },
+            },
+        }
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectTool(expectedTool);
+    await selectItemAndWorkers({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+
+    await expect(expectedRequest).resolves.not.toThrow();
+});
+
+test("queries item details again if tool is changed after first query", async () => {
+    const expectedTool = Tools.Copper;
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedItemDetailsQueryName,
+        {
+            filters: {
+                name: item.name,
+                optimal: { maxAvailableTool: expectedTool },
+            },
+        }
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectTool(Tools.Steel);
+    await selectItemAndWorkers({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+    await selectTool(expectedTool);
+
+    await expect(expectedRequest).resolves.not.toThrow();
+});
+
 afterAll(() => {
     server.close();
 });
