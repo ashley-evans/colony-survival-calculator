@@ -6,12 +6,13 @@ enum OutputUnit {
 }
 
 interface QueryOutputPrimaryPort {
-    (
-        name: string,
-        workers: number,
-        unit: OutputUnit,
-        maxAvailableTool?: Tools
-    ): Promise<number>;
+    (input: {
+        name: string;
+        workers: number;
+        unit: OutputUnit;
+        maxAvailableTool?: Tools;
+        creator?: string;
+    }): Promise<number>;
 }
 
 export { OutputUnit, QueryOutputPrimaryPort };

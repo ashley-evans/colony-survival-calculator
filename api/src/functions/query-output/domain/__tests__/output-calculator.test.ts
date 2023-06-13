@@ -38,7 +38,11 @@ test("throws an error given an empty string as an item name", async () => {
 
     expect.assertions(1);
     await expect(
-        calculateOutput("", validWorkers, OutputUnit.MINUTES)
+        calculateOutput({
+            name: "",
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+        })
     ).rejects.toThrow(expectedError);
 });
 
@@ -54,7 +58,11 @@ test.each([
 
         expect.assertions(1);
         await expect(
-            calculateOutput(validItemName, amount, OutputUnit.MINUTES)
+            calculateOutput({
+                name: validItemName,
+                workers: amount,
+                unit: OutputUnit.MINUTES,
+            })
         ).rejects.toThrow(expectedError);
     }
 );
@@ -63,7 +71,11 @@ test("calls the database adapter to get the output details for the provided item
     const details = createItemOutputDetails(2, 3);
     mockQueryOutputDetails.mockResolvedValue([details]);
 
-    await calculateOutput(validItemName, validWorkers, OutputUnit.MINUTES);
+    await calculateOutput({
+        name: validItemName,
+        workers: validWorkers,
+        unit: OutputUnit.MINUTES,
+    });
 
     expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
     expect(mockQueryOutputDetails).toHaveBeenCalledWith(validItemName);
@@ -75,7 +87,11 @@ test("throws an error if no item output details are returned from DB", async () 
 
     expect.assertions(1);
     await expect(
-        calculateOutput(validItemName, validWorkers, OutputUnit.MINUTES)
+        calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+        })
     ).rejects.toThrow(expectedError);
 });
 
@@ -85,7 +101,11 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
     expect.assertions(1);
     await expect(
-        calculateOutput(validItemName, validWorkers, OutputUnit.MINUTES)
+        calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+        })
     ).rejects.toThrow(expectedError);
 });
 
@@ -105,7 +125,11 @@ test.each([
         const details = createItemOutputDetails(createTime, amount);
         mockQueryOutputDetails.mockResolvedValue([details]);
 
-        const actual = await calculateOutput(validItemName, validWorkers, unit);
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit,
+        });
 
         expect(actual).toBeCloseTo(expected);
     }
@@ -129,12 +153,12 @@ describe("handles tool modifiers", () => {
 
             expect.assertions(1);
             await expect(
-                calculateOutput(
-                    validItemName,
-                    validWorkers,
-                    OutputUnit.MINUTES,
-                    provided
-                )
+                calculateOutput({
+                    name: validItemName,
+                    workers: validWorkers,
+                    unit: OutputUnit.MINUTES,
+                    maxAvailableTool: provided,
+                })
             ).rejects.toThrow(expectedError);
         }
     );
@@ -157,12 +181,12 @@ describe("handles tool modifiers", () => {
             );
             mockQueryOutputDetails.mockResolvedValue([details]);
 
-            const actual = await calculateOutput(
-                validItemName,
-                validWorkers,
-                OutputUnit.MINUTES,
-                provided
-            );
+            const actual = await calculateOutput({
+                name: validItemName,
+                workers: validWorkers,
+                unit: OutputUnit.MINUTES,
+                maxAvailableTool: provided,
+            });
 
             expect(actual).toBeCloseTo(expected);
         }
@@ -173,12 +197,12 @@ describe("handles tool modifiers", () => {
         const details = createItemOutputDetails(2, 3, Tools.none, Tools.copper);
         mockQueryOutputDetails.mockResolvedValue([details]);
 
-        const actual = await calculateOutput(
-            validItemName,
-            validWorkers,
-            OutputUnit.MINUTES,
-            Tools.steel
-        );
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            maxAvailableTool: Tools.steel,
+        });
 
         expect(actual).toBeCloseTo(expected);
     });
@@ -193,12 +217,12 @@ describe("multiple recipe handling", () => {
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
-        const actual = await calculateOutput(
-            validItemName,
-            validWorkers,
-            OutputUnit.MINUTES,
-            Tools.steel
-        );
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            maxAvailableTool: Tools.steel,
+        });
 
         expect(actual).toBeCloseTo(expected);
     });
@@ -211,12 +235,12 @@ describe("multiple recipe handling", () => {
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
-        const actual = await calculateOutput(
-            validItemName,
-            validWorkers,
-            OutputUnit.MINUTES,
-            Tools.steel
-        );
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            maxAvailableTool: Tools.steel,
+        });
 
         expect(actual).toBeCloseTo(expected);
     });
@@ -229,12 +253,12 @@ describe("multiple recipe handling", () => {
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
-        const actual = await calculateOutput(
-            validItemName,
-            validWorkers,
-            OutputUnit.MINUTES,
-            Tools.none
-        );
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            maxAvailableTool: Tools.none,
+        });
 
         expect(actual).toBeCloseTo(expected);
     });
@@ -249,12 +273,12 @@ describe("multiple recipe handling", () => {
 
         expect.assertions(1);
         await expect(
-            calculateOutput(
-                validItemName,
-                validWorkers,
-                OutputUnit.MINUTES,
-                Tools.none
-            )
+            calculateOutput({
+                name: validItemName,
+                workers: validWorkers,
+                unit: OutputUnit.MINUTES,
+                maxAvailableTool: Tools.none,
+            })
         ).rejects.toThrow(expectedError);
     });
 });

@@ -77,12 +77,12 @@ function getMaxOutput(
     return outputPerWorker * workers;
 }
 
-const calculateOutput: QueryOutputPrimaryPort = async (
+const calculateOutput: QueryOutputPrimaryPort = async ({
     name,
     workers,
     unit,
-    maxAvailableTool = Tools.none
-) => {
+    maxAvailableTool = Tools.none,
+}) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
     }
