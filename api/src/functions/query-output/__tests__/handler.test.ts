@@ -20,7 +20,8 @@ function createMockEvent(
     name: string,
     workers: number,
     unit: OutputUnit,
-    maxAvailableTool?: Tools
+    maxAvailableTool?: Tools,
+    creator?: string
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
@@ -28,6 +29,7 @@ function createMockEvent(
         workers,
         unit,
         maxAvailableTool: maxAvailableTool ?? null,
+        creator: creator ?? null,
     };
 
     return mockEvent;
@@ -51,12 +53,11 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
     await handler(validEvent);
 
     expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
-    expect(mockCalculateOutput).toHaveBeenCalledWith(
-        expectedItemName,
-        expectedWorkers,
-        expectedUnit,
-        undefined
-    );
+    expect(mockCalculateOutput).toHaveBeenCalledWith({
+        name: expectedItemName,
+        workers: expectedWorkers,
+        unit: expectedUnit,
+    });
 });
 
 test.each<[Tools, SchemaTools]>([
@@ -82,14 +83,35 @@ test.each<[Tools, SchemaTools]>([
         await handler(event);
 
         expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
-        expect(mockCalculateOutput).toHaveBeenCalledWith(
-            expectedItemName,
-            expectedWorkers,
-            expectedUnit,
-            expectedTool
-        );
+        expect(mockCalculateOutput).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            maxAvailableTool: expectedTool,
+        });
     }
 );
+
+test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
+    const expectedCreator = "test item creator";
+    const event = createMockEvent(
+        expectedItemName,
+        expectedWorkers,
+        expectedUnit,
+        undefined,
+        expectedCreator
+    );
+
+    await handler(event);
+
+    expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
+    expect(mockCalculateOutput).toHaveBeenCalledWith({
+        name: expectedItemName,
+        workers: expectedWorkers,
+        unit: expectedUnit,
+        creator: expectedCreator,
+    });
+});
 
 test("returns the calculated output", async () => {
     const expected = 5;

@@ -5,14 +5,17 @@ import { OutputUnit } from "./interfaces/query-output-primary-port";
 import { ToolSchemaMap } from "../../common/modifiers";
 
 const handler: GraphQLEventHandler<QueryOutputArgs, number> = async (event) => {
-    const { name, workers, unit, maxAvailableTool } = event.arguments;
+    const { name, workers, unit, maxAvailableTool, creator } = event.arguments;
 
-    return calculateOutput(
+    return calculateOutput({
         name,
         workers,
-        OutputUnit[unit],
-        maxAvailableTool ? ToolSchemaMap[maxAvailableTool] : undefined
-    );
+        unit: OutputUnit[unit],
+        ...(maxAvailableTool
+            ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
+            : {}),
+        ...(creator ? { creator } : {}),
+    });
 };
 
 export { handler };

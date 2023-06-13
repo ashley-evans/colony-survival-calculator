@@ -18,6 +18,7 @@ import { Items, Tools } from "../../../../types";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 
 const validItemName = "test item";
+const validCreatorName = "a test item creator";
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
@@ -72,7 +73,7 @@ test.each([
 test("returns an empty array if no items are stored in the items collection", async () => {
     const { queryOutputDetails } = await import("../mongodb-output-adapter");
 
-    const actual = await queryOutputDetails(validItemName);
+    const actual = await queryOutputDetails({ name: validItemName });
 
     expect(actual).toEqual([]);
 });
@@ -162,12 +163,68 @@ test.each([
             "../mongodb-output-adapter"
         );
 
-        const actual = await queryOutputDetails(validItemName);
+        const actual = await queryOutputDetails({ name: validItemName });
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
     }
 );
+
+test("only returns output details related to provided creator if item is created by more than one creator", async () => {
+    const expected = {
+        createTime: 1,
+        output: 3,
+        minimumTool: Tools.stone,
+        maximumTool: Tools.copper,
+    };
+    const expectedItem = createItem({
+        ...expected,
+        name: validItemName,
+        requirements: [],
+        creator: validCreatorName,
+    });
+    const stored = [
+        expectedItem,
+        createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 4,
+            requirements: [],
+            creator: "another creator",
+        }),
+    ];
+    await storeItems(stored);
+    const { queryOutputDetails } = await import("../mongodb-output-adapter");
+
+    const actual = await queryOutputDetails({
+        name: validItemName,
+        creator: validCreatorName,
+    });
+
+    expect(actual).toHaveLength(1);
+    expect(actual[0]).toEqual(expected);
+});
+
+test("returns no output details if an item is not created by the provided creator", async () => {
+    const stored = [
+        createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 4,
+            requirements: [],
+            creator: "another creator",
+        }),
+    ];
+    await storeItems(stored);
+    const { queryOutputDetails } = await import("../mongodb-output-adapter");
+
+    const actual = await queryOutputDetails({
+        name: validItemName,
+        creator: validCreatorName,
+    });
+
+    expect(actual).toHaveLength(0);
+});
 
 afterAll(async () => {
     (await mockClient).close(true);

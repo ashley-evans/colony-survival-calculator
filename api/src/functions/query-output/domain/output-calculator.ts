@@ -22,10 +22,14 @@ const TOOL_LEVEL_ERROR_PREFIX =
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
 async function getItemOutputDetails(
-    name: string
+    name: string,
+    creator?: string
 ): Promise<ItemOutputDetails[]> {
     try {
-        return await queryOutputDetails(name);
+        return await queryOutputDetails({
+            name,
+            ...(creator ? { creator } : {}),
+        });
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
@@ -77,12 +81,13 @@ function getMaxOutput(
     return outputPerWorker * workers;
 }
 
-const calculateOutput: QueryOutputPrimaryPort = async (
+const calculateOutput: QueryOutputPrimaryPort = async ({
     name,
     workers,
     unit,
-    maxAvailableTool = Tools.none
-) => {
+    maxAvailableTool = Tools.none,
+    creator,
+}) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
     }
@@ -91,7 +96,7 @@ const calculateOutput: QueryOutputPrimaryPort = async (
         throw new Error(INVALID_WORKERS_ERROR);
     }
 
-    const outputDetails = await getItemOutputDetails(name);
+    const outputDetails = await getItemOutputDetails(name, creator);
     if (outputDetails.length === 0) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
