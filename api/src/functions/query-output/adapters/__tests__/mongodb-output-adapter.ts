@@ -72,7 +72,7 @@ test.each([
 test("returns an empty array if no items are stored in the items collection", async () => {
     const { queryOutputDetails } = await import("../mongodb-output-adapter");
 
-    const actual = await queryOutputDetails(validItemName);
+    const actual = await queryOutputDetails({ name: validItemName });
 
     expect(actual).toEqual([]);
 });
@@ -162,7 +162,7 @@ test.each([
             "../mongodb-output-adapter"
         );
 
-        const actual = await queryOutputDetails(validItemName);
+        const actual = await queryOutputDetails({ name: validItemName });
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));

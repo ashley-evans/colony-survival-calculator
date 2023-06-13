@@ -6,7 +6,7 @@ type ItemOutputDetails = Pick<
 >;
 
 interface OutputDatabasePort {
-    (name: string): Promise<ItemOutputDetails[]>;
+    (input: { name: string; creator?: string }): Promise<ItemOutputDetails[]>;
 }
 
 export type { ItemOutputDetails, OutputDatabasePort };

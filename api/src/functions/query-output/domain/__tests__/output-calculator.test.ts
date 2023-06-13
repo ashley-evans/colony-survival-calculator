@@ -78,7 +78,28 @@ test("calls the database adapter to get the output details for the provided item
     });
 
     expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
-    expect(mockQueryOutputDetails).toHaveBeenCalledWith(validItemName);
+    expect(mockQueryOutputDetails).toHaveBeenCalledWith({
+        name: validItemName,
+    });
+});
+
+test("provides the creator name to database adapter if provided", async () => {
+    const expectedCreatorName = "test creator";
+    const details = createItemOutputDetails(2, 3);
+    mockQueryOutputDetails.mockResolvedValue([details]);
+
+    await calculateOutput({
+        name: validItemName,
+        workers: validWorkers,
+        unit: OutputUnit.MINUTES,
+        creator: expectedCreatorName,
+    });
+
+    expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
+    expect(mockQueryOutputDetails).toHaveBeenCalledWith({
+        name: validItemName,
+        creator: expectedCreatorName,
+    });
 });
 
 test("throws an error if no item output details are returned from DB", async () => {

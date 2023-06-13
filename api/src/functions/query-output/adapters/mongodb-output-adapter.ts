@@ -16,7 +16,7 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryOutputDetails: OutputDatabasePort = async (name) => {
+const queryOutputDetails: OutputDatabasePort = async ({ name }) => {
     const db = (await client).db(databaseName);
     const collection = db.collection(itemCollectionName);
 
