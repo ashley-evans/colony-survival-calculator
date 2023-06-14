@@ -13,6 +13,11 @@ type Item {
     size: FarmSize
 }
 
+input CreatorOverride {
+    itemName: String!
+    creator: String!
+}
+
 type Requirement {
     name: ID!
     workers: Float!
@@ -50,6 +55,7 @@ type Query {
         name: ID!
         workers: Int!
         maxAvailableTool: Tools
+        creatorOverrides: [CreatorOverride!]
     ): [Requirement!]!
     output(
         name: ID!

@@ -2,6 +2,7 @@ import type { AppSyncResolverEvent } from "aws-lambda";
 import { mock } from "jest-mock-extended";
 
 import type {
+    CreatorOverride,
     QueryRequirementArgs,
     Requirement as GraphQLRequirement,
     Tools,
@@ -20,13 +21,15 @@ const mockQueryRequirements = queryRequirements as jest.Mock;
 function createMockEvent(
     name: string,
     workers: number,
-    maxAvailableTool?: Tools
+    maxAvailableTool?: Tools,
+    creatorOverrides?: CreatorOverride[]
 ): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.arguments = {
         name,
         workers,
         maxAvailableTool: maxAvailableTool ?? null,
+        creatorOverrides: creatorOverrides ?? null,
     };
 
     return mockEvent;
@@ -47,6 +50,7 @@ test("calls the domain to fetch requirements for provided event w/o tool modifie
     expect(mockQueryRequirements).toHaveBeenCalledWith(
         expectedItemName,
         expectedAmount,
+        undefined,
         undefined
     );
 });
@@ -75,10 +79,42 @@ test.each<[Tools, SchemaTools]>([
         expect(mockQueryRequirements).toHaveBeenCalledWith(
             expectedItemName,
             expectedAmount,
-            expectedTool
+            expectedTool,
+            undefined
         );
     }
 );
+
+test("provides specified creator overrides to domain if provided", async () => {
+    const expectedItemName = "test name";
+    const expectedAmount = 4;
+    const overrides: CreatorOverride[] = [
+        {
+            itemName: "test name",
+            creator: "first creator",
+        },
+        {
+            itemName: "second item",
+            creator: "another creator",
+        },
+    ];
+    const event = createMockEvent(
+        expectedItemName,
+        expectedAmount,
+        undefined,
+        overrides
+    );
+
+    await handler(event);
+
+    expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+    expect(mockQueryRequirements).toHaveBeenCalledWith(
+        expectedItemName,
+        expectedAmount,
+        undefined,
+        overrides
+    );
+});
 
 test.each([
     ["no requirements received", [], []],
