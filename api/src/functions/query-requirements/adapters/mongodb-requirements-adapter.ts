@@ -44,6 +44,24 @@ const queryRequirements: RequirementsDatabasePort = async (name: string) => {
             },
         },
         {
+            $group: {
+                _id: {
+                    name: "$name",
+                    creator: "$creator",
+                },
+                unique: {
+                    $addToSet: "$$ROOT",
+                },
+            },
+        },
+        {
+            $replaceRoot: {
+                newRoot: {
+                    $arrayElemAt: ["$unique", 0],
+                },
+            },
+        },
+        {
             $sort: {
                 depth: 1,
             },

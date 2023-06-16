@@ -307,6 +307,42 @@ test.each([
     }
 );
 
+test("removes duplicate items w/ same creator when input item has multiple creators that require the same item", async () => {
+    const requiredItemName = "required item 1";
+    const expected = [
+        createItem({
+            name: requiredItemName,
+            createTime: 4,
+            output: 2,
+            requirements: [],
+        }),
+        createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 8,
+            requirements: [{ name: requiredItemName, amount: 4 }],
+            creator: "test creator 1",
+        }),
+        createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 4,
+            requirements: [{ name: requiredItemName, amount: 2 }],
+            creator: "test creator 2",
+        }),
+    ];
+    await storeItems(JSON.parse(JSON.stringify(expected)));
+
+    const { queryRequirements } = await import(
+        "../mongodb-requirements-adapter"
+    );
+
+    const actual = await queryRequirements(validItemName);
+
+    expect(actual).toHaveLength(expected.length);
+    expect(actual).toEqual(expect.arrayContaining(expected));
+});
+
 afterAll(async () => {
     (await mockClient).close(true);
     await mongoDBMemoryServer.stop();
