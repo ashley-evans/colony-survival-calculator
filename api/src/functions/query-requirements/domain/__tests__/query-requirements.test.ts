@@ -23,9 +23,9 @@ test("throws an error given an empty string as an item name", async () => {
     );
 
     expect.assertions(1);
-    await expect(queryRequirements("", validWorkers)).rejects.toThrow(
-        expectedError
-    );
+    await expect(
+        queryRequirements({ name: "", workers: validWorkers })
+    ).rejects.toThrow(expectedError);
 });
 
 test.each([
@@ -39,9 +39,9 @@ test.each([
         );
 
         expect.assertions(1);
-        await expect(queryRequirements(validItemName, amount)).rejects.toThrow(
-            expectedError
-        );
+        await expect(
+            queryRequirements({ name: validItemName, workers: amount })
+        ).rejects.toThrow(expectedError);
     }
 );
 
@@ -54,7 +54,7 @@ test("calls the database adapter to get the requirements given valid input", asy
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item]);
 
-    await queryRequirements(validItemName, validWorkers);
+    await queryRequirements({ name: validItemName, workers: validWorkers });
 
     expect(mockMongoDBQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockMongoDBQueryRequirements).toHaveBeenCalledWith(validItemName);
@@ -66,7 +66,7 @@ test("throws an error if no requirements are returned at all (item does not exis
 
     expect.assertions(1);
     await expect(
-        queryRequirements(validItemName, validWorkers)
+        queryRequirements({ name: validItemName, workers: validWorkers })
     ).rejects.toThrow(expectedError);
 });
 
@@ -82,7 +82,7 @@ test("throws an error if the provided item details are not returned from DB", as
 
     expect.assertions(1);
     await expect(
-        queryRequirements(validItemName, validWorkers)
+        queryRequirements({ name: validItemName, workers: validWorkers })
     ).rejects.toThrow(expectedError);
 });
 
@@ -95,7 +95,10 @@ test("returns an empty array if the provided item has no requirements", async ()
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toEqual([]);
 });
@@ -112,7 +115,7 @@ test("throws an error if provided item requires an item that does not exist in d
 
     expect.assertions(1);
     await expect(
-        queryRequirements(validItemName, validWorkers)
+        queryRequirements({ name: validItemName, workers: validWorkers })
     ).rejects.toThrow(expectedError);
 });
 
@@ -131,7 +134,10 @@ test("returns requirement given item with a single requirement and no nested req
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toHaveLength(1);
     expect(actual[0]?.name).toEqual(requiredItem.name);
@@ -166,7 +172,10 @@ test("returns requirements given item with multiple requirements and no nested r
         requiredItem2,
     ]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toHaveLength(2);
     expect(actual).toEqual([
@@ -200,7 +209,10 @@ test("returns requirements given item with single nested requirement", async () 
         requiredItem2,
     ]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toHaveLength(2);
     expect(actual).toEqual([
@@ -244,7 +256,10 @@ test("returns requirements given item with multiple different nested requirement
         requiredItem3,
     ]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toHaveLength(3);
     expect(actual).toEqual([
@@ -292,7 +307,10 @@ test("returns combined requirements given item with multiple nested requirements
         requiredItem3,
     ]);
 
-    const actual = await queryRequirements(validItemName, validWorkers);
+    const actual = await queryRequirements({
+        name: validItemName,
+        workers: validWorkers,
+    });
 
     expect(actual).toHaveLength(3);
     expect(actual).toContainEqual({ name: requiredItem1.name, workers: 7.5 });
@@ -306,7 +324,7 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
     expect.assertions(1);
     await expect(
-        queryRequirements(validItemName, validWorkers)
+        queryRequirements({ name: validItemName, workers: validWorkers })
     ).rejects.toThrow(expectedError);
 });
 
@@ -333,7 +351,11 @@ describe("handles tool modifiers", () => {
 
             expect.assertions(1);
             await expect(
-                queryRequirements(validItemName, validWorkers, provided)
+                queryRequirements({
+                    name: validItemName,
+                    workers: validWorkers,
+                    maxAvailableTool: provided,
+                })
             ).rejects.toThrow(expectedError);
         }
     );
@@ -371,7 +393,11 @@ describe("handles tool modifiers", () => {
 
             expect.assertions(1);
             await expect(
-                queryRequirements(validItemName, validWorkers, provided)
+                queryRequirements({
+                    name: validItemName,
+                    workers: validWorkers,
+                    maxAvailableTool: provided,
+                })
             ).rejects.toThrow(expectedError);
         }
     );
@@ -399,7 +425,7 @@ describe("handles tool modifiers", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements(validItemName, validWorkers)
+            queryRequirements({ name: validItemName, workers: validWorkers })
         ).rejects.toThrow(expectedError);
     });
 
@@ -435,11 +461,11 @@ describe("handles tool modifiers", () => {
                 requiredItem,
             ]);
 
-            const actual = await queryRequirements(
-                validItemName,
-                validWorkers,
-                provided
-            );
+            const actual = await queryRequirements({
+                name: validItemName,
+                workers: validWorkers,
+                maxAvailableTool: provided,
+            });
             const requirement = actual.find(
                 (value) => value.name === requiredItemName
             ) as RequiredWorkers;
@@ -468,11 +494,11 @@ describe("handles tool modifiers", () => {
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
-        const actual = await queryRequirements(
-            validItemName,
-            validWorkers,
-            Tools.steel
-        );
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            maxAvailableTool: Tools.steel,
+        });
         const requirement = actual.find(
             (value) => value.name === requiredItemName
         ) as RequiredWorkers;
@@ -500,11 +526,11 @@ describe("handles tool modifiers", () => {
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
-        const actual = await queryRequirements(
-            validItemName,
-            validWorkers,
-            Tools.steel
-        );
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            maxAvailableTool: Tools.steel,
+        });
         const requirement = actual.find(
             (value) => value.name === requiredItemName
         ) as RequiredWorkers;
@@ -532,11 +558,11 @@ describe("handles tool modifiers", () => {
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
-        const actual = await queryRequirements(
-            validItemName,
-            validWorkers,
-            Tools.steel
-        );
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            maxAvailableTool: Tools.steel,
+        });
         const requirement = actual.find(
             (value) => value.name === requiredItemName
         ) as RequiredWorkers;
@@ -564,7 +590,10 @@ describe("optional output requirement impact", () => {
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem1]);
 
-        const actual = await queryRequirements(validItemName, validWorkers);
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
 
         expect(actual).toHaveLength(1);
         expect(actual[0]?.name).toEqual(requiredItem1.name);
@@ -599,7 +628,10 @@ describe("optional output requirement impact", () => {
             requiredItem2,
         ]);
 
-        const actual = await queryRequirements(validItemName, validWorkers);
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
 
         expect(actual).toHaveLength(2);
         expect(actual).toContainEqual({
@@ -641,7 +673,10 @@ describe("multiple recipe handling", () => {
             requiredItem,
         ]);
 
-        const actual = await queryRequirements(validItemName, validWorkers);
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
 
         expect(actual).toHaveLength(1);
         expect(actual[0]?.name).toEqual(requiredItem.name);
@@ -677,11 +712,11 @@ describe("multiple recipe handling", () => {
             requiredItem,
         ]);
 
-        const actual = await queryRequirements(
-            validItemName,
-            validWorkers,
-            Tools.steel
-        );
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            maxAvailableTool: Tools.steel,
+        });
 
         expect(actual).toHaveLength(1);
         expect(actual[0]?.name).toEqual(requiredItem.name);
@@ -718,7 +753,10 @@ describe("multiple recipe handling", () => {
             requiredItem,
         ]);
 
-        const actual = await queryRequirements(validItemName, validWorkers);
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
 
         expect(actual).toHaveLength(1);
         expect(actual[0]?.name).toEqual(requiredItem.name);
@@ -759,7 +797,7 @@ describe("multiple recipe handling", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements(validItemName, validWorkers)
+            queryRequirements({ name: validItemName, workers: validWorkers })
         ).rejects.toThrow(expectedError);
     });
 });

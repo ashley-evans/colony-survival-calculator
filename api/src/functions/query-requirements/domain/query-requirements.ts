@@ -45,11 +45,11 @@ function mapResults(
     return requiredWorkers;
 }
 
-const queryRequirements: QueryRequirementsPrimaryPort = async (
-    name: string,
-    workers: number,
-    maxAvailableTool: Tools = Tools.none
-) => {
+const queryRequirements: QueryRequirementsPrimaryPort = async ({
+    name,
+    workers,
+    maxAvailableTool = Tools.none,
+}) => {
     if (name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
     }

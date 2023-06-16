@@ -18,12 +18,17 @@ jest.mock("../domain/query-requirements", () => ({
 
 const mockQueryRequirements = queryRequirements as jest.Mock;
 
-function createMockEvent(
-    name: string,
-    workers: number,
-    maxAvailableTool?: Tools,
-    creatorOverrides?: CreatorOverride[]
-): AppSyncResolverEvent<QueryRequirementArgs> {
+function createMockEvent({
+    name,
+    workers,
+    maxAvailableTool,
+    creatorOverrides,
+}: {
+    name: string;
+    workers: number;
+    maxAvailableTool?: Tools;
+    creatorOverrides?: CreatorOverride[];
+}): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.arguments = {
         name,
@@ -42,17 +47,18 @@ beforeEach(() => {
 test("calls the domain to fetch requirements for provided event w/o tool modifier", async () => {
     const expectedItemName = "test name";
     const expectedAmount = 4;
-    const event = createMockEvent(expectedItemName, expectedAmount);
+    const event = createMockEvent({
+        name: expectedItemName,
+        workers: expectedAmount,
+    });
 
     await handler(event);
 
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
-    expect(mockQueryRequirements).toHaveBeenCalledWith(
-        expectedItemName,
-        expectedAmount,
-        undefined,
-        undefined
-    );
+    expect(mockQueryRequirements).toHaveBeenCalledWith({
+        name: expectedItemName,
+        workers: expectedAmount,
+    });
 });
 
 test.each<[Tools, SchemaTools]>([
@@ -67,21 +73,20 @@ test.each<[Tools, SchemaTools]>([
     async (provided: Tools, expectedTool: SchemaTools) => {
         const expectedItemName = "test name";
         const expectedAmount = 4;
-        const event = createMockEvent(
-            expectedItemName,
-            expectedAmount,
-            provided
-        );
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedAmount,
+            maxAvailableTool: provided,
+        });
 
         await handler(event);
 
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
-        expect(mockQueryRequirements).toHaveBeenCalledWith(
-            expectedItemName,
-            expectedAmount,
-            expectedTool,
-            undefined
-        );
+        expect(mockQueryRequirements).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedAmount,
+            maxAvailableTool: expectedTool,
+        });
     }
 );
 
@@ -98,22 +103,20 @@ test("provides specified creator overrides to domain if provided", async () => {
             creator: "another creator",
         },
     ];
-    const event = createMockEvent(
-        expectedItemName,
-        expectedAmount,
-        undefined,
-        overrides
-    );
+    const event = createMockEvent({
+        name: expectedItemName,
+        workers: expectedAmount,
+        creatorOverrides: overrides,
+    });
 
     await handler(event);
 
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
-    expect(mockQueryRequirements).toHaveBeenCalledWith(
-        expectedItemName,
-        expectedAmount,
-        undefined,
-        overrides
-    );
+    expect(mockQueryRequirements).toHaveBeenCalledWith({
+        name: expectedItemName,
+        workers: expectedAmount,
+        creatorOverrides: overrides,
+    });
 });
 
 test.each([
@@ -137,7 +140,7 @@ test.each([
         expected: GraphQLRequirement[]
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);
-        const event = createMockEvent("test", 1);
+        const event = createMockEvent({ name: "test", workers: 1 });
 
         const actual = await handler(event);
 
@@ -149,7 +152,7 @@ test.each([
 test("throws the exception if an exception occurs while fetching item requirements", async () => {
     const expectedError = new Error("expected error");
     mockQueryRequirements.mockRejectedValue(expectedError);
-    const event = createMockEvent("test", 1);
+    const event = createMockEvent({ name: "test", workers: 1 });
 
     expect.assertions(1);
     await expect(handler(event)).rejects.toThrow(expectedError);

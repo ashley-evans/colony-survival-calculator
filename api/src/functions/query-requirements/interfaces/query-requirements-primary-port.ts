@@ -11,12 +11,12 @@ type RequiredWorkers = {
 };
 
 interface QueryRequirementsPrimaryPort {
-    (
-        name: string,
-        workers: number,
-        maxAvailableTool?: Tools,
-        creatorOverrides?: CreatorOverride[]
-    ): Promise<RequiredWorkers[]>;
+    (input: {
+        name: string;
+        workers: number;
+        maxAvailableTool?: Tools;
+        creatorOverrides?: CreatorOverride[];
+    }): Promise<RequiredWorkers[]>;
 }
 
 export type { RequiredWorkers, QueryRequirementsPrimaryPort };
