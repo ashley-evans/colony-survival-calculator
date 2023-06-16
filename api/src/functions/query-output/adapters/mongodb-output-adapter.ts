@@ -1,3 +1,4 @@
+import { Filter } from "mongodb";
 import client from "@colony-survival-calculator/mongodb-client";
 
 import type { Item } from "../../../types";
@@ -16,12 +17,17 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryOutputDetails: OutputDatabasePort = async (name) => {
+const queryOutputDetails: OutputDatabasePort = async (name, creator) => {
     const db = (await client).db(databaseName);
-    const collection = db.collection(itemCollectionName);
+    const collection = db.collection<Item>(itemCollectionName);
+
+    const filter: Filter<Item> = {
+        ...(name ? { name } : {}),
+        ...(creator ? { creator } : {}),
+    };
 
     return collection
-        .find<Item>({ name })
+        .find(filter)
         .project<ItemOutputDetails>({
             _id: 0,
             createTime: 1,

@@ -18,6 +18,7 @@ import { Items, Tools } from "../../../../types";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 
 const validItemName = "test item";
+const validCreator = "test item creator";
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
@@ -79,7 +80,7 @@ test("returns an empty array if no items are stored in the items collection", as
 
 test.each([
     [
-        "only relevant item details",
+        "only item details related to provided item name",
         "only one item stored in database",
         [
             createItem({
@@ -99,10 +100,12 @@ test.each([
                 maximumTool: Tools.copper,
             },
         ],
+        validItemName,
+        undefined,
     ],
     [
-        "only relevant item details",
-        "multiple items stored in database",
+        "only item details related to provided item name",
+        "multiple different items stored in database",
         [
             createItem({
                 name: validItemName,
@@ -129,10 +132,12 @@ test.each([
                 maximumTool: Tools.steel,
             },
         ],
+        validItemName,
+        undefined,
     ],
     [
         "nothing",
-        "no relevant items stored in database",
+        "no items stored in database w/ item name",
         [
             createItem({
                 name: "another item",
@@ -148,6 +153,42 @@ test.each([
             }),
         ],
         [],
+        validItemName,
+        undefined,
+    ],
+    [
+        "only item details related to item created by specific creator",
+        "multiple recipes for same item by different creators",
+        [
+            createItem({
+                name: validItemName,
+                createTime: 1,
+                output: 5,
+                requirements: [],
+                creator: validCreator,
+                minimumTool: Tools.stone,
+                maximumTool: Tools.iron,
+            }),
+            createItem({
+                name: validItemName,
+                createTime: 2,
+                output: 4,
+                requirements: [],
+                creator: "another creator",
+                minimumTool: Tools.steel,
+                maximumTool: Tools.steel,
+            }),
+        ],
+        [
+            {
+                createTime: 1,
+                output: 5,
+                minimumTool: Tools.stone,
+                maximumTool: Tools.iron,
+            },
+        ],
+        validItemName,
+        validCreator,
     ],
 ])(
     "returns %s given %s",
@@ -155,14 +196,16 @@ test.each([
         _: string,
         __: string,
         stored: Items,
-        expected: ItemOutputDetails[]
+        expected: ItemOutputDetails[],
+        itemName: string,
+        creator?: string
     ) => {
         await storeItems(stored);
         const { queryOutputDetails } = await import(
             "../mongodb-output-adapter"
         );
 
-        const actual = await queryOutputDetails(validItemName);
+        const actual = await queryOutputDetails(itemName, creator);
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
