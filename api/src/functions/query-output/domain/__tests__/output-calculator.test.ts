@@ -78,7 +78,10 @@ test("calls the database adapter to get the output details for the provided item
     });
 
     expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
-    expect(mockQueryOutputDetails).toHaveBeenCalledWith(validItemName);
+    expect(mockQueryOutputDetails).toHaveBeenCalledWith(
+        validItemName,
+        undefined
+    );
 });
 
 test("throws an error if no item output details are returned from DB", async () => {
@@ -281,4 +284,24 @@ describe("multiple recipe handling", () => {
             })
         ).rejects.toThrow(expectedError);
     });
+});
+
+test("calls database to fetch output details for specific item w/ specific creator if provided", async () => {
+    const expectedCreator = "test creator";
+    const recipes = [createItemOutputDetails(1, 3, Tools.none, Tools.copper)];
+    mockQueryOutputDetails.mockResolvedValue(recipes);
+
+    await calculateOutput({
+        name: validItemName,
+        workers: validWorkers,
+        unit: OutputUnit.MINUTES,
+        maxAvailableTool: Tools.steel,
+        creator: expectedCreator,
+    });
+
+    expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
+    expect(mockQueryOutputDetails).toHaveBeenCalledWith(
+        validItemName,
+        expectedCreator
+    );
 });
