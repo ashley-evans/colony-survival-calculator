@@ -5,6 +5,10 @@ const INVALID_WORKERS_ERROR =
 const UNKNOWN_ITEM_ERROR = "Unknown item provided";
 const TOOL_LEVEL_ERROR_PREFIX =
     "Unable to create item with available tools, minimum tool is:";
+const MULTIPLE_OVERRIDE_ERROR_PREFIX =
+    "Invalid input: More than one creator override provided for:";
+const INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR =
+    "Invalid input, item is not creatable with current overrides";
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
 export {
@@ -12,5 +16,7 @@ export {
     INVALID_WORKERS_ERROR,
     UNKNOWN_ITEM_ERROR,
     TOOL_LEVEL_ERROR_PREFIX,
+    MULTIPLE_OVERRIDE_ERROR_PREFIX,
+    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
     INTERNAL_SERVER_ERROR,
 };

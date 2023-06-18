@@ -763,6 +763,50 @@ describe("multiple recipe handling", () => {
         expect(actual[0]?.workers).toBeCloseTo(7.5);
     });
 
+    test("does not return any required items if the required item was related to a sub optimal recipe", async () => {
+        const moreOptimalRequiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalRequiredItem = createItem({
+            name: "another required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: lessOptimalRequiredItem.name, amount: 4 }],
+            creator: "creator 1",
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 6,
+            requirements: [{ name: moreOptimalRequiredItem.name, amount: 4 }],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            moreOptimalRequiredItem,
+            lessOptimalRequiredItem,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(moreOptimalRequiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(15);
+    });
+
     test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
         const requiredItem = createItem({
             name: "required item",
@@ -799,5 +843,321 @@ describe("multiple recipe handling", () => {
         await expect(
             queryRequirements({ name: validItemName, workers: validWorkers })
         ).rejects.toThrow(expectedError);
+    });
+});
+
+describe("creator override handling", () => {
+    test("overrides more optimal recipe when given applicable item override", async () => {
+        const overrideCreator = "override creator";
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: overrideCreator,
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            creatorOverrides: [
+                { itemName: validItemName, creator: overrideCreator },
+            ],
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(7.5);
+    });
+
+    test("favours less optimal requirement recipe given applicable requirement override", async () => {
+        const requiredItemName = "required item";
+        const overrideCreator = "override creator";
+        const moreOptimalRequirementRecipe = createItem({
+            name: requiredItemName,
+            createTime: 1,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalRequirementRecipe = createItem({
+            name: requiredItemName,
+            createTime: 3,
+            output: 4,
+            requirements: [],
+            creator: overrideCreator,
+        });
+        const recipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItemName, amount: 4 }],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            recipe,
+            moreOptimalRequirementRecipe,
+            lessOptimalRequirementRecipe,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            creatorOverrides: [
+                { itemName: requiredItemName, creator: overrideCreator },
+            ],
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItemName);
+        expect(actual[0]?.workers).toBeCloseTo(15);
+    });
+
+    test("throws an error if provided more than one override for a single item", async () => {
+        const overrideCreator = "override creator";
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const recipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: overrideCreator,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
+        const expectedError = `Invalid input: More than one creator override provided for: ${validItemName}`;
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                name: validItemName,
+                workers: validWorkers,
+                creatorOverrides: [
+                    { itemName: validItemName, creator: overrideCreator },
+                    { itemName: validItemName, creator: "another creator" },
+                ],
+            })
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("ignores any provided override that is irrelevant to calculating requirements", async () => {
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+        });
+        const moreOptimalItemRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            lessOptimalItemRecipe,
+            moreOptimalItemRecipe,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            creatorOverrides: [
+                { itemName: "another item", creator: "another item creator" },
+            ],
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(15);
+    });
+
+    test("does not return any requirement that relates to a recipe that was removed by an override", async () => {
+        const override = "test override creator";
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const overriddenRequirement = createItem({
+            name: "overridden item requirement",
+            createTime: 2,
+            output: 1,
+            requirements: [],
+        });
+        const removedItemRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: overriddenRequirement.name, amount: 4 }],
+        });
+        const usedRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: override,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            usedRecipe,
+            removedItemRecipe,
+            overriddenRequirement,
+            requiredItem,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            creatorOverrides: [{ itemName: validItemName, creator: override }],
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requiredItem.name);
+        expect(actual[0]?.workers).toBeCloseTo(15);
+    });
+
+    test("throws an error if the provided override would result in no recipe being known for a given item (root override)", async () => {
+        const override = "another creator";
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const recipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "test creator",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
+        const expectedError =
+            "Invalid input, item is not creatable with current overrides";
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                name: validItemName,
+                workers: validWorkers,
+                creatorOverrides: [
+                    { itemName: validItemName, creator: override },
+                ],
+            })
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("throws an error if the provided override would result in no recipe being known for a given item (requirement override)", async () => {
+        const override = "another creator";
+        const requiredItem = createItem({
+            name: "required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const recipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [{ name: requiredItem.name, amount: 4 }],
+            creator: "test creator",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
+        const expectedError =
+            "Invalid input, item is not creatable with current overrides";
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                name: validItemName,
+                workers: validWorkers,
+                creatorOverrides: [
+                    { itemName: requiredItem.name, creator: override },
+                ],
+            })
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("does not return any requirement related to optimal but un-creatable recipes if override removes requirement", async () => {
+        const lessOptimalRecipeRequirement = createItem({
+            name: "less optimal item requirement",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const moreOptimalRecipeRequirement = createItem({
+            name: "more optimal required item",
+            createTime: 3,
+            output: 4,
+            requirements: [],
+        });
+        const lessOptimalRecipe = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [
+                { name: lessOptimalRecipeRequirement.name, amount: 4 },
+            ],
+            creator: "creator 1",
+        });
+        const moreOptimalRecipe = createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 3,
+            requirements: [
+                { name: moreOptimalRecipeRequirement.name, amount: 4 },
+            ],
+            creator: "creator 2",
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            moreOptimalRecipe,
+            lessOptimalRecipe,
+            moreOptimalRecipeRequirement,
+            lessOptimalRecipeRequirement,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+            creatorOverrides: [
+                {
+                    itemName: moreOptimalRecipeRequirement.name,
+                    creator: "unknown creator",
+                },
+            ],
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(lessOptimalRecipeRequirement.name);
+        expect(actual[0]?.workers).toBeCloseTo(7.5);
     });
 });

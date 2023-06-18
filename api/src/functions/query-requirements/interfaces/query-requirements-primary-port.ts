@@ -19,4 +19,4 @@ interface QueryRequirementsPrimaryPort {
     }): Promise<RequiredWorkers[]>;
 }
 
-export type { RequiredWorkers, QueryRequirementsPrimaryPort };
+export type { CreatorOverride, RequiredWorkers, QueryRequirementsPrimaryPort };
