@@ -7,13 +7,17 @@ const handler: GraphQLEventHandler<
     QueryRequirementArgs,
     Requirement[]
 > = async (event) => {
-    const { name, workers, maxAvailableTool } = event.arguments;
+    const { name, workers, maxAvailableTool, creatorOverrides } =
+        event.arguments;
 
-    return await queryRequirements(
+    return await queryRequirements({
         name,
         workers,
-        maxAvailableTool ? ToolSchemaMap[maxAvailableTool] : undefined
-    );
+        ...(maxAvailableTool
+            ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
+            : {}),
+        ...(creatorOverrides ? { creatorOverrides } : {}),
+    });
 };
 
 export { handler };
