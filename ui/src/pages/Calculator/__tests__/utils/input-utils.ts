@@ -83,8 +83,16 @@ async function selectTool(tool: Tools) {
     });
 }
 
+async function openTab(name: string) {
+    const user = userEvent.setup();
+    const tab = await screen.findByRole("tab", { name });
+
+    await act(() => user.click(tab));
+}
+
 export {
     openSelectMenu,
+    openTab,
     selectOption,
     selectItemAndWorkers,
     selectOutputUnit,

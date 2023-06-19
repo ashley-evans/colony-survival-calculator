@@ -14,7 +14,7 @@ import {
     expectedItemSelectLabel,
     expectedWorkerInputLabel,
     ItemName,
-    expectedDesiredOutputHeader,
+    expectedCalculatorTabHeader,
     expectedToolSelectLabel,
     openSelectMenu,
     selectOption,
@@ -80,7 +80,7 @@ test("renders desired output header", async () => {
 
     expect(
         await screen.findByRole("heading", {
-            name: expectedDesiredOutputHeader,
+            name: expectedCalculatorTabHeader,
         })
     ).toBeVisible();
 });
@@ -108,7 +108,7 @@ describe("handles item loading", () => {
 
         expect(
             screen.queryByRole("heading", {
-                name: expectedDesiredOutputHeader,
+                name: expectedCalculatorTabHeader,
             })
         ).not.toBeInTheDocument();
     });

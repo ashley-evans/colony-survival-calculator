@@ -6,7 +6,7 @@ import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
 import Requirements from "./components/Requirements";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { CalculatorContainer, CalculatorHeader } from "./styles";
+import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
 import { OutputUnit, Tools } from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
@@ -29,7 +29,7 @@ const GET_ITEM_DETAILS_QUERY = gql(`
     }
 `);
 
-function Calculator() {
+function CalculatorTab() {
     const [workers, setWorkers] = useState<number>();
     const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
@@ -57,9 +57,9 @@ function Calculator() {
 
     if (itemNamesLoading) {
         return (
-            <CalculatorContainer>
+            <PageContainer>
                 <span>Loading items...</span>
-            </CalculatorContainer>
+            </PageContainer>
         );
     }
 
@@ -70,8 +70,8 @@ function Calculator() {
     const networkError = itemNameError || itemDetailsError;
 
     return (
-        <CalculatorContainer>
-            <CalculatorHeader>Desired output:</CalculatorHeader>
+        <>
+            <TabHeader>Desired output:</TabHeader>
             {itemNameData?.distinctItemNames &&
             itemNameData.distinctItemNames.length > 0 ? (
                 <>
@@ -120,7 +120,49 @@ function Calculator() {
                     page and try again.
                 </span>
             ) : null}
-        </CalculatorContainer>
+        </>
+    );
+}
+
+function SettingsTab() {
+    return <TabHeader>Overrides:</TabHeader>;
+}
+
+enum PageTabs {
+    CALCULATOR = "calculator",
+    SETTINGS = "settings",
+}
+
+function Calculator() {
+    const [selectedTab, setSelectedTab] = useState<PageTabs>(
+        PageTabs.CALCULATOR
+    );
+
+    return (
+        <PageContainer>
+            <Tabs role="tablist">
+                <button
+                    role="tab"
+                    aria-selected={selectedTab === PageTabs.CALCULATOR}
+                    tabIndex={selectedTab === PageTabs.CALCULATOR ? 0 : -1}
+                    onClick={() => setSelectedTab(PageTabs.CALCULATOR)}
+                >
+                    Calculator
+                </button>
+                <button
+                    role="tab"
+                    aria-selected={selectedTab === PageTabs.SETTINGS}
+                    tabIndex={selectedTab === PageTabs.SETTINGS ? 0 : -1}
+                    onClick={() => setSelectedTab(PageTabs.SETTINGS)}
+                >
+                    Settings
+                </button>
+            </Tabs>
+            <TabContainer role="tabpanel">
+                {selectedTab === PageTabs.CALCULATOR ? <CalculatorTab /> : null}
+                {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}
+            </TabContainer>
+        </PageContainer>
     );
 }
 
