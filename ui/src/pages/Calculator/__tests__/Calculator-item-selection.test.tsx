@@ -18,6 +18,10 @@ import {
     expectedToolSelectLabel,
     openSelectMenu,
     selectOption,
+    openTab,
+    expectedSettingsTab,
+    expectedSettingsTabHeader,
+    expectedCalculatorTab,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 
@@ -237,12 +241,17 @@ test("renders each item name returned as an option in the combo box", async () =
 });
 
 test("renders the first option in the item name list as selected by default", async () => {
+    const expected = items[0].name;
+
     render(<Calculator />);
     await openSelectMenu({ selectLabel: expectedItemSelectLabel });
 
     expect(
-        await screen.findByRole("option", {
-            name: items[0].name,
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
             selected: true,
         })
     ).toBeVisible();
@@ -263,6 +272,27 @@ test("requests item details on the first option in the item name list without se
     expect(matchedRequestDetails.variables).toEqual({
         filters: { name: items[0].name, optimal: { maxAvailableTool: "NONE" } },
     });
+});
+
+test("updates the selected option if selected is changed", async () => {
+    const expected = items[1].name;
+
+    render(<Calculator />);
+    await selectOption({
+        selectLabel: expectedItemSelectLabel,
+        optionName: expected,
+    });
+    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
+            selected: true,
+        })
+    ).toBeVisible();
 });
 
 test("requests item details for newly selected item if selection is changed", async () => {
@@ -293,6 +323,26 @@ test("requests item details for newly selected item if selection is changed", as
             optimal: { maxAvailableTool: "NONE" },
         },
     });
+});
+
+test("does not reset the currently selected item after changing tabs", async () => {
+    const expected = items[1].name;
+
+    render(<Calculator />);
+    await selectOption({
+        selectLabel: expectedItemSelectLabel,
+        optionName: expected,
+    });
+    await openTab(expectedSettingsTab);
+    await screen.findByRole("heading", {
+        name: expectedSettingsTabHeader,
+        level: 2,
+    });
+    await openTab(expectedCalculatorTab);
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+    ).toHaveTextContent(expected);
 });
 
 describe("item name request error handling", () => {

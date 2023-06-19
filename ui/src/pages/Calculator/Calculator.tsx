@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 
 import ItemSelector from "./components/ItemSelector";
@@ -29,7 +29,12 @@ const GET_ITEM_DETAILS_QUERY = gql(`
     }
 `);
 
-function CalculatorTab() {
+type CalculatorTabProps = {
+    selectedItem: string | undefined;
+    onItemChange: (item: string) => void;
+};
+
+function CalculatorTab({ selectedItem, onItemChange }: CalculatorTabProps) {
     const [workers, setWorkers] = useState<number>();
     const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
@@ -41,7 +46,6 @@ function CalculatorTab() {
         data: itemNameData,
         error: itemNameError,
     } = useQuery(GET_ITEM_NAMES_QUERY);
-    const [selectedItem, setSelectedItem] = useState<string>();
     const { data: itemDetailsData, error: itemDetailsError } = useQuery(
         GET_ITEM_DETAILS_QUERY,
         {
@@ -55,16 +59,18 @@ function CalculatorTab() {
         }
     );
 
+    useEffect(() => {
+        if (!selectedItem && itemNameData?.distinctItemNames[0]) {
+            onItemChange(itemNameData.distinctItemNames[0]);
+        }
+    }, [selectedItem, itemNameData]);
+
     if (itemNamesLoading) {
         return (
             <PageContainer>
                 <span>Loading items...</span>
             </PageContainer>
         );
-    }
-
-    if (!selectedItem && itemNameData?.distinctItemNames[0]) {
-        setSelectedItem(itemNameData.distinctItemNames[0]);
     }
 
     const networkError = itemNameError || itemDetailsError;
@@ -77,7 +83,8 @@ function CalculatorTab() {
                 <>
                     <ItemSelector
                         items={itemNameData.distinctItemNames}
-                        onItemChange={setSelectedItem}
+                        onItemChange={onItemChange}
+                        defaultSelectedItem={selectedItem}
                     />
                     <WorkerInput onWorkerChange={setWorkers} />
                     <ToolSelector onToolChange={setSelectedTool} />
@@ -138,6 +145,8 @@ function Calculator() {
         PageTabs.CALCULATOR
     );
 
+    const [selectedItem, setSelectedItem] = useState<string>();
+
     return (
         <PageContainer>
             <Tabs role="tablist">
@@ -159,7 +168,12 @@ function Calculator() {
                 </button>
             </Tabs>
             <TabContainer role="tabpanel">
-                {selectedTab === PageTabs.CALCULATOR ? <CalculatorTab /> : null}
+                {selectedTab === PageTabs.CALCULATOR ? (
+                    <CalculatorTab
+                        selectedItem={selectedItem}
+                        onItemChange={setSelectedItem}
+                    />
+                ) : null}
                 {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}
             </TabContainer>
         </PageContainer>
