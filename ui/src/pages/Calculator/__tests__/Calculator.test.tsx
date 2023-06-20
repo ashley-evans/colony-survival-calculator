@@ -284,6 +284,25 @@ describe("worker input rendering", () => {
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
+
+    test("does not reset worker input after tab is changed", async () => {
+        const expectedWorkerValue = "24";
+
+        render(<Calculator />);
+        await selectItemAndWorkers({ workers: expectedWorkerValue });
+        await openTab(expectedSettingsTab);
+        await screen.findByRole("heading", {
+            name: expectedSettingsTabHeader,
+            level: 2,
+        });
+        await openTab(expectedCalculatorTab);
+
+        expect(
+            await screen.findByLabelText(expectedWorkerInputLabel, {
+                selector: "input",
+            })
+        ).toHaveValue(expectedWorkerValue);
+    });
 });
 
 describe("optimal farm size note rendering", () => {

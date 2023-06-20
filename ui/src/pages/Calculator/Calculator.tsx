@@ -29,13 +29,17 @@ const GET_ITEM_DETAILS_QUERY = gql(`
     }
 `);
 
+type StateProp<S> = ReturnType<typeof useState<S>>;
+
 type CalculatorTabProps = {
-    selectedItem: string | undefined;
-    onItemChange: (item: string) => void;
+    selectedItem: StateProp<string>;
+    workers: StateProp<number>;
 };
 
-function CalculatorTab({ selectedItem, onItemChange }: CalculatorTabProps) {
-    const [workers, setWorkers] = useState<number>();
+function CalculatorTab({
+    selectedItem: [selectedItem, setSelectedItem],
+    workers: [workers, setWorkers],
+}: CalculatorTabProps) {
     const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
         OutputUnit.Minutes
@@ -61,7 +65,7 @@ function CalculatorTab({ selectedItem, onItemChange }: CalculatorTabProps) {
 
     useEffect(() => {
         if (!selectedItem && itemNameData?.distinctItemNames[0]) {
-            onItemChange(itemNameData.distinctItemNames[0]);
+            setSelectedItem(itemNameData.distinctItemNames[0]);
         }
     }, [selectedItem, itemNameData]);
 
@@ -83,10 +87,13 @@ function CalculatorTab({ selectedItem, onItemChange }: CalculatorTabProps) {
                 <>
                     <ItemSelector
                         items={itemNameData.distinctItemNames}
-                        onItemChange={onItemChange}
+                        onItemChange={setSelectedItem}
                         defaultSelectedItem={selectedItem}
                     />
-                    <WorkerInput onWorkerChange={setWorkers} />
+                    <WorkerInput
+                        onWorkerChange={setWorkers}
+                        defaultWorkers={workers}
+                    />
                     <ToolSelector onToolChange={setSelectedTool} />
                     <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
                 </>
@@ -145,7 +152,8 @@ function Calculator() {
         PageTabs.CALCULATOR
     );
 
-    const [selectedItem, setSelectedItem] = useState<string>();
+    const selectedItemState = useState<string>();
+    const workersState = useState<number>();
 
     return (
         <PageContainer>
@@ -170,8 +178,8 @@ function Calculator() {
             <TabContainer role="tabpanel">
                 {selectedTab === PageTabs.CALCULATOR ? (
                     <CalculatorTab
-                        selectedItem={selectedItem}
-                        onItemChange={setSelectedItem}
+                        selectedItem={selectedItemState}
+                        workers={workersState}
                     />
                 ) : null}
                 {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}

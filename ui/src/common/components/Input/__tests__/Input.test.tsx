@@ -306,3 +306,22 @@ test("provides undefined to change handler if input is cleared", async () => {
 
     expect(mockOnChangeHandler).toHaveBeenLastCalledWith(undefined);
 });
+
+test("sets the provided value as default if specified", async () => {
+    const expectedDefault = "123";
+
+    render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+            defaultValue={expectedDefault}
+        />
+    );
+
+    expect(
+        await screen.findByLabelText(expectedLabelText, {
+            selector: "input",
+        })
+    ).toHaveValue(expectedDefault);
+});
