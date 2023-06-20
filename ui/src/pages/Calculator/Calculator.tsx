@@ -29,18 +29,19 @@ const GET_ITEM_DETAILS_QUERY = gql(`
     }
 `);
 
-type StateProp<S> = ReturnType<typeof useState<S>>;
+type StateProp<S> = [S, (value: S) => void];
 
 type CalculatorTabProps = {
-    selectedItem: StateProp<string>;
-    workers: StateProp<number>;
+    selectedItem: StateProp<string | undefined>;
+    workers: StateProp<number | undefined>;
+    selectedTool: StateProp<Tools>;
 };
 
 function CalculatorTab({
     selectedItem: [selectedItem, setSelectedItem],
     workers: [workers, setWorkers],
+    selectedTool: [selectedTool, setSelectedTool],
 }: CalculatorTabProps) {
-    const [selectedTool, setSelectedTool] = useState<Tools>(Tools.None);
     const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
         OutputUnit.Minutes
     );
@@ -94,7 +95,10 @@ function CalculatorTab({
                         onWorkerChange={setWorkers}
                         defaultWorkers={workers}
                     />
-                    <ToolSelector onToolChange={setSelectedTool} />
+                    <ToolSelector
+                        onToolChange={setSelectedTool}
+                        defaultTool={selectedTool}
+                    />
                     <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
                 </>
             ) : null}
@@ -154,6 +158,7 @@ function Calculator() {
 
     const selectedItemState = useState<string>();
     const workersState = useState<number>();
+    const selectedToolState = useState<Tools>(Tools.None);
 
     return (
         <PageContainer>
@@ -180,6 +185,7 @@ function Calculator() {
                     <CalculatorTab
                         selectedItem={selectedItemState}
                         workers={workersState}
+                        selectedTool={selectedToolState}
                     />
                 ) : null}
                 {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}
