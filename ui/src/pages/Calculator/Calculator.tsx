@@ -35,17 +35,15 @@ type CalculatorTabProps = {
     selectedItem: StateProp<string | undefined>;
     workers: StateProp<number | undefined>;
     selectedTool: StateProp<Tools>;
+    selectedOutputUnit: StateProp<OutputUnit>;
 };
 
 function CalculatorTab({
     selectedItem: [selectedItem, setSelectedItem],
     workers: [workers, setWorkers],
     selectedTool: [selectedTool, setSelectedTool],
+    selectedOutputUnit: [selectedOutputUnit, setSelectedOutputUnit],
 }: CalculatorTabProps) {
-    const [selectedOutputUnit, setSelectedOutputUnit] = useState<OutputUnit>(
-        OutputUnit.Minutes
-    );
-
     const {
         loading: itemNamesLoading,
         data: itemNameData,
@@ -99,7 +97,10 @@ function CalculatorTab({
                         onToolChange={setSelectedTool}
                         defaultTool={selectedTool}
                     />
-                    <OutputUnitSelector onUnitChange={setSelectedOutputUnit} />
+                    <OutputUnitSelector
+                        onUnitChange={setSelectedOutputUnit}
+                        defaultUnit={selectedOutputUnit}
+                    />
                 </>
             ) : null}
             <ErrorBoundary>
@@ -159,6 +160,7 @@ function Calculator() {
     const selectedItemState = useState<string>();
     const workersState = useState<number>();
     const selectedToolState = useState<Tools>(Tools.None);
+    const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
 
     return (
         <PageContainer>
@@ -186,6 +188,7 @@ function Calculator() {
                         selectedItem={selectedItemState}
                         workers={workersState}
                         selectedTool={selectedToolState}
+                        selectedOutputUnit={selectedOutputUnitState}
                     />
                 ) : null}
                 {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}

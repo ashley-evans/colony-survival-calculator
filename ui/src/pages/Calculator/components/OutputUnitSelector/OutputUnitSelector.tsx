@@ -6,11 +6,12 @@ import { Selector } from "../../../../common/components";
 
 type ItemSelectorProps = {
     onUnitChange: (unit: OutputUnit) => void;
+    defaultUnit?: OutputUnit;
 };
 
 const outputUnits = Object.values(OutputUnit);
 
-function OutputUnitSelector({ onUnitChange }: ItemSelectorProps) {
+function OutputUnitSelector({ onUnitChange, defaultUnit }: ItemSelectorProps) {
     const handleUnitChange = (selectedUnit?: OutputUnit) => {
         if (selectedUnit) onUnitChange(selectedUnit);
     };
@@ -21,7 +22,7 @@ function OutputUnitSelector({ onUnitChange }: ItemSelectorProps) {
             itemToKey={(unit) => unit}
             itemToDisplayText={(unit) => OutputUnitSelectorMappings[unit]}
             labelText="Desired output units:"
-            defaultSelectedItem={outputUnits[1]}
+            defaultSelectedItem={defaultUnit ?? outputUnits[1]}
             onSelectedItemChange={handleUnitChange}
             palette="secondary"
         />

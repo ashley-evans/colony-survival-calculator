@@ -11,13 +11,17 @@ import {
 import { waitForRequest } from "../../../helpers/utils";
 import {
     ItemName,
+    expectedCalculatorTab,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedOutputPrefix,
     expectedOutputQueryName,
     expectedOutputUnitLabel,
     expectedRequirementsQueryName,
+    expectedSettingsTab,
+    expectedSettingsTabHeader,
     openSelectMenu,
+    openTab,
     selectItemAndWorkers,
     selectOutputUnit,
 } from "./utils";
@@ -68,15 +72,55 @@ test.each(["Minutes", "Game days"])(
 );
 
 test("selects the Minutes option by default", async () => {
+    const expected = "Minutes";
+
     render(<Calculator />, expectedGraphQLAPIURL);
     await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
 
     expect(
-        await screen.findByRole("option", {
-            name: "Minutes",
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
             selected: true,
         })
-    ).toBeInTheDocument();
+    ).toBeVisible();
+});
+
+test("updates the selected output unit if selected is changed", async () => {
+    const expected = "Game days";
+
+    render(<Calculator />);
+    await selectOutputUnit(OutputUnit.GameDays);
+    await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
+            selected: true,
+        })
+    ).toBeVisible();
+});
+
+test("does not reset the currently selected output unit after changing tabs", async () => {
+    const expected = "Game days";
+
+    render(<Calculator />);
+    await selectOutputUnit(OutputUnit.GameDays);
+    await openTab(expectedSettingsTab);
+    await screen.findByRole("heading", {
+        name: expectedSettingsTabHeader,
+        level: 2,
+    });
+    await openTab(expectedCalculatorTab);
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
 });
 
 test("queries optimal output if item and workers inputted with default unit selected", async () => {
