@@ -22,6 +22,7 @@ import { CreatorOverride } from "../../../graphql/__generated__/graphql";
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedLoadingMessage = "Loading overrides...";
 const expectedNoOverridesMessage = "No overrides available";
+const expectedAddButtonText = "Add creator override";
 
 const items: ItemName[] = [
     { name: "Item 1" },
@@ -141,6 +142,14 @@ describe("handles creator override list loading", () => {
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
+
+    test("does not render an add creator override button", async () => {
+        await renderSettingsTab();
+
+        expect(
+            screen.queryByRole("button", { name: expectedAddButtonText })
+        ).not.toBeInTheDocument();
+    });
 });
 
 describe("given no creator overrides returned", () => {
@@ -172,6 +181,15 @@ describe("given no creator overrides returned", () => {
             screen.queryByText(expectedLoadingMessage)
         ).not.toBeInTheDocument();
     });
+
+    test("does not render an add creator override button", async () => {
+        await renderSettingsTab();
+        await screen.findByRole("alert");
+
+        expect(
+            screen.queryByRole("button", { name: expectedAddButtonText })
+        ).not.toBeInTheDocument();
+    });
 });
 
 describe("given creator overrides returned", async () => {
@@ -179,6 +197,14 @@ describe("given creator overrides returned", async () => {
         await renderSettingsTab();
 
         expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+
+    test("renders an add creator override button", async () => {
+        await renderSettingsTab();
+
+        expect(
+            await screen.findByRole("button", { name: expectedAddButtonText })
+        ).toBeVisible();
     });
 });
 

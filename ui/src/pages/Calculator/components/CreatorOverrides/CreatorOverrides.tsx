@@ -1,7 +1,9 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
+import { faAdd } from "@fortawesome/free-solid-svg-icons";
 
 import { gql } from "../../../../graphql/__generated__";
+import { AddIcon, LargeAddButton, OverrideListContainer } from "./styles";
 
 const GET_ITEMS_WITH_MULTIPLE_CREATORS = gql(`
     query GetMultipleCreatorDetails {
@@ -24,6 +26,14 @@ function CreatorOverrides() {
             {loading ? <span>Loading overrides...</span> : null}
             {!loading && data?.item.length === 0 ? (
                 <span role="alert">No overrides available</span>
+            ) : null}
+            {data && data.item.length > 0 ? (
+                <OverrideListContainer>
+                    <LargeAddButton>
+                        <span>Add creator override</span>
+                        <AddIcon icon={faAdd} />
+                    </LargeAddButton>
+                </OverrideListContainer>
             ) : null}
         </>
     );
