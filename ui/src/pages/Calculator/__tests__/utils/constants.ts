@@ -2,6 +2,7 @@ export const expectedRequirementsQueryName = "GetItemRequirements";
 export const expectedOutputQueryName = "GetOptimalOutput";
 export const expectedItemNameQueryName = "GetItemNames";
 export const expectedItemDetailsQueryName = "GetItemDetails";
+export const expectedCreatorOverrideQueryName = "GetMultipleCreatorDetails";
 
 export const expectedCalculatorTabHeader = "Desired output:";
 export const expectedItemSelectLabel = "Item:";

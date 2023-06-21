@@ -100,7 +100,7 @@ describe("handles item loading", () => {
         );
     });
 
-    test("renders a loading message...", async () => {
+    test("renders a loading message", async () => {
         render(<Calculator />);
 
         expect(await screen.findByText(expectedMessage)).toBeVisible();

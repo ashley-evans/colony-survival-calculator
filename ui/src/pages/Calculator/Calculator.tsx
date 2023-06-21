@@ -11,6 +11,7 @@ import { OutputUnit, Tools } from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
 import ToolSelector from "./components/ToolSelector";
+import CreatorOverrides from "./components/CreatorOverrides";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -144,7 +145,12 @@ function CalculatorTab({
 }
 
 function SettingsTab() {
-    return <TabHeader>Overrides:</TabHeader>;
+    return (
+        <>
+            <TabHeader>Overrides:</TabHeader>
+            <CreatorOverrides />
+        </>
+    );
 }
 
 enum PageTabs {
