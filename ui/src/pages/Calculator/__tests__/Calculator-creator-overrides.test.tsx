@@ -11,10 +11,12 @@ import {
     expectedOutputQueryName,
     expectedItemNameQueryName,
     ItemName,
-    openTab,
+    clickByName,
     expectedSettingsTab,
     expectedSettingsTabHeader,
     expectedCreatorOverrideQueryName,
+    expectedAddCreatorOverrideButtonText,
+    openSelectMenu,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import { CreatorOverride } from "../../../graphql/__generated__/graphql";
@@ -22,7 +24,6 @@ import { CreatorOverride } from "../../../graphql/__generated__/graphql";
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedLoadingMessage = "Loading overrides...";
 const expectedNoOverridesMessage = "No overrides available";
-const expectedAddButtonText = "Add creator override";
 
 const items: ItemName[] = [
     { name: "Item 1" },
@@ -30,12 +31,25 @@ const items: ItemName[] = [
     { name: "Item 3" },
 ];
 const expectedCreatorOverrides: CreatorOverride[] = [
-    { itemName: items[0].name, creator: "Creator 1" },
-    { itemName: items[0].name, creator: "Creator 2" },
-    { itemName: items[2].name, creator: "Creator 3" },
-    { itemName: items[2].name, creator: "Creator 4" },
-    { itemName: items[2].name, creator: "Creator 5" },
+    ...generateItemCreatorOverrides(items[0].name, 2),
+    ...generateItemCreatorOverrides(items[2].name, 3, 2),
 ];
+
+function generateItemCreatorOverrides(
+    name: string,
+    amount: number,
+    creatorOffset = 0
+): CreatorOverride[] {
+    const overrides: CreatorOverride[] = [];
+    for (let i = 0; i < amount; i++) {
+        overrides.push({
+            itemName: name,
+            creator: `${name} creator - ${i + 1 + creatorOffset}`,
+        });
+    }
+
+    return overrides;
+}
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
@@ -93,7 +107,7 @@ beforeEach(() => {
 
 async function renderSettingsTab(apiURL = expectedGraphQLAPIURL) {
     render(<Calculator />, apiURL);
-    await openTab(expectedSettingsTab);
+    await clickByName(expectedSettingsTab, "tab");
     await screen.findByRole("heading", {
         name: expectedSettingsTabHeader,
         level: 2,
@@ -147,7 +161,9 @@ describe("handles creator override list loading", () => {
         await renderSettingsTab();
 
         expect(
-            screen.queryByRole("button", { name: expectedAddButtonText })
+            screen.queryByRole("button", {
+                name: expectedAddCreatorOverrideButtonText,
+            })
         ).not.toBeInTheDocument();
     });
 });
@@ -187,12 +203,14 @@ describe("given no creator overrides returned", () => {
         await screen.findByRole("alert");
 
         expect(
-            screen.queryByRole("button", { name: expectedAddButtonText })
+            screen.queryByRole("button", {
+                name: expectedAddCreatorOverrideButtonText,
+            })
         ).not.toBeInTheDocument();
     });
 });
 
-describe("given creator overrides returned", async () => {
+describe("given items w/ multiple creators returned", () => {
     test("does not render any errors", async () => {
         await renderSettingsTab();
 
@@ -203,8 +221,160 @@ describe("given creator overrides returned", async () => {
         await renderSettingsTab();
 
         expect(
-            await screen.findByRole("button", { name: expectedAddButtonText })
+            await screen.findByRole("button", {
+                name: expectedAddCreatorOverrideButtonText,
+            })
         ).toBeVisible();
+    });
+
+    test("does not render any item override selectors by default", async () => {
+        await renderSettingsTab();
+        await screen.findByRole("button", {
+            name: expectedAddCreatorOverrideButtonText,
+        });
+
+        expect(screen.queryAllByRole("combobox")).toHaveLength(0);
+    });
+
+    describe("one item w/ multiple creator returned", () => {
+        const expectedItemSelectOverrideLabel = "Item:";
+        const expectedCreatorSelectOverrideLabel = "Creator:";
+        const expectedItemName = "Test item";
+        const expectedOverrides = generateItemCreatorOverrides(
+            expectedItemName,
+            2
+        );
+
+        beforeEach(() => {
+            server.use(
+                graphql.query(
+                    expectedCreatorOverrideQueryName,
+                    (_, res, ctx) => {
+                        return res(
+                            ctx.data({
+                                item: expectedOverrides.map(
+                                    ({ itemName, creator }) => ({
+                                        name: itemName,
+                                        creator,
+                                    })
+                                ),
+                            })
+                        );
+                    }
+                )
+            );
+        });
+
+        test("renders a select to allow the item to override to be selected", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedItemSelectOverrideLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("renders the item's name as the selected and only item in the item override select", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await openSelectMenu({
+                selectLabel: expectedItemSelectOverrideLabel,
+            });
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedItemSelectOverrideLabel,
+                })
+            ).toHaveTextContent(expectedItemName);
+            expect(screen.getAllByRole("option")).toHaveLength(1);
+            expect(
+                screen.getByRole("option", {
+                    name: expectedItemName,
+                    selected: true,
+                })
+            ).toBeVisible();
+        });
+
+        test("renders a select to allow the item to override to be selected", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedItemSelectOverrideLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("renders the item's name as the selected and only item in the item override select", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await openSelectMenu({
+                selectLabel: expectedItemSelectOverrideLabel,
+            });
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedItemSelectOverrideLabel,
+                })
+            ).toHaveTextContent(expectedItemName);
+            expect(screen.getAllByRole("option")).toHaveLength(1);
+            expect(
+                screen.getByRole("option", {
+                    name: expectedItemName,
+                    selected: true,
+                })
+            ).toBeVisible();
+        });
+
+        test("renders a select to allow a specific creator to be selected", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedCreatorSelectOverrideLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("renders each creator returned for item as an option in the creator select", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await openSelectMenu({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+            });
+
+            for (const { creator } of expectedOverrides) {
+                expect(
+                    await screen.findByRole("option", { name: creator })
+                ).toBeVisible();
+            }
+        });
+
+        test("renders the first creator returned as the default selected option", async () => {
+            const expectedDefaultCreator = expectedOverrides[0].creator;
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await openSelectMenu({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+            });
+
+            expect(
+                await screen.findByRole("combobox", {
+                    name: expectedCreatorSelectOverrideLabel,
+                })
+            ).toHaveTextContent(expectedOverrides[0].creator);
+            expect(
+                screen.getByRole("option", {
+                    name: expectedDefaultCreator,
+                    selected: true,
+                })
+            ).toBeVisible();
+        });
     });
 });
 

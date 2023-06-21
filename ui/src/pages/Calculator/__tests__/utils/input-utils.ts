@@ -1,4 +1,4 @@
-import { act, screen } from "@testing-library/react";
+import { ByRoleMatcher, act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import {
@@ -83,16 +83,16 @@ async function selectTool(tool: Tools) {
     });
 }
 
-async function openTab(name: string) {
+async function clickByName(name: string, matcher: ByRoleMatcher) {
     const user = userEvent.setup();
-    const tab = await screen.findByRole("tab", { name });
+    const tab = await screen.findByRole(matcher, { name });
 
     await act(() => user.click(tab));
 }
 
 export {
+    clickByName,
     openSelectMenu,
-    openTab,
     selectOption,
     selectItemAndWorkers,
     selectOutputUnit,

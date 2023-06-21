@@ -18,8 +18,9 @@ import {
     expectedCalculatorTab,
     expectedSettingsTab,
     expectedCalculatorTabHeader,
-    openTab,
+    clickByName,
     expectedSettingsTabHeader,
+    expectedCreatorOverrideQueryName,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 
@@ -50,6 +51,13 @@ const server = setupServer(
     }),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: 5.2 }));
+    }),
+    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
+        return res(
+            ctx.data({
+                item: [],
+            })
+        );
     })
 );
 
@@ -119,7 +127,7 @@ describe("tab rendering", async () => {
 
     test("sets the settings tab to selected if clicked", async () => {
         render(<Calculator />);
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
 
         const settingsTab = await screen.findByRole("tab", {
             name: expectedSettingsTab,
@@ -132,12 +140,12 @@ describe("tab rendering", async () => {
     test("sets the calculator tab back to selected if re-opened", async () => {
         render(<Calculator />);
         const tablist = await screen.findByRole("tablist");
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
         await within(tablist).findByRole("tab", {
             name: expectedSettingsTab,
             selected: true,
         });
-        await openTab(expectedCalculatorTab);
+        await clickByName(expectedCalculatorTab, "tab");
 
         const calculatorTab = await within(tablist).findByRole("tab", {
             name: expectedCalculatorTab,
@@ -149,7 +157,7 @@ describe("tab rendering", async () => {
 
     test("renders the settings tab content inside a tab panel if settings tab is selected", async () => {
         render(<Calculator />);
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
         const panel = await screen.findByRole("tabpanel");
 
         expect(
@@ -178,13 +186,13 @@ describe("tab rendering", async () => {
 
     test("hides the settings tab if the calculator tab is re-opened", async () => {
         render(<Calculator />);
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
         const panel = await screen.findByRole("tabpanel");
         await within(panel).findByRole("heading", {
             level: 2,
             name: expectedSettingsTabHeader,
         });
-        await openTab(expectedCalculatorTab);
+        await clickByName(expectedCalculatorTab, "tab");
 
         expect(
             within(panel).queryByRole("heading", {
@@ -196,7 +204,7 @@ describe("tab rendering", async () => {
 
     test("hides the calculator tab if the settings tab is opened", async () => {
         render(<Calculator />);
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
         const panel = await screen.findByRole("tabpanel");
         await within(panel).findByRole("heading", {
             level: 2,
@@ -290,12 +298,12 @@ describe("worker input rendering", () => {
 
         render(<Calculator />);
         await selectItemAndWorkers({ workers: expectedWorkerValue });
-        await openTab(expectedSettingsTab);
+        await clickByName(expectedSettingsTab, "tab");
         await screen.findByRole("heading", {
             name: expectedSettingsTabHeader,
             level: 2,
         });
-        await openTab(expectedCalculatorTab);
+        await clickByName(expectedCalculatorTab, "tab");
 
         expect(
             await screen.findByLabelText(expectedWorkerInputLabel, {

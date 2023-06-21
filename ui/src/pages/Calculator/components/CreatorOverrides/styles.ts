@@ -31,3 +31,12 @@ export const LargeAddButton = styled.button`
 export const AddIcon = styled(FontAwesomeIcon)`
     margin-left: 0.5rem;
 `;
+
+export const OverrideContainer = styled.div`
+    display: flex;
+    column-gap: 0.5rem;
+
+    div {
+        flex: 1;
+    }
+`;

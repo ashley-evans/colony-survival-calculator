@@ -16,3 +16,4 @@ export const expectedCalculatorTab = "Calculator";
 export const expectedSettingsTab = "Settings";
 
 export const expectedSettingsTabHeader = "Overrides:";
+export const expectedAddCreatorOverrideButtonText = "Add creator override";

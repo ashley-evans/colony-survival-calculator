@@ -14,9 +14,10 @@ import {
     expectedSettingsTabHeader,
     expectedToolSelectLabel,
     openSelectMenu,
-    openTab,
+    clickByName,
     selectItemAndWorkers,
     selectTool,
+    expectedCreatorOverrideQueryName,
 } from "./utils";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import Calculator from "../Calculator";
@@ -38,6 +39,13 @@ const server = setupServer(
     }),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: 5.2 }));
+    }),
+    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
+        return res(
+            ctx.data({
+                item: [],
+            })
+        );
     })
 );
 
@@ -262,12 +270,12 @@ test("does not reset the currently selected tool after changing tabs", async () 
 
     render(<Calculator />);
     await selectTool(Tools.Iron);
-    await openTab(expectedSettingsTab);
+    await clickByName(expectedSettingsTab, "tab");
     await screen.findByRole("heading", {
         name: expectedSettingsTabHeader,
         level: 2,
     });
-    await openTab(expectedCalculatorTab);
+    await clickByName(expectedCalculatorTab, "tab");
 
     expect(
         await screen.findByRole("combobox", { name: expectedToolSelectLabel })

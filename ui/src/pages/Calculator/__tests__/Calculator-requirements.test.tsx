@@ -25,6 +25,7 @@ import {
     ItemName,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
+    expectedCreatorOverrideQueryName,
 } from "./utils";
 import Requirements from "../components/Requirements";
 
@@ -70,6 +71,13 @@ const server = setupServer(
     }),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: expectedOutput }));
+    }),
+    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
+        return res(
+            ctx.data({
+                item: [],
+            })
+        );
     })
 );
 
