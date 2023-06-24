@@ -17,3 +17,4 @@ export const expectedSettingsTab = "Settings";
 
 export const expectedSettingsTabHeader = "Overrides:";
 export const expectedAddCreatorOverrideButtonText = "Add creator override";
+export const expectedRemoveCreatorOverrideButtonText = "Remove";

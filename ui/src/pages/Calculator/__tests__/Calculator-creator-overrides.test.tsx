@@ -17,6 +17,7 @@ import {
     expectedCreatorOverrideQueryName,
     expectedAddCreatorOverrideButtonText,
     openSelectMenu,
+    expectedRemoveCreatorOverrideButtonText,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import { CreatorOverride } from "../../../graphql/__generated__/graphql";
@@ -374,6 +375,70 @@ describe("given items w/ multiple creators returned", () => {
                     selected: true,
                 })
             ).toBeVisible();
+        });
+
+        test("removes the add creator override button once override is added", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await screen.findByRole("combobox", {
+                name: expectedCreatorSelectOverrideLabel,
+            });
+
+            expect(
+                screen.queryByRole("button", {
+                    name: expectedAddCreatorOverrideButtonText,
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        test("displays a remove creator override button once an override is added", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+
+            expect(
+                await screen.findByRole("button", {
+                    name: expectedRemoveCreatorOverrideButtonText,
+                })
+            ).toBeVisible();
+        });
+
+        test("re-displays the add creator override if the added override is removed", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await screen.findByRole("combobox", {
+                name: expectedCreatorSelectOverrideLabel,
+            });
+            await clickByName(
+                expectedRemoveCreatorOverrideButtonText,
+                "button"
+            );
+
+            expect(
+                await screen.findByRole("button", {
+                    name: expectedAddCreatorOverrideButtonText,
+                })
+            ).toBeVisible();
+        });
+
+        test("removes the creator override if the remove button is pressed", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await screen.findByRole("combobox", {
+                name: expectedCreatorSelectOverrideLabel,
+            });
+            await clickByName(
+                expectedRemoveCreatorOverrideButtonText,
+                "button"
+            );
+            await screen.findByRole("button", {
+                name: expectedAddCreatorOverrideButtonText,
+            });
+
+            expect(
+                screen.queryByRole("combobox", {
+                    name: expectedCreatorSelectOverrideLabel,
+                })
+            ).not.toBeInTheDocument();
         });
     });
 });
