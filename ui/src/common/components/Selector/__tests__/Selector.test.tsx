@@ -4,7 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import Selector from "..";
-import { renderWithTestProviders as render } from "../../../../test/utils";
+import {
+    renderWithTestProviders as render,
+    wrapWithTestProviders,
+} from "../../../../test/utils";
 
 type Item = { name: string };
 
@@ -43,7 +46,7 @@ async function clickOption(option: string): Promise<void> {
 const items: Item[] = [createItem("test item 1"), createItem("test item 2")];
 const expectedLabelText = "Label text:";
 
-it("renders a select with the provided label text", async () => {
+test("renders a select with the provided label text", async () => {
     render(
         <Selector
             items={items}
@@ -59,7 +62,7 @@ it("renders a select with the provided label text", async () => {
     ).toBeVisible();
 });
 
-it("does not render any options by default", async () => {
+test("does not render any options by default", async () => {
     render(
         <Selector
             items={items}
@@ -78,7 +81,7 @@ it("does not render any options by default", async () => {
     }
 });
 
-it("shows the provided default value as the default shown item", async () => {
+test("shows the provided default value as the default shown item", async () => {
     const expectedDefaultItem = items[0];
 
     render(
@@ -96,7 +99,7 @@ it("shows the provided default value as the default shown item", async () => {
     ).toHaveTextContent(expectedDefaultItem.name);
 });
 
-it("show each item provided as an option in the select when clicked", async () => {
+test("show each item provided as an option in the select when clicked", async () => {
     render(
         <Selector
             items={items}
@@ -115,7 +118,7 @@ it("show each item provided as an option in the select when clicked", async () =
     }
 });
 
-it("shows the provided default item as selected in the option list by default", async () => {
+test("shows the provided default item as selected in the option list by default", async () => {
     const expectedDefaultItem = items[0];
 
     render(
@@ -137,7 +140,7 @@ it("shows the provided default item as selected in the option list by default", 
     ).toBeVisible();
 });
 
-it("updates the shown item when a different item is selected", async () => {
+test("updates the shown item when a different item is selected", async () => {
     const expectedShownItem = items[1];
 
     render(
@@ -157,7 +160,7 @@ it("updates the shown item when a different item is selected", async () => {
     ).toHaveTextContent(expectedShownItem.name);
 });
 
-it("updates the selected item in the option list after a different item is selected", async () => {
+test("updates the selected item in the option list after a different item is selected", async () => {
     const expectedSelectedItem = items[1];
     const expectedDeselectedItem = items[0];
 
@@ -205,6 +208,37 @@ test("calls the provided on change function when an item is selected", async () 
     await clickSelect(expectedLabelText);
     await clickOption(expectedItem.name);
     await screen.findByText(expectedItem.name);
+
+    expect(mockOnItemChange).toHaveBeenCalledTimes(1);
+    expect(mockOnItemChange).toHaveBeenCalledWith(expectedItem);
+});
+
+test("calls the provided on change function when the default item is changed", async () => {
+    const mockOnItemChange = vi.fn();
+    const expectedItem = items[1];
+    const { rerender } = render(
+        <Selector
+            items={items}
+            labelText={expectedLabelText}
+            defaultSelectedItem={items[0]}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+            onSelectedItemChange={mockOnItemChange}
+        />
+    );
+
+    rerender(
+        wrapWithTestProviders(
+            <Selector
+                items={items}
+                labelText={expectedLabelText}
+                defaultSelectedItem={expectedItem}
+                itemToKey={itemToKey}
+                itemToDisplayText={itemToDisplayText}
+                onSelectedItemChange={mockOnItemChange}
+            />
+        )
+    );
 
     expect(mockOnItemChange).toHaveBeenCalledTimes(1);
     expect(mockOnItemChange).toHaveBeenCalledWith(expectedItem);
