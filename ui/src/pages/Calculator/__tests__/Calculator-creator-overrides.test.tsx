@@ -19,6 +19,8 @@ import {
     openSelectMenu,
     expectedRemoveCreatorOverrideButtonText,
     selectOption,
+    expectedCalculatorTab,
+    expectedCalculatorTabHeader,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import { CreatorOverride } from "../../../graphql/__generated__/graphql";
@@ -704,6 +706,110 @@ describe("given items w/ multiple creators returned", () => {
                     })
                 ).not.toBeInTheDocument();
             });
+        });
+
+        test("does not reset the currently selected item overrides if tab changes", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedCalculatorTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedCalculatorTabHeader,
+                level: 2,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedSettingsTabHeader,
+                level: 2,
+            });
+
+            const itemOverrideSelects = await screen.findAllByRole("combobox", {
+                name: expectedItemSelectOverrideLabel,
+            });
+            expect(itemOverrideSelects[0]).toHaveTextContent(
+                expectedFirstItemName
+            );
+            expect(itemOverrideSelects[1]).toHaveTextContent(
+                expectedSecondItemName
+            );
+        });
+
+        test("does not reset the currently selected creator overrides if tab changes", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedCalculatorTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedCalculatorTabHeader,
+                level: 2,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedSettingsTabHeader,
+                level: 2,
+            });
+
+            const creatorOverrideSelects = screen.getAllByRole("combobox", {
+                name: expectedCreatorSelectOverrideLabel,
+            });
+            expect(creatorOverrideSelects[0]).toHaveTextContent(
+                expectedFirstItemOverrides[0].creator
+            );
+            expect(creatorOverrideSelects[1]).toHaveTextContent(
+                expectedSecondItemOverrides[0].creator
+            );
+        });
+
+        test("does not reset the currently selected item override if non-default item selected", async () => {
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedItemSelectOverrideLabel,
+                optionName: expectedSecondItemName,
+            });
+            await clickByName(expectedCalculatorTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedCalculatorTabHeader,
+                level: 2,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedSettingsTabHeader,
+                level: 2,
+            });
+
+            expect(
+                screen.getByRole("combobox", {
+                    name: expectedItemSelectOverrideLabel,
+                })
+            ).toHaveTextContent(expectedSecondItemName);
+        });
+
+        test("does not reset the currently selected creator override if non-default creator selected", async () => {
+            const expected = expectedFirstItemOverrides[1].creator;
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+                optionName: expected,
+            });
+            await clickByName(expectedCalculatorTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedCalculatorTabHeader,
+                level: 2,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await screen.findByRole("heading", {
+                name: expectedSettingsTabHeader,
+                level: 2,
+            });
+
+            expect(
+                screen.getByRole("combobox", {
+                    name: expectedCreatorSelectOverrideLabel,
+                })
+            ).toHaveTextContent(expected);
         });
     });
 });

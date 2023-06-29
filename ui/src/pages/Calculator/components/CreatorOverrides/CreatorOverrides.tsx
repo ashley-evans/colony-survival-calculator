@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { faAdd, faRemove } from "@fortawesome/free-solid-svg-icons";
+import { faAdd } from "@fortawesome/free-solid-svg-icons";
 
 import { gql } from "../../../../graphql/__generated__";
+import { Icon, LargeAddButton, OverrideListContainer } from "./styles";
 import {
-    Icon,
-    LargeAddButton,
-    OverrideContainer,
-    OverrideListContainer,
-    RemoveButton,
-    RemoveButtonContainer,
-} from "./styles";
-import { Selector } from "../../../../common";
-import { Item } from "../../../../graphql/__generated__/graphql";
+    CreatorOverride,
+    Item,
+} from "../../../../graphql/__generated__/graphql";
+import { CreatorOverrideSelector } from "./CreatorOverrideSelector";
 
 const UNHANDLED_EXCEPTION =
     "Something went wrong, please refresh and try again.";
@@ -36,125 +32,87 @@ function groupByCreators(items: Pick<Item, "name" | "creator">[]): CreatorMap {
     }, new Map<string, string[]>());
 }
 
-type CreatorOverrideProps = {
-    creatorMap: CreatorMap;
-    allOverrides: string[];
-    activeOverrides: Set<string>;
-    defaultOverride: string;
-    onSelectedItemChange: (newItem: string, oldItem: string) => void;
-    onRemove: (selectedItem: string) => void;
+type CreatorOverridesProps = {
+    defaultOverrides: CreatorOverride[];
+    onOverridesUpdate: (overrides: CreatorOverride[]) => void;
 };
 
-function CreatorOverride({
-    creatorMap,
-    allOverrides,
-    activeOverrides,
-    defaultOverride,
-    onSelectedItemChange,
-    onRemove,
-}: CreatorOverrideProps) {
-    const [selectedItem, setSelectedItem] = useState<string>(defaultOverride);
-    const availableOverrides = allOverrides.filter(
-        (override) => !activeOverrides.has(override) || override == selectedItem
-    );
-
-    const selectedItemCreators = creatorMap.get(selectedItem);
-    if (!selectedItemCreators) {
-        throw new Error(UNHANDLED_EXCEPTION);
-    }
-
-    const handleSelectedItemChange = (value?: string) => {
-        if (!value) {
-            return;
-        }
-
-        const oldItem = selectedItem;
-        setSelectedItem(value);
-        onSelectedItemChange(value, oldItem);
-    };
-
-    const handleRemove = () => {
-        onRemove(selectedItem);
-    };
-
-    return (
-        <OverrideContainer>
-            <Selector
-                items={availableOverrides}
-                itemToKey={(name) => name}
-                itemToDisplayText={(name) => name}
-                labelText="Item:"
-                defaultSelectedItem={selectedItem}
-                onSelectedItemChange={handleSelectedItemChange}
-            />
-            <Selector
-                items={selectedItemCreators}
-                itemToKey={(creator) => creator}
-                itemToDisplayText={(creator) => creator}
-                labelText="Creator:"
-                defaultSelectedItem={selectedItemCreators[0]}
-            />
-            <RemoveButtonContainer>
-                <RemoveButton onClick={handleRemove}>
-                    <span>Remove</span>
-                    <Icon icon={faRemove} />
-                </RemoveButton>
-            </RemoveButtonContainer>
-        </OverrideContainer>
-    );
-}
-
-function CreatorOverrides() {
+function CreatorOverrides({
+    defaultOverrides,
+    onOverridesUpdate,
+}: CreatorOverridesProps) {
     const { loading, data } = useQuery(GET_ITEMS_WITH_MULTIPLE_CREATORS);
     const [creatorMap, setCreatorMap] = useState<CreatorMap>(new Map());
 
-    const [allOverrides, setAllOverrides] = useState<string[]>([]);
-    const [activeOverrides, setActiveOverrides] = useState<Set<string>>(
-        new Set()
+    const [allItems, setAllItems] = useState<string[]>([]);
+    const [activeOverrides, setActiveOverrides] = useState<Map<string, string>>(
+        new Map()
     );
 
     useEffect(() => {
         if (data?.item) {
             const groupedItems = groupByCreators(data.item);
-            const items = Array.from(groupedItems.entries()).map(
-                ([name]) => name
-            );
-            setAllOverrides(items);
+            const items = Array.from(groupedItems.keys()).map((name) => name);
+            setAllItems(items);
             setCreatorMap(groupedItems);
+        }
+
+        if (defaultOverrides) {
+            const active = new Map(
+                defaultOverrides.map(({ itemName, creator }) => [
+                    itemName,
+                    creator,
+                ])
+            );
+            setActiveOverrides(active);
         }
     }, [data]);
 
-    const overrideCanBeAdded = () => {
-        return (
-            allOverrides.length !== 0 &&
-            activeOverrides.size !== allOverrides.length
-        );
-    };
+    useEffect(() => {
+        const overrides: CreatorOverride[] = Array.from(
+            activeOverrides.entries()
+        ).map(([itemName, creator]) => ({ itemName, creator }));
+        onOverridesUpdate(overrides);
+    }, [activeOverrides]);
 
-    const addOverride = () => {
-        if (!overrideCanBeAdded()) {
-            return;
+    const canOverrideBeAdded = () => activeOverrides.size !== allItems.length;
+
+    const getItemCreators = (item: string): string[] => {
+        const creators = creatorMap.get(item);
+        if (!creators) {
+            throw new Error(UNHANDLED_EXCEPTION);
         }
 
-        const availableOverrides = allOverrides.filter(
+        return creators;
+    };
+
+    const getNextOverride = (): [string, string[]] => {
+        const availableItems = allItems.filter(
             (override) => !activeOverrides.has(override)
         );
-        const newActiveOverrides = new Set(activeOverrides);
-        newActiveOverrides.add(availableOverrides[0]);
-        setActiveOverrides(newActiveOverrides);
+
+        const nextItem = availableItems[0];
+        return [nextItem, getItemCreators(nextItem)];
+    };
+
+    const setOverride = (item: string, creator: string) => {
+        const active = new Map(activeOverrides);
+        active.set(item, creator);
+        setActiveOverrides(active);
     };
 
     const removeOverride = (item: string) => {
-        const newActiveOverrides = new Set(activeOverrides);
-        newActiveOverrides.delete(item);
-        setActiveOverrides(newActiveOverrides);
+        const active = new Map(activeOverrides);
+        active.delete(item);
+        setActiveOverrides(active);
     };
 
-    const handleActiveOverrideChange = (newItem: string, oldItem: string) => {
-        const newActiveOverrides = new Set(activeOverrides);
-        newActiveOverrides.delete(oldItem);
-        newActiveOverrides.add(newItem);
-        setActiveOverrides(newActiveOverrides);
+    const handleOverrideItemChange = (newItem: string, oldItem: string) => {
+        const newItemCreators = getItemCreators(newItem);
+        const active = new Map(activeOverrides);
+        active.set(newItem, newItemCreators[0]);
+        active.delete(oldItem);
+        setActiveOverrides(active);
     };
 
     return (
@@ -169,19 +127,33 @@ function CreatorOverrides() {
             ) : null}
             {data && data.item.length > 0 ? (
                 <OverrideListContainer>
-                    {Array.from(activeOverrides.values()).map((override) => (
-                        <CreatorOverride
-                            key={override}
-                            creatorMap={creatorMap}
-                            allOverrides={allOverrides}
-                            activeOverrides={activeOverrides}
-                            defaultOverride={override}
-                            onSelectedItemChange={handleActiveOverrideChange}
-                            onRemove={removeOverride}
-                        />
-                    ))}
-                    {overrideCanBeAdded() ? (
-                        <LargeAddButton onClick={addOverride}>
+                    {Array.from(activeOverrides.entries()).map(
+                        ([item, creator]) => (
+                            <CreatorOverrideSelector
+                                key={item}
+                                items={allItems.filter(
+                                    (override) =>
+                                        !activeOverrides.has(override) ||
+                                        override === item
+                                )}
+                                creators={getItemCreators(item)}
+                                defaultOverride={{
+                                    itemName: item,
+                                    creator: creator,
+                                }}
+                                onSelectedItemChange={handleOverrideItemChange}
+                                onSelectedCreatorChange={setOverride}
+                                onRemove={removeOverride}
+                            />
+                        )
+                    )}
+                    {canOverrideBeAdded() ? (
+                        <LargeAddButton
+                            onClick={() => {
+                                const [item, creators] = getNextOverride();
+                                setOverride(item, creators[0]);
+                            }}
+                        >
                             <span>Add creator override</span>
                             <Icon icon={faAdd} />
                         </LargeAddButton>

@@ -7,7 +7,11 @@ import OutputUnitSelector from "./components/OutputUnitSelector";
 import Requirements from "./components/Requirements";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
-import { OutputUnit, Tools } from "../../graphql/__generated__/graphql";
+import {
+    CreatorOverride,
+    OutputUnit,
+    Tools,
+} from "../../graphql/__generated__/graphql";
 import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
 import ToolSelector from "./components/ToolSelector";
@@ -144,11 +148,23 @@ function CalculatorTab({
     );
 }
 
-function SettingsTab() {
+type SettingsTabProps = {
+    selectedCreatorOverrides: StateProp<CreatorOverride[]>;
+};
+
+function SettingsTab({
+    selectedCreatorOverrides: [
+        selectedCreatorOverrides,
+        setSelectedCreatorOverrides,
+    ],
+}: SettingsTabProps) {
     return (
         <>
             <TabHeader>Overrides:</TabHeader>
-            <CreatorOverrides />
+            <CreatorOverrides
+                defaultOverrides={selectedCreatorOverrides}
+                onOverridesUpdate={setSelectedCreatorOverrides}
+            />
         </>
     );
 }
@@ -167,6 +183,7 @@ function Calculator() {
     const workersState = useState<number>();
     const selectedToolState = useState<Tools>(Tools.None);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
+    const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
 
     return (
         <PageContainer>
@@ -197,7 +214,11 @@ function Calculator() {
                         selectedOutputUnit={selectedOutputUnitState}
                     />
                 ) : null}
-                {selectedTab === PageTabs.SETTINGS ? <SettingsTab /> : null}
+                {selectedTab === PageTabs.SETTINGS ? (
+                    <SettingsTab
+                        selectedCreatorOverrides={selectedCreatorOverrides}
+                    />
+                ) : null}
             </TabContainer>
         </PageContainer>
     );
