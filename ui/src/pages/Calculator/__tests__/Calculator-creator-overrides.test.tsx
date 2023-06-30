@@ -843,6 +843,93 @@ describe("given items w/ multiple creators returned", () => {
 
             await expect(expectedRequest).resolves.not.toThrow();
         });
+
+        test("provides all creator overrides when querying requirements", async () => {
+            const user = userEvent.setup();
+            const expectedItem = expectedSecondItemName;
+            const expectedWorkers = 5;
+            const expectedOverrides: CreatorOverride[] = [
+                {
+                    itemName: expectedFirstItemName,
+                    creator: expectedFirstItemOverrides[1].creator,
+                },
+                {
+                    itemName: expectedSecondItemName,
+                    creator: expectedSecondItemOverrides[1].creator,
+                },
+            ];
+            const expectedTool = Tools.None;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedRequirementsQueryName,
+                {
+                    name: expectedItem,
+                    workers: expectedWorkers,
+                    maxAvailableTool: expectedTool,
+                    creatorOverrides: expectedOverrides,
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            const creatorOverrideSelects = await screen.findAllByRole(
+                "combobox",
+                { name: expectedCreatorSelectOverrideLabel }
+            );
+            await act(() => user.click(creatorOverrideSelects[0]));
+            const firstItemCreatorOption = await screen.findByRole("option", {
+                name: expectedFirstItemOverrides[1].creator,
+            });
+            await act(() => user.click(firstItemCreatorOption));
+            await act(() => user.click(creatorOverrideSelects[1]));
+            const secondItemCreatorOption = await screen.findByRole("option", {
+                name: expectedSecondItemOverrides[1].creator,
+            });
+            await act(() => user.click(secondItemCreatorOption));
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({
+                itemName: expectedItem,
+                workers: expectedWorkers,
+            });
+
+            await expect(expectedRequest).resolves.not.toThrow();
+        });
+
+        test("returns to querying requirements without creator overrides if removed", async () => {
+            const expectedItem = expectedSecondItemName;
+            const expectedWorkers = 5;
+            const expectedTool = Tools.None;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedRequirementsQueryName,
+                {
+                    name: expectedItem,
+                    workers: expectedWorkers,
+                    maxAvailableTool: expectedTool,
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({
+                itemName: expectedItem,
+                workers: expectedWorkers,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await clickByName(
+                expectedRemoveCreatorOverrideButtonText,
+                "button"
+            );
+            await clickByName(expectedCalculatorTab, "tab");
+
+            await expect(expectedRequest).resolves.not.toThrow();
+        });
     });
 });
 

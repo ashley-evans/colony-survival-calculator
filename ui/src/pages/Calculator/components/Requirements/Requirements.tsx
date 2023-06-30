@@ -18,7 +18,11 @@ import {
     SortableHeader,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
-import { Requirement, Tools } from "../../../../graphql/__generated__/graphql";
+import {
+    CreatorOverride,
+    Requirement,
+    Tools,
+} from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
 
 type ValidSortDirections = "none" | "ascending" | "descending";
@@ -26,6 +30,7 @@ type RequirementsProps = {
     selectedItemName: string;
     workers: number;
     maxAvailableTool?: Tools;
+    creatorOverrides?: CreatorOverride[];
 };
 
 const sortDirectionOrderMap: {
@@ -43,8 +48,8 @@ const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
 };
 
 const GET_ITEM_REQUIREMENTS = gql(`
-    query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools) {
-        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool) {
+    query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!]) {
+        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides) {
             name
             workers
         }
@@ -70,6 +75,7 @@ function Requirements({
     selectedItemName,
     workers,
     maxAvailableTool,
+    creatorOverrides,
 }: RequirementsProps) {
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
         GET_ITEM_REQUIREMENTS
@@ -85,14 +91,25 @@ function Requirements({
     };
 
     useEffect(() => {
+        const creatorOverridesFilter =
+            creatorOverrides && creatorOverrides.length > 0
+                ? creatorOverrides
+                : undefined;
+
         getItemRequirements({
             variables: {
                 name: selectedItemName,
                 workers: debouncedWorkers,
                 maxAvailableTool,
+                creatorOverrides: creatorOverridesFilter,
             },
         });
-    }, [selectedItemName, debouncedWorkers, maxAvailableTool]);
+    }, [
+        selectedItemName,
+        debouncedWorkers,
+        maxAvailableTool,
+        creatorOverrides,
+    ]);
 
     if (error) {
         return (
