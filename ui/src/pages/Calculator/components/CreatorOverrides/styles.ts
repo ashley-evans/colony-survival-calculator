@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 
 export const OverrideListContainer = styled.div`
-    max-width: 40rem;
+    max-width: 45rem;
     width: 100%;
 
     display: flex;
@@ -67,7 +67,7 @@ export const OverrideContainer = styled.div`
     column-gap: 0.5rem;
     row-gap: 0.5rem;
 
-    div {
-        flex: 1;
+    > div {
+        flex: 1 0 13rem;
     }
 `;

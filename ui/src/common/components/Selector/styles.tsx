@@ -68,7 +68,8 @@ export const Menu = styled.div<MenuProps>`
     position: absolute;
     z-index: 1;
     width: 100%;
-    margin-top: 4rem;
+    top: 100%;
+    margin-top: 0.5rem;
     padding: 0.25rem 0rem;
     border-radius: 0.25rem;
     list-style-type: none;
