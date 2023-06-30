@@ -5,14 +5,19 @@ import { screen } from "@testing-library/react";
 
 import {
     ItemName,
+    expectedCalculatorTab,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedOutputQueryName,
     expectedRequirementsQueryName,
+    expectedSettingsTab,
+    expectedSettingsTabHeader,
     expectedToolSelectLabel,
     openSelectMenu,
+    clickByName,
     selectItemAndWorkers,
     selectTool,
+    expectedCreatorOverrideQueryName,
 } from "./utils";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import Calculator from "../Calculator";
@@ -34,6 +39,13 @@ const server = setupServer(
     }),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: 5.2 }));
+    }),
+    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
+        return res(
+            ctx.data({
+                item: [],
+            })
+        );
     })
 );
 
@@ -65,11 +77,34 @@ test.each(["None", "Stone", "Copper", "Iron", "Bronze", "Steel"])(
 );
 
 test("renders none as the selected tool by default", async () => {
+    const expected = "None";
+
     render(<Calculator />);
     await openSelectMenu({ selectLabel: expectedToolSelectLabel });
 
     expect(
-        await screen.findByRole("option", { name: "None", selected: true })
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", { name: expected, selected: true })
+    ).toBeVisible();
+});
+
+test("updates the selected tool if selected is changed", async () => {
+    const expected = "Iron";
+
+    render(<Calculator />);
+    await selectTool(Tools.Iron);
+    await openSelectMenu({ selectLabel: expectedToolSelectLabel });
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
+            selected: true,
+        })
     ).toBeVisible();
 });
 
@@ -228,6 +263,23 @@ test("queries item details again if tool is changed after first query", async ()
     await selectTool(expectedTool);
 
     await expect(expectedRequest).resolves.not.toThrow();
+});
+
+test("does not reset the currently selected tool after changing tabs", async () => {
+    const expected = "Iron";
+
+    render(<Calculator />);
+    await selectTool(Tools.Iron);
+    await clickByName(expectedSettingsTab, "tab");
+    await screen.findByRole("heading", {
+        name: expectedSettingsTabHeader,
+        level: 2,
+    });
+    await clickByName(expectedCalculatorTab, "tab");
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+    ).toHaveTextContent(expected);
 });
 
 afterAll(() => {

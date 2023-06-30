@@ -6,11 +6,12 @@ import { Selector } from "../../../../common/components";
 
 type ToolSelectorProps = {
     onToolChange: (unit: Tools) => void;
+    defaultTool?: Tools;
 };
 
 const tools = Object.values(Tools);
 
-function ToolSelector({ onToolChange }: ToolSelectorProps) {
+function ToolSelector({ onToolChange, defaultTool }: ToolSelectorProps) {
     const handleToolChange = (selectedTool?: Tools) => {
         if (selectedTool) onToolChange(selectedTool);
     };
@@ -21,7 +22,7 @@ function ToolSelector({ onToolChange }: ToolSelectorProps) {
             itemToKey={(tool) => tool}
             itemToDisplayText={(tool) => ToolSelectorMappings[tool]}
             labelText="Tools:"
-            defaultSelectedItem={tools[3]}
+            defaultSelectedItem={defaultTool ?? tools[3]}
             onSelectedItemChange={handleToolChange}
             palette="secondary"
         />

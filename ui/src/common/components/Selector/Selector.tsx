@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelect, UseSelectProps, UseSelectStateChange } from "downshift";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
@@ -44,11 +44,16 @@ function Selector<Item>({
         getToggleButtonProps,
         getMenuProps,
         getItemProps,
+        selectItem,
     } = useSelect({
         items,
         defaultSelectedItem,
         onSelectedItemChange: handleSelectedItemChange,
     });
+
+    useEffect(() => {
+        selectItem(defaultSelectedItem);
+    }, [defaultSelectedItem]);
 
     return (
         <Container palette={palette} className={className}>

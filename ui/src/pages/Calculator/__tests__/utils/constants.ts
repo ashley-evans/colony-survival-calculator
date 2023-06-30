@@ -1,26 +1,20 @@
-const expectedRequirementsQueryName = "GetItemRequirements";
-const expectedOutputQueryName = "GetOptimalOutput";
-const expectedItemNameQueryName = "GetItemNames";
-const expectedItemDetailsQueryName = "GetItemDetails";
+export const expectedRequirementsQueryName = "GetItemRequirements";
+export const expectedOutputQueryName = "GetOptimalOutput";
+export const expectedItemNameQueryName = "GetItemNames";
+export const expectedItemDetailsQueryName = "GetItemDetails";
+export const expectedCreatorOverrideQueryName = "GetMultipleCreatorDetails";
 
-const expectedDesiredOutputHeader = "Desired output:";
-const expectedItemSelectLabel = "Item:";
-const expectedWorkerInputLabel = "Workers:";
-const expectedOutputUnitLabel = "Desired output units:";
-const expectedToolSelectLabel = "Tools:";
-const expectedOutputPrefix = "Optimal output:";
-const expectedFarmSizeNotePrefix = "Calculations use optimal farm size:";
+export const expectedCalculatorTabHeader = "Desired output:";
+export const expectedItemSelectLabel = "Item:";
+export const expectedWorkerInputLabel = "Workers:";
+export const expectedOutputUnitLabel = "Desired output units:";
+export const expectedToolSelectLabel = "Tools:";
+export const expectedOutputPrefix = "Optimal output:";
+export const expectedFarmSizeNotePrefix = "Calculations use optimal farm size:";
 
-export {
-    expectedRequirementsQueryName,
-    expectedOutputQueryName,
-    expectedItemNameQueryName,
-    expectedItemDetailsQueryName,
-    expectedDesiredOutputHeader,
-    expectedItemSelectLabel,
-    expectedWorkerInputLabel,
-    expectedOutputUnitLabel,
-    expectedToolSelectLabel,
-    expectedOutputPrefix,
-    expectedFarmSizeNotePrefix,
-};
+export const expectedCalculatorTab = "Calculator";
+export const expectedSettingsTab = "Settings";
+
+export const expectedSettingsTabHeader = "Overrides:";
+export const expectedAddCreatorOverrideButtonText = "Add creator override";
+export const expectedRemoveCreatorOverrideButtonText = "Remove";

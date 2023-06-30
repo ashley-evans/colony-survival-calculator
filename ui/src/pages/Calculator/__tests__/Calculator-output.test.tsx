@@ -11,15 +11,20 @@ import {
 import { waitForRequest } from "../../../helpers/utils";
 import {
     ItemName,
+    expectedCalculatorTab,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedOutputPrefix,
     expectedOutputQueryName,
     expectedOutputUnitLabel,
     expectedRequirementsQueryName,
+    expectedSettingsTab,
+    expectedSettingsTabHeader,
     openSelectMenu,
+    clickByName,
     selectItemAndWorkers,
     selectOutputUnit,
+    expectedCreatorOverrideQueryName,
 } from "./utils";
 import { OutputUnit } from "../../../graphql/__generated__/graphql";
 
@@ -41,6 +46,13 @@ const server = setupServer(
     }),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: 5.2 }));
+    }),
+    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
+        return res(
+            ctx.data({
+                item: [],
+            })
+        );
     })
 );
 
@@ -68,15 +80,55 @@ test.each(["Minutes", "Game days"])(
 );
 
 test("selects the Minutes option by default", async () => {
+    const expected = "Minutes";
+
     render(<Calculator />, expectedGraphQLAPIURL);
     await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
 
     expect(
-        await screen.findByRole("option", {
-            name: "Minutes",
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
             selected: true,
         })
-    ).toBeInTheDocument();
+    ).toBeVisible();
+});
+
+test("updates the selected output unit if selected is changed", async () => {
+    const expected = "Game days";
+
+    render(<Calculator />);
+    await selectOutputUnit(OutputUnit.GameDays);
+    await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
+    expect(
+        screen.getByRole("option", {
+            name: expected,
+            selected: true,
+        })
+    ).toBeVisible();
+});
+
+test("does not reset the currently selected output unit after changing tabs", async () => {
+    const expected = "Game days";
+
+    render(<Calculator />);
+    await selectOutputUnit(OutputUnit.GameDays);
+    await clickByName(expectedSettingsTab, "tab");
+    await screen.findByRole("heading", {
+        name: expectedSettingsTabHeader,
+        level: 2,
+    });
+    await clickByName(expectedCalculatorTab, "tab");
+
+    expect(
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+    ).toHaveTextContent(expected);
 });
 
 test("queries optimal output if item and workers inputted with default unit selected", async () => {

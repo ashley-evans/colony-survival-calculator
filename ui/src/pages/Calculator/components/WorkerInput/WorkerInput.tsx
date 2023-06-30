@@ -4,9 +4,10 @@ import { Input } from "../../../../common/components";
 
 type ItemSelectorProps = {
     onWorkerChange: (workers?: number) => void;
+    defaultWorkers?: number;
 };
 
-function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
+function WorkerInput({ onWorkerChange, defaultWorkers }: ItemSelectorProps) {
     const parseValue = (value: unknown): number => {
         const input = Number(value);
         if (!isNaN(input) && input > 0 && input % 1 === 0) {
@@ -24,6 +25,7 @@ function WorkerInput({ onWorkerChange }: ItemSelectorProps) {
             errorMessage="Invalid input, must be a positive non-zero whole number"
             inputMode="numeric"
             clearIconLabel="Clear worker input"
+            defaultValue={defaultWorkers?.toString()}
         />
     );
 }

@@ -150,6 +150,20 @@
         "creator": "Water gatherer"
     },
     {
+        "name": "Pot of Water",
+        "createTime": 16,
+        "output": 1,
+        "requires": [
+            {
+                "name": "Empty Pot",
+                "amount": 1
+            }
+        ],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Water pump worker"
+    },
+    {
         "name": "Bread",
         "createTime": 20,
         "output": 1,

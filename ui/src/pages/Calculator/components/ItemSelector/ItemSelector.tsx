@@ -5,9 +5,14 @@ import { Selector } from "../../../../common/components";
 type ItemSelectorProps = {
     items: string[];
     onItemChange: (item: string) => void;
+    defaultSelectedItem?: string;
 };
 
-function ItemSelector({ items, onItemChange }: ItemSelectorProps) {
+function ItemSelector({
+    items,
+    defaultSelectedItem,
+    onItemChange,
+}: ItemSelectorProps) {
     const handleItemChange = (selectedItem?: string) => {
         if (selectedItem) onItemChange(selectedItem);
     };
@@ -18,7 +23,7 @@ function ItemSelector({ items, onItemChange }: ItemSelectorProps) {
             itemToKey={(item) => item}
             itemToDisplayText={(item) => item}
             labelText="Item:"
-            defaultSelectedItem={items[0]}
+            defaultSelectedItem={defaultSelectedItem ?? items[0]}
             onSelectedItemChange={handleItemChange}
             palette="secondary"
         />

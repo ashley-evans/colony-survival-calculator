@@ -33,6 +33,7 @@ export const ToggleButton = styled.div<CommonProps>`
     align-items: center;
     padding: 0.5rem;
     border-radius: 0.25rem;
+    cursor: pointer;
 `;
 
 interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
@@ -71,6 +72,7 @@ export const Menu = styled.div<MenuProps>`
     padding: 0.25rem 0rem;
     border-radius: 0.25rem;
     list-style-type: none;
+    cursor: pointer;
 `;
 
 export const Item = styled.li<CommonProps>`

@@ -16,6 +16,7 @@ type InputProps<Type> = Pick<HTMLAttributes<HTMLInputElement>, "inputMode"> & {
     parseValue: (value: unknown) => Type;
     errorMessage?: string;
     clearIconLabel?: string;
+    defaultValue?: string;
     palette?: ColorPalettes;
     className?: string;
 };
@@ -26,11 +27,12 @@ function Input<Type>({
     parseValue,
     errorMessage,
     clearIconLabel,
+    defaultValue,
     inputMode,
     palette = "secondary",
     className,
 }: InputProps<Type>) {
-    const [value, setValue] = useState<string>("");
+    const [value, setValue] = useState<string>(defaultValue ?? "");
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const inputID = useId();
 

@@ -1,4 +1,4 @@
-import { act, screen } from "@testing-library/react";
+import { ByRoleMatcher, act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import {
@@ -83,7 +83,15 @@ async function selectTool(tool: Tools) {
     });
 }
 
+async function clickByName(name: string, matcher: ByRoleMatcher) {
+    const user = userEvent.setup();
+    const tab = await screen.findByRole(matcher, { name });
+
+    await act(() => user.click(tab));
+}
+
 export {
+    clickByName,
     openSelectMenu,
     selectOption,
     selectItemAndWorkers,
