@@ -24,7 +24,11 @@ import {
     selectItemAndWorkers,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
-import { CreatorOverride, Tools } from "../../../graphql/__generated__/graphql";
+import {
+    CreatorOverride,
+    OutputUnit,
+    Tools,
+} from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
@@ -807,7 +811,6 @@ describe("given items w/ multiple creators returned", () => {
 
         test("returns to querying optimal recipe if applicable override is removed", async () => {
             const expectedItem = expectedSecondItemName;
-            const expectedCreator = expectedSecondItemOverrides[1].creator;
             const expectedTool = Tools.None;
             const expectedRequest = waitForRequest(
                 server,
@@ -830,7 +833,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await selectOption({
                 selectLabel: expectedCreatorSelectOverrideLabel,
-                optionName: expectedCreator,
+                optionName: expectedSecondItemOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");
             await selectItemAndWorkers({ itemName: expectedItem });
@@ -916,6 +919,88 @@ describe("given items w/ multiple creators returned", () => {
 
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({
+                itemName: expectedItem,
+                workers: expectedWorkers,
+            });
+            await clickByName(expectedSettingsTab, "tab");
+            await clickByName(
+                expectedRemoveCreatorOverrideButtonText,
+                "button"
+            );
+            await clickByName(expectedCalculatorTab, "tab");
+
+            await expect(expectedRequest).resolves.not.toThrow();
+        });
+
+        test("queries output with specified creator if applicable override enabled", async () => {
+            const expectedItem = expectedSecondItemName;
+            const expectedCreator = expectedSecondItemOverrides[1].creator;
+            const expectedWorkers = 5;
+            const expectedTool = Tools.None;
+            const expectedOutputUnit = OutputUnit.Minutes;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedOutputQueryName,
+                {
+                    name: expectedItem,
+                    workers: expectedWorkers,
+                    unit: expectedOutputUnit,
+                    maxAvailableTool: expectedTool,
+                    creator: expectedCreator,
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedItemSelectOverrideLabel,
+                optionName: expectedItem,
+            });
+            await selectOption({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+                optionName: expectedCreator,
+            });
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({
+                itemName: expectedItem,
+                workers: expectedWorkers,
+            });
+
+            await expect(expectedRequest).resolves.not.toThrow();
+        });
+
+        test("returns to querying optimal recipe if applicable override is removed", async () => {
+            const expectedItem = expectedSecondItemName;
+            const expectedWorkers = 5;
+            const expectedTool = Tools.None;
+            const expectedOutputUnit = OutputUnit.Minutes;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedOutputQueryName,
+                {
+                    name: expectedItem,
+                    workers: expectedWorkers,
+                    unit: expectedOutputUnit,
+                    maxAvailableTool: expectedTool,
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedItemSelectOverrideLabel,
+                optionName: expectedItem,
+            });
+            await selectOption({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+                optionName: expectedSecondItemOverrides[1].creator,
+            });
             await clickByName(expectedCalculatorTab, "tab");
             await selectItemAndWorkers({
                 itemName: expectedItem,
