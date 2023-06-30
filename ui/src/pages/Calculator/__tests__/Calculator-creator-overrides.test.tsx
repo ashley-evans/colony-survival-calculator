@@ -21,9 +21,10 @@ import {
     selectOption,
     expectedCalculatorTab,
     expectedCalculatorTabHeader,
+    selectItemAndWorkers,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
-import { CreatorOverride } from "../../../graphql/__generated__/graphql";
+import { CreatorOverride, Tools } from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
@@ -37,9 +38,22 @@ const items: ItemName[] = [
     { name: "Item 2" },
     { name: "Item 3" },
 ];
+
+const expectedFirstItemName = items[0].name;
+const expectedFirstItemOverrides = generateItemCreatorOverrides(
+    expectedFirstItemName,
+    2
+);
+const expectedSecondItemName = items[2].name;
+const expectedSecondItemOverrides = generateItemCreatorOverrides(
+    expectedSecondItemName,
+    3,
+    2
+);
+
 const expectedCreatorOverrides: CreatorOverride[] = [
-    ...generateItemCreatorOverrides(items[0].name, 2),
-    ...generateItemCreatorOverrides(items[2].name, 3, 2),
+    ...expectedFirstItemOverrides,
+    ...expectedSecondItemOverrides,
 ];
 
 function generateItemCreatorOverrides(
@@ -76,12 +90,10 @@ const server = setupServer(
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
-                item: [
-                    expectedCreatorOverrides.map(({ itemName, creator }) => ({
-                        name: itemName,
-                        creator,
-                    })),
-                ],
+                item: expectedCreatorOverrides.map(({ itemName, creator }) => ({
+                    name: itemName,
+                    creator,
+                })),
             })
         );
     })
@@ -94,22 +106,6 @@ beforeAll(() => {
 beforeEach(() => {
     server.resetHandlers();
     server.events.removeAllListeners();
-    server.use(
-        graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-            return res(
-                ctx.data({
-                    item: [
-                        expectedCreatorOverrides.map(
-                            ({ itemName, creator }) => ({
-                                name: itemName,
-                                creator,
-                            })
-                        ),
-                    ],
-                })
-            );
-        })
-    );
 });
 
 async function renderSettingsTab(apiURL = expectedGraphQLAPIURL) {
@@ -447,41 +443,6 @@ describe("given items w/ multiple creators returned", () => {
     });
 
     describe("multiple items w/ multiple creator returned", () => {
-        const expectedFirstItemName = "Test first item";
-        const expectedFirstItemOverrides = generateItemCreatorOverrides(
-            expectedFirstItemName,
-            2
-        );
-        const expectedSecondItemName = "Test second item";
-        const expectedSecondItemOverrides = generateItemCreatorOverrides(
-            expectedSecondItemName,
-            2
-        );
-        const expectedOverrides = [
-            ...expectedFirstItemOverrides,
-            ...expectedSecondItemOverrides,
-        ];
-
-        beforeEach(() => {
-            server.use(
-                graphql.query(
-                    expectedCreatorOverrideQueryName,
-                    (_, res, ctx) => {
-                        return res(
-                            ctx.data({
-                                item: expectedOverrides.map(
-                                    ({ itemName, creator }) => ({
-                                        name: itemName,
-                                        creator,
-                                    })
-                                ),
-                            })
-                        );
-                    }
-                )
-            );
-        });
-
         test("renders the first item as selected in the item override select if only one override is added", async () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
@@ -810,6 +771,77 @@ describe("given items w/ multiple creators returned", () => {
                     name: expectedCreatorSelectOverrideLabel,
                 })
             ).toHaveTextContent(expected);
+        });
+
+        test("queries item details with specified creator if applicable override enabled", async () => {
+            const expectedItem = expectedSecondItemName;
+            const expectedCreator = expectedSecondItemOverrides[1].creator;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedItemDetailsQueryName,
+                {
+                    filters: {
+                        name: expectedItem,
+                        creator: expectedCreator,
+                    },
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedItemSelectOverrideLabel,
+                optionName: expectedItem,
+            });
+            await selectOption({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+                optionName: expectedCreator,
+            });
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({ itemName: expectedItem });
+
+            await expect(expectedRequest).resolves.not.toThrow();
+        });
+
+        test("returns to querying optimal recipe if applicable override is removed", async () => {
+            const expectedItem = expectedSecondItemName;
+            const expectedCreator = expectedSecondItemOverrides[1].creator;
+            const expectedTool = Tools.None;
+            const expectedRequest = waitForRequest(
+                server,
+                "POST",
+                expectedGraphQLAPIURL,
+                expectedItemDetailsQueryName,
+                {
+                    filters: {
+                        name: expectedItem,
+                        optimal: { maxAvailableTool: expectedTool },
+                    },
+                }
+            );
+
+            await renderSettingsTab();
+            await clickByName(expectedAddCreatorOverrideButtonText, "button");
+            await selectOption({
+                selectLabel: expectedItemSelectOverrideLabel,
+                optionName: expectedItem,
+            });
+            await selectOption({
+                selectLabel: expectedCreatorSelectOverrideLabel,
+                optionName: expectedCreator,
+            });
+            await clickByName(expectedCalculatorTab, "tab");
+            await selectItemAndWorkers({ itemName: expectedItem });
+            await clickByName(expectedSettingsTab, "tab");
+            await clickByName(
+                expectedRemoveCreatorOverrideButtonText,
+                "button"
+            );
+            await clickByName(expectedCalculatorTab, "tab");
+
+            await expect(expectedRequest).resolves.not.toThrow();
         });
     });
 });

@@ -9,6 +9,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
 import {
     CreatorOverride,
+    ItemsFilters,
     OutputUnit,
     Tools,
 } from "../../graphql/__generated__/graphql";
@@ -37,17 +38,32 @@ const GET_ITEM_DETAILS_QUERY = gql(`
 type StateProp<S> = [S, (value: S) => void];
 
 type CalculatorTabProps = {
-    selectedItem: StateProp<string | undefined>;
-    workers: StateProp<number | undefined>;
-    selectedTool: StateProp<Tools>;
-    selectedOutputUnit: StateProp<OutputUnit>;
+    itemState: StateProp<string | undefined>;
+    workersState: StateProp<number | undefined>;
+    toolState: StateProp<Tools>;
+    outputUnitState: StateProp<OutputUnit>;
+    selectedCreatorOverrides: CreatorOverride[];
 };
 
+function getItemDetailsFilters(
+    item?: string,
+    tool?: Tools,
+    overrides?: CreatorOverride[]
+): ItemsFilters {
+    const creator = overrides
+        ? overrides.find(({ itemName }) => item == itemName)?.creator
+        : undefined;
+    return creator
+        ? { name: item, creator }
+        : { name: item, optimal: { maxAvailableTool: tool } };
+}
+
 function CalculatorTab({
-    selectedItem: [selectedItem, setSelectedItem],
-    workers: [workers, setWorkers],
-    selectedTool: [selectedTool, setSelectedTool],
-    selectedOutputUnit: [selectedOutputUnit, setSelectedOutputUnit],
+    itemState: [selectedItem, setSelectedItem],
+    workersState: [workers, setWorkers],
+    toolState: [selectedTool, setSelectedTool],
+    outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
+    selectedCreatorOverrides,
 }: CalculatorTabProps) {
     const {
         loading: itemNamesLoading,
@@ -58,10 +74,11 @@ function CalculatorTab({
         GET_ITEM_DETAILS_QUERY,
         {
             variables: {
-                filters: {
-                    name: selectedItem,
-                    optimal: { maxAvailableTool: selectedTool },
-                },
+                filters: getItemDetailsFilters(
+                    selectedItem,
+                    selectedTool,
+                    selectedCreatorOverrides
+                ),
             },
             skip: !selectedItem,
         }
@@ -208,10 +225,11 @@ function Calculator() {
             <TabContainer role="tabpanel">
                 {selectedTab === PageTabs.CALCULATOR ? (
                     <CalculatorTab
-                        selectedItem={selectedItemState}
-                        workers={workersState}
-                        selectedTool={selectedToolState}
-                        selectedOutputUnit={selectedOutputUnitState}
+                        itemState={selectedItemState}
+                        workersState={workersState}
+                        toolState={selectedToolState}
+                        outputUnitState={selectedOutputUnitState}
+                        selectedCreatorOverrides={selectedCreatorOverrides[0]}
                     />
                 ) : null}
                 {selectedTab === PageTabs.SETTINGS ? (
