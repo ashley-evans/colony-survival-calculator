@@ -29,7 +29,7 @@
         "npm-package-json-lint": "^6.4.0",
         "prettier": "^2.8.7",
         "semantic-release": "^21.0.1",
-        "typescript": "^5.0.3"
+        "typescript": "^5.1.6"
     },
     "config": {
         "commitizen": {
