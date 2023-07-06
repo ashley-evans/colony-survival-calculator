@@ -13,6 +13,14 @@ const mockMongoDBQueryRequirements = mongoDBQueryRequirements as jest.Mock;
 const validItemName = "test item name";
 const validWorkers = 5;
 
+function findItemWorkers(
+    requiredWorkers: RequiredWorkers[],
+    itemName: string
+): number | undefined {
+    return requiredWorkers.find((workers) => workers.name === itemName)
+        ?.workers;
+}
+
 beforeEach(() => {
     mockMongoDBQueryRequirements.mockReset();
 });
@@ -597,7 +605,7 @@ describe("optional output requirement impact", () => {
 
         expect(actual).toHaveLength(1);
         expect(actual[0]?.name).toEqual(requiredItem1.name);
-        expect(actual[0]?.workers).toBeCloseTo(3.157);
+        expect(actual[0]?.workers).toBeCloseTo(2.8125);
     });
 
     test("factors optional output given item with nested requirement that is top level optional output", async () => {
@@ -634,14 +642,50 @@ describe("optional output requirement impact", () => {
         });
 
         expect(actual).toHaveLength(2);
-        expect(actual).toContainEqual({
-            name: requiredItem1.name,
-            workers: 7.5,
+        expect(findItemWorkers(actual, requiredItem1.name)).toBeCloseTo(7.5);
+        expect(findItemWorkers(actual, requiredItem2.name)).toBeCloseTo(25);
+    });
+
+    test("uses recipe with high optional output over lower base output", async () => {
+        const requirementName = "required item";
+        const higherBaseRecipe = createItem({
+            name: requirementName,
+            createTime: 3,
+            output: 4,
+            requirements: [],
+            creator: "creator 1",
         });
-        expect(actual).toContainEqual({
-            name: requiredItem2.name,
-            workers: 15,
+        const higherOptionalOutputRecipe = createItem({
+            name: requirementName,
+            createTime: 3,
+            output: 1,
+            requirements: [],
+            optionalOutputs: [
+                { name: requirementName, amount: 4, likelihood: 1 },
+            ],
+            creator: "creator 2",
         });
+        const item = createItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [{ name: requirementName, amount: 2 }],
+            optionalOutputs: [],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            item,
+            higherBaseRecipe,
+            higherOptionalOutputRecipe,
+        ]);
+
+        const actual = await queryRequirements({
+            name: validItemName,
+            workers: validWorkers,
+        });
+
+        expect(actual).toHaveLength(1);
+        expect(actual[0]?.name).toEqual(requirementName);
+        expect(actual[0]?.workers).toBeCloseTo(3);
     });
 });
 
