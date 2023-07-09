@@ -1,5 +1,3 @@
-import GLPK, { Result } from "glpk.js";
-
 import type {
     CreatorOverride,
     QueryRequirementsPrimaryPort,
@@ -8,7 +6,11 @@ import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-re
 import { Items, Tools } from "../../../types";
 import { isAvailableToolSufficient } from "../../../common/modifiers";
 import { RequiredWorkers } from "../interfaces/query-requirements-primary-port";
-import { createRequirementsLinearProgram } from "./requirements-linear-program";
+import {
+    VertexOutput,
+    WORKERS_PROPERTY,
+    computeRequirementVertices,
+} from "./requirements-linear-program";
 import {
     INTERNAL_SERVER_ERROR,
     INVALID_ITEM_NAME_ERROR,
@@ -22,13 +24,8 @@ import {
     canCreateItem,
     filterByCreatorOverrides,
     filterByMinimumTool,
-    filterByOptimal,
     getLowestRequiredTool,
 } from "./item-utils";
-
-const glpk = GLPK();
-
-type ResultVariables = Result["result"]["vars"];
 
 function findMultipleOverrides(
     overrides?: CreatorOverride[]
@@ -76,16 +73,32 @@ async function getRequiredItemDetails(name: string): Promise<Items> {
 
 function mapResults(
     inputItemName: string,
-    results: ResultVariables
+    results?: VertexOutput
 ): RequiredWorkers[] {
-    const requiredWorkers: RequiredWorkers[] = [];
-    for (const [itemName, workers] of Object.entries(results)) {
-        if (itemName != inputItemName && workers !== 0) {
-            requiredWorkers.push({ name: itemName, workers });
+    if (!results) {
+        return [];
+    }
+
+    const requiredWorkers = new Map<string, number>();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { bounded, ...workerKeys } = results;
+    for (const [variableKey, workers] of Object.entries(workerKeys)) {
+        const itemName = variableKey.split("-")[0] as string;
+        if (
+            itemName != inputItemName &&
+            workers !== 0 &&
+            variableKey !== WORKERS_PROPERTY
+        ) {
+            const currentWorkers = requiredWorkers.get(itemName) ?? 0;
+            requiredWorkers.set(itemName, currentWorkers + workers);
         }
     }
 
-    return requiredWorkers;
+    return Array.from(requiredWorkers.entries()).map(([name, workers]) => ({
+        name,
+        workers,
+    }));
 }
 
 const queryRequirements: QueryRequirementsPrimaryPort = async ({
@@ -127,21 +140,14 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${lowestToolRequired}`);
     }
 
-    const optimalRequirements = filterByOptimal(
+    const result = computeRequirementVertices(
+        name,
+        workers,
         overriddenRequirements,
         maxAvailableTool
     );
 
-    const program = createRequirementsLinearProgram(
-        glpk,
-        name,
-        workers,
-        optimalRequirements,
-        maxAvailableTool
-    );
-
-    const output = glpk.solve(program);
-    return mapResults(name, output.result.vars);
+    return mapResults(name, result);
 };
 
 export { queryRequirements };

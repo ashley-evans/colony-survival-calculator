@@ -3,7 +3,6 @@ import { Graph } from "graph-data-structure";
 import {
     ToolModifierValues,
     getMaxToolModifier,
-    isAvailableToolSufficient,
 } from "../../../common/modifiers";
 import { Item, Items, Tools } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
@@ -17,13 +16,6 @@ function calculateCreateTime(
 ) {
     const toolModifier = getMaxToolModifier(item.maximumTool, availableTool);
     return item.createTime / toolModifier;
-}
-
-function calculateOutput(
-    item: Pick<Item, "maximumTool" | "createTime" | "output">,
-    maxAvailableTool: Tools
-): number {
-    return item.output / calculateCreateTime(item, maxAvailableTool);
 }
 
 function filterByMinimumTool(items: Items): Items {
@@ -46,34 +38,6 @@ function filterByMinimumTool(items: Items): Items {
     return Array.from(itemMap.values());
 }
 
-function filterByOptimal(items: Items, maxAvailableTool: Tools): Items {
-    const itemMap = new Map<string, Item>();
-
-    for (const item of items) {
-        if (!isAvailableToolSufficient(item.minimumTool, maxAvailableTool)) {
-            continue;
-        }
-
-        const currentOptimalItem = itemMap.get(item.name);
-        if (!currentOptimalItem) {
-            itemMap.set(item.name, item);
-            continue;
-        }
-
-        const currentOptimalOutput = calculateOutput(
-            currentOptimalItem,
-            maxAvailableTool
-        );
-        const itemOutput = calculateOutput(item, maxAvailableTool);
-
-        if (itemOutput > currentOptimalOutput) {
-            itemMap.set(item.name, item);
-        }
-    }
-
-    return Array.from(itemMap.values());
-}
-
 function getLowestRequiredTool(items: Items): Tools {
     let currentLowestTool = Tools.none;
     for (const item of items) {
@@ -88,7 +52,9 @@ function getLowestRequiredTool(items: Items): Tools {
     return currentLowestTool;
 }
 
-function groupItemsByName(items: Items): Map<string, Items> {
+type RecipeMap = Map<string, Items>;
+
+function groupItemsByName(items: Items): RecipeMap {
     const itemRecipes = new Map<string, Items>();
     for (const item of items) {
         const recipes = itemRecipes.get(item.name) ?? [];
@@ -223,11 +189,11 @@ function canCreateItem(name: string, items: Items): boolean {
 }
 
 export {
+    RecipeMap,
     calculateCreateTime,
-    calculateOutput,
     canCreateItem,
     filterByMinimumTool,
-    filterByOptimal,
     filterByCreatorOverrides,
     getLowestRequiredTool,
+    groupItemsByName,
 };
