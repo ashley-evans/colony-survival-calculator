@@ -54,7 +54,7 @@ function getLowestRequiredTool(items: Items): Tools {
 
 type RecipeMap = Map<string, Items>;
 
-function groupItemsByName(items: Items): RecipeMap {
+function groupItemsByName(items: Readonly<Items>): RecipeMap {
     const itemRecipes = new Map<string, Items>();
     for (const item of items) {
         const recipes = itemRecipes.get(item.name) ?? [];
