@@ -7,8 +7,8 @@ import { Items, Tools } from "../../../types";
 import { isAvailableToolSufficient } from "../../../common/modifiers";
 import { RequiredWorkers } from "../interfaces/query-requirements-primary-port";
 import {
+    RECIPE_PREFIX,
     VertexOutput,
-    WORKERS_PROPERTY,
     computeRequirementVertices,
 } from "./requirements-linear-program";
 import {
@@ -84,12 +84,12 @@ function mapResults(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { bounded, ...workerKeys } = results;
     for (const [variableKey, workers] of Object.entries(workerKeys)) {
-        const itemName = variableKey.split("-")[0] as string;
-        if (
-            itemName != inputItemName &&
-            workers !== 0 &&
-            variableKey !== WORKERS_PROPERTY
-        ) {
+        if (!variableKey.startsWith(RECIPE_PREFIX)) {
+            continue;
+        }
+
+        const itemName = variableKey.split("-")[1] as string;
+        if (itemName != inputItemName && workers !== 0) {
             const currentWorkers = requiredWorkers.get(itemName) ?? 0;
             requiredWorkers.set(itemName, currentWorkers + workers);
         }
