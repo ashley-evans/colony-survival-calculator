@@ -36,7 +36,7 @@ function createItem({
     requirements,
     minimumTool = Tools.none,
     maximumTool = Tools.none,
-    creator = `${name}-creator`,
+    creator = `${name} creator`,
     optionalOutputs,
     width,
     height,

@@ -5,9 +5,22 @@ type CreatorOverride = {
     creator: string;
 };
 
-type RequiredWorkers = {
+type Demand = {
     name: string;
+    amount: number;
+};
+
+type RequirementRecipe = {
+    name: string;
+    creator: string;
     workers: number;
+    demands: Demand[];
+};
+
+type Requirement = {
+    name: string;
+    amount: number;
+    creators: RequirementRecipe[];
 };
 
 interface QueryRequirementsPrimaryPort {
@@ -16,7 +29,13 @@ interface QueryRequirementsPrimaryPort {
         workers: number;
         maxAvailableTool?: Tools;
         creatorOverrides?: CreatorOverride[];
-    }): Promise<RequiredWorkers[]>;
+    }): Promise<Requirement[]>;
 }
 
-export type { CreatorOverride, RequiredWorkers, QueryRequirementsPrimaryPort };
+export type {
+    CreatorOverride,
+    Requirement,
+    RequirementRecipe,
+    Demand,
+    QueryRequirementsPrimaryPort,
+};

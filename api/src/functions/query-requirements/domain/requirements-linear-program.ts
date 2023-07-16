@@ -7,7 +7,7 @@ import { isAvailableToolSufficient } from "../../../common/modifiers";
 
 export const WORKERS_PROPERTY = "workers";
 export const REQUIREMENT_PREFIX = "requirement-";
-export const RECIPE_PREFIX = "recipe-";
+export const OUTPUT_PREFIX = "output-";
 
 type Constraints = IModelBase["constraints"];
 type Variables = IModelBase["variables"];
@@ -50,14 +50,21 @@ function filterCreatable(
 }
 
 function createBaseOutputPropertyName(itemName: string) {
-    return `${itemName}-base`;
+    return `${itemName}#base`;
 }
 
-function createSpecificRecipeRequirementPropertyName(
-    itemName: string,
-    requiring: Pick<Item, "name" | "creator">
+function createRecipeDemandVariableName(
+    recipe: Pick<Item, "name" | "creator">,
+    demand: string
 ) {
-    return `${REQUIREMENT_PREFIX}${requiring.name}-${requiring.creator}-${itemName}`;
+    return `${REQUIREMENT_PREFIX}${createVariableName(recipe)}-${demand}`;
+}
+
+function createRecipeOutputVariableName(
+    recipe: Pick<Item, "name" | "creator">,
+    output: string
+): string {
+    return `${OUTPUT_PREFIX}${createVariableName(recipe)}-${output}`;
 }
 
 function createDemandVariables(
@@ -103,19 +110,18 @@ function createDemandVariables(
                     {};
 
                 // Create specific recipe output properties
-                const specificRecipeRequirementPropertyName =
-                    createSpecificRecipeRequirementPropertyName(
-                        requirement.name,
-                        recipe
-                    );
-                specificRecipeRequirementVariable[requirement.name] = -1;
-                specificRecipeRequirementVariable[
-                    specificRecipeRequirementPropertyName
-                ] = 1;
-
-                recipeVariable[specificRecipeRequirementPropertyName] =
+                const recipeDemandVariableName = createRecipeDemandVariableName(
+                    recipe,
+                    requirement.name
+                );
+                recipeVariable[recipeDemandVariableName] =
                     (requirement.amount / createTime) * -1;
-                variables[specificRecipeRequirementPropertyName] =
+
+                // Add linking properties
+                specificRecipeRequirementVariable[requirement.name] = -1;
+                specificRecipeRequirementVariable[recipeDemandVariableName] = 1;
+
+                variables[recipeDemandVariableName] =
                     specificRecipeRequirementVariable;
             }
 
@@ -124,13 +130,40 @@ function createDemandVariables(
                 const baseItemPropertyName = createBaseOutputPropertyName(
                     optional.name
                 );
-                const currentOutput = recipeVariable[baseItemPropertyName] ?? 0;
+
+                // If optional output is same as base recipe, update base recipe output
+                // rather than adding separate output
                 const optionalOutput =
                     (optional.amount / createTime) * optional.likelihood;
-                recipeVariable[optional.name] = currentOutput + optionalOutput;
+                if (optional.name === recipe.name) {
+                    const newOutput =
+                        (recipeVariable[baseItemPropertyName] ?? 0) +
+                        optionalOutput;
+                    recipeVariable[baseItemPropertyName] = newOutput;
+                    continue;
+                }
+
+                const recipeOutputVariableName = createRecipeOutputVariableName(
+                    recipe,
+                    optional.name
+                );
+
+                // Create/Update optional output recipe variable
+                const currentOutputVariable =
+                    variables[recipeOutputVariableName] ?? {};
+                const currentOutput =
+                    currentOutputVariable[baseItemPropertyName] ?? 0;
+                const newOutput = currentOutput + optionalOutput;
+                currentOutputVariable[baseItemPropertyName] = newOutput;
+
+                // Add linking properties
+                recipeVariable[recipeOutputVariableName] = 1;
+                currentOutputVariable[recipeOutputVariableName] = -1;
+
+                variables[recipeOutputVariableName] = currentOutputVariable;
             }
 
-            variables[`${RECIPE_PREFIX}${createVariableName(recipe)}`] =
+            variables[createRecipeOutputVariableName(recipe, recipe.name)] =
                 recipeVariable;
         }
 
@@ -212,6 +245,11 @@ function computeRequirementVertices(
         equal: workers,
     };
 
+    // Ensure total output matches base output of item
+    demandConstraints[createBaseOutputPropertyName(inputItemName)] = {
+        equal: 0,
+    };
+
     const model: IMultiObjectiveModel = {
         optimize: {
             [inputItemName]: "max",
@@ -229,4 +267,25 @@ function computeRequirementVertices(
     );
 }
 
-export { computeRequirementVertices };
+function isOutputVariable(variableName: string): boolean {
+    return variableName.startsWith(OUTPUT_PREFIX);
+}
+
+function isRequirementVariable(variableName: string): boolean {
+    return variableName.startsWith(REQUIREMENT_PREFIX);
+}
+
+function isTotalVariable(variableName: string): boolean {
+    return (
+        !isOutputVariable(variableName) &&
+        !isRequirementVariable(variableName) &&
+        variableName !== WORKERS_PROPERTY
+    );
+}
+
+export {
+    computeRequirementVertices,
+    isOutputVariable,
+    isRequirementVariable,
+    isTotalVariable,
+};

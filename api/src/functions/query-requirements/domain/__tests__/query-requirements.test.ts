@@ -2,7 +2,11 @@ import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem } from "../../../../../test";
 import { Tools } from "../../../../types";
-import { RequiredWorkers } from "../../interfaces/query-requirements-primary-port";
+import {
+    Demand,
+    Requirement,
+    RequirementRecipe,
+} from "../../interfaces/query-requirements-primary-port";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: jest.fn(),
@@ -13,12 +17,11 @@ const mockMongoDBQueryRequirements = mongoDBQueryRequirements as jest.Mock;
 const validItemName = "test item name";
 const validWorkers = 5;
 
-function findItemWorkers(
-    requiredWorkers: RequiredWorkers[],
+function findRequirement(
+    requirements: Requirement[],
     itemName: string
-): number | undefined {
-    return requiredWorkers.find((workers) => workers.name === itemName)
-        ?.workers;
+): Requirement | undefined {
+    return requirements.find((workers) => workers.name === itemName);
 }
 
 beforeEach(() => {
@@ -147,9 +150,23 @@ test("returns requirement given item with a single requirement and no nested req
         workers: validWorkers,
     });
 
+    // Check overall item requirement
     expect(actual).toHaveLength(1);
-    expect(actual[0]?.name).toEqual(requiredItem.name);
-    expect(actual[0]?.workers).toBeCloseTo(7.5);
+    const requirement = actual[0] as Requirement;
+
+    expect(requirement.name).toEqual(requiredItem.name);
+    expect(requirement.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement.creators).toHaveLength(1);
+    const creator = requirement.creators[0] as RequirementRecipe;
+
+    expect(creator.name).toEqual(requiredItem.name);
+    expect(creator.creator).toEqual(requiredItem.creator);
+    expect(creator.workers).toBeCloseTo(7.5);
+
+    // Check specific creator demands
+    expect(creator.demands).toEqual([]);
 });
 
 test("returns requirements given item with multiple requirements and no nested requirements", async () => {
@@ -185,11 +202,40 @@ test("returns requirements given item with multiple requirements and no nested r
         workers: validWorkers,
     });
 
+    // Check overall item requirement
     expect(actual).toHaveLength(2);
-    expect(actual).toEqual([
-        { name: requiredItem1.name, workers: 7.5 },
-        { name: requiredItem2.name, workers: 30 },
-    ]);
+    const requirement1 = actual[0] as Requirement;
+
+    expect(requirement1.name).toEqual(requiredItem1.name);
+    expect(requirement1.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement1.creators).toHaveLength(1);
+    const requirement1Creator = requirement1.creators[0] as RequirementRecipe;
+
+    expect(requirement1Creator.name).toEqual(requiredItem1.name);
+    expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.workers).toBeCloseTo(7.5);
+
+    // Check specific creator demands
+    expect(requirement1Creator.demands).toEqual([]);
+
+    // Check overall item requirement
+    const requirement2 = actual[1] as Requirement;
+
+    expect(requirement2.name).toEqual(requiredItem2.name);
+    expect(requirement2.amount).toBeCloseTo(15);
+
+    // Check creator requirement
+    expect(requirement2.creators).toHaveLength(1);
+    const requirement2Creator = requirement2.creators[0] as RequirementRecipe;
+
+    expect(requirement2Creator.name).toEqual(requiredItem2.name);
+    expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.workers).toBeCloseTo(30);
+
+    // Check specific creator demands
+    expect(requirement2Creator.demands).toEqual([]);
 });
 
 test("returns requirements given item with single nested requirement", async () => {
@@ -222,11 +268,44 @@ test("returns requirements given item with single nested requirement", async () 
         workers: validWorkers,
     });
 
+    // Check overall item requirement
     expect(actual).toHaveLength(2);
-    expect(actual).toEqual([
-        { name: requiredItem1.name, workers: 7.5 },
-        { name: requiredItem2.name, workers: 30 },
-    ]);
+    const requirement1 = actual[0] as Requirement;
+
+    expect(requirement1.name).toEqual(requiredItem1.name);
+    expect(requirement1.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement1.creators).toHaveLength(1);
+    const requirement1Creator = requirement1.creators[0] as RequirementRecipe;
+
+    expect(requirement1Creator.name).toEqual(requiredItem1.name);
+    expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.workers).toBeCloseTo(7.5);
+
+    // Check specific creator demands
+    expect(requirement1Creator.demands).toHaveLength(1);
+    const requirement1CreatorDemands = requirement1Creator.demands[0] as Demand;
+
+    expect(requirement1CreatorDemands.name).toEqual(requiredItem2.name);
+    expect(requirement1CreatorDemands.amount).toEqual(15);
+
+    // Check overall item requirement
+    const requirement2 = actual[1] as Requirement;
+
+    expect(requirement2.name).toEqual(requiredItem2.name);
+    expect(requirement2.amount).toBeCloseTo(15);
+
+    // Check creator requirement
+    expect(requirement2.creators).toHaveLength(1);
+    const requirement2Creator = requirement2.creators[0] as RequirementRecipe;
+
+    expect(requirement2Creator.name).toEqual(requiredItem2.name);
+    expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.workers).toBeCloseTo(30);
+
+    // Check specific creator demands
+    expect(requirement2Creator.demands).toEqual([]);
 });
 
 test("returns requirements given item with multiple different nested requirements", async () => {
@@ -269,12 +348,68 @@ test("returns requirements given item with multiple different nested requirement
         workers: validWorkers,
     });
 
+    // Check overall item requirement
     expect(actual).toHaveLength(3);
-    expect(actual).toEqual([
-        { name: requiredItem1.name, workers: 7.5 },
-        { name: requiredItem2.name, workers: 30 },
-        { name: requiredItem3.name, workers: 20 },
-    ]);
+    const requirement1 = actual[0] as Requirement;
+
+    expect(requirement1.name).toEqual(requiredItem1.name);
+    expect(requirement1.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement1.creators).toHaveLength(1);
+    const requirement1Creator = requirement1.creators[0] as RequirementRecipe;
+
+    expect(requirement1Creator.name).toEqual(requiredItem1.name);
+    expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.workers).toBeCloseTo(7.5);
+
+    // Check specific creator demands
+    expect(requirement1Creator.demands).toHaveLength(2);
+    const requirement1CreatorDemands1 = requirement1Creator
+        .demands[0] as Demand;
+
+    expect(requirement1CreatorDemands1.name).toEqual(requiredItem2.name);
+    expect(requirement1CreatorDemands1.amount).toEqual(15);
+
+    const requirement1CreatorDemands2 = requirement1Creator
+        .demands[1] as Demand;
+
+    expect(requirement1CreatorDemands2.name).toEqual(requiredItem3.name);
+    expect(requirement1CreatorDemands2.amount).toEqual(10);
+
+    // Check overall item requirement
+    const requirement2 = actual[1] as Requirement;
+
+    expect(requirement2.name).toEqual(requiredItem2.name);
+    expect(requirement2.amount).toBeCloseTo(15);
+
+    // Check creator requirement
+    expect(requirement2.creators).toHaveLength(1);
+    const requirement2Creator = requirement2.creators[0] as RequirementRecipe;
+
+    expect(requirement2Creator.name).toEqual(requiredItem2.name);
+    expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.workers).toBeCloseTo(30);
+
+    // Check specific creator demands
+    expect(requirement2Creator.demands).toEqual([]);
+
+    // Check overall item requirement
+    const requirement3 = actual[2] as Requirement;
+
+    expect(requirement3.name).toEqual(requiredItem3.name);
+    expect(requirement3.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement3.creators).toHaveLength(1);
+    const requirement3Creator = requirement3.creators[0] as RequirementRecipe;
+
+    expect(requirement3Creator.name).toEqual(requiredItem3.name);
+    expect(requirement3Creator.creator).toEqual(requiredItem3.creator);
+    expect(requirement3Creator.workers).toBeCloseTo(20);
+
+    // Check specific creator demands
+    expect(requirement3Creator.demands).toEqual([]);
 });
 
 test("returns combined requirements given item with multiple nested requirements with common requirement", async () => {
@@ -320,10 +455,68 @@ test("returns combined requirements given item with multiple nested requirements
         workers: validWorkers,
     });
 
+    // Check overall item requirement
     expect(actual).toHaveLength(3);
-    expect(actual).toContainEqual({ name: requiredItem1.name, workers: 7.5 });
-    expect(actual).toContainEqual({ name: requiredItem2.name, workers: 30 });
-    expect(actual).toContainEqual({ name: requiredItem3.name, workers: 30 });
+    const requirement1 = actual[0] as Requirement;
+
+    expect(requirement1.name).toEqual(requiredItem1.name);
+    expect(requirement1.amount).toBeCloseTo(10);
+
+    // Check creator requirement
+    expect(requirement1.creators).toHaveLength(1);
+    const requirement1Creator = requirement1.creators[0] as RequirementRecipe;
+
+    expect(requirement1Creator.name).toEqual(requiredItem1.name);
+    expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.workers).toBeCloseTo(7.5);
+
+    // Check specific creator demands
+    expect(requirement1Creator.demands).toHaveLength(2);
+    const requirement1CreatorDemands1 = requirement1Creator
+        .demands[0] as Demand;
+
+    expect(requirement1CreatorDemands1.name).toEqual(requiredItem2.name);
+    expect(requirement1CreatorDemands1.amount).toEqual(15);
+
+    const requirement1CreatorDemands2 = requirement1Creator
+        .demands[1] as Demand;
+
+    expect(requirement1CreatorDemands2.name).toEqual(requiredItem3.name);
+    expect(requirement1CreatorDemands2.amount).toEqual(10);
+
+    // Check overall item requirement
+    const requirement2 = actual[1] as Requirement;
+
+    expect(requirement2.name).toEqual(requiredItem3.name);
+    expect(requirement2.amount).toBeCloseTo(15);
+
+    // Check creator requirement
+    expect(requirement2.creators).toHaveLength(1);
+    const requirement2Creator = requirement2.creators[0] as RequirementRecipe;
+
+    expect(requirement2Creator.name).toEqual(requiredItem3.name);
+    expect(requirement2Creator.creator).toEqual(requiredItem3.creator);
+    expect(requirement2Creator.workers).toBeCloseTo(30);
+
+    // Check specific creator demands
+    expect(requirement2Creator.demands).toEqual([]);
+
+    // Check overall item requirement
+    const requirement3 = actual[2] as Requirement;
+
+    expect(requirement3.name).toEqual(requiredItem2.name);
+    expect(requirement3.amount).toBeCloseTo(15);
+
+    // Check creator requirement
+    expect(requirement3.creators).toHaveLength(1);
+    const requirement3Creator = requirement3.creators[0] as RequirementRecipe;
+
+    expect(requirement3Creator.name).toEqual(requiredItem2.name);
+    expect(requirement3Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement3Creator.workers).toBeCloseTo(30);
+
+    // Check specific creator demands
+    expect(requirement3Creator.demands).toEqual([]);
 });
 
 test("throws an error if an unhandled exception occurs while fetching item requirements", async () => {
@@ -438,15 +631,19 @@ describe("handles tool modifiers", () => {
     });
 
     test.each([
-        [Tools.none, 5],
-        [Tools.stone, 10],
-        [Tools.copper, 20],
-        [Tools.iron, 26.5],
-        [Tools.bronze, 30.75],
-        [Tools.steel, 40],
+        [Tools.none, 7.5, 5],
+        [Tools.stone, 15, 10],
+        [Tools.copper, 30, 20],
+        [Tools.iron, 39.75, 26.5],
+        [Tools.bronze, 46.125, 30.75],
+        [Tools.steel, 60, 40],
     ])(
-        "returns expected workers for requirement given item with applicable tool: %s and requirement with no tools",
-        async (provided: Tools, expectedWorkers: number) => {
+        "returns expected output for requirement given item with applicable tool: %s and requirement with no tools",
+        async (
+            provided: Tools,
+            expectedOutput: number,
+            expectedWorkers: number
+        ) => {
             const requiredItemName = "another item";
             const requiredItem = createItem({
                 name: requiredItemName,
@@ -474,15 +671,19 @@ describe("handles tool modifiers", () => {
                 workers: validWorkers,
                 maxAvailableTool: provided,
             });
-            const requirement = actual.find(
-                (value) => value.name === requiredItemName
-            ) as RequiredWorkers;
+            const requirement = findRequirement(
+                actual,
+                requiredItemName
+            ) as Requirement;
 
-            expect(requirement.workers).toBeCloseTo(expectedWorkers);
+            expect(requirement.amount).toBeCloseTo(expectedOutput);
+            expect(requirement.creators[0]?.workers).toBeCloseTo(
+                expectedWorkers
+            );
         }
     );
 
-    test("returns required workers to satisfy input item given tool better than applicable to input item", async () => {
+    test("returns required output/workers to satisfy input item given tool better than applicable to input item", async () => {
         const requiredItemName = "another item";
         const requiredItem = createItem({
             name: requiredItemName,
@@ -507,11 +708,13 @@ describe("handles tool modifiers", () => {
             workers: validWorkers,
             maxAvailableTool: Tools.steel,
         });
-        const requirement = actual.find(
-            (value) => value.name === requiredItemName
-        ) as RequiredWorkers;
+        const requirement = findRequirement(
+            actual,
+            requiredItemName
+        ) as Requirement;
 
-        expect(requirement.workers).toBeCloseTo(20);
+        expect(requirement.amount).toBeCloseTo(30);
+        expect(requirement.creators[0]?.workers).toBeCloseTo(20);
     });
 
     test("reduces required workers for requirement if tool provided is applicable to requirement and not input item", async () => {
@@ -539,11 +742,12 @@ describe("handles tool modifiers", () => {
             workers: validWorkers,
             maxAvailableTool: Tools.steel,
         });
-        const requirement = actual.find(
-            (value) => value.name === requiredItemName
-        ) as RequiredWorkers;
+        const requirement = findRequirement(
+            actual,
+            requiredItemName
+        ) as Requirement;
 
-        expect(requirement.workers).toBeCloseTo(0.625);
+        expect(requirement.creators[0]?.workers).toBeCloseTo(0.625);
     });
 
     test("reduces required workers for required item to max applicable to requirement given better tool applicable to only requirement", async () => {
@@ -571,17 +775,18 @@ describe("handles tool modifiers", () => {
             workers: validWorkers,
             maxAvailableTool: Tools.steel,
         });
-        const requirement = actual.find(
-            (value) => value.name === requiredItemName
-        ) as RequiredWorkers;
+        const requirement = findRequirement(
+            actual,
+            requiredItemName
+        ) as Requirement;
 
-        expect(requirement.workers).toBeCloseTo(1.25);
+        expect(requirement.creators[0]?.workers).toBeCloseTo(1.25);
     });
 });
 
 describe("optional output requirement impact", () => {
     test("factors optional output given item with single requirement that is also optional output", async () => {
-        const requiredItem1 = createItem({
+        const requiredItem = createItem({
             name: "required item 1",
             createTime: 3,
             output: 4,
@@ -591,21 +796,45 @@ describe("optional output requirement impact", () => {
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem1.name, amount: 2 }],
+            requirements: [{ name: requiredItem.name, amount: 2 }],
             optionalOutputs: [
-                { name: requiredItem1.name, amount: 1, likelihood: 0.5 },
+                { name: requiredItem.name, amount: 1, likelihood: 0.5 },
             ],
         });
-        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem1]);
+        mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem1.name);
-        expect(actual[0]?.workers).toBeCloseTo(2.8125);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(5);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(2);
+        const creator1 = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator1.name).toEqual(item.name);
+        expect(creator1.creator).toEqual(item.creator);
+        expect(creator1.workers).toBeCloseTo(5);
+
+        // Check specific creator demands
+        expect(creator1.demands).toEqual([]);
+
+        // Check creator requirement
+        const creator2 = requirement.creators[1] as RequirementRecipe;
+
+        expect(creator2.name).toEqual(requiredItem.name);
+        expect(creator2.creator).toEqual(requiredItem.creator);
+        expect(creator2.workers).toBeCloseTo(2.8125);
+
+        // Check specific creator demands
+        expect(creator2.demands).toEqual([]);
     });
 
     test("factors optional output given item with nested requirement that is top level optional output", async () => {
@@ -641,9 +870,58 @@ describe("optional output requirement impact", () => {
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(2);
-        expect(findItemWorkers(actual, requiredItem1.name)).toBeCloseTo(7.5);
-        expect(findItemWorkers(actual, requiredItem2.name)).toBeCloseTo(25);
+        const requirement1 = actual[0] as Requirement;
+
+        expect(requirement1.name).toEqual(requiredItem1.name);
+        expect(requirement1.amount).toBeCloseTo(10);
+
+        // Check creator requirement
+        expect(requirement1.creators).toHaveLength(1);
+        const requirement1Creator = requirement1
+            .creators[0] as RequirementRecipe;
+
+        expect(requirement1Creator.name).toEqual(requiredItem1.name);
+        expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+        expect(requirement1Creator.workers).toBeCloseTo(7.5);
+
+        // Check specific creator demands
+        expect(requirement1Creator.demands).toHaveLength(1);
+        const requirement1CreatorDemands = requirement1Creator
+            .demands[0] as Demand;
+
+        expect(requirement1CreatorDemands.name).toEqual(requiredItem2.name);
+        expect(requirement1CreatorDemands.amount).toEqual(15);
+
+        // Check overall item requirement
+        const requirement2 = actual[1] as Requirement;
+
+        expect(requirement2.name).toEqual(requiredItem2.name);
+        expect(requirement2.amount).toBeCloseTo(15);
+
+        // Check creator requirement
+        expect(requirement2.creators).toHaveLength(2);
+        const requirement2Creator1 = requirement2
+            .creators[0] as RequirementRecipe;
+
+        expect(requirement2Creator1.name).toEqual(item.name);
+        expect(requirement2Creator1.creator).toEqual(item.creator);
+        expect(requirement2Creator1.workers).toBeCloseTo(5);
+
+        // Check specific creator demands
+        expect(requirement2Creator1.demands).toEqual([]);
+
+        // Check creator requirement
+        const requirement2Creator2 = requirement2
+            .creators[1] as RequirementRecipe;
+
+        expect(requirement2Creator2.name).toEqual(requiredItem2.name);
+        expect(requirement2Creator2.creator).toEqual(requiredItem2.creator);
+        expect(requirement2Creator2.workers).toBeCloseTo(25);
+
+        // Check specific creator demands
+        expect(requirement2Creator2.demands).toEqual([]);
     });
 
     test("uses recipe with high optional output over lower base output", async () => {
@@ -683,9 +961,23 @@ describe("optional output requirement impact", () => {
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requirementName);
-        expect(actual[0]?.workers).toBeCloseTo(3);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requirementName);
+        expect(requirement.amount).toBeCloseTo(5);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requirementName);
+        expect(creator.creator).toEqual(higherOptionalOutputRecipe.creator);
+        expect(creator.workers).toBeCloseTo(3);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 });
 
@@ -722,9 +1014,23 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(15);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(20);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(15);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("factors max available tool into most output calculation when given item w/ lower base output but higher modified", async () => {
@@ -762,9 +1068,23 @@ describe("multiple recipe handling", () => {
             maxAvailableTool: Tools.steel,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(60);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(80);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(60);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("ignores more optimal recipe if cannot be created by provided max tool", async () => {
@@ -802,9 +1122,23 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(7.5);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(10);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(7.5);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("does not return any required items if the required item was related to a sub optimal recipe", async () => {
@@ -846,9 +1180,23 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(moreOptimalRequiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(15);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(moreOptimalRequiredItem.name);
+        expect(requirement.amount).toBeCloseTo(20);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(moreOptimalRequiredItem.name);
+        expect(creator.creator).toEqual(moreOptimalRequiredItem.creator);
+        expect(creator.workers).toBeCloseTo(15);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
@@ -927,9 +1275,23 @@ describe("creator override handling", () => {
             ],
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(7.5);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(10);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(7.5);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("favours less optimal requirement recipe given applicable requirement override", async () => {
@@ -969,9 +1331,23 @@ describe("creator override handling", () => {
             ],
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItemName);
-        expect(actual[0]?.workers).toBeCloseTo(15);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItemName);
+        expect(requirement.amount).toBeCloseTo(20);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItemName);
+        expect(creator.creator).toEqual(overrideCreator);
+        expect(creator.workers).toBeCloseTo(15);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("throws an error if provided more than one override for a single item", async () => {
@@ -1039,9 +1415,23 @@ describe("creator override handling", () => {
             ],
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(15);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(20);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(15);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("does not return any requirement that relates to a recipe that was removed by an override", async () => {
@@ -1084,9 +1474,23 @@ describe("creator override handling", () => {
             creatorOverrides: [{ itemName: validItemName, creator: override }],
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(requiredItem.name);
-        expect(actual[0]?.workers).toBeCloseTo(15);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(requiredItem.name);
+        expect(requirement.amount).toBeCloseTo(20);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(requiredItem.name);
+        expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.workers).toBeCloseTo(15);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 
     test("throws an error if the provided override would result in no recipe being known for a given item (root override)", async () => {
@@ -1200,8 +1604,22 @@ describe("creator override handling", () => {
             ],
         });
 
+        // Check overall item requirement
         expect(actual).toHaveLength(1);
-        expect(actual[0]?.name).toEqual(lessOptimalRecipeRequirement.name);
-        expect(actual[0]?.workers).toBeCloseTo(7.5);
+        const requirement = actual[0] as Requirement;
+
+        expect(requirement.name).toEqual(lessOptimalRecipeRequirement.name);
+        expect(requirement.amount).toBeCloseTo(10);
+
+        // Check creator requirement
+        expect(requirement.creators).toHaveLength(1);
+        const creator = requirement.creators[0] as RequirementRecipe;
+
+        expect(creator.name).toEqual(lessOptimalRecipeRequirement.name);
+        expect(creator.creator).toEqual(lessOptimalRecipeRequirement.creator);
+        expect(creator.workers).toBeCloseTo(7.5);
+
+        // Check specific creator demands
+        expect(creator.demands).toEqual([]);
     });
 });
