@@ -150,10 +150,7 @@ function createRecipeMap(
     return [itemRecipeMap, recipeMap];
 }
 
-function mapResults(
-    inputItemName: string,
-    results?: VertexOutput
-): Requirement[] {
+function mapResults(results?: VertexOutput): Requirement[] {
     if (!results) {
         return [];
     }
@@ -172,7 +169,7 @@ function mapResults(
     const result: Requirement[] = [];
     for (const [totalKey, amount] of totalOutputVariables) {
         // Ignore input item or items that have zero requirement
-        if (totalKey === inputItemName || amount === 0) {
+        if (amount === 0) {
             continue;
         }
 
@@ -250,7 +247,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         maxAvailableTool
     );
 
-    return mapResults(name, result);
+    return mapResults(result);
 };
 
 export { queryRequirements };
