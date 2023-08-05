@@ -7,7 +7,8 @@ import { isAvailableToolSufficient } from "../../../common/modifiers";
 
 export const WORKERS_PROPERTY = "workers";
 export const REQUIREMENT_PREFIX = "requirement-";
-export const RECIPE_PREFIX = "recipe-";
+export const PRODUCTION_PREFIX = "production-";
+export const OUTPUT_PREFIX = "output-";
 
 type Constraints = IModelBase["constraints"];
 type Variables = IModelBase["variables"];
@@ -50,14 +51,28 @@ function filterCreatable(
 }
 
 function createBaseOutputPropertyName(itemName: string) {
-    return `${itemName}-base`;
+    return `${itemName}#base`;
 }
 
-function createSpecificRecipeRequirementPropertyName(
-    itemName: string,
-    requiring: Pick<Item, "name" | "creator">
+function createRecipeDemandVariableName(
+    recipe: Pick<Item, "name" | "creator">,
+    demand: string
 ) {
-    return `${REQUIREMENT_PREFIX}${requiring.name}-${requiring.creator}-${itemName}`;
+    return `${REQUIREMENT_PREFIX}${createVariableName(recipe)}-${demand}`;
+}
+
+function createRecipeProductionVariableName(
+    recipe: Pick<Item, "name" | "creator">,
+    product: string
+): string {
+    return `${PRODUCTION_PREFIX}${createVariableName(recipe)}-${product}`;
+}
+
+function createRecipeOutputVariableName(
+    recipe: Pick<Item, "name" | "creator">,
+    output: string
+): string {
+    return `${OUTPUT_PREFIX}${createVariableName(recipe)}-${output}`;
 }
 
 function createDemandVariables(
@@ -75,16 +90,28 @@ function createDemandVariables(
         const totalOutputVariable: VariableProperties = {};
 
         // Set total output properties
-        const baseItemPropertyName = createBaseOutputPropertyName(itemName);
+        const baseItemOutputPropertyName =
+            createBaseOutputPropertyName(itemName);
         totalOutputVariable[itemName] = 1;
-        totalOutputVariable[baseItemPropertyName] = -1;
+        totalOutputVariable[baseItemOutputPropertyName] = -1;
 
         for (const recipe of recipes) {
             const recipeVariable: VariableProperties = {};
+            const baseRecipeOutputPropertyName = createRecipeOutputVariableName(
+                recipe,
+                recipe.name
+            );
 
             // Set recipe output properties
             const createTime = calculateCreateTime(recipe, maxAvailableTool);
-            recipeVariable[baseItemPropertyName] = recipe.output / createTime;
+            recipeVariable[baseRecipeOutputPropertyName] =
+                recipe.output / createTime;
+
+            // Create base output to recipe output mapping
+            const recipeOutputVariable: VariableProperties = {};
+            recipeOutputVariable[baseRecipeOutputPropertyName] = -1;
+            recipeOutputVariable[baseItemOutputPropertyName] = 1;
+            variables[baseRecipeOutputPropertyName] = recipeOutputVariable;
 
             // Set worker properties
             recipeVariable[WORKERS_PROPERTY] = 1;
@@ -103,34 +130,68 @@ function createDemandVariables(
                     {};
 
                 // Create specific recipe output properties
-                const specificRecipeRequirementPropertyName =
-                    createSpecificRecipeRequirementPropertyName(
-                        requirement.name,
-                        recipe
-                    );
-                specificRecipeRequirementVariable[requirement.name] = -1;
-                specificRecipeRequirementVariable[
-                    specificRecipeRequirementPropertyName
-                ] = 1;
-
-                recipeVariable[specificRecipeRequirementPropertyName] =
+                const recipeDemandVariableName = createRecipeDemandVariableName(
+                    recipe,
+                    requirement.name
+                );
+                recipeVariable[recipeDemandVariableName] =
                     (requirement.amount / createTime) * -1;
-                variables[specificRecipeRequirementPropertyName] =
+
+                // Add linking properties
+                specificRecipeRequirementVariable[requirement.name] = -1;
+                specificRecipeRequirementVariable[recipeDemandVariableName] = 1;
+
+                variables[recipeDemandVariableName] =
                     specificRecipeRequirementVariable;
             }
 
             // Set optional output properties
             for (const optional of recipe.optionalOutputs ?? []) {
-                const baseItemPropertyName = createBaseOutputPropertyName(
-                    optional.name
-                );
-                const currentOutput = recipeVariable[baseItemPropertyName] ?? 0;
+                const baseOptionalOutputPropertyName =
+                    createBaseOutputPropertyName(optional.name);
+
+                // If optional output is same as base recipe, update base recipe output
+                // rather than adding separate output
                 const optionalOutput =
                     (optional.amount / createTime) * optional.likelihood;
-                recipeVariable[optional.name] = currentOutput + optionalOutput;
+                if (optional.name === recipe.name) {
+                    const newOutput =
+                        (recipeVariable[baseRecipeOutputPropertyName] ?? 0) +
+                        optionalOutput;
+                    recipeVariable[baseRecipeOutputPropertyName] = newOutput;
+                    continue;
+                }
+
+                const recipeProductionVariableName =
+                    createRecipeProductionVariableName(recipe, optional.name);
+                const recipeOptionalOutputVariableName =
+                    createRecipeOutputVariableName(recipe, optional.name);
+
+                // Create/Update optional output recipe variable
+                const currentOutputVariable =
+                    variables[recipeProductionVariableName] ?? {};
+                const currentOutput =
+                    currentOutputVariable[recipeOptionalOutputVariableName] ??
+                    0;
+                const newOutput = currentOutput + optionalOutput;
+                currentOutputVariable[recipeOptionalOutputVariableName] =
+                    newOutput;
+
+                // Add production linking properties
+                recipeVariable[recipeProductionVariableName] = 1;
+                currentOutputVariable[recipeProductionVariableName] = -1;
+
+                // Create output linking variable
+                const optionalOutputVariable: VariableProperties = {};
+                optionalOutputVariable[recipeOptionalOutputVariableName] = -1;
+                optionalOutputVariable[baseOptionalOutputPropertyName] = 1;
+                variables[recipeOptionalOutputVariableName] =
+                    optionalOutputVariable;
+
+                variables[recipeProductionVariableName] = currentOutputVariable;
             }
 
-            variables[`${RECIPE_PREFIX}${createVariableName(recipe)}`] =
+            variables[createRecipeProductionVariableName(recipe, recipe.name)] =
                 recipeVariable;
         }
 
@@ -140,25 +201,34 @@ function createDemandVariables(
     return variables;
 }
 
-function createDemandConstraints(
-    variables: Readonly<Variables>,
-    inputItemName: string
-): Constraints {
+function createMinimumConstraints(
+    variables: Readonly<Variables>
+): Readonly<Constraints> {
     const uniqueConstraints: Constraints = {};
-    const inputItemWorkerVariable =
-        createInputWorkersPropertyName(inputItemName);
     for (const properties of Object.values(variables)) {
         for (const property of Object.keys(properties ?? {})) {
-            if (
-                property !== WORKERS_PROPERTY &&
-                property !== inputItemWorkerVariable
-            ) {
-                uniqueConstraints[property] = { min: 0 };
-            }
+            uniqueConstraints[property] = { min: 0 };
         }
     }
 
     return uniqueConstraints;
+}
+
+function createOutputConstraints(
+    variables: Readonly<Variables>
+): Readonly<Constraints> {
+    const outputConstraints: Constraints = {};
+    for (const [key, properties] of Object.entries(variables)) {
+        if (!isOutputVariable(key) || !properties) {
+            continue;
+        }
+
+        for (const property of Object.keys(properties)) {
+            outputConstraints[property] = { equal: 0 };
+        }
+    }
+
+    return outputConstraints;
 }
 
 function getVertexWithHighestOutputAndLowestWorkers(
@@ -207,26 +277,56 @@ function computeRequirementVertices(
         inputItemName
     );
 
-    const demandConstraints = createDemandConstraints(variables, inputItemName);
-    demandConstraints[createInputWorkersPropertyName(inputItemName)] = {
-        equal: workers,
-    };
+    const demandConstraints = createMinimumConstraints(variables);
+    const outputConstraints = createOutputConstraints(variables);
+    const inputWorkersConstraintName =
+        createInputWorkersPropertyName(inputItemName);
 
     const model: IMultiObjectiveModel = {
         optimize: {
             [inputItemName]: "max",
             [WORKERS_PROPERTY]: "min",
         },
-        constraints: demandConstraints,
+        constraints: {
+            ...demandConstraints,
+            ...outputConstraints,
+            [inputWorkersConstraintName]: { equal: workers },
+        },
         variables: variables,
     };
 
     const result = solver.MultiObjective(model) as LinearProgramOutput;
-
     return getVertexWithHighestOutputAndLowestWorkers(
         inputItemName,
         result.vertices
     );
 }
 
-export { computeRequirementVertices };
+function isProductionVariable(variableName: string): boolean {
+    return variableName.startsWith(PRODUCTION_PREFIX);
+}
+
+function isRequirementVariable(variableName: string): boolean {
+    return variableName.startsWith(REQUIREMENT_PREFIX);
+}
+
+function isOutputVariable(variableName: string): boolean {
+    return variableName.startsWith(OUTPUT_PREFIX);
+}
+
+function isTotalVariable(variableName: string): boolean {
+    return (
+        !isProductionVariable(variableName) &&
+        !isRequirementVariable(variableName) &&
+        !isOutputVariable(variableName) &&
+        variableName !== WORKERS_PROPERTY
+    );
+}
+
+export {
+    computeRequirementVertices,
+    isProductionVariable,
+    isRequirementVariable,
+    isOutputVariable,
+    isTotalVariable,
+};
