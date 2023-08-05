@@ -31,6 +31,12 @@ export type RequirementsTableRow = {
     workers: number;
 };
 
+type SortableProperty = {
+    [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
+        ? K
+        : never;
+}[keyof RequirementsTableRow];
+
 type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
     selectedItemName: string;
@@ -67,16 +73,17 @@ const GET_ITEM_REQUIREMENTS = gql(`
     }
 `);
 
-function sortByWorkers(
+function sortBy(
     requirements: Readonly<RequirementsTableRow[]>,
-    order: ValidSortDirections
+    order: ValidSortDirections,
+    property: SortableProperty
 ): RequirementsTableRow[] {
     const reference = [...requirements];
     switch (order) {
         case "descending":
-            return reference.sort((a, b) => b.workers - a.workers);
+            return reference.sort((a, b) => b[property] - a[property]);
         case "ascending":
-            return reference.sort((a, b) => a.workers - b.workers);
+            return reference.sort((a, b) => a[property] - b[property]);
         default:
             return reference;
     }
@@ -190,7 +197,10 @@ function Requirements({
     }
 
     const rows = mapRequirementsToRow(filtered);
-    const sortedRows = sortByWorkers(rows, workerSortDirection);
+    const sortedRows =
+        workerSortDirection !== "none"
+            ? sortBy(rows, workerSortDirection, "workers")
+            : sortBy(rows, amountSortDirection, "amount");
 
     return (
         <>

@@ -813,6 +813,147 @@ describe("requirements rendering given requirements", () => {
             }
         }
     );
+
+    test.each([
+        [
+            "descending",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 2", amount: 20, workers: 1 },
+                { name: "test item 1", amount: 10, workers: 1 },
+            ],
+            1,
+        ],
+        [
+            "ascending",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 2", amount: 10, workers: 1 },
+                { name: "test item 1", amount: 20, workers: 1 },
+            ],
+            2,
+        ],
+        [
+            "default",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 1", amount: 10, workers: 1 },
+                { name: "test item 2", amount: 20, workers: 1 },
+            ],
+            3,
+        ],
+    ])(
+        "displays the items in %s order by amount if amount column is sorted in that order",
+        async (
+            _: string,
+            unsorted: RequirementsResponse[],
+            sorted: RequirementsTableRow[],
+            numberOfClicks: number
+        ) => {
+            server.use(
+                graphql.query<GetItemRequirementsQuery>(
+                    expectedRequirementsQueryName,
+                    (_, res, ctx) => {
+                        return res.once(ctx.data({ requirement: unsorted }));
+                    }
+                )
+            );
+
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const amountColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedAmountColumnName }
+            );
+            for (let i = 0; i < numberOfClicks; i++) {
+                await act(async () => {
+                    await user.click(amountColumnHeader);
+                });
+            }
+            const requirementRows = await within(
+                requirementsTable
+            ).findAllByRole("row");
+
+            for (let i = 0; i < sorted.length; i++) {
+                const currentRow = requirementRows[i + 1];
+                expect(
+                    within(currentRow).getByText(sorted[i].name)
+                ).toBeVisible();
+                expect(
+                    within(currentRow).getByText(sorted[i].amount)
+                ).toBeVisible();
+            }
+        }
+    );
 });
 
 describe("error handling", async () => {
