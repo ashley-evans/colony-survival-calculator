@@ -18,9 +18,23 @@ input CreatorOverride {
     creator: String!
 }
 
+type CreatorDemand {
+    name: ID!
+    amount: Float!
+}
+
+type RequirementCreator {
+    name: ID!
+    creator: String!
+    amount: Float!
+    workers: Float!
+    demands: [CreatorDemand!]!
+}
+
 type Requirement {
     name: ID!
-    workers: Float!
+    amount: Float!
+    creators: [RequirementCreator!]!
 }
 
 enum OutputUnit {

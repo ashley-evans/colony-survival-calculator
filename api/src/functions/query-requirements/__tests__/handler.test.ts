@@ -7,7 +7,7 @@ import type {
     Requirement as GraphQLRequirement,
     Tools,
 } from "../../../graphql/schema";
-import type { RequiredWorkers } from "../interfaces/query-requirements-primary-port";
+import type { Requirement } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 import { Tools as SchemaTools } from "../../../types";
@@ -124,19 +124,67 @@ test.each([
     [
         "multiple requirements received",
         [
-            { name: "test", workers: 2 },
-            { name: "test 2", workers: 5 },
+            {
+                name: "test item 1",
+                amount: 60,
+                creators: [
+                    {
+                        name: "test item 1",
+                        creator: "test item 1 creator",
+                        amount: 60,
+                        workers: 5,
+                        demands: [{ name: "required item 1", amount: 80 }],
+                    },
+                ],
+            },
+            {
+                name: "required item 1",
+                amount: 80,
+                creators: [
+                    {
+                        name: "required item 1",
+                        creator: "required item 1 creator",
+                        amount: 80,
+                        workers: 60,
+                        demands: [],
+                    },
+                ],
+            },
         ],
         [
-            { name: "test", workers: 2 },
-            { name: "test 2", workers: 5 },
+            {
+                name: "test item 1",
+                amount: 60,
+                creators: [
+                    {
+                        name: "test item 1",
+                        creator: "test item 1 creator",
+                        amount: 60,
+                        workers: 5,
+                        demands: [{ name: "required item 1", amount: 80 }],
+                    },
+                ],
+            },
+            {
+                name: "required item 1",
+                amount: 80,
+                creators: [
+                    {
+                        name: "required item 1",
+                        creator: "required item 1 creator",
+                        amount: 80,
+                        workers: 60,
+                        demands: [],
+                    },
+                ],
+            },
         ],
     ],
 ])(
     "returns all items received from domain given %s",
     async (
         _: string,
-        returned: RequiredWorkers[],
+        returned: Requirement[],
         expected: GraphQLRequirement[]
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);
