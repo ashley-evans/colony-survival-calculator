@@ -23,7 +23,7 @@ import {
     GetItemRequirementsQuery,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
-import { DEFAULT_DEBOUNCE } from "../../utils";
+import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
 
 export type RequirementsTableRow = {
     name: string;
@@ -229,7 +229,9 @@ function Requirements({
                     {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
-                            <NumberColumnCell></NumberColumnCell>
+                            <NumberColumnCell>
+                                {roundOutput(requirement.amount)}
+                            </NumberColumnCell>
                             <NumberColumnCell>
                                 {Math.ceil(requirement.workers)}
                             </NumberColumnCell>

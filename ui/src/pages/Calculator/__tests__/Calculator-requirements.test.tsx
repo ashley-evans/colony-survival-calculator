@@ -539,12 +539,98 @@ describe("requirements rendering given requirements", () => {
                 ).toBeVisible();
                 expect(
                     within(requirementsTable).getByRole("cell", {
+                        name: requirement.amount.toString(),
+                    })
+                );
+                expect(
+                    within(requirementsTable).getByRole("cell", {
                         name: requirement.workers.toString(),
                     })
                 ).toBeVisible();
             }
         }
     );
+
+    test("rounds amount to 1 decimals if more than 1 decimal places", async () => {
+        const actualAmount = 3.14;
+        const expectedAmount = "≈3.1";
+        server.use(
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(
+                        ctx.data({
+                            requirement: [
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: actualAmount,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: 1,
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        })
+                    );
+                }
+            )
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: expectedAmount,
+            })
+        ).toBeVisible();
+    });
+
+    test("does not show approx symbol if optimal output is only accurate to 1 decimal place", async () => {
+        const actualAmount = 3.1;
+        server.use(
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(
+                        ctx.data({
+                            requirement: [
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: actualAmount,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: 1,
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        })
+                    );
+                }
+            )
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: actualAmount.toString(),
+            })
+        ).toBeVisible();
+    });
 
     test("ceils workers value if the returned value is returned as decimal", async () => {
         const actualWorkers = 3.14;
@@ -593,7 +679,7 @@ describe("requirements rendering given requirements", () => {
             [
                 createRequirement({
                     name: "test item 1",
-                    amount: 1,
+                    amount: 10,
                     creators: [
                         createRequirementCreator({
                             name: "test item 1",
@@ -603,7 +689,7 @@ describe("requirements rendering given requirements", () => {
                 }),
                 createRequirement({
                     name: "test item 2",
-                    amount: 1,
+                    amount: 20,
                     creators: [
                         createRequirementCreator({
                             name: "test item 2",
@@ -613,8 +699,8 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 1, workers: 2 },
-                { name: "test item 1", amount: 1, workers: 1 },
+                { name: "test item 2", amount: 10, workers: 2 },
+                { name: "test item 1", amount: 20, workers: 1 },
             ],
             1,
         ],
@@ -623,7 +709,7 @@ describe("requirements rendering given requirements", () => {
             [
                 createRequirement({
                     name: "test item 1",
-                    amount: 1,
+                    amount: 10,
                     creators: [
                         createRequirementCreator({
                             name: "test item 1",
@@ -633,7 +719,7 @@ describe("requirements rendering given requirements", () => {
                 }),
                 createRequirement({
                     name: "test item 2",
-                    amount: 1,
+                    amount: 20,
                     creators: [
                         createRequirementCreator({
                             name: "test item 2",
@@ -643,8 +729,8 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 1, workers: 1 },
-                { name: "test item 1", amount: 1, workers: 2 },
+                { name: "test item 2", amount: 20, workers: 1 },
+                { name: "test item 1", amount: 10, workers: 2 },
             ],
             2,
         ],
@@ -653,7 +739,7 @@ describe("requirements rendering given requirements", () => {
             [
                 createRequirement({
                     name: "test item 1",
-                    amount: 1,
+                    amount: 10,
                     creators: [
                         createRequirementCreator({
                             name: "test item 1",
@@ -663,7 +749,7 @@ describe("requirements rendering given requirements", () => {
                 }),
                 createRequirement({
                     name: "test item 2",
-                    amount: 1,
+                    amount: 20,
                     creators: [
                         createRequirementCreator({
                             name: "test item 2",
@@ -673,8 +759,8 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 1", amount: 1, workers: 1 },
-                { name: "test item 2", amount: 1, workers: 2 },
+                { name: "test item 1", amount: 10, workers: 1 },
+                { name: "test item 2", amount: 20, workers: 2 },
             ],
             3,
         ],
