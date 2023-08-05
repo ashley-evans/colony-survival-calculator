@@ -5,8 +5,8 @@
     "scripts": {
         "cm": "cz",
         "cz": "cz",
-        "i": "npx lerna bootstrap --no-ci",
-        "ci": "npx lerna bootstrap --ci",
+        "i": "npx lerna@^6.6.1 bootstrap --no-ci",
+        "ci": "npx lerna@^6.6.1 bootstrap --ci",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
         "validate": "./scripts/validate-terraform.sh -r ./infra/",
