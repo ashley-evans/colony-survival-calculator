@@ -27,6 +27,7 @@ import { DEFAULT_DEBOUNCE } from "../../utils";
 
 export type RequirementsTableRow = {
     name: string;
+    amount: number;
     workers: number;
 };
 
@@ -115,6 +116,7 @@ function mapRequirementsToRow(
 
         return {
             name: requirement.name,
+            amount: requirement.amount,
             workers: totalWorkers,
         };
     });
@@ -129,13 +131,22 @@ function Requirements({
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
         GET_ITEM_REQUIREMENTS
     );
+    const [amountSortDirection, setAmountSortDirection] =
+        useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
 
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
 
+    const changeAmountSortDirection: MouseEventHandler = (event) => {
+        event.stopPropagation();
+        setWorkerSortDirection("none");
+        setAmountSortDirection(sortDirectionOrderMap[amountSortDirection]);
+    };
+
     const changeWorkerSortDirection: MouseEventHandler = (event) => {
         event.stopPropagation();
+        setAmountSortDirection("none");
         setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
     };
 
@@ -190,6 +201,18 @@ function Requirements({
                         <TextColumnHeader>Item</TextColumnHeader>
                         <SortableHeader
                             item-alignment="end"
+                            aria-sort={amountSortDirection}
+                            onClick={changeAmountSortDirection}
+                            tabIndex={0}
+                        >
+                            <button>Amount</button>
+                            <FontAwesomeIcon
+                                icon={sortDirectionIconMap[amountSortDirection]}
+                                aria-hidden="true"
+                            />
+                        </SortableHeader>
+                        <SortableHeader
+                            item-alignment="end"
                             aria-sort={workerSortDirection}
                             onClick={changeWorkerSortDirection}
                             tabIndex={0}
@@ -206,6 +229,7 @@ function Requirements({
                     {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
+                            <NumberColumnCell></NumberColumnCell>
                             <NumberColumnCell>
                                 {Math.ceil(requirement.workers)}
                             </NumberColumnCell>

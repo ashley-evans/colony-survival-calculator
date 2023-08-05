@@ -33,23 +33,21 @@ type SortableHeaderProps = {
 };
 
 export const SortableHeader = styled.th<SortableHeaderProps>`
-    display: flex;
+        ${({ "item-alignment": itemAlignment, theme }) => css`
+            text-align: ${itemAlignment};
 
-    ${({ "item-alignment": itemAlignment, theme }) => css`
-        justify-content: ${itemAlignment};
-        align-items: center;
+            button {
+                color: ${theme.color.surface.on_main};
+            }
+        `}
 
         button {
-            color: ${theme.color.surface.on_main};
+            border: none;
+            background: none;
+            margin-right: 0.5rem;
+            font-weight: bold;
+            padding: 0;
         }
-    `}
-
-    button {
-        border: none;
-        background: none;
-        margin-right: 0.5rem;
-        font-weight: bold;
-        padding: 0;
     }
 `;
 
