@@ -168,7 +168,7 @@ function mapResults(results?: VertexOutput): Requirement[] {
 
     const result: Requirement[] = [];
     for (const [totalKey, amount] of totalOutputVariables) {
-        // Ignore input item or items that have zero requirement
+        // Ignore items that have zero requirement
         if (amount === 0) {
             continue;
         }
