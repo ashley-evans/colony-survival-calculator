@@ -15,44 +15,63 @@ import {
     renderWithTestProviders as render,
     wrapWithTestProviders,
 } from "../../../test/utils";
-import { Requirement } from "../../../graphql/__generated__/graphql";
+import { GetItemRequirementsQuery } from "../../../graphql/__generated__/graphql";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
     expectedRequirementsQueryName,
     expectedOutputQueryName,
-    ItemName,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
     expectedCreatorOverrideQueryName,
 } from "./utils";
 import Requirements from "../components/Requirements";
+import { RequirementsTableRow } from "../components/Requirements/Requirements";
+
+type RequirementsResponse = GetItemRequirementsQuery["requirement"][number];
+type RequirementCreator = RequirementsResponse["creators"][number];
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
 const expectedWorkerColumnName = "Workers";
 
-const requirements: Requirement[] = [
-    {
-        name: "Required Item 1",
-        workers: 20,
-    },
-    {
-        name: "Required Item 2",
-        workers: 40,
-    },
+function createRequirementCreator(
+    name: string,
+    workers: number
+): RequirementCreator {
+    return {
+        name,
+        workers,
+    };
+}
+
+function createRequirement(
+    name: string,
+    creators: RequirementCreator[]
+): RequirementsResponse {
+    return {
+        name,
+        creators,
+    };
+}
+
+const requirements: RequirementsResponse[] = [
+    createRequirement("Required Item 1", [
+        createRequirementCreator("Required Item 1", 20),
+    ]),
+    createRequirement("Required Item 2", [
+        createRequirementCreator("Required Item 2", 40),
+    ]),
 ];
 
-const itemWithSingleRequirement: ItemName = {
-    name: "Item w/ single requirement",
-};
-const itemWithMultipleRequirements: ItemName = {
-    name: "Item w/ multiple requirements",
-};
+const selectedItemName = "Selected Item";
+const selectedItem: RequirementsResponse = createRequirement(selectedItemName, [
+    createRequirementCreator(selectedItemName, 20),
+]);
 
-const items = [itemWithSingleRequirement, itemWithMultipleRequirements];
+const items = [selectedItem, ...requirements];
 
 const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
@@ -66,9 +85,12 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [requirements[0]] }));
-    }),
+    graphql.query<GetItemRequirementsQuery>(
+        expectedRequirementsQueryName,
+        (_, res, ctx) => {
+            return res(ctx.data({ requirement: [requirements[0]] }));
+        }
+    ),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: expectedOutput }));
     }),
@@ -101,13 +123,13 @@ test("queries requirements if item and workers inputted", async () => {
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectItemAndWorkers({
-        itemName: itemWithSingleRequirement.name,
+        itemName: selectedItemName,
         workers: expectedWorkers,
     });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: itemWithSingleRequirement.name,
+        name: selectedItemName,
         workers: expectedWorkers,
         maxAvailableTool: "NONE",
     });
@@ -116,16 +138,19 @@ test("queries requirements if item and workers inputted", async () => {
 describe("item w/o requirements handling", async () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                return res.once(ctx.data({ requirement: [] }));
-            })
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(ctx.data({ requirement: [selectedItem] }));
+                }
+            )
         );
     });
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);
@@ -140,7 +165,7 @@ describe("item w/o requirements handling", async () => {
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);
@@ -161,7 +186,7 @@ describe("response delay handling", () => {
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);
@@ -176,7 +201,7 @@ describe("response delay handling", () => {
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);
@@ -189,7 +214,7 @@ describe("requirements rendering given requirements", () => {
     test("renders the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
 
@@ -203,7 +228,7 @@ describe("requirements rendering given requirements", () => {
     test("renders the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
 
@@ -223,7 +248,7 @@ describe("requirements rendering given requirements", () => {
     test("renders the workers column sort button", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
 
@@ -238,7 +263,7 @@ describe("requirements rendering given requirements", () => {
     test("sets the worker column as unsorted (default sort) by default", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
 
@@ -261,7 +286,7 @@ describe("requirements rendering given requirements", () => {
 
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
-                itemName: itemWithSingleRequirement.name,
+                itemName: selectedItemName,
                 workers: 5,
             });
             const requirementsTable = await screen.findByRole("table");
@@ -284,21 +309,83 @@ describe("requirements rendering given requirements", () => {
         }
     );
 
+    test("renders the sum total of required workers given requirement with multiple creators", async () => {
+        const expectedRequiredItemName = "test requirement";
+        const expectedTotal = "12";
+        const response: RequirementsResponse[] = [
+            selectedItem,
+            createRequirement(expectedRequiredItemName, [
+                createRequirementCreator(expectedRequiredItemName, 5),
+                createRequirementCreator("another creator recipe", 7),
+            ]),
+        ];
+        server.use(
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(ctx.data({ requirement: response }));
+                }
+            )
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: expectedTotal,
+            })
+        ).toBeVisible();
+    });
+
     test.each([
-        ["a single requirement", [requirements[0]]],
-        ["multiple requirements", requirements],
+        [
+            "a single requirement",
+            [selectedItem, requirements[0]],
+            [
+                {
+                    name: requirements[0].name,
+                    workers: requirements[0].creators[0].workers,
+                },
+            ],
+        ],
+        [
+            "multiple requirements",
+            items,
+            [
+                {
+                    name: requirements[0].name,
+                    workers: requirements[0].creators[0].workers,
+                },
+                {
+                    name: requirements[1].name,
+                    workers: requirements[1].creators[0].workers,
+                },
+            ],
+        ],
     ])(
         "renders each requirement in the table given %s",
-        async (_: string, expected: Requirement[]) => {
+        async (
+            _: string,
+            response: RequirementsResponse[],
+            expected: RequirementsTableRow[]
+        ) => {
             server.use(
-                graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: expected }));
-                })
+                graphql.query<GetItemRequirementsQuery>(
+                    expectedRequirementsQueryName,
+                    (_, res, ctx) => {
+                        return res.once(ctx.data({ requirement: response }));
+                    }
+                )
             );
 
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
-                itemName: itemWithSingleRequirement.name,
+                itemName: selectedItemName,
                 workers: 5,
             });
             const requirementsTable = await screen.findByRole("table");
@@ -322,20 +409,28 @@ describe("requirements rendering given requirements", () => {
         const actualWorkers = 3.14;
         const expectedWorkers = "4";
         server.use(
-            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                return res.once(
-                    ctx.data({
-                        requirement: [
-                            { ...requirements[0], workers: actualWorkers },
-                        ],
-                    })
-                );
-            })
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(
+                        ctx.data({
+                            requirement: [
+                                createRequirement("test item name", [
+                                    createRequirementCreator(
+                                        "test item name",
+                                        actualWorkers
+                                    ),
+                                ]),
+                            ],
+                        })
+                    );
+                }
+            )
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         const requirementsTable = await screen.findByRole("table");
@@ -351,8 +446,12 @@ describe("requirements rendering given requirements", () => {
         [
             "descending",
             [
-                { name: "test item 1", workers: 1 },
-                { name: "test item 2", workers: 2 },
+                createRequirement("test item 1", [
+                    createRequirementCreator("test item 1", 1),
+                ]),
+                createRequirement("test item 2", [
+                    createRequirementCreator("test item 2", 2),
+                ]),
             ],
             [
                 { name: "test item 2", workers: 2 },
@@ -363,8 +462,12 @@ describe("requirements rendering given requirements", () => {
         [
             "ascending",
             [
-                { name: "test item 1", workers: 2 },
-                { name: "test item 2", workers: 1 },
+                createRequirement("test item 1", [
+                    createRequirementCreator("test item 1", 2),
+                ]),
+                createRequirement("test item 2", [
+                    createRequirementCreator("test item 2", 1),
+                ]),
             ],
             [
                 { name: "test item 2", workers: 1 },
@@ -375,8 +478,12 @@ describe("requirements rendering given requirements", () => {
         [
             "default",
             [
-                { name: "test item 1", workers: 1 },
-                { name: "test item 2", workers: 2 },
+                createRequirement("test item 1", [
+                    createRequirementCreator("test item 1", 1),
+                ]),
+                createRequirement("test item 2", [
+                    createRequirementCreator("test item 2", 2),
+                ]),
             ],
             [
                 { name: "test item 1", workers: 1 },
@@ -388,21 +495,24 @@ describe("requirements rendering given requirements", () => {
         "displays the items in %s order by workers if workers column is sorted in that order",
         async (
             _: string,
-            unsorted: Requirement[],
-            sorted: Requirement[],
+            unsorted: RequirementsResponse[],
+            sorted: RequirementsTableRow[],
             numberOfClicks: number
         ) => {
             server.use(
-                graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: unsorted }));
-                })
+                graphql.query<GetItemRequirementsQuery>(
+                    expectedRequirementsQueryName,
+                    (_, res, ctx) => {
+                        return res.once(ctx.data({ requirement: unsorted }));
+                    }
+                )
             );
 
             const user = userEvent.setup();
 
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
-                itemName: itemWithSingleRequirement.name,
+                itemName: selectedItemName,
                 workers: 5,
             });
             const requirementsTable = await screen.findByRole("table");
@@ -447,7 +557,7 @@ describe("error handling", async () => {
 
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
 
@@ -459,7 +569,7 @@ describe("error handling", async () => {
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);
@@ -474,7 +584,7 @@ describe("error handling", async () => {
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectItemAndWorkers({
-            itemName: itemWithSingleRequirement.name,
+            itemName: selectedItemName,
             workers: 5,
         });
         await screen.findByText(expectedOutputText);

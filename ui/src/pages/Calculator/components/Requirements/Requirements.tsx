@@ -20,10 +20,15 @@ import {
 import { gql } from "../../../../graphql/__generated__";
 import {
     CreatorOverride,
-    Requirement,
+    GetItemRequirementsQuery,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
+
+export type RequirementsTableRow = {
+    name: string;
+    workers: number;
+};
 
 type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
@@ -32,6 +37,7 @@ type RequirementsProps = {
     maxAvailableTool?: Tools;
     creatorOverrides?: CreatorOverride[];
 };
+type Requirements = GetItemRequirementsQuery["requirement"];
 
 const sortDirectionOrderMap: {
     [key in ValidSortDirections]: ValidSortDirections;
@@ -51,15 +57,18 @@ const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!]) {
         requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides) {
             name
-            workers
+            creators {
+                name
+                workers
+            }
         }
     }
 `);
 
 function sortByWorkers(
-    requirements: Readonly<Requirement[]>,
+    requirements: Readonly<RequirementsTableRow[]>,
     order: ValidSortDirections
-): Requirement[] {
+): RequirementsTableRow[] {
     const reference = [...requirements];
     switch (order) {
         case "descending":
@@ -69,6 +78,45 @@ function sortByWorkers(
         default:
             return reference;
     }
+}
+
+function removeSelectedItemRows(
+    selectedItemName: string,
+    requirements: Readonly<Requirements> | undefined
+): Readonly<Requirements> {
+    if (!requirements) {
+        return [];
+    }
+
+    return requirements.reduce((acc, current) => {
+        if (current.name !== selectedItemName) {
+            const filteredCreators = current.creators.filter(
+                (creator) => creator.name !== selectedItemName
+            );
+            acc.push({
+                ...current,
+                creators: filteredCreators,
+            });
+        }
+
+        return acc;
+    }, [] as Requirements);
+}
+
+function mapRequirementsToRow(
+    requirements: Readonly<Requirements>
+): Readonly<RequirementsTableRow[]> {
+    return requirements.map((requirement) => {
+        const totalWorkers = requirement.creators.reduce(
+            (acc, current) => acc + current.workers,
+            0
+        );
+
+        return {
+            name: requirement.name,
+            workers: totalWorkers,
+        };
+    });
 }
 
 function Requirements({
@@ -120,11 +168,17 @@ function Requirements({
         );
     }
 
-    if (loading || !data || data.requirement.length === 0) {
+    const filtered = removeSelectedItemRows(
+        selectedItemName,
+        data?.requirement
+    );
+
+    if (loading || filtered.length === 0) {
         return <></>;
     }
 
-    const sortedWorkers = sortByWorkers(data.requirement, workerSortDirection);
+    const rows = mapRequirementsToRow(filtered);
+    const sortedRows = sortByWorkers(rows, workerSortDirection);
 
     return (
         <>
@@ -148,7 +202,7 @@ function Requirements({
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedWorkers.map((requirement) => (
+                    {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
                             <NumberColumnCell>
