@@ -13,6 +13,7 @@ type Demand = {
 type RequirementRecipe = {
     name: string;
     creator: string;
+    amount: number;
     workers: number;
     demands: Demand[];
 };

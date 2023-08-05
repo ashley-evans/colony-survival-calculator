@@ -1,5 +1,6 @@
 import type {
     CreatorOverride,
+    Demand,
     QueryRequirementsPrimaryPort,
     RequirementRecipe,
 } from "../interfaces/query-requirements-primary-port";
@@ -11,6 +12,7 @@ import {
     VertexOutput,
     computeRequirementVertices,
     isOutputVariable,
+    isProductionVariable,
     isRequirementVariable,
     isTotalVariable,
 } from "./requirements-linear-program";
@@ -74,6 +76,80 @@ async function getRequiredItemDetails(name: string): Promise<Items> {
     }
 }
 
+function getRecipeKey(
+    recipeName: string,
+    creator: string,
+    outputItem = recipeName
+): string {
+    return `${recipeName}-${creator}-${outputItem}`;
+}
+
+function createRecipeDemandMap(
+    variables: [string, number][]
+): Map<string, Demand[]> {
+    const map = new Map<string, Demand[]>();
+    const demandVariables = variables.filter(([key]) =>
+        isRequirementVariable(key)
+    );
+
+    for (const [key, amount] of demandVariables) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, itemName, creator, requirement] = key.split("-");
+        if (!itemName || !creator || !requirement) {
+            throw new Error(INTERNAL_SERVER_ERROR);
+        }
+
+        const recipeDemandKey = getRecipeKey(itemName, creator);
+        const currentDemands = map.get(recipeDemandKey) ?? [];
+        map.set(
+            recipeDemandKey,
+            currentDemands.concat([{ name: requirement, amount }])
+        );
+    }
+
+    return map;
+}
+
+function createRecipeMap(
+    variables: [string, number][]
+): [Map<string, string[]>, Map<string, RequirementRecipe>] {
+    const itemRecipeMap = new Map<string, string[]>();
+    const recipeMap = new Map<string, RequirementRecipe>();
+
+    const productionOutputVariables = variables.filter(
+        ([key]) => isProductionVariable(key) || isOutputVariable(key)
+    );
+
+    for (const [key, value] of productionOutputVariables) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [_, recipeName, creator, outputItem] = key.split("-");
+        if (!recipeName || !creator || !outputItem) {
+            throw new Error(INTERNAL_SERVER_ERROR);
+        }
+
+        const recipeKey = getRecipeKey(recipeName, creator, outputItem);
+        const itemRecipeKeys = itemRecipeMap.get(outputItem) ?? [];
+        if (!itemRecipeKeys.includes(recipeKey)) {
+            itemRecipeMap.set(outputItem, itemRecipeKeys.concat([recipeKey]));
+        }
+
+        const currentRecipeDetails = recipeMap.get(recipeKey) ?? {
+            name: recipeName,
+            creator,
+            amount: 0,
+            workers: 0,
+            demands: [],
+        };
+        recipeMap.set(recipeKey, {
+            ...currentRecipeDetails,
+            ...(isProductionVariable(key) && { workers: value }),
+            ...(isOutputVariable(key) && { amount: value }),
+        });
+    }
+
+    return [itemRecipeMap, recipeMap];
+}
+
 function mapResults(
     inputItemName: string,
     results?: VertexOutput
@@ -86,74 +162,13 @@ function mapResults(
     const { bounded, ...variables } = results;
     const variablesArray = Object.entries(variables);
 
-    const getRecipeKey = (itemName: string, creator: string) =>
-        `${itemName}-${creator}`;
-
-    // Create recipe maps
-    const creatorMap = new Map<string, string[]>();
-    const recipeDemandMap = new Map<string, RequirementRecipe>();
-    const outputVariables = variablesArray.filter(([key]) =>
-        isOutputVariable(key)
-    );
-
-    for (const [outputKey, workers] of outputVariables) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, recipeName, creator, outputItem] = outputKey.split("-");
-        if (!recipeName || !creator || !outputItem) {
-            throw new Error(INTERNAL_SERVER_ERROR);
-        }
-
-        // Ignore input item
-        if (outputItem === inputItemName) {
-            continue;
-        }
-
-        // Add current recipe variable to overall creator map
-        const demandMapKey = getRecipeKey(recipeName, creator);
-        const currentKnownCreators = creatorMap.get(outputItem) ?? [];
-        creatorMap.set(outputItem, [...currentKnownCreators, demandMapKey]);
-
-        // Add recipe details
-        recipeDemandMap.set(demandMapKey, {
-            name: recipeName,
-            creator,
-            workers,
-            demands: [],
-        });
-    }
-
-    // Add recipe demands
-    const recipeDemands = variablesArray.filter(([key]) =>
-        isRequirementVariable(key)
-    );
-
-    for (const [demandKey, amount] of recipeDemands) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, itemName, creator, requirement] = demandKey.split("-");
-        if (!itemName || !creator || !requirement) {
-            throw new Error(INTERNAL_SERVER_ERROR);
-        }
-
-        // Ignore input item
-        if (itemName === inputItemName) {
-            continue;
-        }
-
-        const demandMapKey = getRecipeKey(itemName, creator);
-        const recipeDemand = recipeDemandMap.get(demandMapKey);
-        if (!recipeDemand) {
-            throw new Error(INTERNAL_SERVER_ERROR);
-        }
-
-        recipeDemandMap.set(demandMapKey, {
-            ...recipeDemand,
-            demands: [...recipeDemand.demands, { name: requirement, amount }],
-        });
-    }
+    const recipeDemandMap = createRecipeDemandMap(variablesArray);
+    const [itemRecipeMap, recipeCreatorMap] = createRecipeMap(variablesArray);
 
     const totalOutputVariables = variablesArray.filter(([key]) =>
         isTotalVariable(key)
     );
+
     const result: Requirement[] = [];
     for (const [totalKey, amount] of totalOutputVariables) {
         // Ignore input item or items that have zero requirement
@@ -161,18 +176,20 @@ function mapResults(
             continue;
         }
 
-        const creators = creatorMap.get(totalKey);
+        const creators = itemRecipeMap.get(totalKey);
         if (!creators) {
             throw new Error(INTERNAL_SERVER_ERROR);
         }
 
         const creatorsWithDemands = creators.map((creator) => {
-            const recipe = recipeDemandMap.get(creator);
+            const recipe = recipeCreatorMap.get(creator);
             if (!recipe) {
                 throw new Error(INTERNAL_SERVER_ERROR);
             }
 
-            return recipe;
+            const demands = recipeDemandMap.get(creator);
+
+            return { ...recipe, demands: demands ?? [] };
         });
 
         result.push({

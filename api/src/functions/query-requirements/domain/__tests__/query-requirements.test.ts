@@ -163,6 +163,7 @@ test("returns requirement given item with a single requirement and no nested req
 
     expect(creator.name).toEqual(requiredItem.name);
     expect(creator.creator).toEqual(requiredItem.creator);
+    expect(creator.amount).toBeCloseTo(10);
     expect(creator.workers).toBeCloseTo(7.5);
 
     // Check specific creator demands
@@ -215,6 +216,7 @@ test("returns requirements given item with multiple requirements and no nested r
 
     expect(requirement1Creator.name).toEqual(requiredItem1.name);
     expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.amount).toBeCloseTo(10);
     expect(requirement1Creator.workers).toBeCloseTo(7.5);
 
     // Check specific creator demands
@@ -232,6 +234,7 @@ test("returns requirements given item with multiple requirements and no nested r
 
     expect(requirement2Creator.name).toEqual(requiredItem2.name);
     expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.amount).toBeCloseTo(15);
     expect(requirement2Creator.workers).toBeCloseTo(30);
 
     // Check specific creator demands
@@ -281,6 +284,7 @@ test("returns requirements given item with single nested requirement", async () 
 
     expect(requirement1Creator.name).toEqual(requiredItem1.name);
     expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.amount).toBeCloseTo(10);
     expect(requirement1Creator.workers).toBeCloseTo(7.5);
 
     // Check specific creator demands
@@ -302,6 +306,7 @@ test("returns requirements given item with single nested requirement", async () 
 
     expect(requirement2Creator.name).toEqual(requiredItem2.name);
     expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.amount).toBeCloseTo(15);
     expect(requirement2Creator.workers).toBeCloseTo(30);
 
     // Check specific creator demands
@@ -361,6 +366,7 @@ test("returns requirements given item with multiple different nested requirement
 
     expect(requirement1Creator.name).toEqual(requiredItem1.name);
     expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.amount).toBeCloseTo(10);
     expect(requirement1Creator.workers).toBeCloseTo(7.5);
 
     // Check specific creator demands
@@ -389,6 +395,7 @@ test("returns requirements given item with multiple different nested requirement
 
     expect(requirement2Creator.name).toEqual(requiredItem2.name);
     expect(requirement2Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement2Creator.amount).toBeCloseTo(15);
     expect(requirement2Creator.workers).toBeCloseTo(30);
 
     // Check specific creator demands
@@ -406,6 +413,7 @@ test("returns requirements given item with multiple different nested requirement
 
     expect(requirement3Creator.name).toEqual(requiredItem3.name);
     expect(requirement3Creator.creator).toEqual(requiredItem3.creator);
+    expect(requirement3Creator.amount).toBeCloseTo(10);
     expect(requirement3Creator.workers).toBeCloseTo(20);
 
     // Check specific creator demands
@@ -468,6 +476,7 @@ test("returns combined requirements given item with multiple nested requirements
 
     expect(requirement1Creator.name).toEqual(requiredItem1.name);
     expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+    expect(requirement1Creator.amount).toBeCloseTo(10);
     expect(requirement1Creator.workers).toBeCloseTo(7.5);
 
     // Check specific creator demands
@@ -496,6 +505,7 @@ test("returns combined requirements given item with multiple nested requirements
 
     expect(requirement2Creator.name).toEqual(requiredItem3.name);
     expect(requirement2Creator.creator).toEqual(requiredItem3.creator);
+    expect(requirement2Creator.amount).toBeCloseTo(15);
     expect(requirement2Creator.workers).toBeCloseTo(30);
 
     // Check specific creator demands
@@ -513,6 +523,7 @@ test("returns combined requirements given item with multiple nested requirements
 
     expect(requirement3Creator.name).toEqual(requiredItem2.name);
     expect(requirement3Creator.creator).toEqual(requiredItem2.creator);
+    expect(requirement3Creator.amount).toBeCloseTo(15);
     expect(requirement3Creator.workers).toBeCloseTo(30);
 
     // Check specific creator demands
@@ -671,12 +682,14 @@ describe("handles tool modifiers", () => {
                 workers: validWorkers,
                 maxAvailableTool: provided,
             });
+
             const requirement = findRequirement(
                 actual,
                 requiredItemName
             ) as Requirement;
 
             expect(requirement.amount).toBeCloseTo(expectedOutput);
+            expect(requirement.creators[0]?.amount).toBeCloseTo(expectedOutput);
             expect(requirement.creators[0]?.workers).toBeCloseTo(
                 expectedWorkers
             );
@@ -714,6 +727,7 @@ describe("handles tool modifiers", () => {
         ) as Requirement;
 
         expect(requirement.amount).toBeCloseTo(30);
+        expect(requirement.creators[0]?.amount).toBeCloseTo(30);
         expect(requirement.creators[0]?.workers).toBeCloseTo(20);
     });
 
@@ -821,6 +835,7 @@ describe("optional output requirement impact", () => {
 
         expect(creator1.name).toEqual(item.name);
         expect(creator1.creator).toEqual(item.creator);
+        expect(creator1.amount).toBeCloseTo(1.25);
         expect(creator1.workers).toBeCloseTo(5);
 
         // Check specific creator demands
@@ -831,6 +846,7 @@ describe("optional output requirement impact", () => {
 
         expect(creator2.name).toEqual(requiredItem.name);
         expect(creator2.creator).toEqual(requiredItem.creator);
+        expect(creator2.amount).toBeCloseTo(3.75);
         expect(creator2.workers).toBeCloseTo(2.8125);
 
         // Check specific creator demands
@@ -884,6 +900,7 @@ describe("optional output requirement impact", () => {
 
         expect(requirement1Creator.name).toEqual(requiredItem1.name);
         expect(requirement1Creator.creator).toEqual(requiredItem1.creator);
+        expect(requirement1Creator.amount).toBeCloseTo(10);
         expect(requirement1Creator.workers).toBeCloseTo(7.5);
 
         // Check specific creator demands
@@ -907,6 +924,7 @@ describe("optional output requirement impact", () => {
 
         expect(requirement2Creator1.name).toEqual(item.name);
         expect(requirement2Creator1.creator).toEqual(item.creator);
+        expect(requirement2Creator1.amount).toBeCloseTo(2.5);
         expect(requirement2Creator1.workers).toBeCloseTo(5);
 
         // Check specific creator demands
@@ -918,6 +936,7 @@ describe("optional output requirement impact", () => {
 
         expect(requirement2Creator2.name).toEqual(requiredItem2.name);
         expect(requirement2Creator2.creator).toEqual(requiredItem2.creator);
+        expect(requirement2Creator2.amount).toBeCloseTo(12.5);
         expect(requirement2Creator2.workers).toBeCloseTo(25);
 
         // Check specific creator demands
@@ -974,6 +993,7 @@ describe("optional output requirement impact", () => {
 
         expect(creator.name).toEqual(requirementName);
         expect(creator.creator).toEqual(higherOptionalOutputRecipe.creator);
+        expect(creator.amount).toBeCloseTo(5);
         expect(creator.workers).toBeCloseTo(3);
 
         // Check specific creator demands
@@ -1027,6 +1047,7 @@ describe("multiple recipe handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(20);
         expect(creator.workers).toBeCloseTo(15);
 
         // Check specific creator demands
@@ -1081,6 +1102,7 @@ describe("multiple recipe handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(80);
         expect(creator.workers).toBeCloseTo(60);
 
         // Check specific creator demands
@@ -1135,6 +1157,7 @@ describe("multiple recipe handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(10);
         expect(creator.workers).toBeCloseTo(7.5);
 
         // Check specific creator demands
@@ -1193,6 +1216,7 @@ describe("multiple recipe handling", () => {
 
         expect(creator.name).toEqual(moreOptimalRequiredItem.name);
         expect(creator.creator).toEqual(moreOptimalRequiredItem.creator);
+        expect(creator.amount).toBeCloseTo(20);
         expect(creator.workers).toBeCloseTo(15);
 
         // Check specific creator demands
@@ -1288,6 +1312,7 @@ describe("creator override handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(10);
         expect(creator.workers).toBeCloseTo(7.5);
 
         // Check specific creator demands
@@ -1344,6 +1369,7 @@ describe("creator override handling", () => {
 
         expect(creator.name).toEqual(requiredItemName);
         expect(creator.creator).toEqual(overrideCreator);
+        expect(creator.amount).toBeCloseTo(20);
         expect(creator.workers).toBeCloseTo(15);
 
         // Check specific creator demands
@@ -1428,6 +1454,7 @@ describe("creator override handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(20);
         expect(creator.workers).toBeCloseTo(15);
 
         // Check specific creator demands
@@ -1487,6 +1514,7 @@ describe("creator override handling", () => {
 
         expect(creator.name).toEqual(requiredItem.name);
         expect(creator.creator).toEqual(requiredItem.creator);
+        expect(creator.amount).toBeCloseTo(20);
         expect(creator.workers).toBeCloseTo(15);
 
         // Check specific creator demands
@@ -1617,6 +1645,7 @@ describe("creator override handling", () => {
 
         expect(creator.name).toEqual(lessOptimalRecipeRequirement.name);
         expect(creator.creator).toEqual(lessOptimalRecipeRequirement.creator);
+        expect(creator.amount).toBeCloseTo(10);
         expect(creator.workers).toBeCloseTo(7.5);
 
         // Check specific creator demands
