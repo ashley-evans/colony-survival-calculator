@@ -35,41 +35,63 @@ type RequirementCreator = RequirementsResponse["creators"][number];
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
+const expectedAmountColumnName = "Amount";
 const expectedWorkerColumnName = "Workers";
 
-function createRequirementCreator(
-    name: string,
-    workers: number
-): RequirementCreator {
+function createRequirementCreator({
+    name,
+    workers,
+}: {
+    name: string;
+    workers: number;
+}): RequirementCreator {
     return {
         name,
         workers,
     };
 }
 
-function createRequirement(
-    name: string,
-    creators: RequirementCreator[]
-): RequirementsResponse {
+function createRequirement({
+    name,
+    amount,
+    creators,
+}: {
+    name: string;
+    amount: number;
+    creators: RequirementCreator[];
+}): RequirementsResponse {
     return {
         name,
+        amount,
         creators,
     };
 }
 
 const requirements: RequirementsResponse[] = [
-    createRequirement("Required Item 1", [
-        createRequirementCreator("Required Item 1", 20),
-    ]),
-    createRequirement("Required Item 2", [
-        createRequirementCreator("Required Item 2", 40),
-    ]),
+    createRequirement({
+        name: "Required Item 1",
+        amount: 30,
+        creators: [
+            createRequirementCreator({ name: "Required Item 1", workers: 20 }),
+        ],
+    }),
+    createRequirement({
+        name: "Required Item 2",
+        amount: 60,
+        creators: [
+            createRequirementCreator({ name: "Required Item 2", workers: 40 }),
+        ],
+    }),
 ];
 
 const selectedItemName = "Selected Item";
-const selectedItem: RequirementsResponse = createRequirement(selectedItemName, [
-    createRequirementCreator(selectedItemName, 20),
-]);
+const selectedItem: RequirementsResponse = createRequirement({
+    name: selectedItemName,
+    amount: 90,
+    creators: [
+        createRequirementCreator({ name: selectedItemName, workers: 20 }),
+    ],
+});
 
 const items = [selectedItem, ...requirements];
 
@@ -240,84 +262,200 @@ describe("requirements rendering given requirements", () => {
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
-                name: expectedWorkerColumnName,
+                name: expectedAmountColumnName,
             })
         ).toBeVisible();
-    });
-
-    test("renders the workers column sort button", async () => {
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-
-        const requirementsTable = await screen.findByRole("table");
         expect(
-            within(requirementsTable).getByRole("button", {
+            within(requirementsTable).getByRole("columnheader", {
                 name: expectedWorkerColumnName,
             })
         ).toBeVisible();
     });
 
-    test("sets the worker column as unsorted (default sort) by default", async () => {
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-
-        const requirementsTable = await screen.findByRole("table");
-        const workersColumnHeader = within(requirementsTable).getByRole(
-            "columnheader",
-            { name: expectedWorkerColumnName }
-        );
-        expect(workersColumnHeader).toHaveAttribute("aria-sort", "none");
-    });
-
-    test.each([
-        ["once", "descending", 1],
-        ["twice", "ascending", 2],
-        ["three times", "none", 3],
-    ])(
-        "pressing the worker column header %s sets the worker column sort to %s",
-        async (_: string, expectedOrder: string, numberOfClicks: number) => {
-            const user = userEvent.setup();
-
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            const requirementsTable = await screen.findByRole("table");
-            const workersColumnHeader = within(requirementsTable).getByRole(
-                "columnheader",
-                { name: expectedWorkerColumnName }
-            );
-            for (let i = 0; i < numberOfClicks; i++) {
-                await act(async () => {
-                    await user.click(workersColumnHeader);
+    describe.each([expectedAmountColumnName, expectedWorkerColumnName])(
+        "%s sortable column behavior",
+        (columnName: string) => {
+            test("renders the column sort button", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
                 });
-            }
 
-            await waitFor(() =>
-                expect(workersColumnHeader).toHaveAttribute(
+                const requirementsTable = await screen.findByRole("table");
+                expect(
+                    within(requirementsTable).getByRole("button", {
+                        name: columnName,
+                    })
+                ).toBeVisible();
+            });
+
+            test("sets the column as unsorted (default sort) by default", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+
+                const requirementsTable = await screen.findByRole("table");
+                const sortableColumnHeader = within(
+                    requirementsTable
+                ).getByRole("columnheader", { name: columnName });
+                expect(sortableColumnHeader).toHaveAttribute(
                     "aria-sort",
-                    expectedOrder
-                )
+                    "none"
+                );
+            });
+
+            test.each([
+                ["once", "descending", 1],
+                ["twice", "ascending", 2],
+                ["three times", "none", 3],
+            ])(
+                "pressing the column header %s sets the column sort to %s",
+                async (
+                    _: string,
+                    expectedOrder: string,
+                    numberOfClicks: number
+                ) => {
+                    const user = userEvent.setup();
+
+                    render(<Calculator />, expectedGraphQLAPIURL);
+                    await selectItemAndWorkers({
+                        itemName: selectedItemName,
+                        workers: 5,
+                    });
+                    const requirementsTable = await screen.findByRole("table");
+                    const sortableColumnHeader = within(
+                        requirementsTable
+                    ).getByRole("columnheader", {
+                        name: columnName,
+                    });
+                    for (let i = 0; i < numberOfClicks; i++) {
+                        await act(async () => {
+                            await user.click(sortableColumnHeader);
+                        });
+                    }
+
+                    await waitFor(() =>
+                        expect(sortableColumnHeader).toHaveAttribute(
+                            "aria-sort",
+                            expectedOrder
+                        )
+                    );
+                }
             );
         }
     );
+
+    test("pressing the worker sort resets the amount sort", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+        const workersSortableColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            {
+                name: expectedWorkerColumnName,
+            }
+        );
+        const amountSortableColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            {
+                name: expectedAmountColumnName,
+            }
+        );
+        await act(async () => {
+            await user.click(amountSortableColumnHeader);
+        });
+        await waitFor(() =>
+            expect(amountSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "descending"
+            )
+        );
+
+        await act(async () => {
+            await user.click(workersSortableColumnHeader);
+        });
+        await waitFor(() =>
+            expect(workersSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "descending"
+            )
+        );
+        expect(amountSortableColumnHeader).toHaveAttribute("aria-sort", "none");
+    });
+
+    test("pressing the amount sort resets the worker sort", async () => {
+        const user = userEvent.setup();
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+        const workersSortableColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            {
+                name: expectedWorkerColumnName,
+            }
+        );
+        const amountSortableColumnHeader = within(requirementsTable).getByRole(
+            "columnheader",
+            {
+                name: expectedAmountColumnName,
+            }
+        );
+        await act(async () => {
+            await user.click(workersSortableColumnHeader);
+        });
+        await waitFor(() =>
+            expect(workersSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "descending"
+            )
+        );
+
+        await act(async () => {
+            await user.click(amountSortableColumnHeader);
+        });
+        await waitFor(() =>
+            expect(amountSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "descending"
+            )
+        );
+        expect(workersSortableColumnHeader).toHaveAttribute(
+            "aria-sort",
+            "none"
+        );
+    });
 
     test("renders the sum total of required workers given requirement with multiple creators", async () => {
         const expectedRequiredItemName = "test requirement";
         const expectedTotal = "12";
         const response: RequirementsResponse[] = [
             selectedItem,
-            createRequirement(expectedRequiredItemName, [
-                createRequirementCreator(expectedRequiredItemName, 5),
-                createRequirementCreator("another creator recipe", 7),
-            ]),
+            createRequirement({
+                name: expectedRequiredItemName,
+                amount: 30,
+                creators: [
+                    createRequirementCreator({
+                        name: expectedRequiredItemName,
+                        workers: 5,
+                    }),
+                    createRequirementCreator({
+                        name: "another creator recipe",
+                        workers: 7,
+                    }),
+                ],
+            }),
         ];
         server.use(
             graphql.query<GetItemRequirementsQuery>(
@@ -349,6 +487,7 @@ describe("requirements rendering given requirements", () => {
             [
                 {
                     name: requirements[0].name,
+                    amount: requirements[0].amount,
                     workers: requirements[0].creators[0].workers,
                 },
             ],
@@ -359,10 +498,12 @@ describe("requirements rendering given requirements", () => {
             [
                 {
                     name: requirements[0].name,
+                    amount: requirements[0].amount,
                     workers: requirements[0].creators[0].workers,
                 },
                 {
                     name: requirements[1].name,
+                    amount: requirements[1].amount,
                     workers: requirements[1].creators[0].workers,
                 },
             ],
@@ -398,12 +539,98 @@ describe("requirements rendering given requirements", () => {
                 ).toBeVisible();
                 expect(
                     within(requirementsTable).getByRole("cell", {
+                        name: requirement.amount.toString(),
+                    })
+                );
+                expect(
+                    within(requirementsTable).getByRole("cell", {
                         name: requirement.workers.toString(),
                     })
                 ).toBeVisible();
             }
         }
     );
+
+    test("rounds amount to 1 decimals if more than 1 decimal places", async () => {
+        const actualAmount = 3.14;
+        const expectedAmount = "≈3.1";
+        server.use(
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(
+                        ctx.data({
+                            requirement: [
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: actualAmount,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: 1,
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        })
+                    );
+                }
+            )
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: expectedAmount,
+            })
+        ).toBeVisible();
+    });
+
+    test("does not show approx symbol if optimal output is only accurate to 1 decimal place", async () => {
+        const actualAmount = 3.1;
+        server.use(
+            graphql.query<GetItemRequirementsQuery>(
+                expectedRequirementsQueryName,
+                (_, res, ctx) => {
+                    return res.once(
+                        ctx.data({
+                            requirement: [
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: actualAmount,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: 1,
+                                        }),
+                                    ],
+                                }),
+                            ],
+                        })
+                    );
+                }
+            )
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).getByRole("cell", {
+                name: actualAmount.toString(),
+            })
+        ).toBeVisible();
+    });
 
     test("ceils workers value if the returned value is returned as decimal", async () => {
         const actualWorkers = 3.14;
@@ -415,12 +642,16 @@ describe("requirements rendering given requirements", () => {
                     return res.once(
                         ctx.data({
                             requirement: [
-                                createRequirement("test item name", [
-                                    createRequirementCreator(
-                                        "test item name",
-                                        actualWorkers
-                                    ),
-                                ]),
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: 30,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: actualWorkers,
+                                        }),
+                                    ],
+                                }),
                             ],
                         })
                     );
@@ -446,48 +677,90 @@ describe("requirements rendering given requirements", () => {
         [
             "descending",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 1),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 2),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 2,
+                        }),
+                    ],
+                }),
             ],
             [
-                { name: "test item 2", workers: 2 },
-                { name: "test item 1", workers: 1 },
+                { name: "test item 2", amount: 10, workers: 2 },
+                { name: "test item 1", amount: 20, workers: 1 },
             ],
             1,
         ],
         [
             "ascending",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 2),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 1),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 2,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
             ],
             [
-                { name: "test item 2", workers: 1 },
-                { name: "test item 1", workers: 2 },
+                { name: "test item 2", amount: 20, workers: 1 },
+                { name: "test item 1", amount: 10, workers: 2 },
             ],
             2,
         ],
         [
             "default",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 1),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 2),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 2,
+                        }),
+                    ],
+                }),
             ],
             [
-                { name: "test item 1", workers: 1 },
-                { name: "test item 2", workers: 2 },
+                { name: "test item 1", amount: 10, workers: 1 },
+                { name: "test item 2", amount: 20, workers: 2 },
             ],
             3,
         ],
@@ -536,6 +809,147 @@ describe("requirements rendering given requirements", () => {
                 ).toBeVisible();
                 expect(
                     within(currentRow).getByText(sorted[i].workers)
+                ).toBeVisible();
+            }
+        }
+    );
+
+    test.each([
+        [
+            "descending",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 2", amount: 20, workers: 1 },
+                { name: "test item 1", amount: 10, workers: 1 },
+            ],
+            1,
+        ],
+        [
+            "ascending",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 2", amount: 10, workers: 1 },
+                { name: "test item 1", amount: 20, workers: 1 },
+            ],
+            2,
+        ],
+        [
+            "default",
+            [
+                createRequirement({
+                    name: "test item 1",
+                    amount: 10,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ],
+            [
+                { name: "test item 1", amount: 10, workers: 1 },
+                { name: "test item 2", amount: 20, workers: 1 },
+            ],
+            3,
+        ],
+    ])(
+        "displays the items in %s order by amount if amount column is sorted in that order",
+        async (
+            _: string,
+            unsorted: RequirementsResponse[],
+            sorted: RequirementsTableRow[],
+            numberOfClicks: number
+        ) => {
+            server.use(
+                graphql.query<GetItemRequirementsQuery>(
+                    expectedRequirementsQueryName,
+                    (_, res, ctx) => {
+                        return res.once(ctx.data({ requirement: unsorted }));
+                    }
+                )
+            );
+
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const amountColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedAmountColumnName }
+            );
+            for (let i = 0; i < numberOfClicks; i++) {
+                await act(async () => {
+                    await user.click(amountColumnHeader);
+                });
+            }
+            const requirementRows = await within(
+                requirementsTable
+            ).findAllByRole("row");
+
+            for (let i = 0; i < sorted.length; i++) {
+                const currentRow = requirementRows[i + 1];
+                expect(
+                    within(currentRow).getByText(sorted[i].name)
+                ).toBeVisible();
+                expect(
+                    within(currentRow).getByText(sorted[i].amount)
                 ).toBeVisible();
             }
         }

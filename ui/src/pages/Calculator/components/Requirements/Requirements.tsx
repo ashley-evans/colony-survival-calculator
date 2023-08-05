@@ -23,12 +23,19 @@ import {
     GetItemRequirementsQuery,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
-import { DEFAULT_DEBOUNCE } from "../../utils";
+import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
 
 export type RequirementsTableRow = {
     name: string;
+    amount: number;
     workers: number;
 };
+
+type SortableProperty = {
+    [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
+        ? K
+        : never;
+}[keyof RequirementsTableRow];
 
 type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
@@ -57,6 +64,7 @@ const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!]) {
         requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides) {
             name
+            amount
             creators {
                 name
                 workers
@@ -65,16 +73,17 @@ const GET_ITEM_REQUIREMENTS = gql(`
     }
 `);
 
-function sortByWorkers(
+function sortBy(
     requirements: Readonly<RequirementsTableRow[]>,
-    order: ValidSortDirections
+    order: ValidSortDirections,
+    property: SortableProperty
 ): RequirementsTableRow[] {
     const reference = [...requirements];
     switch (order) {
         case "descending":
-            return reference.sort((a, b) => b.workers - a.workers);
+            return reference.sort((a, b) => b[property] - a[property]);
         case "ascending":
-            return reference.sort((a, b) => a.workers - b.workers);
+            return reference.sort((a, b) => a[property] - b[property]);
         default:
             return reference;
     }
@@ -114,6 +123,7 @@ function mapRequirementsToRow(
 
         return {
             name: requirement.name,
+            amount: requirement.amount,
             workers: totalWorkers,
         };
     });
@@ -128,13 +138,22 @@ function Requirements({
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
         GET_ITEM_REQUIREMENTS
     );
+    const [amountSortDirection, setAmountSortDirection] =
+        useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
 
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
 
+    const changeAmountSortDirection: MouseEventHandler = (event) => {
+        event.stopPropagation();
+        setWorkerSortDirection("none");
+        setAmountSortDirection(sortDirectionOrderMap[amountSortDirection]);
+    };
+
     const changeWorkerSortDirection: MouseEventHandler = (event) => {
         event.stopPropagation();
+        setAmountSortDirection("none");
         setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
     };
 
@@ -178,7 +197,10 @@ function Requirements({
     }
 
     const rows = mapRequirementsToRow(filtered);
-    const sortedRows = sortByWorkers(rows, workerSortDirection);
+    const sortedRows =
+        workerSortDirection !== "none"
+            ? sortBy(rows, workerSortDirection, "workers")
+            : sortBy(rows, amountSortDirection, "amount");
 
     return (
         <>
@@ -187,6 +209,18 @@ function Requirements({
                 <thead>
                     <tr>
                         <TextColumnHeader>Item</TextColumnHeader>
+                        <SortableHeader
+                            item-alignment="end"
+                            aria-sort={amountSortDirection}
+                            onClick={changeAmountSortDirection}
+                            tabIndex={0}
+                        >
+                            <button>Amount</button>
+                            <FontAwesomeIcon
+                                icon={sortDirectionIconMap[amountSortDirection]}
+                                aria-hidden="true"
+                            />
+                        </SortableHeader>
                         <SortableHeader
                             item-alignment="end"
                             aria-sort={workerSortDirection}
@@ -205,6 +239,9 @@ function Requirements({
                     {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
+                            <NumberColumnCell>
+                                {roundOutput(requirement.amount)}
+                            </NumberColumnCell>
                             <NumberColumnCell>
                                 {Math.ceil(requirement.workers)}
                             </NumberColumnCell>

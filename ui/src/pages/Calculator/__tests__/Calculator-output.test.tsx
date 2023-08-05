@@ -243,7 +243,7 @@ test("rounds optimal output to 1 decimals if more than 1 decimal places", async 
     const expectedOutput = `${expectedOutputPrefix} ≈28.2 per minute`;
     server.use(
         graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-            return res(ctx.data({ output: 28.2356 }));
+            return res(ctx.data({ output: 28.23 }));
         })
     );
 
