@@ -37,39 +37,60 @@ const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
 const expectedWorkerColumnName = "Workers";
 
-function createRequirementCreator(
-    name: string,
-    workers: number
-): RequirementCreator {
+function createRequirementCreator({
+    name,
+    workers,
+}: {
+    name: string;
+    workers: number;
+}): RequirementCreator {
     return {
         name,
         workers,
     };
 }
 
-function createRequirement(
-    name: string,
-    creators: RequirementCreator[]
-): RequirementsResponse {
+function createRequirement({
+    name,
+    amount,
+    creators,
+}: {
+    name: string;
+    amount: number;
+    creators: RequirementCreator[];
+}): RequirementsResponse {
     return {
         name,
+        amount,
         creators,
     };
 }
 
 const requirements: RequirementsResponse[] = [
-    createRequirement("Required Item 1", [
-        createRequirementCreator("Required Item 1", 20),
-    ]),
-    createRequirement("Required Item 2", [
-        createRequirementCreator("Required Item 2", 40),
-    ]),
+    createRequirement({
+        name: "Required Item 1",
+        amount: 30,
+        creators: [
+            createRequirementCreator({ name: "Required Item 1", workers: 20 }),
+        ],
+    }),
+    createRequirement({
+        name: "Required Item 2",
+        amount: 60,
+        creators: [
+            createRequirementCreator({ name: "Required Item 2", workers: 40 }),
+        ],
+    }),
 ];
 
 const selectedItemName = "Selected Item";
-const selectedItem: RequirementsResponse = createRequirement(selectedItemName, [
-    createRequirementCreator(selectedItemName, 20),
-]);
+const selectedItem: RequirementsResponse = createRequirement({
+    name: selectedItemName,
+    amount: 90,
+    creators: [
+        createRequirementCreator({ name: selectedItemName, workers: 20 }),
+    ],
+});
 
 const items = [selectedItem, ...requirements];
 
@@ -314,10 +335,20 @@ describe("requirements rendering given requirements", () => {
         const expectedTotal = "12";
         const response: RequirementsResponse[] = [
             selectedItem,
-            createRequirement(expectedRequiredItemName, [
-                createRequirementCreator(expectedRequiredItemName, 5),
-                createRequirementCreator("another creator recipe", 7),
-            ]),
+            createRequirement({
+                name: expectedRequiredItemName,
+                amount: 30,
+                creators: [
+                    createRequirementCreator({
+                        name: expectedRequiredItemName,
+                        workers: 5,
+                    }),
+                    createRequirementCreator({
+                        name: "another creator recipe",
+                        workers: 7,
+                    }),
+                ],
+            }),
         ];
         server.use(
             graphql.query<GetItemRequirementsQuery>(
@@ -415,12 +446,16 @@ describe("requirements rendering given requirements", () => {
                     return res.once(
                         ctx.data({
                             requirement: [
-                                createRequirement("test item name", [
-                                    createRequirementCreator(
-                                        "test item name",
-                                        actualWorkers
-                                    ),
-                                ]),
+                                createRequirement({
+                                    name: "test item name",
+                                    amount: 30,
+                                    creators: [
+                                        createRequirementCreator({
+                                            name: "test item name",
+                                            workers: actualWorkers,
+                                        }),
+                                    ],
+                                }),
                             ],
                         })
                     );
@@ -446,12 +481,26 @@ describe("requirements rendering given requirements", () => {
         [
             "descending",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 1),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 2),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 2,
+                        }),
+                    ],
+                }),
             ],
             [
                 { name: "test item 2", workers: 2 },
@@ -462,12 +511,26 @@ describe("requirements rendering given requirements", () => {
         [
             "ascending",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 2),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 1),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 2,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 1,
+                        }),
+                    ],
+                }),
             ],
             [
                 { name: "test item 2", workers: 1 },
@@ -478,12 +541,26 @@ describe("requirements rendering given requirements", () => {
         [
             "default",
             [
-                createRequirement("test item 1", [
-                    createRequirementCreator("test item 1", 1),
-                ]),
-                createRequirement("test item 2", [
-                    createRequirementCreator("test item 2", 2),
-                ]),
+                createRequirement({
+                    name: "test item 1",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 1",
+                            workers: 1,
+                        }),
+                    ],
+                }),
+                createRequirement({
+                    name: "test item 2",
+                    amount: 1,
+                    creators: [
+                        createRequirementCreator({
+                            name: "test item 2",
+                            workers: 2,
+                        }),
+                    ],
+                }),
             ],
             [
                 { name: "test item 1", workers: 1 },

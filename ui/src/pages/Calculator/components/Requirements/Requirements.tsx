@@ -57,6 +57,7 @@ const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!]) {
         requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides) {
             name
+            amount
             creators {
                 name
                 workers
