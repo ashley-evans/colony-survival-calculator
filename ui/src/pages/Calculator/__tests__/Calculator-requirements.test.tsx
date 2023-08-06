@@ -601,6 +601,11 @@ describe("requirements rendering given requirements", () => {
             0.001,
             "0.001",
         ],
+        [
+            "rounds amount to 1 decimal place (recurring close to ceil)",
+            0.8999999999999999,
+            "≈0.9",
+        ],
     ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
             graphql.query<GetItemRequirementsQuery>(
