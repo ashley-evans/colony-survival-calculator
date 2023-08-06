@@ -1,4 +1,4 @@
-import { OutputUnit } from "../interfaces/query-output-primary-port";
+import { OutputUnit } from "../../../common/output";
 
 const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.SECONDS]: 1,
