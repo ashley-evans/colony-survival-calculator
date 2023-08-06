@@ -38,6 +38,7 @@ type Requirement {
 }
 
 enum OutputUnit {
+    SECONDS
     MINUTES
     GAME_DAYS
 }

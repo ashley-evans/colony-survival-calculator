@@ -1,8 +1,9 @@
 import { Tools } from "../../../types";
 
 enum OutputUnit {
-    GAME_DAYS = "GAME_DAYS",
+    SECONDS = "SECONDS",
     MINUTES = "MINUTES",
+    GAME_DAYS = "GAME_DAYS",
 }
 
 interface QueryOutputPrimaryPort {
