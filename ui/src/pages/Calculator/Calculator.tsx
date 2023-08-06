@@ -149,6 +149,7 @@ function CalculatorTab({
                             workers={workers}
                             maxAvailableTool={selectedTool}
                             creatorOverrides={selectedCreatorOverrides}
+                            unit={selectedOutputUnit}
                         />
                     ) : null}
                 </>

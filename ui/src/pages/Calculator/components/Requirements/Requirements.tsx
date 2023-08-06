@@ -21,6 +21,7 @@ import { gql } from "../../../../graphql/__generated__";
 import {
     CreatorOverride,
     GetItemRequirementsQuery,
+    OutputUnit,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
@@ -43,6 +44,7 @@ type RequirementsProps = {
     workers: number;
     maxAvailableTool?: Tools;
     creatorOverrides?: CreatorOverride[];
+    unit?: OutputUnit;
 };
 type Requirements = GetItemRequirementsQuery["requirement"];
 
@@ -61,8 +63,8 @@ const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
 };
 
 const GET_ITEM_REQUIREMENTS = gql(`
-    query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!]) {
-        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides) {
+    query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!], $unit: OutputUnit) {
+        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides, unit: $unit) {
             name
             amount
             creators {
@@ -134,6 +136,7 @@ function Requirements({
     workers,
     maxAvailableTool,
     creatorOverrides,
+    unit,
 }: RequirementsProps) {
     const [getItemRequirements, { loading, data, error }] = useLazyQuery(
         GET_ITEM_REQUIREMENTS
@@ -169,6 +172,7 @@ function Requirements({
                 workers: debouncedWorkers,
                 maxAvailableTool,
                 creatorOverrides: creatorOverridesFilter,
+                unit,
             },
         });
     }, [
@@ -176,6 +180,7 @@ function Requirements({
         debouncedWorkers,
         maxAvailableTool,
         creatorOverrides,
+        unit,
     ]);
 
     if (error) {
