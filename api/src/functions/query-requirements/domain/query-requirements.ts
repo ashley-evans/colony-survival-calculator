@@ -31,6 +31,7 @@ import {
     filterByMinimumTool,
     getLowestRequiredTool,
 } from "./item-utils";
+import { OutputUnit, OutputUnitSecondMappings } from "../../../common/output";
 
 function findMultipleOverrides(
     overrides?: CreatorOverride[]
@@ -201,10 +202,41 @@ function mapResults(results?: VertexOutput): Requirement[] {
     return result;
 }
 
+function applyOutputUnit(
+    requirements: Requirement[],
+    unit: OutputUnit
+): Requirement[] {
+    const factor = OutputUnitSecondMappings[unit];
+
+    return requirements.map((requirement) => {
+        const creators = requirement.creators.map((creator) => {
+            const demands = creator.demands.map((demand) => {
+                return {
+                    ...demand,
+                    amount: factor * demand.amount,
+                };
+            });
+
+            return {
+                ...creator,
+                demands,
+                amount: factor * creator.amount,
+            };
+        });
+
+        return {
+            ...requirement,
+            creators,
+            amount: factor * requirement.amount,
+        };
+    });
+}
+
 const queryRequirements: QueryRequirementsPrimaryPort = async ({
     name,
     workers,
     maxAvailableTool = Tools.none,
+    unit = OutputUnit.SECONDS,
     creatorOverrides,
 }) => {
     if (name === "") {
@@ -247,7 +279,8 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         maxAvailableTool
     );
 
-    return mapResults(result);
+    const mapped = mapResults(result);
+    return unit !== OutputUnit.SECONDS ? applyOutputUnit(mapped, unit) : mapped;
 };
 
 export { queryRequirements };
