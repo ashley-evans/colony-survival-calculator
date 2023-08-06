@@ -240,29 +240,32 @@ test.each([
     }
 );
 
-test("rounds optimal output to 1 decimals if more than 1 decimal places", async () => {
-    const expectedOutput = `${expectedOutputPrefix} ≈28.2 per minute`;
+test.each([
+    [
+        "rounds optimal output to 1 decimals if more than 1 decimal places",
+        28.23,
+        "≈28.2",
+    ],
+    [
+        "does not show approx symbol if optimal output is only accurate to 1 decimal place",
+        28.1,
+        "28.1",
+    ],
+    [
+        "rounds optimal output to more precision if rounding would output zero",
+        0.0012,
+        "≈0.001",
+    ],
+    [
+        "does not show approx symbol if optimal output has no additional precision (below 0.1)",
+        0.001,
+        "0.001",
+    ],
+])("%s", async (_: string, actual: number, expected: string) => {
+    const expectedOutput = `${expectedOutputPrefix} ${expected} per minute`;
     server.use(
         graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-            return res(ctx.data({ output: 28.23 }));
-        })
-    );
-
-    render(<Calculator />);
-    await selectItemAndWorkers({
-        itemName: item.name,
-        workers: 5,
-    });
-
-    expect(await screen.findByText(expectedOutput)).toBeVisible();
-});
-
-test("does not show approx symbol if optimal output is only accurate to 1 decimal place", async () => {
-    const output = 28.1;
-    const expectedOutput = `${expectedOutputPrefix} ${output} per minute`;
-    server.use(
-        graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-            return res(ctx.data({ output }));
+            return res(ctx.data({ output: actual }));
         })
     );
 

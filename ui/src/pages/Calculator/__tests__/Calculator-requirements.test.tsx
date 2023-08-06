@@ -551,9 +551,28 @@ describe("requirements rendering given requirements", () => {
         }
     );
 
-    test("rounds amount to 1 decimals if more than 1 decimal places", async () => {
-        const actualAmount = 3.14;
-        const expectedAmount = "≈3.1";
+    test.each([
+        [
+            "rounds amount to 1 decimal place if more than 1 decimal places",
+            3.13,
+            "≈3.1",
+        ],
+        [
+            "does not show approx symbol if amount is only accurate to 1 decimal place",
+            3.1,
+            "3.1",
+        ],
+        [
+            "rounds amount to more precision if rounding would output zero",
+            0.0012,
+            "≈0.001",
+        ],
+        [
+            "does not show approx symbol if amount has no additional precision (below 0.1)",
+            0.001,
+            "0.001",
+        ],
+    ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
             graphql.query<GetItemRequirementsQuery>(
                 expectedRequirementsQueryName,
@@ -563,7 +582,7 @@ describe("requirements rendering given requirements", () => {
                             requirement: [
                                 createRequirement({
                                     name: "test item name",
-                                    amount: actualAmount,
+                                    amount: actual,
                                     creators: [
                                         createRequirementCreator({
                                             name: "test item name",
@@ -587,47 +606,7 @@ describe("requirements rendering given requirements", () => {
 
         expect(
             within(requirementsTable).getByRole("cell", {
-                name: expectedAmount,
-            })
-        ).toBeVisible();
-    });
-
-    test("does not show approx symbol if optimal output is only accurate to 1 decimal place", async () => {
-        const actualAmount = 3.1;
-        server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(
-                        ctx.data({
-                            requirement: [
-                                createRequirement({
-                                    name: "test item name",
-                                    amount: actualAmount,
-                                    creators: [
-                                        createRequirementCreator({
-                                            name: "test item name",
-                                            workers: 1,
-                                        }),
-                                    ],
-                                }),
-                            ],
-                        })
-                    );
-                }
-            )
-        );
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-        const requirementsTable = await screen.findByRole("table");
-
-        expect(
-            within(requirementsTable).getByRole("cell", {
-                name: actualAmount.toString(),
+                name: expected,
             })
         ).toBeVisible();
     });
