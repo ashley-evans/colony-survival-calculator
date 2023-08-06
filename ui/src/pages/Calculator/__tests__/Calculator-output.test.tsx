@@ -65,7 +65,7 @@ beforeEach(() => {
     server.events.removeAllListeners();
 });
 
-test.each(["Minutes", "Game days"])(
+test.each(["Seconds", "Minutes", "Game days"])(
     "renders the %s option in the output unit selector",
     async (unit: string) => {
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -211,6 +211,7 @@ test("does not render the optimal output message if output has not been received
 });
 
 test.each([
+    ["seconds", OutputUnit.Seconds, 0.1, "second"],
     ["minutes", OutputUnit.Minutes, 5, "minute"],
     ["game days", OutputUnit.GameDays, 60, "game day"],
 ])(
