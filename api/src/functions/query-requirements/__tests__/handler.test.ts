@@ -29,14 +29,17 @@ function createMockEvent({
     maxAvailableTool,
     creatorOverrides,
     unit,
+    selectionSetList = ["name"],
 }: {
     name: string;
     workers: number;
     maxAvailableTool?: Tools;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
+    selectionSetList?: string[];
 }): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
+    mockEvent.info.selectionSetList = selectionSetList;
     mockEvent.arguments = {
         name,
         workers,
@@ -142,6 +145,27 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
             workers: expectedAmount,
             unit: expected,
         });
+    }
+);
+
+test.each([
+    ["overall output amount", ["amount"]],
+    ["requirement creator output amount", ["creators/amount"]],
+    ["requirement creator output amount", ["creators/demands/amount"]],
+])(
+    "throws invalid arguments exception if %s is queried without providing output unit",
+    async (_: string, selectionSetList: string[]) => {
+        const expectedError = new Error(
+            "Invalid arguments: Must provide output unit when querying amounts"
+        );
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedAmount,
+            selectionSetList,
+        });
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrow(expectedError);
     }
 );
 
