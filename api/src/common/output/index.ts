@@ -1,4 +1,8 @@
-import { OutputUnit } from "../interfaces/query-output-primary-port";
+enum OutputUnit {
+    SECONDS = "SECONDS",
+    MINUTES = "MINUTES",
+    GAME_DAYS = "GAME_DAYS",
+}
 
 const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.SECONDS]: 1,
@@ -6,4 +10,4 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.GAME_DAYS]: 435,
 };
 
-export default OutputUnitSecondMappings;
+export { OutputUnit, OutputUnitSecondMappings };

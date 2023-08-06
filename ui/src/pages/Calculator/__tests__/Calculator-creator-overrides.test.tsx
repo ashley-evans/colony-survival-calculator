@@ -872,6 +872,7 @@ describe("given items w/ multiple creators returned", () => {
                     workers: expectedWorkers,
                     maxAvailableTool: expectedTool,
                     creatorOverrides: expectedOverrides,
+                    unit: OutputUnit.Minutes,
                 }
             );
 
@@ -914,6 +915,7 @@ describe("given items w/ multiple creators returned", () => {
                     name: expectedItem,
                     workers: expectedWorkers,
                     maxAvailableTool: expectedTool,
+                    unit: OutputUnit.Minutes,
                 }
             );
 

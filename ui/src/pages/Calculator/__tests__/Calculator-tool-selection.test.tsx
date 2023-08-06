@@ -183,6 +183,7 @@ test("queries requirements with provided tool if non default selected", async ()
         name: item.name,
         workers: expectedWorkers,
         maxAvailableTool: expectedTool,
+        unit: OutputUnit.Minutes,
     });
 });
 
@@ -198,6 +199,7 @@ test("queries requirements again if tool is changed after first query", async ()
             name: item.name,
             workers: expectedWorkers,
             maxAvailableTool: expectedTool,
+            unit: OutputUnit.Minutes,
         }
     );
 

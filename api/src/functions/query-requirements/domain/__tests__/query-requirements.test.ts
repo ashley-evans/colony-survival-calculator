@@ -3,6 +3,7 @@ import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mo
 import { createItem } from "../../../../../test";
 import { Tools } from "../../../../types";
 import { Requirement } from "../../interfaces/query-requirements-primary-port";
+import { OutputUnit } from "../../../../common/output";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: jest.fn(),
@@ -1774,4 +1775,191 @@ describe("creator override handling", () => {
             },
         ]);
     });
+});
+
+describe("handles multiple output units", () => {
+    const requiredItem1 = createItem({
+        name: "required item 1",
+        createTime: 3,
+        output: 4,
+        requirements: [],
+    });
+    const requiredItem2 = createItem({
+        name: "required item 2",
+        createTime: 4,
+        output: 2,
+        requirements: [],
+    });
+    const item = createItem({
+        name: validItemName,
+        createTime: 2,
+        output: 3,
+        requirements: [
+            { name: requiredItem1.name, amount: 4 },
+            { name: requiredItem2.name, amount: 6 },
+        ],
+    });
+
+    beforeEach(() => {
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            item,
+            requiredItem1,
+            requiredItem2,
+        ]);
+    });
+
+    test.each([
+        [
+            OutputUnit.SECONDS,
+            [
+                {
+                    name: item.name,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [
+                                { name: requiredItem1.name, amount: 10 },
+                                { name: requiredItem2.name, amount: 15 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 15,
+                            workers: 30,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+        [
+            OutputUnit.MINUTES,
+            [
+                {
+                    name: item.name,
+                    amount: 450,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 450,
+                            workers: 5,
+                            demands: [
+                                { name: requiredItem1.name, amount: 600 },
+                                { name: requiredItem2.name, amount: 900 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 600,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 600,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 900,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 900,
+                            workers: 30,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+        [
+            OutputUnit.GAME_DAYS,
+            [
+                {
+                    name: item.name,
+                    amount: 3262.5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 3262.5,
+                            workers: 5,
+                            demands: [
+                                { name: requiredItem1.name, amount: 4350 },
+                                { name: requiredItem2.name, amount: 6525 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 4350,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 4350,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 6525,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 6525,
+                            workers: 30,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+    ])(
+        "returns requirement amounts in provided output given unit: %s",
+        async (unit: OutputUnit, expected: Requirement[]) => {
+            const actual = await queryRequirements({
+                name: validItemName,
+                workers: validWorkers,
+                unit,
+            });
+
+            expect(actual).toEqual(expected);
+        }
+    );
 });

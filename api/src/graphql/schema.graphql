@@ -71,6 +71,7 @@ type Query {
         workers: Int!
         maxAvailableTool: Tools
         creatorOverrides: [CreatorOverride!]
+        unit: OutputUnit
     ): [Requirement!]!
     output(
         name: ID!

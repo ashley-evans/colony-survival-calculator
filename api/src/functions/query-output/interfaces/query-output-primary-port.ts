@@ -1,10 +1,5 @@
+import { OutputUnit } from "../../../common/output";
 import { Tools } from "../../../types";
-
-enum OutputUnit {
-    SECONDS = "SECONDS",
-    MINUTES = "MINUTES",
-    GAME_DAYS = "GAME_DAYS",
-}
 
 interface QueryOutputPrimaryPort {
     (input: {
@@ -16,4 +11,4 @@ interface QueryOutputPrimaryPort {
     }): Promise<number>;
 }
 
-export { OutputUnit, QueryOutputPrimaryPort };
+export { QueryOutputPrimaryPort };

@@ -3,14 +3,11 @@ import {
     getMaxToolModifier,
     isAvailableToolSufficient,
 } from "../../../common/modifiers";
+import { OutputUnit, OutputUnitSecondMappings } from "../../../common/output";
 import { Tools } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
-import type {
-    OutputUnit,
-    QueryOutputPrimaryPort,
-} from "../interfaces/query-output-primary-port";
-import OutputUnitSecondMappings from "../utils/OutputUnitSecondMapping";
+import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
 
 const INVALID_ITEM_NAME_ERROR =
     "Invalid item name provided, must be a non-empty string";

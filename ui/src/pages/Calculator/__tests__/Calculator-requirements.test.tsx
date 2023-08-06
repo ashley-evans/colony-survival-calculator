@@ -15,7 +15,10 @@ import {
     renderWithTestProviders as render,
     wrapWithTestProviders,
 } from "../../../test/utils";
-import { GetItemRequirementsQuery } from "../../../graphql/__generated__/graphql";
+import {
+    GetItemRequirementsQuery,
+    OutputUnit,
+} from "../../../graphql/__generated__/graphql";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import {
@@ -25,6 +28,7 @@ import {
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
     expectedCreatorOverrideQueryName,
+    selectOutputUnit,
 } from "./utils";
 import Requirements from "../components/Requirements";
 import { RequirementsTableRow } from "../components/Requirements/Requirements";
@@ -84,6 +88,7 @@ const requirements: RequirementsResponse[] = [
     }),
 ];
 
+const expectedWorkers = 5;
 const selectedItemName = "Selected Item";
 const selectedItem: RequirementsResponse = createRequirement({
     name: selectedItemName,
@@ -134,8 +139,7 @@ beforeEach(() => {
     server.events.removeAllListeners();
 });
 
-test("queries requirements if item and workers inputted", async () => {
-    const expectedWorkers = 5;
+test("queries requirements if item and workers inputted with default unit selected", async () => {
     const expectedRequest = waitForRequest(
         server,
         "POST",
@@ -153,6 +157,31 @@ test("queries requirements if item and workers inputted", async () => {
     expect(matchedRequestDetails.variables).toEqual({
         name: selectedItemName,
         workers: expectedWorkers,
+        maxAvailableTool: "NONE",
+        unit: OutputUnit.Minutes,
+    });
+});
+
+test("queries requirements if item and workers inputted with non-default unit selected", async () => {
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedRequirementsQueryName
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectOutputUnit(OutputUnit.GameDays);
+    await selectItemAndWorkers({
+        itemName: selectedItemName,
+        workers: expectedWorkers,
+    });
+    const { matchedRequestDetails } = await expectedRequest;
+
+    expect(matchedRequestDetails.variables).toEqual({
+        name: selectedItemName,
+        workers: expectedWorkers,
+        unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
     });
 });
@@ -571,6 +600,11 @@ describe("requirements rendering given requirements", () => {
             "does not show approx symbol if amount has no additional precision (below 0.1)",
             0.001,
             "0.001",
+        ],
+        [
+            "rounds amount to 1 decimal place (recurring close to ceil)",
+            0.8999999999999999,
+            "≈0.9",
         ],
     ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
@@ -998,7 +1032,7 @@ describe("debounces requirement requests", () => {
             "POST",
             expectedGraphQLAPIURL,
             expectedRequirementsQueryName,
-            { name: expectedItemName, workers: 3 }
+            { name: expectedItemName, workers: 3, unit: OutputUnit.Minutes }
         );
 
         const { rerender } = rtlRender(
@@ -1006,6 +1040,7 @@ describe("debounces requirement requests", () => {
                 <Requirements
                     selectedItemName={expectedItemName}
                     workers={1}
+                    unit={OutputUnit.Minutes}
                 />,
                 expectedGraphQLAPIURL
             )
@@ -1015,6 +1050,7 @@ describe("debounces requirement requests", () => {
                 <Requirements
                     selectedItemName={expectedItemName}
                     workers={2}
+                    unit={OutputUnit.Minutes}
                 />,
                 expectedGraphQLAPIURL
             )
@@ -1024,6 +1060,7 @@ describe("debounces requirement requests", () => {
                 <Requirements
                     selectedItemName={expectedItemName}
                     workers={3}
+                    unit={OutputUnit.Minutes}
                 />,
                 expectedGraphQLAPIURL
             )
