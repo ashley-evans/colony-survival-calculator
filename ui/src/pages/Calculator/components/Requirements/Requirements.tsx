@@ -28,15 +28,18 @@ import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
 
 export type RequirementsTableRow = {
     name: string;
+    creator?: string;
     amount: number;
     workers: number;
 };
 
-type SortableProperty = {
-    [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
-        ? K
-        : never;
-}[keyof RequirementsTableRow];
+type SortableProperty = NonNullable<
+    {
+        [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
+            ? K
+            : never;
+    }[keyof RequirementsTableRow]
+>;
 
 type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
@@ -69,7 +72,9 @@ const GET_ITEM_REQUIREMENTS = gql(`
             amount
             creators {
                 name
+                creator
                 workers
+                amount
             }
         }
     }
@@ -101,12 +106,8 @@ function removeSelectedItemRows(
 
     return requirements.reduce((acc, current) => {
         if (current.name !== selectedItemName) {
-            const filteredCreators = current.creators.filter(
-                (creator) => creator.name !== selectedItemName
-            );
             acc.push({
                 ...current,
-                creators: filteredCreators,
             });
         }
 
@@ -118,6 +119,10 @@ function mapRequirementsToRow(
     requirements: Readonly<Requirements>
 ): Readonly<RequirementsTableRow[]> {
     return requirements.map((requirement) => {
+        const creator =
+            requirement.creators.length === 1
+                ? requirement.creators[0].creator
+                : "";
         const totalWorkers = requirement.creators.reduce(
             (acc, current) => acc + current.workers,
             0
@@ -125,6 +130,7 @@ function mapRequirementsToRow(
 
         return {
             name: requirement.name,
+            creator,
             amount: requirement.amount,
             workers: totalWorkers,
         };
@@ -214,6 +220,7 @@ function Requirements({
                 <thead>
                     <tr>
                         <TextColumnHeader>Item</TextColumnHeader>
+                        <TextColumnHeader>Creator</TextColumnHeader>
                         <SortableHeader
                             item-alignment="end"
                             aria-sort={amountSortDirection}
@@ -244,6 +251,9 @@ function Requirements({
                     {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             <TextColumnCell>{requirement.name}</TextColumnCell>
+                            <TextColumnCell>
+                                {requirement.creator}
+                            </TextColumnCell>
                             <NumberColumnCell>
                                 {roundOutput(requirement.amount)}
                             </NumberColumnCell>

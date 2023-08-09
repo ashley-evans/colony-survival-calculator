@@ -39,18 +39,25 @@ type RequirementCreator = RequirementsResponse["creators"][number];
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
+const expectedCreatorColumnName = "Creator";
 const expectedAmountColumnName = "Amount";
 const expectedWorkerColumnName = "Workers";
 
 function createRequirementCreator({
-    name,
+    recipeName,
+    creator = `${recipeName} creator`,
+    amount,
     workers,
 }: {
-    name: string;
+    recipeName: string;
+    creator?: string;
+    amount: number;
     workers: number;
 }): RequirementCreator {
     return {
-        name,
+        name: recipeName,
+        creator,
+        amount,
         workers,
     };
 }
@@ -71,34 +78,80 @@ function createRequirement({
     };
 }
 
-const requirements: RequirementsResponse[] = [
+const createRequirementsResponseHandler = (response: RequirementsResponse[]) =>
+    graphql.query<GetItemRequirementsQuery>(
+        expectedRequirementsQueryName,
+        (_, res, ctx) => {
+            return res.once(
+                ctx.data({
+                    requirement: response,
+                })
+            );
+        }
+    );
+
+const requirementsWithSingleCreator: RequirementsResponse[] = [
     createRequirement({
         name: "Required Item 1",
         amount: 30,
         creators: [
-            createRequirementCreator({ name: "Required Item 1", workers: 20 }),
+            createRequirementCreator({
+                recipeName: "Required Item 1",
+                creator: "Creator 1",
+                amount: 30,
+                workers: 20,
+            }),
         ],
     }),
     createRequirement({
         name: "Required Item 2",
         amount: 60,
         creators: [
-            createRequirementCreator({ name: "Required Item 2", workers: 40 }),
+            createRequirementCreator({
+                recipeName: "Required Item 2",
+                amount: 60,
+                workers: 40,
+            }),
         ],
     }),
 ];
 
-const expectedWorkers = 5;
-const selectedItemName = "Selected Item";
-const selectedItem: RequirementsResponse = createRequirement({
-    name: selectedItemName,
-    amount: 90,
+const requirementWithMultipleCreators = createRequirement({
+    name: "Multiple creator item",
+    amount: 50,
     creators: [
-        createRequirementCreator({ name: selectedItemName, workers: 20 }),
+        createRequirementCreator({
+            recipeName: "Multiple creator item",
+            creator: "Creator 1",
+            amount: 30,
+            workers: 12,
+        }),
+        createRequirementCreator({
+            recipeName: "Multiple creator item",
+            creator: "Creator 2",
+            amount: 20,
+            workers: 5,
+        }),
     ],
 });
 
-const items = [selectedItem, ...requirements];
+const expectedWorkers = 5;
+const selectedItemName = "Selected Item";
+const selectedItemCreator = "Selected Item Creator";
+const selectedItem = createRequirement({
+    name: selectedItemName,
+    amount: 90,
+    creators: [
+        createRequirementCreator({
+            recipeName: selectedItemName,
+            creator: selectedItemCreator,
+            amount: 90,
+            workers: 20,
+        }),
+    ],
+});
+
+const items = [selectedItem, ...requirementsWithSingleCreator];
 
 const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
@@ -115,7 +168,9 @@ const server = setupServer(
     graphql.query<GetItemRequirementsQuery>(
         expectedRequirementsQueryName,
         (_, res, ctx) => {
-            return res(ctx.data({ requirement: [requirements[0]] }));
+            return res(
+                ctx.data({ requirement: [requirementsWithSingleCreator[0]] })
+            );
         }
     ),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
@@ -188,14 +243,7 @@ test("queries requirements if item and workers inputted with non-default unit se
 
 describe("item w/o requirements handling", async () => {
     beforeEach(() => {
-        server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: [selectedItem] }));
-                }
-            )
-        );
+        server.use(createRequirementsResponseHandler([selectedItem]));
     });
 
     test("does not render the requirements section header", async () => {
@@ -287,6 +335,11 @@ describe("requirements rendering given requirements", () => {
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedItemNameColumnName,
+            })
+        ).toBeVisible();
+        expect(
+            within(requirementsTable).getByRole("columnheader", {
+                name: expectedCreatorColumnName,
             })
         ).toBeVisible();
         expect(
@@ -467,32 +520,9 @@ describe("requirements rendering given requirements", () => {
     });
 
     test("renders the sum total of required workers given requirement with multiple creators", async () => {
-        const expectedRequiredItemName = "test requirement";
-        const expectedTotal = "12";
-        const response: RequirementsResponse[] = [
-            selectedItem,
-            createRequirement({
-                name: expectedRequiredItemName,
-                amount: 30,
-                creators: [
-                    createRequirementCreator({
-                        name: expectedRequiredItemName,
-                        workers: 5,
-                    }),
-                    createRequirementCreator({
-                        name: "another creator recipe",
-                        workers: 7,
-                    }),
-                ],
-            }),
-        ];
+        const expectedTotal = "17";
         server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: response }));
-                }
-            )
+            createRequirementsResponseHandler([requirementWithMultipleCreators])
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -511,29 +541,38 @@ describe("requirements rendering given requirements", () => {
 
     test.each([
         [
-            "a single requirement",
-            [selectedItem, requirements[0]],
+            "a single requirement with a single creator",
+            [selectedItem, requirementsWithSingleCreator[0]],
             [
                 {
-                    name: requirements[0].name,
-                    amount: requirements[0].amount,
-                    workers: requirements[0].creators[0].workers,
+                    name: requirementsWithSingleCreator[0].name,
+                    creator:
+                        requirementsWithSingleCreator[0].creators[0].creator,
+                    amount: requirementsWithSingleCreator[0].amount,
+                    workers:
+                        requirementsWithSingleCreator[0].creators[0].workers,
                 },
             ],
         ],
         [
-            "multiple requirements",
+            "multiple requirements with a single creator",
             items,
             [
                 {
-                    name: requirements[0].name,
-                    amount: requirements[0].amount,
-                    workers: requirements[0].creators[0].workers,
+                    name: requirementsWithSingleCreator[0].name,
+                    creator:
+                        requirementsWithSingleCreator[0].creators[0].creator,
+                    amount: requirementsWithSingleCreator[0].amount,
+                    workers:
+                        requirementsWithSingleCreator[0].creators[0].workers,
                 },
                 {
-                    name: requirements[1].name,
-                    amount: requirements[1].amount,
-                    workers: requirements[1].creators[0].workers,
+                    name: requirementsWithSingleCreator[1].name,
+                    creator:
+                        requirementsWithSingleCreator[1].creators[0].creator,
+                    amount: requirementsWithSingleCreator[1].amount,
+                    workers:
+                        requirementsWithSingleCreator[1].creators[0].workers,
                 },
             ],
         ],
@@ -544,14 +583,7 @@ describe("requirements rendering given requirements", () => {
             response: RequirementsResponse[],
             expected: RequirementsTableRow[]
         ) => {
-            server.use(
-                graphql.query<GetItemRequirementsQuery>(
-                    expectedRequirementsQueryName,
-                    (_, res, ctx) => {
-                        return res.once(ctx.data({ requirement: response }));
-                    }
-                )
-            );
+            server.use(createRequirementsResponseHandler(response));
 
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
@@ -568,6 +600,11 @@ describe("requirements rendering given requirements", () => {
                 ).toBeVisible();
                 expect(
                     within(requirementsTable).getByRole("cell", {
+                        name: requirement.creator,
+                    })
+                ).toBeVisible();
+                expect(
+                    within(requirementsTable).getByRole("cell", {
                         name: requirement.amount.toString(),
                     })
                 );
@@ -576,6 +613,50 @@ describe("requirements rendering given requirements", () => {
                         name: requirement.workers.toString(),
                     })
                 ).toBeVisible();
+            }
+        }
+    );
+
+    test.each([
+        ["created by multiple creators", requirementWithMultipleCreators],
+        [
+            "created by multiple creators (one being the selected item)",
+            createRequirement({
+                name: "test item",
+                amount: 20,
+                creators: [
+                    createRequirementCreator({
+                        recipeName: selectedItemName,
+                        creator: selectedItemCreator,
+                        amount: 15,
+                        workers: 2,
+                    }),
+                    createRequirementCreator({
+                        recipeName: "test item",
+                        amount: 5,
+                        workers: 2,
+                    }),
+                ],
+            }),
+        ],
+    ])(
+        "does not render the creator by default for any item that is created by multiple creators",
+        async (_: string, response: RequirementsResponse) => {
+            server.use(createRequirementsResponseHandler([response]));
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+
+            for (const creator of response.creators) {
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.creator,
+                    })
+                ).not.toBeInTheDocument();
             }
         }
     );
@@ -619,7 +700,8 @@ describe("requirements rendering given requirements", () => {
                                     amount: actual,
                                     creators: [
                                         createRequirementCreator({
-                                            name: "test item name",
+                                            recipeName: "test item name",
+                                            amount: actual,
                                             workers: 1,
                                         }),
                                     ],
@@ -660,7 +742,8 @@ describe("requirements rendering given requirements", () => {
                                     amount: 30,
                                     creators: [
                                         createRequirementCreator({
-                                            name: "test item name",
+                                            recipeName: "test item name",
+                                            amount: 30,
                                             workers: actualWorkers,
                                         }),
                                     ],
@@ -695,7 +778,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -705,7 +789,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 2,
                         }),
                     ],
@@ -725,7 +810,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 2,
                         }),
                     ],
@@ -735,7 +821,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
@@ -755,7 +842,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -765,7 +853,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 2,
                         }),
                     ],
@@ -836,7 +925,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -846,7 +936,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
@@ -866,7 +957,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
@@ -876,7 +968,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -896,7 +989,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -906,7 +1000,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
