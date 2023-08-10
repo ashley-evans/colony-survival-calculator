@@ -41,6 +41,8 @@ export const SortableHeader = styled.th<SortableHeaderProps>`
             }
         `}
 
+        cursor: pointer;
+
         button {
             border: none;
             background: none;
