@@ -58,3 +58,8 @@ export const TextColumnCell = styled.td`
 export const NumberColumnCell = styled.td`
     text-align: end;
 `;
+
+export const ExpandRowIconContainer = styled.span`
+    cursor: pointer;
+    margin-right: 0.5rem;
+`;

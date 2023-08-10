@@ -4,10 +4,13 @@ import { useDebounce } from "use-debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     IconDefinition,
+    faMinus,
+    faPlus,
     faSort,
     faSortAsc,
     faSortDesc,
 } from "@fortawesome/free-solid-svg-icons";
+import update from "immutability-helper";
 
 import {
     RequirementsTable,
@@ -16,6 +19,7 @@ import {
     NumberColumnCell,
     Header,
     SortableHeader,
+    ExpandRowIconContainer,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
 import {
@@ -26,12 +30,23 @@ import {
 } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
 
-export type RequirementsTableRow = {
+export type SingleCreatorRequirementsTableRow = {
     name: string;
-    creator?: string;
+    creator: string;
     amount: number;
     workers: number;
 };
+
+export type MultipleCreatorRequirementsTableRow = Omit<
+    SingleCreatorRequirementsTableRow,
+    "creator"
+> & {
+    isExpanded: boolean;
+};
+
+export type RequirementsTableRow =
+    | SingleCreatorRequirementsTableRow
+    | MultipleCreatorRequirementsTableRow;
 
 type SortableProperty = NonNullable<
     {
@@ -99,7 +114,7 @@ function sortBy(
 function removeSelectedItemRows(
     selectedItemName: string,
     requirements: Readonly<Requirements> | undefined
-): Readonly<Requirements> {
+): Requirements {
     if (!requirements) {
         return [];
     }
@@ -115,24 +130,36 @@ function removeSelectedItemRows(
     }, [] as Requirements);
 }
 
+function isSingleCreatorRow(
+    row: RequirementsTableRow
+): row is SingleCreatorRequirementsTableRow {
+    const casted = row as SingleCreatorRequirementsTableRow;
+    return casted.creator !== undefined;
+}
+
 function mapRequirementsToRow(
     requirements: Readonly<Requirements>
-): Readonly<RequirementsTableRow[]> {
+): RequirementsTableRow[] {
     return requirements.map((requirement) => {
-        const creator =
-            requirement.creators.length === 1
-                ? requirement.creators[0].creator
-                : "";
         const totalWorkers = requirement.creators.reduce(
             (acc, current) => acc + current.workers,
             0
         );
 
+        if (requirement.creators.length === 1) {
+            return {
+                name: requirement.name,
+                creator: requirement.creators[0].creator,
+                amount: requirement.amount,
+                workers: totalWorkers,
+            };
+        }
+
         return {
             name: requirement.name,
-            creator,
             amount: requirement.amount,
             workers: totalWorkers,
+            isExpanded: false,
         };
     });
 }
@@ -151,6 +178,7 @@ function Requirements({
         useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
+    const [rows, setRows] = useState<RequirementsTableRow[]>([]);
 
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
 
@@ -164,6 +192,17 @@ function Requirements({
         event.stopPropagation();
         setAmountSortDirection("none");
         setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
+    };
+
+    const toggleRowExpansion = (index: number) => {
+        const row = rows[index];
+        if (!isSingleCreatorRow(row)) {
+            const updated = update(rows, {
+                [index]: { isExpanded: { $set: !row.isExpanded } },
+            });
+
+            setRows(updated);
+        }
     };
 
     useEffect(() => {
@@ -189,6 +228,15 @@ function Requirements({
         unit,
     ]);
 
+    useEffect(() => {
+        const filtered = removeSelectedItemRows(
+            selectedItemName,
+            data?.requirement
+        );
+
+        setRows(mapRequirementsToRow(filtered));
+    }, [data]);
+
     if (error) {
         return (
             <span role="alert">
@@ -198,16 +246,10 @@ function Requirements({
         );
     }
 
-    const filtered = removeSelectedItemRows(
-        selectedItemName,
-        data?.requirement
-    );
-
-    if (loading || filtered.length === 0) {
+    if (loading || rows.length === 0) {
         return <></>;
     }
 
-    const rows = mapRequirementsToRow(filtered);
     const sortedRows =
         workerSortDirection !== "none"
             ? sortBy(rows, workerSortDirection, "workers")
@@ -248,11 +290,50 @@ function Requirements({
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedRows.map((requirement) => (
+                    {sortedRows.map((requirement, index) => (
                         <tr key={requirement.name}>
-                            <TextColumnCell>{requirement.name}</TextColumnCell>
+                            {isSingleCreatorRow(requirement) ? (
+                                <TextColumnCell>
+                                    {requirement.name}
+                                </TextColumnCell>
+                            ) : (
+                                <TextColumnCell>
+                                    {requirement.isExpanded ? (
+                                        <ExpandRowIconContainer
+                                            role="button"
+                                            aria-label={
+                                                "Collapse creator breakdown"
+                                            }
+                                            tabIndex={0}
+                                            onClick={() =>
+                                                toggleRowExpansion(index)
+                                            }
+                                        >
+                                            <FontAwesomeIcon icon={faMinus} />
+                                        </ExpandRowIconContainer>
+                                    ) : (
+                                        <ExpandRowIconContainer
+                                            role="button"
+                                            aria-label={
+                                                "Expand creator breakdown"
+                                            }
+                                            tabIndex={0}
+                                            onClick={() =>
+                                                toggleRowExpansion(index)
+                                            }
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} />
+                                        </ExpandRowIconContainer>
+                                    )}
+
+                                    {requirement.name}
+                                </TextColumnCell>
+                            )}
+
                             <TextColumnCell>
-                                {requirement.creator}
+                                {isSingleCreatorRow(requirement)
+                                    ? requirement.creator
+                                    : ""}
                             </TextColumnCell>
                             <NumberColumnCell>
                                 {roundOutput(requirement.amount)}

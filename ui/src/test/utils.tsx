@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
 import { render } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProviderProps, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
@@ -65,8 +66,18 @@ function renderWithTestProviders(
     };
 }
 
+async function clickButton({ label }: { label: string }): Promise<void> {
+    const user = userEvent.setup();
+    const button = await screen.findByRole("button", { name: label });
+
+    await act(async () => {
+        await user.click(button);
+    });
+}
+
 export {
     wrapWithTestProviders,
     renderWithRouterProvider,
     renderWithTestProviders,
+    clickButton,
 };

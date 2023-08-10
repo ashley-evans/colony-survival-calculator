@@ -3,7 +3,10 @@ import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
-import { renderWithTestProviders as render } from "../../../../test/utils";
+import {
+    clickButton,
+    renderWithTestProviders as render,
+} from "../../../../test";
 import Input from "..";
 
 const expectedLabelText = "Label:";
@@ -26,15 +29,6 @@ async function typeValue({
 
     await act(async () => {
         await user.type(input, value);
-    });
-}
-
-async function clickButton({ label }: { label: string }): Promise<void> {
-    const user = userEvent.setup();
-    const button = await screen.findByRole("button", { name: label });
-
-    await act(async () => {
-        await user.click(button);
     });
 }
 

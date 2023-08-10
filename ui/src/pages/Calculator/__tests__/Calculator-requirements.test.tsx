@@ -12,9 +12,10 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import {
+    clickButton,
     renderWithTestProviders as render,
     wrapWithTestProviders,
-} from "../../../test/utils";
+} from "../../../test";
 import {
     GetItemRequirementsQuery,
     OutputUnit,
@@ -31,7 +32,10 @@ import {
     selectOutputUnit,
 } from "./utils";
 import Requirements from "../components/Requirements";
-import { RequirementsTableRow } from "../components/Requirements/Requirements";
+import {
+    RequirementsTableRow,
+    SingleCreatorRequirementsTableRow,
+} from "../components/Requirements/Requirements";
 
 type RequirementsResponse = GetItemRequirementsQuery["requirement"][number];
 type RequirementCreator = RequirementsResponse["creators"][number];
@@ -42,6 +46,8 @@ const expectedItemNameColumnName = "Item";
 const expectedCreatorColumnName = "Creator";
 const expectedAmountColumnName = "Amount";
 const expectedWorkerColumnName = "Workers";
+const expectedExpandCreatorBreakdownLabel = "Expand creator breakdown";
+const expectedCollapseCreatorBreakdownLabel = "Collapse creator breakdown";
 
 function createRequirementCreator({
     recipeName,
@@ -541,7 +547,7 @@ describe("requirements rendering given requirements", () => {
 
     test.each([
         [
-            "a single requirement with a single creator",
+            "a single requirement",
             [selectedItem, requirementsWithSingleCreator[0]],
             [
                 {
@@ -555,7 +561,7 @@ describe("requirements rendering given requirements", () => {
             ],
         ],
         [
-            "multiple requirements with a single creator",
+            "multiple requirements",
             items,
             [
                 {
@@ -577,11 +583,11 @@ describe("requirements rendering given requirements", () => {
             ],
         ],
     ])(
-        "renders each requirement in the table given %s",
+        "renders each requirement in the table given %s with a single creator",
         async (
             _: string,
             response: RequirementsResponse[],
-            expected: RequirementsTableRow[]
+            expected: SingleCreatorRequirementsTableRow[]
         ) => {
             server.use(createRequirementsResponseHandler(response));
 
@@ -617,49 +623,130 @@ describe("requirements rendering given requirements", () => {
         }
     );
 
-    test.each([
-        ["created by multiple creators", requirementWithMultipleCreators],
-        [
-            "created by multiple creators (one being the selected item)",
-            createRequirement({
-                name: "test item",
-                amount: 20,
-                creators: [
-                    createRequirementCreator({
-                        recipeName: selectedItemName,
-                        creator: selectedItemCreator,
-                        amount: 15,
-                        workers: 2,
-                    }),
-                    createRequirementCreator({
-                        recipeName: "test item",
-                        amount: 5,
-                        workers: 2,
-                    }),
-                ],
-            }),
-        ],
-    ])(
-        "does not render the creator by default for any item that is created by multiple creators",
-        async (_: string, response: RequirementsResponse) => {
-            server.use(createRequirementsResponseHandler([response]));
+    test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const itemCell = await screen.findByRole("cell", {
+            name: requirementsWithSingleCreator[0].name,
+        });
 
+        expect(
+            within(itemCell).queryByRole("button", {
+                name: expectedExpandCreatorBreakdownLabel,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    describe("item with multiple creator rendering", async () => {
+        beforeEach(() => {
+            server.use(
+                createRequirementsResponseHandler([
+                    requirementWithMultipleCreators,
+                ])
+            );
+        });
+
+        test.each([
+            ["none selected item creators", requirementWithMultipleCreators],
+            [
+                "selected item creator",
+                createRequirement({
+                    name: "test item",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            recipeName: selectedItemName,
+                            creator: selectedItemCreator,
+                            amount: 15,
+                            workers: 2,
+                        }),
+                        createRequirementCreator({
+                            recipeName: "test item",
+                            amount: 5,
+                            workers: 2,
+                        }),
+                    ],
+                }),
+            ],
+        ])(
+            "does not render the creator by default for any item that is created by %s",
+            async (_: string, response: RequirementsResponse) => {
+                server.use(createRequirementsResponseHandler([response]));
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+
+                for (const creator of response.creators) {
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: creator.creator,
+                        })
+                    ).not.toBeInTheDocument();
+                }
+            }
+        );
+
+        test("renders a expand button to view creator breakdown", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
                 itemName: selectedItemName,
                 workers: 5,
             });
-            const requirementsTable = await screen.findByRole("table");
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
 
-            for (const creator of response.creators) {
-                expect(
-                    within(requirementsTable).queryByRole("cell", {
-                        name: creator.creator,
-                    })
-                ).not.toBeInTheDocument();
-            }
-        }
-    );
+            expect(
+                within(itemCell).getByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("pressing the expand button toggles the button to a collapse button", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedCollapseCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("pressing the collapse button toggles the button back to expand", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+    });
 
     test.each([
         [
@@ -797,8 +884,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 10, workers: 2 },
-                { name: "test item 1", amount: 20, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 10,
+                    workers: 2,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             1,
         ],
@@ -829,8 +926,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 20, workers: 1 },
-                { name: "test item 1", amount: 10, workers: 2 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 2,
+                },
             ],
             2,
         ],
@@ -861,8 +968,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 1", amount: 10, workers: 1 },
-                { name: "test item 2", amount: 20, workers: 2 },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 2,
+                },
             ],
             3,
         ],
@@ -944,8 +1061,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 20, workers: 1 },
-                { name: "test item 1", amount: 10, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
             ],
             1,
         ],
@@ -976,8 +1103,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 2", amount: 10, workers: 1 },
-                { name: "test item 1", amount: 20, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             2,
         ],
@@ -1008,8 +1145,18 @@ describe("requirements rendering given requirements", () => {
                 }),
             ],
             [
-                { name: "test item 1", amount: 10, workers: 1 },
-                { name: "test item 2", amount: 20, workers: 1 },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             3,
         ],
