@@ -194,7 +194,8 @@ function Requirements({
         setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
     };
 
-    const toggleRowExpansion = (index: number) => {
+    const toggleRowExpansion = (itemName: string) => {
+        const index = rows.findIndex((row) => row.name === itemName);
         const row = rows[index];
         if (!isSingleCreatorRow(row)) {
             const updated = update(rows, {
@@ -290,7 +291,7 @@ function Requirements({
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedRows.map((requirement, index) => (
+                    {sortedRows.map((requirement) => (
                         <tr key={requirement.name}>
                             {isSingleCreatorRow(requirement) ? (
                                 <TextColumnCell>
@@ -306,7 +307,9 @@ function Requirements({
                                             }
                                             tabIndex={0}
                                             onClick={() =>
-                                                toggleRowExpansion(index)
+                                                toggleRowExpansion(
+                                                    requirement.name
+                                                )
                                             }
                                         >
                                             <FontAwesomeIcon icon={faMinus} />
@@ -319,7 +322,9 @@ function Requirements({
                                             }
                                             tabIndex={0}
                                             onClick={() =>
-                                                toggleRowExpansion(index)
+                                                toggleRowExpansion(
+                                                    requirement.name
+                                                )
                                             }
                                         >
                                             <FontAwesomeIcon icon={faPlus} />

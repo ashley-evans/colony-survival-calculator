@@ -645,6 +645,7 @@ describe("requirements rendering given requirements", () => {
             server.use(
                 createRequirementsResponseHandler([
                     requirementWithMultipleCreators,
+                    ...requirementsWithSingleCreator,
                 ])
             );
         });
@@ -743,6 +744,34 @@ describe("requirements rendering given requirements", () => {
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("can toggle creator expansion even if rows sorted", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedWorkerColumnName }
+            );
+            await act(async () => {
+                await user.click(workersColumnHeader);
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedCollapseCreatorBreakdownLabel,
                 })
             ).toBeVisible();
         });
