@@ -41,6 +41,8 @@ export const SortableHeader = styled.th<SortableHeaderProps>`
             }
         `}
 
+        cursor: pointer;
+
         button {
             border: none;
             background: none;
@@ -57,4 +59,13 @@ export const TextColumnCell = styled.td`
 
 export const NumberColumnCell = styled.td`
     text-align: end;
+`;
+
+export const ExpandRowIconContainer = styled.span`
+    cursor: pointer;
+    margin-right: 0.5rem;
+`;
+
+export const CreatorBreakdownRow = styled.tr`
+    background-color: ${(props) => props.theme.color.tertiary.on_main};
 `;

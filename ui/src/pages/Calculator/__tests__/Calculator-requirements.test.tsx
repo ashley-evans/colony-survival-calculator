@@ -12,9 +12,10 @@ import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import {
+    clickButton,
     renderWithTestProviders as render,
     wrapWithTestProviders,
-} from "../../../test/utils";
+} from "../../../test";
 import {
     GetItemRequirementsQuery,
     OutputUnit,
@@ -30,8 +31,10 @@ import {
     expectedCreatorOverrideQueryName,
     selectOutputUnit,
 } from "./utils";
-import Requirements from "../components/Requirements";
-import { RequirementsTableRow } from "../components/Requirements/Requirements";
+import Requirements, {
+    RequirementsTableRow,
+    SingleCreatorRequirementsTableRow,
+} from "../components/Requirements";
 
 type RequirementsResponse = GetItemRequirementsQuery["requirement"][number];
 type RequirementCreator = RequirementsResponse["creators"][number];
@@ -39,18 +42,27 @@ type RequirementCreator = RequirementsResponse["creators"][number];
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
+const expectedCreatorColumnName = "Creator";
 const expectedAmountColumnName = "Amount";
 const expectedWorkerColumnName = "Workers";
+const expectedExpandCreatorBreakdownLabel = "Expand creator breakdown";
+const expectedCollapseCreatorBreakdownLabel = "Collapse creator breakdown";
 
 function createRequirementCreator({
-    name,
+    recipeName,
+    creator = `${recipeName} creator`,
+    amount,
     workers,
 }: {
-    name: string;
+    recipeName: string;
+    creator?: string;
+    amount: number;
     workers: number;
 }): RequirementCreator {
     return {
-        name,
+        name: recipeName,
+        creator,
+        amount,
         workers,
     };
 }
@@ -71,34 +83,79 @@ function createRequirement({
     };
 }
 
-const requirements: RequirementsResponse[] = [
+const createRequirementsResponseHandler = (response: RequirementsResponse[]) =>
+    graphql.query<GetItemRequirementsQuery>(
+        expectedRequirementsQueryName,
+        (_, res, ctx) => {
+            return res.once(
+                ctx.data({
+                    requirement: response,
+                })
+            );
+        }
+    );
+
+const requirementsWithSingleCreator: RequirementsResponse[] = [
     createRequirement({
         name: "Required Item 1",
         amount: 30,
         creators: [
-            createRequirementCreator({ name: "Required Item 1", workers: 20 }),
+            createRequirementCreator({
+                recipeName: "Required Item 1",
+                amount: 30,
+                workers: 20,
+            }),
         ],
     }),
     createRequirement({
         name: "Required Item 2",
         amount: 60,
         creators: [
-            createRequirementCreator({ name: "Required Item 2", workers: 40 }),
+            createRequirementCreator({
+                recipeName: "Required Item 2",
+                amount: 60,
+                workers: 40,
+            }),
         ],
     }),
 ];
 
-const expectedWorkers = 5;
-const selectedItemName = "Selected Item";
-const selectedItem: RequirementsResponse = createRequirement({
-    name: selectedItemName,
-    amount: 90,
+const requirementWithMultipleCreators = createRequirement({
+    name: "Multiple creator item",
+    amount: 50,
     creators: [
-        createRequirementCreator({ name: selectedItemName, workers: 20 }),
+        createRequirementCreator({
+            recipeName: "Multiple creator item",
+            creator: "Multiple creator item creator 1",
+            amount: 45,
+            workers: 12,
+        }),
+        createRequirementCreator({
+            recipeName: "Multiple creator item",
+            creator: "Multiple creator item creator 2",
+            amount: 5,
+            workers: 2,
+        }),
     ],
 });
 
-const items = [selectedItem, ...requirements];
+const expectedWorkers = 5;
+const selectedItemName = "Selected Item";
+const selectedItemCreator = "Selected Item Creator";
+const selectedItem = createRequirement({
+    name: selectedItemName,
+    amount: 90,
+    creators: [
+        createRequirementCreator({
+            recipeName: selectedItemName,
+            creator: selectedItemCreator,
+            amount: 90,
+            workers: 20,
+        }),
+    ],
+});
+
+const items = [selectedItem, ...requirementsWithSingleCreator];
 
 const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
@@ -115,7 +172,9 @@ const server = setupServer(
     graphql.query<GetItemRequirementsQuery>(
         expectedRequirementsQueryName,
         (_, res, ctx) => {
-            return res(ctx.data({ requirement: [requirements[0]] }));
+            return res(
+                ctx.data({ requirement: [requirementsWithSingleCreator[0]] })
+            );
         }
     ),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
@@ -188,14 +247,7 @@ test("queries requirements if item and workers inputted with non-default unit se
 
 describe("item w/o requirements handling", async () => {
     beforeEach(() => {
-        server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: [selectedItem] }));
-                }
-            )
-        );
+        server.use(createRequirementsResponseHandler([selectedItem]));
     });
 
     test("does not render the requirements section header", async () => {
@@ -287,6 +339,11 @@ describe("requirements rendering given requirements", () => {
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedItemNameColumnName,
+            })
+        ).toBeVisible();
+        expect(
+            within(requirementsTable).getByRole("columnheader", {
+                name: expectedCreatorColumnName,
             })
         ).toBeVisible();
         expect(
@@ -467,32 +524,9 @@ describe("requirements rendering given requirements", () => {
     });
 
     test("renders the sum total of required workers given requirement with multiple creators", async () => {
-        const expectedRequiredItemName = "test requirement";
-        const expectedTotal = "12";
-        const response: RequirementsResponse[] = [
-            selectedItem,
-            createRequirement({
-                name: expectedRequiredItemName,
-                amount: 30,
-                creators: [
-                    createRequirementCreator({
-                        name: expectedRequiredItemName,
-                        workers: 5,
-                    }),
-                    createRequirementCreator({
-                        name: "another creator recipe",
-                        workers: 7,
-                    }),
-                ],
-            }),
-        ];
+        const expectedTotal = "14";
         server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(ctx.data({ requirement: response }));
-                }
-            )
+            createRequirementsResponseHandler([requirementWithMultipleCreators])
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -512,12 +546,15 @@ describe("requirements rendering given requirements", () => {
     test.each([
         [
             "a single requirement",
-            [selectedItem, requirements[0]],
+            [selectedItem, requirementsWithSingleCreator[0]],
             [
                 {
-                    name: requirements[0].name,
-                    amount: requirements[0].amount,
-                    workers: requirements[0].creators[0].workers,
+                    name: requirementsWithSingleCreator[0].name,
+                    creator:
+                        requirementsWithSingleCreator[0].creators[0].creator,
+                    amount: requirementsWithSingleCreator[0].amount,
+                    workers:
+                        requirementsWithSingleCreator[0].creators[0].workers,
                 },
             ],
         ],
@@ -526,32 +563,31 @@ describe("requirements rendering given requirements", () => {
             items,
             [
                 {
-                    name: requirements[0].name,
-                    amount: requirements[0].amount,
-                    workers: requirements[0].creators[0].workers,
+                    name: requirementsWithSingleCreator[0].name,
+                    creator:
+                        requirementsWithSingleCreator[0].creators[0].creator,
+                    amount: requirementsWithSingleCreator[0].amount,
+                    workers:
+                        requirementsWithSingleCreator[0].creators[0].workers,
                 },
                 {
-                    name: requirements[1].name,
-                    amount: requirements[1].amount,
-                    workers: requirements[1].creators[0].workers,
+                    name: requirementsWithSingleCreator[1].name,
+                    creator:
+                        requirementsWithSingleCreator[1].creators[0].creator,
+                    amount: requirementsWithSingleCreator[1].amount,
+                    workers:
+                        requirementsWithSingleCreator[1].creators[0].workers,
                 },
             ],
         ],
     ])(
-        "renders each requirement in the table given %s",
+        "renders each requirement in the table given %s with a single creator",
         async (
             _: string,
             response: RequirementsResponse[],
-            expected: RequirementsTableRow[]
+            expected: SingleCreatorRequirementsTableRow[]
         ) => {
-            server.use(
-                graphql.query<GetItemRequirementsQuery>(
-                    expectedRequirementsQueryName,
-                    (_, res, ctx) => {
-                        return res.once(ctx.data({ requirement: response }));
-                    }
-                )
-            );
+            server.use(createRequirementsResponseHandler(response));
 
             render(<Calculator />, expectedGraphQLAPIURL);
             await selectItemAndWorkers({
@@ -568,6 +604,11 @@ describe("requirements rendering given requirements", () => {
                 ).toBeVisible();
                 expect(
                     within(requirementsTable).getByRole("cell", {
+                        name: requirement.creator,
+                    })
+                ).toBeVisible();
+                expect(
+                    within(requirementsTable).getByRole("cell", {
                         name: requirement.amount.toString(),
                     })
                 );
@@ -579,6 +620,458 @@ describe("requirements rendering given requirements", () => {
             }
         }
     );
+
+    test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const itemCell = await screen.findByRole("cell", {
+            name: requirementsWithSingleCreator[0].name,
+        });
+
+        expect(
+            within(itemCell).queryByRole("button", {
+                name: expectedExpandCreatorBreakdownLabel,
+            })
+        ).not.toBeInTheDocument();
+    });
+
+    describe("item with multiple creator rendering", async () => {
+        const requirements = [
+            requirementWithMultipleCreators,
+            ...requirementsWithSingleCreator,
+        ];
+
+        beforeEach(() => {
+            server.use(createRequirementsResponseHandler(requirements));
+        });
+
+        test.each([
+            ["none selected item creators", requirementWithMultipleCreators],
+            [
+                "selected item creator",
+                createRequirement({
+                    name: "test item",
+                    amount: 20,
+                    creators: [
+                        createRequirementCreator({
+                            recipeName: selectedItemName,
+                            creator: selectedItemCreator,
+                            amount: 15,
+                            workers: 2,
+                        }),
+                        createRequirementCreator({
+                            recipeName: "test item",
+                            amount: 5,
+                            workers: 2,
+                        }),
+                    ],
+                }),
+            ],
+        ])(
+            "does not render the creator by default for any item that is created by %s",
+            async (_: string, response: RequirementsResponse) => {
+                server.use(createRequirementsResponseHandler([response]));
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+
+                for (const creator of response.creators) {
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: creator.creator,
+                        })
+                    ).not.toBeInTheDocument();
+                }
+            }
+        );
+
+        test("renders a expand button to view creator breakdown", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+
+            expect(
+                within(itemCell).getByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("pressing the expand button toggles the button to a collapse button", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedCollapseCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("pressing the collapse button toggles the button back to expand", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("can toggle creator expansion even if rows sorted", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersColumnHeader = within(requirementsTable).getByRole(
+                "columnheader",
+                { name: expectedWorkerColumnName }
+            );
+            await act(async () => {
+                await user.click(workersColumnHeader);
+            });
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementWithMultipleCreators.name,
+            });
+
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedCollapseCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("does not show creator breakdown by default", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const rows = within(requirementsTable).getAllByRole("row");
+
+            expect(rows).toHaveLength(requirements.length + 1);
+            for (const creator of requirementWithMultipleCreators.creators) {
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.creator,
+                    })
+                ).not.toBeInTheDocument();
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.amount.toString(),
+                    })
+                ).not.toBeInTheDocument();
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.workers.toString(),
+                    })
+                ).not.toBeInTheDocument();
+            }
+        });
+
+        test("expanding the creator breakdown shows item creation amount and worker requirements for each creator", async () => {
+            const expectedCreators = requirementWithMultipleCreators.creators;
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            const rows = within(requirementsTable).getAllByRole("row");
+
+            expect(rows).toHaveLength(
+                expectedCreators.length + requirements.length + 1
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].creator,
+                })
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].amount.toString(),
+                })
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].workers.toString(),
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].creator,
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].amount.toString(),
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].workers.toString(),
+                })
+            );
+        });
+
+        test.each([
+            [
+                "descending",
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                1,
+            ],
+            [
+                "ascending",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                2,
+            ],
+            [
+                "default",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                3,
+            ],
+        ])(
+            "sorts creator breakdowns in %s order if amount column is sorted in that order",
+            async (
+                _: string,
+                unsorted: RequirementCreator[],
+                expected: RequirementCreator[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    graphql.query<GetItemRequirementsQuery>(
+                        expectedRequirementsQueryName,
+                        (_, res, ctx) => {
+                            return res.once(
+                                ctx.data({
+                                    requirement: [
+                                        {
+                                            ...requirementWithMultipleCreators,
+                                            creators: unsorted,
+                                        },
+                                    ],
+                                })
+                            );
+                        }
+                    )
+                );
+
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const amountColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedAmountColumnName }
+                );
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await act(async () => {
+                        await user.click(amountColumnHeader);
+                    });
+                }
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                for (let i = 0; i < expected.length; i++) {
+                    const expectedRowNumber = i + 2;
+                    const creatorDetails = expected[i];
+
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.creator,
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.amount.toString(),
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.workers.toString(),
+                        })
+                    );
+                }
+            }
+        );
+
+        test.each([
+            [
+                "descending",
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                1,
+            ],
+            [
+                "ascending",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                2,
+            ],
+            [
+                "default",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                3,
+            ],
+        ])(
+            "sorts creator breakdowns in %s order if worker column is sorted in that order",
+            async (
+                _: string,
+                unsorted: RequirementCreator[],
+                expected: RequirementCreator[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    graphql.query<GetItemRequirementsQuery>(
+                        expectedRequirementsQueryName,
+                        (_, res, ctx) => {
+                            return res.once(
+                                ctx.data({
+                                    requirement: [
+                                        {
+                                            ...requirementWithMultipleCreators,
+                                            creators: unsorted,
+                                        },
+                                    ],
+                                })
+                            );
+                        }
+                    )
+                );
+
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const workersColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedWorkerColumnName }
+                );
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await act(async () => {
+                        await user.click(workersColumnHeader);
+                    });
+                }
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                for (let i = 0; i < expected.length; i++) {
+                    const expectedRowNumber = i + 2;
+                    const creatorDetails = expected[i];
+
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.creator,
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.amount.toString(),
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.workers.toString(),
+                        })
+                    );
+                }
+            }
+        );
+    });
 
     test.each([
         [
@@ -619,7 +1112,8 @@ describe("requirements rendering given requirements", () => {
                                     amount: actual,
                                     creators: [
                                         createRequirementCreator({
-                                            name: "test item name",
+                                            recipeName: "test item name",
+                                            amount: actual,
                                             workers: 1,
                                         }),
                                     ],
@@ -660,7 +1154,8 @@ describe("requirements rendering given requirements", () => {
                                     amount: 30,
                                     creators: [
                                         createRequirementCreator({
-                                            name: "test item name",
+                                            recipeName: "test item name",
+                                            amount: 30,
                                             workers: actualWorkers,
                                         }),
                                     ],
@@ -695,7 +1190,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -705,15 +1201,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 2,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 2", amount: 10, workers: 2 },
-                { name: "test item 1", amount: 20, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 10,
+                    workers: 2,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             1,
         ],
@@ -725,7 +1232,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 2,
                         }),
                     ],
@@ -735,15 +1243,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 2", amount: 20, workers: 1 },
-                { name: "test item 1", amount: 10, workers: 2 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 2,
+                },
             ],
             2,
         ],
@@ -755,7 +1274,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -765,15 +1285,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 2,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 1", amount: 10, workers: 1 },
-                { name: "test item 2", amount: 20, workers: 2 },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 2,
+                },
             ],
             3,
         ],
@@ -836,7 +1367,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -846,15 +1378,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 2", amount: 20, workers: 1 },
-                { name: "test item 1", amount: 10, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
             ],
             1,
         ],
@@ -866,7 +1409,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
@@ -876,15 +1420,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 2", amount: 10, workers: 1 },
-                { name: "test item 1", amount: 20, workers: 1 },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             2,
         ],
@@ -896,7 +1451,8 @@ describe("requirements rendering given requirements", () => {
                     amount: 10,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 1",
+                            recipeName: "test item 1",
+                            amount: 10,
                             workers: 1,
                         }),
                     ],
@@ -906,15 +1462,26 @@ describe("requirements rendering given requirements", () => {
                     amount: 20,
                     creators: [
                         createRequirementCreator({
-                            name: "test item 2",
+                            recipeName: "test item 2",
+                            amount: 20,
                             workers: 1,
                         }),
                     ],
                 }),
             ],
             [
-                { name: "test item 1", amount: 10, workers: 1 },
-                { name: "test item 2", amount: 20, workers: 1 },
+                {
+                    name: "test item 1",
+                    creator: "test item 1 creator",
+                    amount: 10,
+                    workers: 1,
+                },
+                {
+                    name: "test item 2",
+                    creator: "test item 2 creator",
+                    amount: 20,
+                    workers: 1,
+                },
             ],
             3,
         ],

@@ -8,12 +8,11 @@ import {
     faSortAsc,
     faSortDesc,
 } from "@fortawesome/free-solid-svg-icons";
+import update from "immutability-helper";
 
 import {
     RequirementsTable,
     TextColumnHeader,
-    TextColumnCell,
-    NumberColumnCell,
     Header,
     SortableHeader,
 } from "./styles";
@@ -24,21 +23,14 @@ import {
     OutputUnit,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
-import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
+import { DEFAULT_DEBOUNCE } from "../../utils";
+import {
+    RequirementRow,
+    RequirementsTableRow,
+    isSingleCreatorRow,
+} from "./RequirementRow";
+import { ValidSortDirections, sortBy, sortDirectionOrderMap } from "./utils";
 
-export type RequirementsTableRow = {
-    name: string;
-    amount: number;
-    workers: number;
-};
-
-type SortableProperty = {
-    [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
-        ? K
-        : never;
-}[keyof RequirementsTableRow];
-
-type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
     selectedItemName: string;
     workers: number;
@@ -47,14 +39,6 @@ type RequirementsProps = {
     unit?: OutputUnit;
 };
 type Requirements = GetItemRequirementsQuery["requirement"];
-
-const sortDirectionOrderMap: {
-    [key in ValidSortDirections]: ValidSortDirections;
-} = {
-    none: "descending",
-    descending: "ascending",
-    ascending: "none",
-};
 
 const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
     none: faSort,
@@ -69,44 +53,26 @@ const GET_ITEM_REQUIREMENTS = gql(`
             amount
             creators {
                 name
+                creator
                 workers
+                amount
             }
         }
     }
 `);
 
-function sortBy(
-    requirements: Readonly<RequirementsTableRow[]>,
-    order: ValidSortDirections,
-    property: SortableProperty
-): RequirementsTableRow[] {
-    const reference = [...requirements];
-    switch (order) {
-        case "descending":
-            return reference.sort((a, b) => b[property] - a[property]);
-        case "ascending":
-            return reference.sort((a, b) => a[property] - b[property]);
-        default:
-            return reference;
-    }
-}
-
 function removeSelectedItemRows(
     selectedItemName: string,
     requirements: Readonly<Requirements> | undefined
-): Readonly<Requirements> {
+): Requirements {
     if (!requirements) {
         return [];
     }
 
     return requirements.reduce((acc, current) => {
         if (current.name !== selectedItemName) {
-            const filteredCreators = current.creators.filter(
-                (creator) => creator.name !== selectedItemName
-            );
             acc.push({
                 ...current,
-                creators: filteredCreators,
             });
         }
 
@@ -116,17 +82,32 @@ function removeSelectedItemRows(
 
 function mapRequirementsToRow(
     requirements: Readonly<Requirements>
-): Readonly<RequirementsTableRow[]> {
+): RequirementsTableRow[] {
     return requirements.map((requirement) => {
         const totalWorkers = requirement.creators.reduce(
             (acc, current) => acc + current.workers,
             0
         );
 
+        if (requirement.creators.length === 1) {
+            return {
+                name: requirement.name,
+                creator: requirement.creators[0].creator,
+                amount: requirement.amount,
+                workers: totalWorkers,
+            };
+        }
+
         return {
             name: requirement.name,
             amount: requirement.amount,
             workers: totalWorkers,
+            isExpanded: false,
+            creatorBreakdownRows: requirement.creators.map((creator) => ({
+                creator: creator.creator,
+                amount: creator.amount,
+                workers: creator.workers,
+            })),
         };
     });
 }
@@ -145,6 +126,7 @@ function Requirements({
         useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
+    const [rows, setRows] = useState<RequirementsTableRow[]>([]);
 
     const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
 
@@ -158,6 +140,18 @@ function Requirements({
         event.stopPropagation();
         setAmountSortDirection("none");
         setWorkerSortDirection(sortDirectionOrderMap[workerSortDirection]);
+    };
+
+    const toggleRowExpansion = (itemName: string) => {
+        const index = rows.findIndex((row) => row.name === itemName);
+        const row = rows[index];
+        if (!isSingleCreatorRow(row)) {
+            const updated = update(rows, {
+                [index]: { isExpanded: { $set: !row.isExpanded } },
+            });
+
+            setRows(updated);
+        }
     };
 
     useEffect(() => {
@@ -183,6 +177,15 @@ function Requirements({
         unit,
     ]);
 
+    useEffect(() => {
+        const filtered = removeSelectedItemRows(
+            selectedItemName,
+            data?.requirement
+        );
+
+        setRows(mapRequirementsToRow(filtered));
+    }, [data]);
+
     if (error) {
         return (
             <span role="alert">
@@ -192,16 +195,10 @@ function Requirements({
         );
     }
 
-    const filtered = removeSelectedItemRows(
-        selectedItemName,
-        data?.requirement
-    );
-
-    if (loading || filtered.length === 0) {
+    if (loading || rows.length === 0) {
         return <></>;
     }
 
-    const rows = mapRequirementsToRow(filtered);
     const sortedRows =
         workerSortDirection !== "none"
             ? sortBy(rows, workerSortDirection, "workers")
@@ -214,6 +211,7 @@ function Requirements({
                 <thead>
                     <tr>
                         <TextColumnHeader>Item</TextColumnHeader>
+                        <TextColumnHeader>Creator</TextColumnHeader>
                         <SortableHeader
                             item-alignment="end"
                             aria-sort={amountSortDirection}
@@ -242,15 +240,11 @@ function Requirements({
                 </thead>
                 <tbody>
                     {sortedRows.map((requirement) => (
-                        <tr key={requirement.name}>
-                            <TextColumnCell>{requirement.name}</TextColumnCell>
-                            <NumberColumnCell>
-                                {roundOutput(requirement.amount)}
-                            </NumberColumnCell>
-                            <NumberColumnCell>
-                                {Math.ceil(requirement.workers)}
-                            </NumberColumnCell>
-                        </tr>
+                        <RequirementRow
+                            key={requirement.name}
+                            row={requirement}
+                            toggleCreatorBreakdown={toggleRowExpansion}
+                        />
                     ))}
                 </tbody>
             </RequirementsTable>
