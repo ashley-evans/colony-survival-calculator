@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
 import "normalize.css";
 import { Auth } from "@aws-amplify/auth";
 import { ApolloProvider } from "@apollo/client";
 
-import router from "./routes/router";
+import RouterProvider from "./routes/AppRouterProvider";
 
 const region = import.meta.env.VITE_AWS_REGION;
 
@@ -21,7 +20,7 @@ const client = createClient(import.meta.env.VITE_GRAPHQL_API_URL, region);
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
         <ApolloProvider client={client}>
-            <RouterProvider router={router} />
+            <RouterProvider />
         </ApolloProvider>
     </React.StrictMode>
 );
