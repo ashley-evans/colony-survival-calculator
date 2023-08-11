@@ -1,10 +1,18 @@
 import styled, { css } from "styled-components";
 
+export const TableContainer = styled.div`
+    width: 100%;
+    overflow-x: auto;
+`;
+
 export const Header = styled.h2`
     margin-bottom: 0rem;
 `;
 
 export const RequirementsTable = styled.table`
+    width: 100%;
+    border-collapse: collapse;
+
     background-color: ${(props) => props.theme.color.tertiary.container};
     border-radius: 0.5rem;
 
@@ -42,6 +50,7 @@ export const SortableHeader = styled.th<SortableHeaderProps>`
         `}
 
         cursor: pointer;
+        white-space: nowrap;
 
         button {
             border: none;

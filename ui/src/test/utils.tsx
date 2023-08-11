@@ -2,7 +2,6 @@ import React, { ReactElement } from "react";
 import { render } from "@testing-library/react";
 import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterProviderProps, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 
 import { darkTheme } from "../routes/components/SiteLayout/theme";
@@ -13,6 +12,9 @@ import {
     InMemoryCache,
     NormalizedCacheObject,
 } from "@apollo/client";
+import AppRouterProvider, {
+    AppRouterProviderProps,
+} from "../routes/AppRouterProvider";
 
 const defaultGraphQLURL = "https://localhost:3000/graphql";
 
@@ -40,18 +42,16 @@ function wrapWithTestProviders(
 }
 
 function renderWithRouterProvider(
-    routerProps: RouterProviderProps,
-    route = "/",
+    routerProps: AppRouterProviderProps = {},
     apiURL = defaultGraphQLURL
 ) {
     const client = createApolloClient(apiURL);
-    routerProps.router.navigate(route);
 
     return {
         user: userEvent.setup(),
         ...render(
             <ApolloProvider client={client}>
-                <RouterProvider {...routerProps} />
+                <AppRouterProvider {...routerProps} />
             </ApolloProvider>
         ),
     };

@@ -15,6 +15,7 @@ import {
     TextColumnHeader,
     Header,
     SortableHeader,
+    TableContainer,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
 import {
@@ -24,12 +25,9 @@ import {
     Tools,
 } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
-import {
-    RequirementRow,
-    RequirementsTableRow,
-    isSingleCreatorRow,
-} from "./RequirementRow";
+import { RequirementRow } from "./RequirementRow";
 import { ValidSortDirections, sortBy, sortDirectionOrderMap } from "./utils";
+import { RequirementsTableRow, isSingleCreatorRow } from "./types";
 
 type RequirementsProps = {
     selectedItemName: string;
@@ -207,47 +205,57 @@ function Requirements({
     return (
         <>
             <Header>Requirements:</Header>
-            <RequirementsTable>
-                <thead>
-                    <tr>
-                        <TextColumnHeader>Item</TextColumnHeader>
-                        <TextColumnHeader>Creator</TextColumnHeader>
-                        <SortableHeader
-                            item-alignment="end"
-                            aria-sort={amountSortDirection}
-                            onClick={changeAmountSortDirection}
-                            tabIndex={0}
-                        >
-                            <button>Amount</button>
-                            <FontAwesomeIcon
-                                icon={sortDirectionIconMap[amountSortDirection]}
-                                aria-hidden="true"
+            <TableContainer>
+                <RequirementsTable>
+                    <thead>
+                        <tr>
+                            <TextColumnHeader>Item</TextColumnHeader>
+                            <TextColumnHeader>Creator</TextColumnHeader>
+                            <SortableHeader
+                                item-alignment="end"
+                                aria-sort={amountSortDirection}
+                                onClick={changeAmountSortDirection}
+                                tabIndex={0}
+                            >
+                                <button>Amount</button>
+                                <FontAwesomeIcon
+                                    icon={
+                                        sortDirectionIconMap[
+                                            amountSortDirection
+                                        ]
+                                    }
+                                    aria-hidden="true"
+                                />
+                            </SortableHeader>
+                            <SortableHeader
+                                item-alignment="end"
+                                aria-sort={workerSortDirection}
+                                onClick={changeWorkerSortDirection}
+                                tabIndex={0}
+                            >
+                                <button>Workers</button>
+                                <FontAwesomeIcon
+                                    icon={
+                                        sortDirectionIconMap[
+                                            workerSortDirection
+                                        ]
+                                    }
+                                    aria-hidden="true"
+                                />
+                            </SortableHeader>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedRows.map((requirement) => (
+                            <RequirementRow
+                                key={requirement.name}
+                                row={requirement}
+                                toggleCreatorBreakdown={toggleRowExpansion}
                             />
-                        </SortableHeader>
-                        <SortableHeader
-                            item-alignment="end"
-                            aria-sort={workerSortDirection}
-                            onClick={changeWorkerSortDirection}
-                            tabIndex={0}
-                        >
-                            <button>Workers</button>
-                            <FontAwesomeIcon
-                                icon={sortDirectionIconMap[workerSortDirection]}
-                                aria-hidden="true"
-                            />
-                        </SortableHeader>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedRows.map((requirement) => (
-                        <RequirementRow
-                            key={requirement.name}
-                            row={requirement}
-                            toggleCreatorBreakdown={toggleRowExpansion}
-                        />
-                    ))}
-                </tbody>
-            </RequirementsTable>
+                        ))}
+                    </tbody>
+                </RequirementsTable>
+            </TableContainer>
         </>
     );
 }

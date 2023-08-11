@@ -1,5 +1,9 @@
-import React, { lazy, ReactElement, Suspense } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import React, { ReactElement, Suspense, lazy } from "react";
+import {
+    RouterProvider,
+    createBrowserRouter,
+    RouterProviderProps,
+} from "react-router-dom";
 
 import SiteLayout from "./components/SiteLayout/SiteLayout";
 
@@ -42,4 +46,19 @@ const router = createBrowserRouter([
     },
 ]);
 
-export default router;
+export type AppRouterProviderProps = Omit<RouterProviderProps, "router"> & {
+    defaultRoute?: string;
+};
+
+const AppRouterProvider = ({
+    defaultRoute,
+    ...providerProps
+}: AppRouterProviderProps) => {
+    if (defaultRoute) {
+        router.navigate(defaultRoute);
+    }
+
+    return <RouterProvider {...providerProps} router={router} />;
+};
+
+export default AppRouterProvider;

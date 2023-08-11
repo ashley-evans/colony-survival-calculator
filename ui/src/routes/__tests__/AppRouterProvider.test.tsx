@@ -3,7 +3,6 @@ import { graphql } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
-import router from "../router";
 import { renderWithRouterProvider } from "../../test/utils";
 import {
     ItemName,
@@ -55,13 +54,13 @@ beforeEach(() => {
 
 describe("root rendering", () => {
     test("renders a loading message while loading", async () => {
-        renderWithRouterProvider({ router });
+        renderWithRouterProvider();
 
         expect(screen.getByText(EXPECTED_LOADING_MESSAGE)).toBeVisible();
     });
 
     test("renders application header", async () => {
-        renderWithRouterProvider({ router });
+        renderWithRouterProvider();
 
         expect(
             await screen.findByRole("heading", {
@@ -71,7 +70,7 @@ describe("root rendering", () => {
     });
 
     test("renders a link to the Github repository inside banner", async () => {
-        renderWithRouterProvider({ router });
+        renderWithRouterProvider();
         const header = await screen.findByRole("heading", {
             name: EXPECTED_APPLICATION_TITLE,
         });
@@ -82,7 +81,7 @@ describe("root rendering", () => {
     });
 
     test("renders a button to change the theme inside the banner", async () => {
-        renderWithRouterProvider({ router });
+        renderWithRouterProvider();
         const header = await screen.findByRole("heading", {
             name: EXPECTED_APPLICATION_TITLE,
         });
@@ -96,7 +95,7 @@ describe("root rendering", () => {
     });
 
     test("clicking the theme button toggles the theme", async () => {
-        const { user } = renderWithRouterProvider({ router });
+        const { user } = renderWithRouterProvider();
         const header = await screen.findByRole("heading", {
             name: EXPECTED_APPLICATION_TITLE,
         });
@@ -121,7 +120,7 @@ describe("root rendering", () => {
     });
 
     test("renders the calculator", async () => {
-        renderWithRouterProvider({ router });
+        renderWithRouterProvider();
 
         expect(
             await screen.findByRole("combobox", {
@@ -144,13 +143,13 @@ describe("unknown path rendering", () => {
     const expectedLinkText = "Return to calculator";
 
     test("renders a loading message while loading", async () => {
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
 
         expect(screen.getByText(EXPECTED_LOADING_MESSAGE)).toBeVisible();
     });
 
     test("renders application header", async () => {
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
 
         expect(
             await screen.findByRole("heading", {
@@ -160,7 +159,7 @@ describe("unknown path rendering", () => {
     });
 
     test("renders a link to the Github repository inside banner", async () => {
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
         const header = await screen.findByRole("heading", {
             name: EXPECTED_APPLICATION_TITLE,
         });
@@ -171,7 +170,7 @@ describe("unknown path rendering", () => {
     });
 
     test("renders a button to change the theme inside the banner", async () => {
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
         const header = await screen.findByRole("heading", {
             name: EXPECTED_APPLICATION_TITLE,
         });
@@ -187,13 +186,13 @@ describe("unknown path rendering", () => {
     test("renders a 404 message", async () => {
         const expectedMessage = "Oh no! You have gotten lost!";
 
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
 
         expect(await screen.findByText(expectedMessage)).toBeVisible();
     });
 
     test("renders a link to return back to calculator", async () => {
-        renderWithRouterProvider({ router }, invalidPath);
+        renderWithRouterProvider({ defaultRoute: invalidPath });
 
         expect(
             await screen.findByRole("link", { name: expectedLinkText })
@@ -201,7 +200,9 @@ describe("unknown path rendering", () => {
     });
 
     test("pressing the link returns the user to the calculator", async () => {
-        const { user } = renderWithRouterProvider({ router }, invalidPath);
+        const { user } = renderWithRouterProvider({
+            defaultRoute: invalidPath,
+        });
         const button = await screen.findByRole("link", {
             name: expectedLinkText,
         });
@@ -234,7 +235,7 @@ describe("theme preference handling", () => {
                 `(prefers-color-scheme: ${theme})`
             );
 
-            renderWithRouterProvider({ router });
+            renderWithRouterProvider();
             const header = await screen.findByRole("heading", {
                 name: EXPECTED_APPLICATION_TITLE,
             });
