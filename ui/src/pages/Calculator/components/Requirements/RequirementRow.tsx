@@ -10,11 +10,14 @@ import {
     TextColumnCell,
 } from "./styles";
 
-export type SingleCreatorRequirementsTableRow = {
-    name: string;
-    creator: string;
+export type SortableFields = {
     amount: number;
     workers: number;
+};
+
+export type SingleCreatorRequirementsTableRow = SortableFields & {
+    name: string;
+    creator: string;
 };
 
 export type MultipleCreatorRequirementsTableRow = Omit<

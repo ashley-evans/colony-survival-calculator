@@ -29,16 +29,8 @@ import {
     RequirementsTableRow,
     isSingleCreatorRow,
 } from "./RequirementRow";
+import { ValidSortDirections, sortBy, sortDirectionOrderMap } from "./utils";
 
-type SortableProperty = NonNullable<
-    {
-        [K in keyof RequirementsTableRow]: RequirementsTableRow[K] extends number
-            ? K
-            : never;
-    }[keyof RequirementsTableRow]
->;
-
-type ValidSortDirections = "none" | "ascending" | "descending";
 type RequirementsProps = {
     selectedItemName: string;
     workers: number;
@@ -47,14 +39,6 @@ type RequirementsProps = {
     unit?: OutputUnit;
 };
 type Requirements = GetItemRequirementsQuery["requirement"];
-
-const sortDirectionOrderMap: {
-    [key in ValidSortDirections]: ValidSortDirections;
-} = {
-    none: "descending",
-    descending: "ascending",
-    ascending: "none",
-};
 
 const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
     none: faSort,
@@ -76,22 +60,6 @@ const GET_ITEM_REQUIREMENTS = gql(`
         }
     }
 `);
-
-function sortBy(
-    requirements: Readonly<RequirementsTableRow[]>,
-    order: ValidSortDirections,
-    property: SortableProperty
-): RequirementsTableRow[] {
-    const reference = [...requirements];
-    switch (order) {
-        case "descending":
-            return reference.sort((a, b) => b[property] - a[property]);
-        case "ascending":
-            return reference.sort((a, b) => a[property] - b[property]);
-        default:
-            return reference;
-    }
-}
 
 function removeSelectedItemRows(
     selectedItemName: string,

@@ -855,6 +855,222 @@ describe("requirements rendering given requirements", () => {
                 })
             );
         });
+
+        test.each([
+            [
+                "descending",
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                1,
+            ],
+            [
+                "ascending",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                2,
+            ],
+            [
+                "default",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                3,
+            ],
+        ])(
+            "sorts creator breakdowns in %s order if amount column is sorted in that order",
+            async (
+                _: string,
+                unsorted: RequirementCreator[],
+                expected: RequirementCreator[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    graphql.query<GetItemRequirementsQuery>(
+                        expectedRequirementsQueryName,
+                        (_, res, ctx) => {
+                            return res.once(
+                                ctx.data({
+                                    requirement: [
+                                        {
+                                            ...requirementWithMultipleCreators,
+                                            creators: unsorted,
+                                        },
+                                    ],
+                                })
+                            );
+                        }
+                    )
+                );
+
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const amountColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedAmountColumnName }
+                );
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await act(async () => {
+                        await user.click(amountColumnHeader);
+                    });
+                }
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                for (let i = 0; i < expected.length; i++) {
+                    const expectedRowNumber = i + 2;
+                    const creatorDetails = expected[i];
+
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.creator,
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.amount.toString(),
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.workers.toString(),
+                        })
+                    );
+                }
+            }
+        );
+
+        test.each([
+            [
+                "descending",
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                1,
+            ],
+            [
+                "ascending",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[1],
+                    requirementWithMultipleCreators.creators[0],
+                ],
+                2,
+            ],
+            [
+                "default",
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                [
+                    requirementWithMultipleCreators.creators[0],
+                    requirementWithMultipleCreators.creators[1],
+                ],
+                3,
+            ],
+        ])(
+            "sorts creator breakdowns in %s order if worker column is sorted in that order",
+            async (
+                _: string,
+                unsorted: RequirementCreator[],
+                expected: RequirementCreator[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    graphql.query<GetItemRequirementsQuery>(
+                        expectedRequirementsQueryName,
+                        (_, res, ctx) => {
+                            return res.once(
+                                ctx.data({
+                                    requirement: [
+                                        {
+                                            ...requirementWithMultipleCreators,
+                                            creators: unsorted,
+                                        },
+                                    ],
+                                })
+                            );
+                        }
+                    )
+                );
+
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const workersColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedWorkerColumnName }
+                );
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await act(async () => {
+                        await user.click(workersColumnHeader);
+                    });
+                }
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                for (let i = 0; i < expected.length; i++) {
+                    const expectedRowNumber = i + 2;
+                    const creatorDetails = expected[i];
+
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.creator,
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.amount.toString(),
+                        })
+                    );
+                    expect(
+                        within(rows[expectedRowNumber]).getByRole("cell", {
+                            name: creatorDetails.workers.toString(),
+                        })
+                    );
+                }
+            }
+        );
     });
 
     test.each([
