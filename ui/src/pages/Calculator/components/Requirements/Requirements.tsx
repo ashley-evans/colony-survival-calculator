@@ -4,8 +4,6 @@ import { useDebounce } from "use-debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     IconDefinition,
-    faMinus,
-    faPlus,
     faSort,
     faSortAsc,
     faSortDesc,
@@ -15,11 +13,8 @@ import update from "immutability-helper";
 import {
     RequirementsTable,
     TextColumnHeader,
-    TextColumnCell,
-    NumberColumnCell,
     Header,
     SortableHeader,
-    ExpandRowIconContainer,
 } from "./styles";
 import { gql } from "../../../../graphql/__generated__";
 import {
@@ -28,25 +23,12 @@ import {
     OutputUnit,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
-import { DEFAULT_DEBOUNCE, roundOutput } from "../../utils";
-
-export type SingleCreatorRequirementsTableRow = {
-    name: string;
-    creator: string;
-    amount: number;
-    workers: number;
-};
-
-export type MultipleCreatorRequirementsTableRow = Omit<
-    SingleCreatorRequirementsTableRow,
-    "creator"
-> & {
-    isExpanded: boolean;
-};
-
-export type RequirementsTableRow =
-    | SingleCreatorRequirementsTableRow
-    | MultipleCreatorRequirementsTableRow;
+import { DEFAULT_DEBOUNCE } from "../../utils";
+import {
+    RequirementRow,
+    RequirementsTableRow,
+    isSingleCreatorRow,
+} from "./RequirementRow";
 
 type SortableProperty = NonNullable<
     {
@@ -130,13 +112,6 @@ function removeSelectedItemRows(
     }, [] as Requirements);
 }
 
-function isSingleCreatorRow(
-    row: RequirementsTableRow
-): row is SingleCreatorRequirementsTableRow {
-    const casted = row as SingleCreatorRequirementsTableRow;
-    return casted.creator !== undefined;
-}
-
 function mapRequirementsToRow(
     requirements: Readonly<Requirements>
 ): RequirementsTableRow[] {
@@ -160,6 +135,11 @@ function mapRequirementsToRow(
             amount: requirement.amount,
             workers: totalWorkers,
             isExpanded: false,
+            creatorBreakdownRows: requirement.creators.map((creator) => ({
+                creator: creator.creator,
+                amount: creator.amount,
+                workers: creator.workers,
+            })),
         };
     });
 }
@@ -292,61 +272,11 @@ function Requirements({
                 </thead>
                 <tbody>
                     {sortedRows.map((requirement) => (
-                        <tr key={requirement.name}>
-                            {isSingleCreatorRow(requirement) ? (
-                                <TextColumnCell>
-                                    {requirement.name}
-                                </TextColumnCell>
-                            ) : (
-                                <TextColumnCell>
-                                    {requirement.isExpanded ? (
-                                        <ExpandRowIconContainer
-                                            role="button"
-                                            aria-label={
-                                                "Collapse creator breakdown"
-                                            }
-                                            tabIndex={0}
-                                            onClick={() =>
-                                                toggleRowExpansion(
-                                                    requirement.name
-                                                )
-                                            }
-                                        >
-                                            <FontAwesomeIcon icon={faMinus} />
-                                        </ExpandRowIconContainer>
-                                    ) : (
-                                        <ExpandRowIconContainer
-                                            role="button"
-                                            aria-label={
-                                                "Expand creator breakdown"
-                                            }
-                                            tabIndex={0}
-                                            onClick={() =>
-                                                toggleRowExpansion(
-                                                    requirement.name
-                                                )
-                                            }
-                                        >
-                                            <FontAwesomeIcon icon={faPlus} />
-                                        </ExpandRowIconContainer>
-                                    )}
-
-                                    {requirement.name}
-                                </TextColumnCell>
-                            )}
-
-                            <TextColumnCell>
-                                {isSingleCreatorRow(requirement)
-                                    ? requirement.creator
-                                    : ""}
-                            </TextColumnCell>
-                            <NumberColumnCell>
-                                {roundOutput(requirement.amount)}
-                            </NumberColumnCell>
-                            <NumberColumnCell>
-                                {Math.ceil(requirement.workers)}
-                            </NumberColumnCell>
-                        </tr>
+                        <RequirementRow
+                            key={requirement.name}
+                            row={requirement}
+                            toggleCreatorBreakdown={toggleRowExpansion}
+                        />
                     ))}
                 </tbody>
             </RequirementsTable>

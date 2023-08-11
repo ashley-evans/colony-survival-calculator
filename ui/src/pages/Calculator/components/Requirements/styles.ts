@@ -65,3 +65,7 @@ export const ExpandRowIconContainer = styled.span`
     cursor: pointer;
     margin-right: 0.5rem;
 `;
+
+export const CreatorBreakdownRow = styled.tr`
+    background-color: ${(props) => props.theme.color.tertiary.on_main};
+`;

@@ -31,11 +31,10 @@ import {
     expectedCreatorOverrideQueryName,
     selectOutputUnit,
 } from "./utils";
-import Requirements from "../components/Requirements";
-import {
+import Requirements, {
     RequirementsTableRow,
     SingleCreatorRequirementsTableRow,
-} from "../components/Requirements/Requirements";
+} from "../components/Requirements";
 
 type RequirementsResponse = GetItemRequirementsQuery["requirement"][number];
 type RequirementCreator = RequirementsResponse["creators"][number];
@@ -103,7 +102,6 @@ const requirementsWithSingleCreator: RequirementsResponse[] = [
         creators: [
             createRequirementCreator({
                 recipeName: "Required Item 1",
-                creator: "Creator 1",
                 amount: 30,
                 workers: 20,
             }),
@@ -128,15 +126,15 @@ const requirementWithMultipleCreators = createRequirement({
     creators: [
         createRequirementCreator({
             recipeName: "Multiple creator item",
-            creator: "Creator 1",
-            amount: 30,
+            creator: "Multiple creator item creator 1",
+            amount: 45,
             workers: 12,
         }),
         createRequirementCreator({
             recipeName: "Multiple creator item",
-            creator: "Creator 2",
-            amount: 20,
-            workers: 5,
+            creator: "Multiple creator item creator 2",
+            amount: 5,
+            workers: 2,
         }),
     ],
 });
@@ -526,7 +524,7 @@ describe("requirements rendering given requirements", () => {
     });
 
     test("renders the sum total of required workers given requirement with multiple creators", async () => {
-        const expectedTotal = "17";
+        const expectedTotal = "14";
         server.use(
             createRequirementsResponseHandler([requirementWithMultipleCreators])
         );
@@ -641,13 +639,13 @@ describe("requirements rendering given requirements", () => {
     });
 
     describe("item with multiple creator rendering", async () => {
+        const requirements = [
+            requirementWithMultipleCreators,
+            ...requirementsWithSingleCreator,
+        ];
+
         beforeEach(() => {
-            server.use(
-                createRequirementsResponseHandler([
-                    requirementWithMultipleCreators,
-                    ...requirementsWithSingleCreator,
-                ])
-            );
+            server.use(createRequirementsResponseHandler(requirements));
         });
 
         test.each([
@@ -774,6 +772,88 @@ describe("requirements rendering given requirements", () => {
                     name: expectedCollapseCreatorBreakdownLabel,
                 })
             ).toBeVisible();
+            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+            expect(
+                await within(itemCell).findByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).toBeVisible();
+        });
+
+        test("does not show creator breakdown by default", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const rows = within(requirementsTable).getAllByRole("row");
+
+            expect(rows).toHaveLength(requirements.length + 1);
+            for (const creator of requirementWithMultipleCreators.creators) {
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.creator,
+                    })
+                ).not.toBeInTheDocument();
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.amount.toString(),
+                    })
+                ).not.toBeInTheDocument();
+                expect(
+                    within(requirementsTable).queryByRole("cell", {
+                        name: creator.workers.toString(),
+                    })
+                ).not.toBeInTheDocument();
+            }
+        });
+
+        test("expanding the creator breakdown shows item creation amount and worker requirements for each creator", async () => {
+            const expectedCreators = requirementWithMultipleCreators.creators;
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            const rows = within(requirementsTable).getAllByRole("row");
+
+            expect(rows).toHaveLength(
+                expectedCreators.length + requirements.length + 1
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].creator,
+                })
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].amount.toString(),
+                })
+            );
+            expect(
+                within(rows[2]).getByRole("cell", {
+                    name: expectedCreators[0].workers.toString(),
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].creator,
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].amount.toString(),
+                })
+            );
+            expect(
+                within(rows[3]).getByRole("cell", {
+                    name: expectedCreators[1].workers.toString(),
+                })
+            );
         });
     });
 
