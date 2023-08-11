@@ -25,12 +25,9 @@ import {
     Tools,
 } from "../../../../graphql/__generated__/graphql";
 import { DEFAULT_DEBOUNCE } from "../../utils";
-import {
-    RequirementRow,
-    RequirementsTableRow,
-    isSingleCreatorRow,
-} from "./RequirementRow";
+import { RequirementRow } from "./RequirementRow";
 import { ValidSortDirections, sortBy, sortDirectionOrderMap } from "./utils";
+import { RequirementsTableRow, isSingleCreatorRow } from "./types";
 
 type RequirementsProps = {
     selectedItemName: string;

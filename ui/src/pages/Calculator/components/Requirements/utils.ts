@@ -2,7 +2,7 @@ import {
     RequirementsTableRow,
     SortableFields,
     isSingleCreatorRow,
-} from "./RequirementRow";
+} from "./types";
 
 export type ValidSortDirections = "none" | "ascending" | "descending";
 

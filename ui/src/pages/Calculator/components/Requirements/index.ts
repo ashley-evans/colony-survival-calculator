@@ -3,7 +3,7 @@ import {
     RequirementsTableRow,
     SingleCreatorRequirementsTableRow,
     MultipleCreatorRequirementsTableRow,
-} from "./RequirementRow";
+} from "./types";
 
 export default Requirements;
 export type {
