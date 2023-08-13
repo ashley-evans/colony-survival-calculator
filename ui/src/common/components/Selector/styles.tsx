@@ -73,8 +73,9 @@ export const Item = styled.li<CommonProps>`
 export const Input = styled.input`
     width: 100%;
     outline: none;
-    background: inherit;
     border: none;
+    background: inherit;
+    color: inherit;
 `;
 
 export const InputIconContainer = styled.div`
