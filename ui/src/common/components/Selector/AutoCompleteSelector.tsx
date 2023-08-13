@@ -4,12 +4,14 @@ import {
     UseComboboxStateChange,
     useCombobox,
 } from "downshift";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 import { ColorPalettes } from "../..";
 import {
+    ClearInputIcon,
     Container,
     Input,
+    InputIconContainer,
     Item,
     Menu,
     SelectorInputContainer,
@@ -23,6 +25,7 @@ interface AutoCompleteSelectorProps<Item>
     inputPlaceholder: string;
     itemToKey: (item: Item, index: number) => string;
     itemToDisplayText: (item: Item) => string;
+    clearIconLabelText?: string;
     getItemFilter?: (input: string) => (item: Item) => boolean;
     onSelectedItemChange?: (item: Item | null) => void;
     palette?: ColorPalettes;
@@ -35,6 +38,7 @@ function AutoCompleteSelector<Item>({
     labelText,
     toggleLabelText,
     inputPlaceholder,
+    clearIconLabelText,
     palette = "secondary",
     className,
     itemToDisplayText,
@@ -56,6 +60,7 @@ function AutoCompleteSelector<Item>({
 
     const {
         isOpen,
+        inputValue,
         getLabelProps,
         getInputProps,
         getToggleButtonProps,
@@ -85,14 +90,25 @@ function AutoCompleteSelector<Item>({
             <label {...getLabelProps()}>{labelText}</label>
             <SelectorInputContainer palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
-                <ToggleIndicatorIcon
-                    {...getToggleButtonProps()}
-                    icon={faChevronDown}
-                    selected={isOpen}
-                    role="button"
-                    aria-hidden={false}
-                    aria-label={toggleLabelText}
-                />
+                <InputIconContainer>
+                    {inputValue ? (
+                        <ClearInputIcon
+                            icon={faTimes}
+                            role="button"
+                            onClick={() => selectItem(null)}
+                            aria-hidden={false}
+                            aria-label={clearIconLabelText}
+                        />
+                    ) : null}
+                    <ToggleIndicatorIcon
+                        {...getToggleButtonProps()}
+                        icon={faChevronDown}
+                        selected={isOpen}
+                        role="button"
+                        aria-hidden={false}
+                        aria-label={toggleLabelText}
+                    />
+                </InputIconContainer>
             </SelectorInputContainer>
             <Menu
                 {...getMenuProps()}

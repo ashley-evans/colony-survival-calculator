@@ -36,25 +36,6 @@ export const SelectorInputContainer = styled.div<CommonProps>`
     cursor: pointer;
 `;
 
-interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
-    selected: boolean;
-}
-
-export const ToggleIndicatorIcon = styled(
-    FontAwesomeIcon
-)<ToggleIndicatorIconProps>`
-    ${({ selected }) => {
-        if (selected) {
-            return css`
-                transform: scaleY(-1);
-            `;
-        }
-    }}
-
-    transition: all 0.2s ease-in;
-    cursor: pointer;
-`;
-
 type MenuProps = {
     isOpen: boolean;
 } & CommonProps;
@@ -94,4 +75,39 @@ export const Input = styled.input`
     outline: none;
     background: inherit;
     border: none;
+`;
+
+export const InputIconContainer = styled.div`
+    display: flex;
+`;
+
+interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
+    selected: boolean;
+}
+
+export const ToggleIndicatorIcon = styled(
+    FontAwesomeIcon
+)<ToggleIndicatorIconProps>`
+    ${({ selected }) => {
+        if (selected) {
+            return css`
+                transform: scaleY(-1);
+            `;
+        }
+    }}
+
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+`;
+
+export const ClearInputIcon = styled(FontAwesomeIcon)`
+    ${({ theme }) => css`
+        :hover,
+        :focus {
+            color: ${theme.color.error.main};
+        }
+    `}
+
+    margin-right: 0.5rem;
+    cursor: pointer;
 `;

@@ -18,6 +18,7 @@ const expectedLabelText = "Label text:";
 const expectedInputPlaceholder = "Placeholder text";
 const expectedDefaultItem = items[0];
 const expectedToggleLabelText = "Toggle label text";
+const expectedClearLabelText = "Clear item input";
 const mockOnItemChange = vi.fn();
 
 const getItemFilter = (inputValue: string) => {
@@ -389,4 +390,84 @@ test("does not call the provided on change function when an invalid item is type
     await typeValue({ label: expectedLabelText, value: input });
 
     expect(mockOnItemChange).toHaveBeenCalledTimes(0);
+});
+
+test("renders a clear input button with the provided label if specified and value entered", async () => {
+    render(
+        <AutoCompleteSelector
+            items={items}
+            labelText={expectedLabelText}
+            toggleLabelText={expectedToggleLabelText}
+            inputPlaceholder={expectedInputPlaceholder}
+            clearIconLabelText={expectedClearLabelText}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: "1" });
+
+    expect(
+        await screen.findByRole("button", { name: expectedClearLabelText })
+    ).toBeVisible();
+});
+
+test("does not render a clear input button if no label is specified and value entered", async () => {
+    render(
+        <AutoCompleteSelector
+            items={items}
+            labelText={expectedLabelText}
+            toggleLabelText={expectedToggleLabelText}
+            inputPlaceholder={expectedInputPlaceholder}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: "1" });
+
+    expect(
+        screen.queryByRole("button", { name: expectedClearLabelText })
+    ).not.toBeInTheDocument();
+});
+
+test("does not render a clear input button if no value entered and label is specified", async () => {
+    render(
+        <AutoCompleteSelector
+            items={items}
+            labelText={expectedLabelText}
+            toggleLabelText={expectedToggleLabelText}
+            inputPlaceholder={expectedInputPlaceholder}
+            clearIconLabelText={expectedClearLabelText}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+        />
+    );
+    await screen.findByRole("combobox", { name: expectedLabelText });
+
+    expect(
+        screen.queryByRole("button", { name: expectedClearLabelText })
+    ).not.toBeInTheDocument();
+});
+
+test("clears the currently entered value if the clear input button is pressed", async () => {
+    const expectedRemovedValue = "123";
+
+    render(
+        <AutoCompleteSelector
+            items={items}
+            labelText={expectedLabelText}
+            toggleLabelText={expectedToggleLabelText}
+            inputPlaceholder={expectedInputPlaceholder}
+            clearIconLabelText={expectedClearLabelText}
+            itemToKey={itemToKey}
+            itemToDisplayText={itemToDisplayText}
+        />
+    );
+    await typeValue({ label: expectedLabelText, value: expectedRemovedValue });
+    await clickButton({ label: expectedClearLabelText });
+
+    await waitFor(() =>
+        expect(
+            screen.getByRole("combobox", { name: expectedLabelText })
+        ).toHaveValue("")
+    );
 });
