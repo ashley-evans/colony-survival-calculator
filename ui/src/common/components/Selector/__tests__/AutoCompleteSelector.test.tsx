@@ -18,7 +18,7 @@ const expectedLabelText = "Label text:";
 const expectedInputPlaceholder = "Placeholder text";
 const expectedDefaultItem = items[0];
 const expectedToggleLabelText = "Toggle label text";
-const expectedClearLabelText = "Clear item input";
+const expectedClearLabelText = "Test clear label text";
 const mockOnItemChange = vi.fn();
 
 const getItemFilter = (inputValue: string) => {
