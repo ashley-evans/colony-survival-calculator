@@ -341,6 +341,9 @@ describe("optimal farm size note rendering", () => {
         );
 
         render(<Calculator />);
+        await selectItemAndWorkers({
+            itemName: items[0].name,
+        });
         await screen.findByRole("alert");
 
         expect(

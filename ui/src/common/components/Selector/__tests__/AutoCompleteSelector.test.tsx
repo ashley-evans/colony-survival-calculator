@@ -1,20 +1,15 @@
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
 
-import {
-    Item,
-    createItem,
-    itemToKey,
-    itemToDisplayText,
-    clickSelect,
-    clickOption,
-} from "./utils";
+import { Item, createItem, itemToKey, itemToDisplayText } from "./utils";
 import { AutoCompleteSelector } from "../AutoCompleteSelector";
 import {
     clickButton,
     renderWithTestProviders as render,
     typeValue,
     wrapWithTestProviders,
+    openSelectMenu,
+    selectOption,
 } from "../../../../test/utils";
 import { vi } from "vitest";
 
@@ -193,7 +188,7 @@ test.each([
                 itemToDisplayText={itemToDisplayText}
             />
         );
-        await clickSelect(expectedLabelText);
+        await openSelectMenu({ label: expectedLabelText });
 
         expect(await screen.findAllByRole("option")).toHaveLength(items.length);
         for (const item of items) {
@@ -301,7 +296,7 @@ test("does not apply default value as filter if filter and default provided", as
             getItemFilter={getItemFilter}
         />
     );
-    await clickSelect(expectedLabelText);
+    await openSelectMenu({ label: expectedLabelText });
 
     expect(screen.getAllByRole("option")).toHaveLength(items.length);
     for (const item of items) {
@@ -326,8 +321,8 @@ test("calls the provided on change function when an item is selected", async () 
             onSelectedItemChange={mockOnItemChange}
         />
     );
-    await clickSelect(expectedLabelText);
-    await clickOption(expectedItem.name);
+    await openSelectMenu({ label: expectedLabelText });
+    await selectOption({ optionName: expectedItem.name });
     await waitFor(() =>
         expect(
             screen.getByRole("combobox", { name: expectedLabelText })

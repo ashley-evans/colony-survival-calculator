@@ -13,13 +13,15 @@ import {
     expectedSettingsTab,
     expectedSettingsTabHeader,
     expectedToolSelectLabel,
-    openSelectMenu,
     clickByName,
     selectItemAndWorkers,
     selectTool,
     expectedCreatorOverrideQueryName,
 } from "./utils";
-import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    openSelectMenu,
+    renderWithTestProviders as render,
+} from "../../../test/utils";
 import Calculator from "../Calculator";
 import { waitForRequest } from "../../../helpers/utils";
 import { OutputUnit, Tools } from "../../../graphql/__generated__/graphql";
@@ -70,7 +72,7 @@ test.each(["None", "Stone", "Copper", "Iron", "Bronze", "Steel"])(
     "renders the %s tool option in the tool selector",
     async (tool: string) => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await openSelectMenu({ selectLabel: expectedToolSelectLabel });
+        await openSelectMenu({ label: expectedToolSelectLabel });
 
         expect(await screen.findByRole("option", { name: tool })).toBeVisible();
     }
@@ -80,7 +82,7 @@ test("renders none as the selected tool by default", async () => {
     const expected = "None";
 
     render(<Calculator />);
-    await openSelectMenu({ selectLabel: expectedToolSelectLabel });
+    await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedToolSelectLabel })
@@ -95,7 +97,7 @@ test("updates the selected tool if selected is changed", async () => {
 
     render(<Calculator />);
     await selectTool(Tools.Iron);
-    await openSelectMenu({ selectLabel: expectedToolSelectLabel });
+    await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedToolSelectLabel })

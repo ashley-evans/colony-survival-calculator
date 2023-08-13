@@ -1,3 +1,4 @@
 import { Selector } from "./Selector";
+import { AutoCompleteSelector } from "./AutoCompleteSelector";
 
-export default Selector;
+export { Selector, AutoCompleteSelector };

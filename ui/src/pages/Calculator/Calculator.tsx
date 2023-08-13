@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 
 import ItemSelector from "./components/ItemSelector";
@@ -17,7 +17,6 @@ import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
 import ToolSelector from "./components/ToolSelector";
 import CreatorOverrides from "./components/CreatorOverrides";
-import { AutoCompleteSelector } from "../../common/components/Selector/AutoCompleteSelector";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -85,12 +84,6 @@ function CalculatorTab({
         }
     );
 
-    useEffect(() => {
-        if (!selectedItem && itemNameData?.distinctItemNames[0]) {
-            setSelectedItem(itemNameData.distinctItemNames[0]);
-        }
-    }, [selectedItem, itemNameData]);
-
     if (itemNamesLoading) {
         return (
             <PageContainer>
@@ -111,22 +104,6 @@ function CalculatorTab({
                         items={itemNameData.distinctItemNames}
                         onItemChange={setSelectedItem}
                         defaultSelectedItem={selectedItem}
-                    />
-                    <AutoCompleteSelector
-                        items={itemNameData.distinctItemNames}
-                        labelText="test"
-                        toggleLabelText="test toggle"
-                        inputPlaceholder="test placeholder"
-                        itemToKey={(value) => value}
-                        itemToDisplayText={(value) => value}
-                        defaultSelectedItem={itemNameData.distinctItemNames[0]}
-                        getItemFilter={(input) => {
-                            const lowercased = input.toLowerCase();
-
-                            return (item) => {
-                                return item.toLowerCase().includes(lowercased);
-                            };
-                        }}
                     />
                     <WorkerInput
                         onWorkerChange={setWorkers}
