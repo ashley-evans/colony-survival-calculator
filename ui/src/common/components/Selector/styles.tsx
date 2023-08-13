@@ -16,7 +16,7 @@ export const Container = styled.div<CommonProps>`
     flex-direction: column;
 `;
 
-export const ToggleButton = styled.div<CommonProps>`
+export const SelectorInputContainer = styled.div<CommonProps>`
     ${({ theme, palette }) => css`
         color: ${theme.color[palette].on_container};
         background-color: ${theme.color[palette].container};
@@ -52,6 +52,7 @@ export const ToggleIndicatorIcon = styled(
     }}
 
     transition: all 0.2s ease-in;
+    cursor: pointer;
 `;
 
 type MenuProps = {
@@ -84,4 +85,11 @@ export const Item = styled.li<CommonProps>`
     `};
 
     padding: 0.5rem;
+`;
+
+export const Input = styled.input`
+    width: 100%;
+    outline: none;
+    background: inherit;
+    border: none;
 `;
