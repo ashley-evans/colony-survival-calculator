@@ -16,7 +16,7 @@ export const Container = styled.div<CommonProps>`
     flex-direction: column;
 `;
 
-export const ToggleButton = styled.div<CommonProps>`
+export const SelectorInputContainer = styled.div<CommonProps>`
     ${({ theme, palette }) => css`
         color: ${theme.color[palette].on_container};
         background-color: ${theme.color[palette].container};
@@ -34,24 +34,6 @@ export const ToggleButton = styled.div<CommonProps>`
     padding: 0.5rem;
     border-radius: 0.25rem;
     cursor: pointer;
-`;
-
-interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
-    selected: boolean;
-}
-
-export const ToggleIndicatorIcon = styled(
-    FontAwesomeIcon
-)<ToggleIndicatorIconProps>`
-    ${({ selected }) => {
-        if (selected) {
-            return css`
-                transform: scaleY(-1);
-            `;
-        }
-    }}
-
-    transition: all 0.2s ease-in;
 `;
 
 type MenuProps = {
@@ -74,6 +56,8 @@ export const Menu = styled.div<MenuProps>`
     border-radius: 0.25rem;
     list-style-type: none;
     cursor: pointer;
+    max-height: 9rem;
+    overflow-y: auto;
 `;
 
 export const Item = styled.li<CommonProps>`
@@ -84,4 +68,46 @@ export const Item = styled.li<CommonProps>`
     `};
 
     padding: 0.5rem;
+`;
+
+export const Input = styled.input`
+    width: 100%;
+    outline: none;
+    background: inherit;
+    border: none;
+`;
+
+export const InputIconContainer = styled.div`
+    display: flex;
+`;
+
+interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
+    selected: boolean;
+}
+
+export const ToggleIndicatorIcon = styled(
+    FontAwesomeIcon
+)<ToggleIndicatorIconProps>`
+    ${({ selected }) => {
+        if (selected) {
+            return css`
+                transform: scaleY(-1);
+            `;
+        }
+    }}
+
+    transition: all 0.2s ease-in;
+    cursor: pointer;
+`;
+
+export const ClearInputIcon = styled(FontAwesomeIcon)`
+    ${({ theme }) => css`
+        :hover,
+        :focus {
+            color: ${theme.color.error.main};
+        }
+    `}
+
+    margin-right: 0.5rem;
+    cursor: pointer;
 `;

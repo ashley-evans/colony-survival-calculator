@@ -58,7 +58,7 @@ function Input<Type>({
     return (
         <Container className={className}>
             <label htmlFor={inputID}>{label}</label>
-            <InputContainer>
+            <InputContainer palette={palette}>
                 <StyledInput
                     id={inputID}
                     inputMode={inputMode}

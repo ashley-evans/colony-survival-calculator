@@ -5,6 +5,7 @@ import { act, screen, render as rtlRender } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
+    openSelectMenu,
     renderWithTestProviders as render,
     wrapWithTestProviders,
 } from "../../../test/utils";
@@ -20,7 +21,6 @@ import {
     expectedRequirementsQueryName,
     expectedSettingsTab,
     expectedSettingsTabHeader,
-    openSelectMenu,
     clickByName,
     selectItemAndWorkers,
     selectOutputUnit,
@@ -69,7 +69,7 @@ test.each(["Seconds", "Minutes", "Game days"])(
     "renders the %s option in the output unit selector",
     async (unit: string) => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
+        await openSelectMenu({ label: expectedOutputUnitLabel });
 
         expect(
             await screen.findByRole("option", {
@@ -83,7 +83,7 @@ test("selects the Minutes option by default", async () => {
     const expected = "Minutes";
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
+    await openSelectMenu({ label: expectedOutputUnitLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
@@ -101,7 +101,7 @@ test("updates the selected output unit if selected is changed", async () => {
 
     render(<Calculator />);
     await selectOutputUnit(OutputUnit.GameDays);
-    await openSelectMenu({ selectLabel: expectedOutputUnitLabel });
+    await openSelectMenu({ label: expectedOutputUnitLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedOutputUnitLabel })

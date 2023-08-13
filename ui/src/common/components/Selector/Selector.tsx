@@ -6,7 +6,7 @@ import {
     Container,
     Item,
     Menu,
-    ToggleButton,
+    SelectorInputContainer,
     ToggleIndicatorIcon,
 } from "./styles";
 import { ColorPalettes } from "../..";
@@ -58,14 +58,17 @@ function Selector<Item>({
     return (
         <Container palette={palette} className={className}>
             <label {...getLabelProps()}>{labelText}</label>
-            <ToggleButton {...getToggleButtonProps()} palette={palette}>
+            <SelectorInputContainer
+                {...getToggleButtonProps()}
+                palette={palette}
+            >
                 <span>
                     {itemToDisplayText(
                         selectedItem ? selectedItem : defaultSelectedItem
                     )}
                 </span>
                 <ToggleIndicatorIcon icon={faChevronDown} selected={isOpen} />
-            </ToggleButton>
+            </SelectorInputContainer>
             <Menu {...getMenuProps()} isOpen={isOpen} palette={palette}>
                 {isOpen ? (
                     <>

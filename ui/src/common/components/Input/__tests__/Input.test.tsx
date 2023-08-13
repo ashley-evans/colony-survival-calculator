@@ -1,11 +1,12 @@
 import React from "react";
-import { act, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
     clickButton,
     renderWithTestProviders as render,
+    typeValue,
+    clearInput,
 } from "../../../../test";
 import Input from "..";
 
@@ -14,34 +15,6 @@ const expectedErrorMessage = "A test error message";
 const expectedClearLabel = "Clear button label";
 const invalidInput = "test";
 const mockOnChangeHandler = vi.fn();
-
-async function typeValue({
-    label,
-    value,
-}: {
-    label: string;
-    value: string;
-}): Promise<void> {
-    const user = userEvent.setup();
-    const input = await screen.findByLabelText(label, {
-        selector: "input",
-    });
-
-    await act(async () => {
-        await user.type(input, value);
-    });
-}
-
-async function clearInput({ label }: { label: string }): Promise<void> {
-    const user = userEvent.setup();
-    const input = await screen.findByLabelText(label, {
-        selector: "input",
-    });
-
-    await act(async () => {
-        await user.clear(input);
-    });
-}
 
 function parseValue(value: unknown): number {
     const parsed = Number(value);

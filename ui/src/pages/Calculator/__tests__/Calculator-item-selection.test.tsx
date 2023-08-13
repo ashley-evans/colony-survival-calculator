@@ -5,7 +5,11 @@ import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
-import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    openSelectMenu,
+    renderWithTestProviders as render,
+    selectOption,
+} from "../../../test/utils";
 import {
     expectedRequirementsQueryName,
     expectedOutputQueryName,
@@ -16,8 +20,6 @@ import {
     ItemName,
     expectedCalculatorTabHeader,
     expectedToolSelectLabel,
-    openSelectMenu,
-    selectOption,
     clickByName,
     expectedSettingsTab,
     expectedSettingsTabHeader,
@@ -227,7 +229,7 @@ test("does not render a missing known items if item names are returned", async (
     ).not.toBeInTheDocument();
 });
 
-test("renders a select for the desired output selector if item names are returned", async () => {
+test("renders a select for the items if item names are returned", async () => {
     render(<Calculator />);
 
     expect(
@@ -237,9 +239,19 @@ test("renders a select for the desired output selector if item names are returne
     ).toBeVisible();
 });
 
-test("renders each item name returned as an option in the combo box", async () => {
+test("renders a placeholder message for the item selector", async () => {
     render(<Calculator />);
-    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
+
+    expect(
+        await screen.findByRole("combobox", {
+            name: expectedItemSelectLabel,
+        })
+    ).toHaveAttribute("placeholder", "Select an item to use in calculations");
+});
+
+test("renders each item name returned as an option in the item selector", async () => {
+    render(<Calculator />);
+    await openSelectMenu({ label: expectedItemSelectLabel });
 
     for (const expected of items) {
         expect(
@@ -248,38 +260,13 @@ test("renders each item name returned as an option in the combo box", async () =
     }
 });
 
-test("renders the first option in the item name list as selected by default", async () => {
-    const expected = items[0].name;
-
+test("renders the item selector with no assigned value by default", async () => {
     render(<Calculator />);
-    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
+    await openSelectMenu({ label: expectedItemSelectLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedItemSelectLabel })
-    ).toHaveTextContent(expected);
-    expect(
-        screen.getByRole("option", {
-            name: expected,
-            selected: true,
-        })
-    ).toBeVisible();
-});
-
-test("requests item details on the first option in the item name list without selection", async () => {
-    const expectedRequest = waitForRequest(
-        server,
-        "POST",
-        expectedGraphQLAPIURL,
-        expectedItemDetailsQueryName
-    );
-
-    render(<Calculator />, expectedGraphQLAPIURL);
-    await screen.findByRole("combobox", { name: expectedItemSelectLabel });
-    const { matchedRequestDetails } = await expectedRequest;
-
-    expect(matchedRequestDetails.variables).toEqual({
-        filters: { name: items[0].name, optimal: { maxAvailableTool: "NONE" } },
-    });
+    ).toHaveValue("");
 });
 
 test("updates the selected option if selected is changed", async () => {
@@ -287,14 +274,14 @@ test("updates the selected option if selected is changed", async () => {
 
     render(<Calculator />);
     await selectOption({
-        selectLabel: expectedItemSelectLabel,
+        label: expectedItemSelectLabel,
         optionName: expected,
     });
-    await openSelectMenu({ selectLabel: expectedItemSelectLabel });
+    await openSelectMenu({ label: expectedItemSelectLabel });
 
     expect(
         await screen.findByRole("combobox", { name: expectedItemSelectLabel })
-    ).toHaveTextContent(expected);
+    ).toHaveValue(expected);
     expect(
         screen.getByRole("option", {
             name: expected,
@@ -320,7 +307,7 @@ test("requests item details for newly selected item if selection is changed", as
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOption({
-        selectLabel: expectedItemSelectLabel,
+        label: expectedItemSelectLabel,
         optionName: expectedItemName,
     });
     const { matchedRequestDetails } = await expectedRequest;
@@ -338,7 +325,7 @@ test("does not reset the currently selected item after changing tabs", async () 
 
     render(<Calculator />);
     await selectOption({
-        selectLabel: expectedItemSelectLabel,
+        label: expectedItemSelectLabel,
         optionName: expected,
     });
     await clickByName(expectedSettingsTab, "tab");
@@ -350,7 +337,7 @@ test("does not reset the currently selected item after changing tabs", async () 
 
     expect(
         await screen.findByRole("combobox", { name: expectedItemSelectLabel })
-    ).toHaveTextContent(expected);
+    ).toHaveValue(expected);
 });
 
 describe("item name request error handling", () => {
@@ -409,6 +396,10 @@ test("renders an unhandled error message if an exception occurs fetching item de
     );
 
     render(<Calculator />);
+    await selectOption({
+        label: expectedItemSelectLabel,
+        optionName: items[1].name,
+    });
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
         expectedNetworkExceptionError

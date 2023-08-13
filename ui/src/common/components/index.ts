@@ -1,4 +1,4 @@
-import Selector from "./Selector";
+import { Selector, AutoCompleteSelector } from "./Selector";
 import Input from "./Input";
 
-export { Selector, Input };
+export { Selector, AutoCompleteSelector, Input };

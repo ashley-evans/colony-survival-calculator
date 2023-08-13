@@ -5,7 +5,11 @@ import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
-import { renderWithTestProviders as render } from "../../../test/utils";
+import {
+    openSelectMenu,
+    renderWithTestProviders as render,
+    selectOption,
+} from "../../../test/utils";
 import {
     expectedRequirementsQueryName,
     expectedOutputQueryName,
@@ -16,9 +20,7 @@ import {
     expectedSettingsTabHeader,
     expectedCreatorOverrideQueryName,
     expectedAddCreatorOverrideButtonText,
-    openSelectMenu,
     expectedRemoveCreatorOverrideButtonText,
-    selectOption,
     expectedCalculatorTab,
     expectedCalculatorTabHeader,
     selectItemAndWorkers,
@@ -285,7 +287,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
             });
 
             expect(
@@ -317,7 +319,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
             });
 
             expect(
@@ -349,7 +351,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
             });
 
             for (const { creator } of expectedOverrides) {
@@ -365,7 +367,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
             });
 
             expect(
@@ -451,7 +453,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
             });
 
             expect(
@@ -471,7 +473,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
             });
 
             expect(
@@ -490,7 +492,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await openSelectMenu({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
             });
 
             const creatorOptions = await screen.findAllByRole("option");
@@ -508,11 +510,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedSecondItemName,
             });
             await openSelectMenu({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
             });
 
             const creatorOptions = await screen.findAllByRole("option");
@@ -532,11 +534,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedSecondItemName,
             });
             await openSelectMenu({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
             });
 
             expect(
@@ -645,7 +647,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await act(() => user.click(removeButtons[0]));
             await openSelectMenu({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
             });
 
             expect(
@@ -729,7 +731,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedSecondItemName,
             });
             await clickByName(expectedCalculatorTab, "tab");
@@ -756,7 +758,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
                 optionName: expected,
             });
             await clickByName(expectedCalculatorTab, "tab");
@@ -796,11 +798,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedItem,
             });
             await selectOption({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
                 optionName: expectedCreator,
             });
             await clickByName(expectedCalculatorTab, "tab");
@@ -828,11 +830,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedItem,
             });
             await selectOption({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
                 optionName: expectedSecondItemOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");
@@ -959,11 +961,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedItem,
             });
             await selectOption({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
                 optionName: expectedCreator,
             });
             await clickByName(expectedCalculatorTab, "tab");
@@ -996,11 +998,11 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await selectOption({
-                selectLabel: expectedItemSelectOverrideLabel,
+                label: expectedItemSelectOverrideLabel,
                 optionName: expectedItem,
             });
             await selectOption({
-                selectLabel: expectedCreatorSelectOverrideLabel,
+                label: expectedCreatorSelectOverrideLabel,
                 optionName: expectedSecondItemOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");

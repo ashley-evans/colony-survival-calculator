@@ -75,9 +75,68 @@ async function clickButton({ label }: { label: string }): Promise<void> {
     });
 }
 
+async function typeValue({
+    label,
+    value,
+}: {
+    label: string;
+    value: string;
+}): Promise<void> {
+    const user = userEvent.setup();
+    const input = await screen.findByLabelText(label, {
+        selector: "input",
+    });
+
+    await act(async () => {
+        await user.type(input, value);
+    });
+}
+
+async function clearInput({ label }: { label: string }): Promise<void> {
+    const user = userEvent.setup();
+    const input = await screen.findByLabelText(label, {
+        selector: "input",
+    });
+
+    await act(async () => {
+        await user.clear(input);
+    });
+}
+
+async function openSelectMenu({ label }: { label: string }) {
+    const user = userEvent.setup();
+    const select = await screen.findByRole("combobox", { name: label });
+
+    await act(async () => {
+        await user.click(select);
+    });
+}
+
+async function selectOption({
+    optionName,
+    label,
+}: {
+    optionName: string;
+    label?: string;
+}) {
+    if (label) {
+        await openSelectMenu({ label });
+    }
+
+    const user = userEvent.setup();
+    const option = await screen.findByRole("option", { name: optionName });
+    await act(async () => {
+        await user.click(option);
+    });
+}
+
 export {
     wrapWithTestProviders,
     renderWithRouterProvider,
     renderWithTestProviders,
     clickButton,
+    typeValue,
+    clearInput,
+    openSelectMenu,
+    selectOption,
 };

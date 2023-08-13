@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Selector } from "../../../../common/components";
+import { AutoCompleteSelector } from "../../../../common/components";
 
 type ItemSelectorProps = {
     items: string[];
@@ -13,19 +13,29 @@ function ItemSelector({
     defaultSelectedItem,
     onItemChange,
 }: ItemSelectorProps) {
-    const handleItemChange = (selectedItem?: string) => {
+    const handleItemChange = (selectedItem: string | null) => {
         if (selectedItem) onItemChange(selectedItem);
     };
 
+    const getItemFilter = (input: string) => {
+        const lowercased = input.toLowerCase();
+
+        return (item: string) => {
+            return item.toLowerCase().includes(lowercased);
+        };
+    };
+
     return (
-        <Selector
+        <AutoCompleteSelector
             items={items}
-            itemToKey={(item) => item}
-            itemToDisplayText={(item) => item}
             labelText="Item:"
-            defaultSelectedItem={defaultSelectedItem ?? items[0]}
+            toggleLabelText="Open item list"
+            inputPlaceholder="Select an item to use in calculations"
+            defaultSelectedItem={defaultSelectedItem}
+            itemToKey={(value) => value}
+            itemToDisplayText={(value) => value}
+            getItemFilter={getItemFilter}
             onSelectedItemChange={handleItemChange}
-            palette="secondary"
         />
     );
 }

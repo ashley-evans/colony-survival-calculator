@@ -7,7 +7,15 @@ export const Container = styled.div`
     flex-direction: column;
 `;
 
-export const InputContainer = styled.div`
+type InputContainerProps = {
+    palette: ColorPalettes;
+};
+
+export const InputContainer = styled.div<InputContainerProps>`
+    ${({ theme, palette }) => css`
+        color: ${theme.color[palette].on_container};
+    `}
+
     display: flex;
     flex-direction: column;
     justify-content: center;

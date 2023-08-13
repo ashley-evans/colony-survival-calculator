@@ -1,47 +1,16 @@
 import React from "react";
-import { act, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { screen } from "@testing-library/react";
 import { vi } from "vitest";
 
-import Selector from "..";
+import { Selector } from "../Selector";
 import {
     renderWithTestProviders as render,
     wrapWithTestProviders,
+    openSelectMenu,
+    selectOption,
 } from "../../../../test/utils";
 
-type Item = { name: string };
-
-function createItem(itemName: string): Item {
-    return { name: itemName };
-}
-
-function itemToKey(item: Item, index: number): string {
-    return `${item.name}-${index}`;
-}
-
-function itemToDisplayText(item: Item): string {
-    return item.name;
-}
-
-async function clickSelect(label: string): Promise<void> {
-    const user = userEvent.setup();
-    const select = await screen.findByRole("combobox", {
-        name: label,
-    });
-    await act(async () => {
-        await user.click(select);
-    });
-}
-
-async function clickOption(option: string): Promise<void> {
-    const user = userEvent.setup();
-    const optionElement = await screen.findByRole("option", {
-        name: option,
-    });
-    await act(async () => {
-        await user.click(optionElement);
-    });
-}
+import { Item, createItem, itemToKey, itemToDisplayText } from "./utils";
 
 const items: Item[] = [createItem("test item 1"), createItem("test item 2")];
 const expectedLabelText = "Label text:";
@@ -109,7 +78,7 @@ test("show each item provided as an option in the select when clicked", async ()
             itemToDisplayText={itemToDisplayText}
         />
     );
-    await clickSelect(expectedLabelText);
+    await openSelectMenu({ label: expectedLabelText });
 
     for (const item of items) {
         expect(
@@ -130,7 +99,7 @@ test("shows the provided default item as selected in the option list by default"
             itemToDisplayText={itemToDisplayText}
         />
     );
-    await clickSelect(expectedLabelText);
+    await openSelectMenu({ label: expectedLabelText });
 
     expect(
         await screen.findByRole("option", {
@@ -152,8 +121,8 @@ test("updates the shown item when a different item is selected", async () => {
             itemToDisplayText={itemToDisplayText}
         />
     );
-    await clickSelect(expectedLabelText);
-    await clickOption(expectedShownItem.name);
+    await openSelectMenu({ label: expectedLabelText });
+    await selectOption({ optionName: expectedShownItem.name });
 
     expect(
         await screen.findByRole("combobox", { name: expectedLabelText })
@@ -173,9 +142,9 @@ test("updates the selected item in the option list after a different item is sel
             itemToDisplayText={itemToDisplayText}
         />
     );
-    await clickSelect(expectedLabelText);
-    await clickOption(expectedSelectedItem.name);
-    await clickSelect(expectedLabelText);
+    await openSelectMenu({ label: expectedLabelText });
+    await selectOption({ optionName: expectedSelectedItem.name });
+    await openSelectMenu({ label: expectedLabelText });
 
     expect(
         await screen.findByRole("option", {
@@ -205,8 +174,8 @@ test("calls the provided on change function when an item is selected", async () 
             onSelectedItemChange={mockOnItemChange}
         />
     );
-    await clickSelect(expectedLabelText);
-    await clickOption(expectedItem.name);
+    await openSelectMenu({ label: expectedLabelText });
+    await selectOption({ optionName: expectedItem.name });
     await screen.findByText(expectedItem.name);
 
     expect(mockOnItemChange).toHaveBeenCalledTimes(1);

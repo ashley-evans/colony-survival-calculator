@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 
 import ItemSelector from "./components/ItemSelector";
@@ -83,12 +83,6 @@ function CalculatorTab({
             skip: !selectedItem,
         }
     );
-
-    useEffect(() => {
-        if (!selectedItem && itemNameData?.distinctItemNames[0]) {
-            setSelectedItem(itemNameData.distinctItemNames[0]);
-        }
-    }, [selectedItem, itemNameData]);
 
     if (itemNamesLoading) {
         return (
