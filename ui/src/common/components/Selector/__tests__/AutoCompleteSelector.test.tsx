@@ -424,6 +424,7 @@ test("does not render a clear input button if no label is specified and value en
     );
     await typeValue({ label: expectedLabelText, value: "1" });
 
+    expect(await screen.findAllByRole("button")).toHaveLength(1);
     expect(
         screen.queryByRole("button", { name: expectedClearLabelText })
     ).not.toBeInTheDocument();

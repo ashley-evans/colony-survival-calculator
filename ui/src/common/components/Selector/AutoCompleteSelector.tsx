@@ -91,7 +91,7 @@ function AutoCompleteSelector<Item>({
             <SelectorInputContainer palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
                 <InputIconContainer>
-                    {inputValue ? (
+                    {inputValue && clearIconLabelText ? (
                         <ClearInputIcon
                             icon={faTimes}
                             role="button"
