@@ -1,3 +1,7 @@
+import {
+    FontAwesomeIcon,
+    FontAwesomeIconProps,
+} from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 
 export const TableContainer = styled.div`
@@ -73,6 +77,23 @@ export const NumberColumnCell = styled.td`
 export const ExpandRowIconContainer = styled.span`
     cursor: pointer;
     margin-right: 0.5rem;
+`;
+
+interface ExpandRowIconProps extends FontAwesomeIconProps {
+    expanded: boolean;
+}
+
+export const ExpandRowIcon = styled(FontAwesomeIcon)<ExpandRowIconProps>`
+    transition: all 0.2s ease-in;
+    transform: rotate(-90deg);
+
+    ${({ expanded }) => {
+        if (expanded) {
+            return css`
+                transform: rotate(0deg);
+            `;
+        }
+    }}
 `;
 
 export const CreatorBreakdownRow = styled.tr`

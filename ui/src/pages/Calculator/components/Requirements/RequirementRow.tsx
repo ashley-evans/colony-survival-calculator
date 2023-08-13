@@ -1,10 +1,10 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 import { roundOutput } from "../../utils";
 import {
     CreatorBreakdownRow,
+    ExpandRowIcon,
     ExpandRowIconContainer,
     NumberColumnCell,
     TextColumnCell,
@@ -47,25 +47,21 @@ function MultipleCreatorRow({
         <>
             <tr>
                 <TextColumnCell>
-                    {row.isExpanded ? (
-                        <ExpandRowIconContainer
-                            role="button"
-                            aria-label={"Collapse creator breakdown"}
-                            tabIndex={0}
-                            onClick={() => toggleCreatorBreakdown(row.name)}
-                        >
-                            <FontAwesomeIcon icon={faMinus} />
-                        </ExpandRowIconContainer>
-                    ) : (
-                        <ExpandRowIconContainer
-                            role="button"
-                            aria-label={"Expand creator breakdown"}
-                            tabIndex={0}
-                            onClick={() => toggleCreatorBreakdown(row.name)}
-                        >
-                            <FontAwesomeIcon icon={faPlus} />
-                        </ExpandRowIconContainer>
-                    )}
+                    <ExpandRowIconContainer
+                        role="button"
+                        aria-label={
+                            row.isExpanded
+                                ? "Collapse creator breakdown"
+                                : "Expand creator breakdown"
+                        }
+                        tabIndex={0}
+                        onClick={() => toggleCreatorBreakdown(row.name)}
+                    >
+                        <ExpandRowIcon
+                            icon={faChevronDown}
+                            expanded={row.isExpanded}
+                        />
+                    </ExpandRowIconContainer>
 
                     {row.name}
                 </TextColumnCell>
