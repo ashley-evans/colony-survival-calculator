@@ -290,6 +290,22 @@ test("updates the selected option if selected is changed", async () => {
     ).toBeVisible();
 });
 
+test("renders a clear button if an item is selected", async () => {
+    const expectedClearButtonLabelText = "Clear item input";
+
+    render(<Calculator />);
+    await selectOption({
+        label: expectedItemSelectLabel,
+        optionName: items[1].name,
+    });
+
+    expect(
+        await screen.findByRole("button", {
+            name: expectedClearButtonLabelText,
+        })
+    ).toBeVisible();
+});
+
 test("requests item details for newly selected item if selection is changed", async () => {
     const expectedItemName = items[1].name;
     const expectedRequest = waitForRequest(

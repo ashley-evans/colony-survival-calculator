@@ -31,6 +31,7 @@ function ItemSelector({
             labelText="Item:"
             toggleLabelText="Open item list"
             inputPlaceholder="Select an item to use in calculations"
+            clearIconLabelText="Clear item input"
             defaultSelectedItem={defaultSelectedItem}
             itemToKey={(value) => value}
             itemToDisplayText={(value) => value}

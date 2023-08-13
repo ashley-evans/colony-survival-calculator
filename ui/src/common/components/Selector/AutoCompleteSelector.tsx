@@ -98,6 +98,7 @@ function AutoCompleteSelector<Item>({
                             onClick={() => selectItem(null)}
                             aria-hidden={false}
                             aria-label={clearIconLabelText}
+                            tabIndex={0}
                         />
                     ) : null}
                     <ToggleIndicatorIcon
@@ -107,6 +108,7 @@ function AutoCompleteSelector<Item>({
                         role="button"
                         aria-hidden={false}
                         aria-label={toggleLabelText}
+                        tabIndex={0}
                     />
                 </InputIconContainer>
             </SelectorInputContainer>
