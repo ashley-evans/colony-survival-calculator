@@ -75,6 +75,8 @@ export const Menu = styled.div<MenuProps>`
     border-radius: 0.25rem;
     list-style-type: none;
     cursor: pointer;
+    max-height: 9rem;
+    overflow-y: auto;
 `;
 
 export const Item = styled.li<CommonProps>`
