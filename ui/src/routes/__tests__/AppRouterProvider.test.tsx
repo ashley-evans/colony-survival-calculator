@@ -75,7 +75,9 @@ describe("root rendering", () => {
             name: EXPECTED_APPLICATION_TITLE,
         });
         const banner = header.parentElement as HTMLElement;
-        const link = within(banner).getByRole("link");
+        const link = within(banner).getByRole("link", {
+            name: "View the source code on GitHub",
+        });
 
         expect(link).toHaveAttribute("href", EXPECTED_REPOSITORY_URL);
     });

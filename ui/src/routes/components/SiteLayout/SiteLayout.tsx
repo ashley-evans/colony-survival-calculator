@@ -70,6 +70,7 @@ function SiteLayout() {
                                 isDarkTheme ? "light" : "dark"
                             } theme`}
                             onClick={() => setDarkTheme(!isDarkTheme)}
+                            tabIndex={0}
                         >
                             <ThemeButton
                                 icon={isDarkTheme ? faSun : faMoon}
@@ -81,6 +82,7 @@ function SiteLayout() {
                             to={
                                 "https://github.com/ashley-evans/colony-survival-calculator"
                             }
+                            aria-label="View the source code on GitHub"
                         >
                             <FontAwesomeIcon icon={faGithub} size="2x" />
                         </Link>
