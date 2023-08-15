@@ -487,9 +487,7 @@ describe("requirements rendering given requirements", () => {
                             name: columnName,
                         });
                         for (let i = 0; i < numberOfClicks; i++) {
-                            await act(async () => {
-                                await user.click(sortableColumnHeader);
-                            });
+                            await user.click(sortableColumnHeader);
                         }
 
                         await waitFor(() =>
@@ -522,9 +520,7 @@ describe("requirements rendering given requirements", () => {
             ).getByRole("columnheader", {
                 name: expectedAmountColumnName,
             });
-            await act(async () => {
-                await user.click(amountSortableColumnHeader);
-            });
+            await user.click(amountSortableColumnHeader);
             await waitFor(() =>
                 expect(amountSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
@@ -532,9 +528,7 @@ describe("requirements rendering given requirements", () => {
                 )
             );
 
-            await act(async () => {
-                await user.click(workersSortableColumnHeader);
-            });
+            await user.click(workersSortableColumnHeader);
             await waitFor(() =>
                 expect(workersSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
@@ -566,9 +560,7 @@ describe("requirements rendering given requirements", () => {
             ).getByRole("columnheader", {
                 name: expectedAmountColumnName,
             });
-            await act(async () => {
-                await user.click(workersSortableColumnHeader);
-            });
+            await user.click(workersSortableColumnHeader);
             await waitFor(() =>
                 expect(workersSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
@@ -576,9 +568,7 @@ describe("requirements rendering given requirements", () => {
                 )
             );
 
-            await act(async () => {
-                await user.click(amountSortableColumnHeader);
-            });
+            await user.click(amountSortableColumnHeader);
             await waitFor(() =>
                 expect(amountSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
@@ -824,9 +814,7 @@ describe("requirements rendering given requirements", () => {
                     "columnheader",
                     { name: expectedAmountColumnName }
                 );
-                await act(async () => {
-                    await user.click(amountColumnHeader);
-                });
+                await user.click(amountColumnHeader);
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithSingleCreatorAndDemands.name,
                 });
@@ -1016,9 +1004,7 @@ describe("requirements rendering given requirements", () => {
                         label: expectedExpandDemandBreakdownLabel,
                     });
                     for (let i = 0; i < numberOfClicks; i++) {
-                        await act(async () => {
-                            await user.click(amountColumnHeader);
-                        });
+                        await user.click(amountColumnHeader);
                     }
                     const rows = within(requirementsTable).getAllByRole("row");
 
@@ -1186,9 +1172,7 @@ describe("requirements rendering given requirements", () => {
                 "columnheader",
                 { name: expectedWorkerColumnName }
             );
-            await act(async () => {
-                await user.click(workersColumnHeader);
-            });
+            await user.click(workersColumnHeader);
             const itemCell = await screen.findByRole("cell", {
                 name: requirementWithMultipleCreators.name,
             });
@@ -1358,9 +1342,7 @@ describe("requirements rendering given requirements", () => {
                     label: expectedExpandCreatorBreakdownLabel,
                 });
                 for (let i = 0; i < numberOfClicks; i++) {
-                    await act(async () => {
-                        await user.click(amountColumnHeader);
-                    });
+                    await user.click(amountColumnHeader);
                 }
                 const rows = within(requirementsTable).getAllByRole("row");
 
@@ -1465,9 +1447,7 @@ describe("requirements rendering given requirements", () => {
                     label: expectedExpandCreatorBreakdownLabel,
                 });
                 for (let i = 0; i < numberOfClicks; i++) {
-                    await act(async () => {
-                        await user.click(workersColumnHeader);
-                    });
+                    await user.click(workersColumnHeader);
                 }
                 const rows = within(requirementsTable).getAllByRole("row");
 
@@ -1599,9 +1579,7 @@ describe("requirements rendering given requirements", () => {
                     "columnheader",
                     { name: expectedAmountColumnName }
                 );
-                await act(async () => {
-                    await user.click(amountColumnHeader);
-                });
+                await user.click(amountColumnHeader);
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
@@ -1974,9 +1952,7 @@ describe("requirements rendering given requirements", () => {
                 { name: expectedWorkerColumnName }
             );
             for (let i = 0; i < numberOfClicks; i++) {
-                await act(async () => {
-                    await user.click(workersColumnHeader);
-                });
+                await user.click(workersColumnHeader);
             }
             const requirementRows = await within(
                 requirementsTable
@@ -2151,9 +2127,7 @@ describe("requirements rendering given requirements", () => {
                 { name: expectedAmountColumnName }
             );
             for (let i = 0; i < numberOfClicks; i++) {
-                await act(async () => {
-                    await user.click(amountColumnHeader);
-                });
+                await user.click(amountColumnHeader);
             }
             const requirementRows = await within(
                 requirementsTable

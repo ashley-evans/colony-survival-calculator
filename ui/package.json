@@ -6,22 +6,19 @@
     "scripts": {
         "dev": "vite",
         "dev:open": "vite --open",
-        "build": "tsc && vite build",
+        "build": "run -T tsc && vite build",
         "deploy": "./scripts/deploy.sh",
         "deploy:plan": "./scripts/deploy.sh -d",
         "preview": "vite preview",
         "validate": "../scripts/validate-terraform.sh -r ./infra/",
-        "format:check": "npx prettier --check . && terraform fmt -recursive -check -diff ./infra/",
-        "format:write": "npx prettier --write . && terraform fmt -recursive ./infra/",
-        "lint": "eslint .",
-        "lint:packages": "npmPkgJsonLint .",
+        "format:check": "run -T prettier --check . && terraform fmt -recursive -check -diff ./infra/",
+        "format:write": "run -T prettier --write . && terraform fmt -recursive ./infra/",
+        "lint": "run -T eslint --max-warnings 0 . ",
+        "lint:packages": "run -T npmPkgJsonLint .",
         "test": "vitest run",
         "test:watch": "vitest watch",
-        "generate": "npx graphql-codegen --config ./codegen.ts",
-        "postinstall": "npm run generate"
-    },
-    "resolutions": {
-        "styled-components": "^5"
+        "generate": "graphql-codegen --config ./codegen.ts",
+        "postinstall": "yarn generate"
     },
     "dependencies": {
         "@apollo/client": "3.7.11",
@@ -43,7 +40,7 @@
         "use-debounce": "9.0.4"
     },
     "devDependencies": {
-        "@colony-survival-calculator/api": "^0.0.0",
+        "@colony-survival-calculator/api": "workspace:^",
         "@graphql-codegen/cli": "^3.3.0",
         "@graphql-codegen/client-preset": "^3.0.0",
         "@testing-library/jest-dom": "^5.16.5",
