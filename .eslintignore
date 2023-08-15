@@ -4,3 +4,4 @@ prettier.config.js
 prettier.config.cjs
 .eslintrc.js
 .eslintrc.cjs
+.yarn/*
