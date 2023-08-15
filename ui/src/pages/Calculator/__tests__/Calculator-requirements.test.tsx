@@ -17,6 +17,7 @@ import {
     wrapWithTestProviders,
 } from "../../../test";
 import {
+    CreatorDemand,
     GetItemRequirementsQuery,
     OutputUnit,
 } from "../../../graphql/__generated__/graphql";
@@ -43,27 +44,48 @@ const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
 const expectedCreatorColumnName = "Creator";
+const expectedDemandedItemColumName = "Demand";
 const expectedAmountColumnName = "Amount";
 const expectedWorkerColumnName = "Workers";
 const expectedExpandCreatorBreakdownLabel = "Expand creator breakdown";
 const expectedCollapseCreatorBreakdownLabel = "Collapse creator breakdown";
+const expectedExpandDemandBreakdownLabel = "Expand demand breakdown";
+const expectedCollapseDemandBreakdownLabel = "Collapse demand breakdown";
+
+enum Columns {
+    ITEM_NAME = 0,
+    CREATOR = 1,
+    DEMANDED_ITEM = 2,
+    AMOUNT = 3,
+    WORKERS = 4,
+}
+
+function createCreatorDemands(name: string, amount: number): CreatorDemand {
+    return {
+        name,
+        amount,
+    };
+}
 
 function createRequirementCreator({
     recipeName,
-    creator = `${recipeName} creator`,
     amount,
     workers,
+    creator = `${recipeName} creator`,
+    demands = [],
 }: {
     recipeName: string;
-    creator?: string;
     amount: number;
     workers: number;
+    creator?: string;
+    demands?: CreatorDemand[];
 }): RequirementCreator {
     return {
         name: recipeName,
         creator,
         amount,
         workers,
+        demands,
     };
 }
 
@@ -120,6 +142,22 @@ const requirementsWithSingleCreator: RequirementsResponse[] = [
     }),
 ];
 
+const requirementWithSingleCreatorAndDemands = createRequirement({
+    name: "Single creator item w/ demands",
+    amount: 200,
+    creators: [
+        createRequirementCreator({
+            recipeName: "Single creator item w/ demands",
+            amount: 200,
+            workers: 38,
+            demands: [
+                createCreatorDemands("Demanded item 1", 25),
+                createCreatorDemands("Demanded item 2", 50),
+            ],
+        }),
+    ],
+});
+
 const requirementWithMultipleCreators = createRequirement({
     name: "Multiple creator item",
     amount: 50,
@@ -135,6 +173,29 @@ const requirementWithMultipleCreators = createRequirement({
             creator: "Multiple creator item creator 2",
             amount: 5,
             workers: 2,
+        }),
+    ],
+});
+
+const requirementWithMultipleCreatorsAndDemands = createRequirement({
+    name: "Multiple creator item w/ demands",
+    amount: 200,
+    creators: [
+        createRequirementCreator({
+            recipeName: "Multiple creator item w/ demands",
+            creator: "Multiple creator item w/ demands creator 1",
+            amount: 150,
+            workers: 29,
+            demands: [
+                createCreatorDemands("Demanded item 1", 25),
+                createCreatorDemands("Demanded item 2", 50),
+            ],
+        }),
+        createRequirementCreator({
+            recipeName: "Multiple creator item w/ demands",
+            creator: "Multiple creator item w/ demands creator 2",
+            amount: 82,
+            workers: 9,
         }),
     ],
 });
@@ -348,6 +409,11 @@ describe("requirements rendering given requirements", () => {
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
+                name: expectedDemandedItemColumName,
+            })
+        ).toBeVisible();
+        expect(
+            within(requirementsTable).getByRole("columnheader", {
                 name: expectedAmountColumnName,
             })
         ).toBeVisible();
@@ -358,52 +424,581 @@ describe("requirements rendering given requirements", () => {
         ).toBeVisible();
     });
 
-    describe.each([expectedAmountColumnName, expectedWorkerColumnName])(
-        "%s sortable column behavior",
-        (columnName: string) => {
-            test("renders the column sort button", async () => {
+    describe("sorting behavior", () => {
+        describe.each([expectedAmountColumnName, expectedWorkerColumnName])(
+            "%s sortable column behavior",
+            (columnName: string) => {
+                test("renders the column sort button", async () => {
+                    render(<Calculator />, expectedGraphQLAPIURL);
+                    await selectItemAndWorkers({
+                        itemName: selectedItemName,
+                        workers: 5,
+                    });
+
+                    const requirementsTable = await screen.findByRole("table");
+                    expect(
+                        within(requirementsTable).getByRole("button", {
+                            name: columnName,
+                        })
+                    ).toBeVisible();
+                });
+
+                test("sets the column as unsorted (default sort) by default", async () => {
+                    render(<Calculator />, expectedGraphQLAPIURL);
+                    await selectItemAndWorkers({
+                        itemName: selectedItemName,
+                        workers: 5,
+                    });
+
+                    const requirementsTable = await screen.findByRole("table");
+                    const sortableColumnHeader = within(
+                        requirementsTable
+                    ).getByRole("columnheader", { name: columnName });
+                    expect(sortableColumnHeader).toHaveAttribute(
+                        "aria-sort",
+                        "none"
+                    );
+                });
+
+                test.each([
+                    ["once", "descending", 1],
+                    ["twice", "ascending", 2],
+                    ["three times", "none", 3],
+                ])(
+                    "pressing the column header %s sets the column sort to %s",
+                    async (
+                        _: string,
+                        expectedOrder: string,
+                        numberOfClicks: number
+                    ) => {
+                        const user = userEvent.setup();
+
+                        render(<Calculator />, expectedGraphQLAPIURL);
+                        await selectItemAndWorkers({
+                            itemName: selectedItemName,
+                            workers: 5,
+                        });
+                        const requirementsTable = await screen.findByRole(
+                            "table"
+                        );
+                        const sortableColumnHeader = within(
+                            requirementsTable
+                        ).getByRole("columnheader", {
+                            name: columnName,
+                        });
+                        for (let i = 0; i < numberOfClicks; i++) {
+                            await act(async () => {
+                                await user.click(sortableColumnHeader);
+                            });
+                        }
+
+                        await waitFor(() =>
+                            expect(sortableColumnHeader).toHaveAttribute(
+                                "aria-sort",
+                                expectedOrder
+                            )
+                        );
+                    }
+                );
+            }
+        );
+
+        test("pressing the worker sort resets the amount sort", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersSortableColumnHeader = within(
+                requirementsTable
+            ).getByRole("columnheader", {
+                name: expectedWorkerColumnName,
+            });
+            const amountSortableColumnHeader = within(
+                requirementsTable
+            ).getByRole("columnheader", {
+                name: expectedAmountColumnName,
+            });
+            await act(async () => {
+                await user.click(amountSortableColumnHeader);
+            });
+            await waitFor(() =>
+                expect(amountSortableColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    "descending"
+                )
+            );
+
+            await act(async () => {
+                await user.click(workersSortableColumnHeader);
+            });
+            await waitFor(() =>
+                expect(workersSortableColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    "descending"
+                )
+            );
+            expect(amountSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "none"
+            );
+        });
+
+        test("pressing the amount sort resets the worker sort", async () => {
+            const user = userEvent.setup();
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const workersSortableColumnHeader = within(
+                requirementsTable
+            ).getByRole("columnheader", {
+                name: expectedWorkerColumnName,
+            });
+            const amountSortableColumnHeader = within(
+                requirementsTable
+            ).getByRole("columnheader", {
+                name: expectedAmountColumnName,
+            });
+            await act(async () => {
+                await user.click(workersSortableColumnHeader);
+            });
+            await waitFor(() =>
+                expect(workersSortableColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    "descending"
+                )
+            );
+
+            await act(async () => {
+                await user.click(amountSortableColumnHeader);
+            });
+            await waitFor(() =>
+                expect(amountSortableColumnHeader).toHaveAttribute(
+                    "aria-sort",
+                    "descending"
+                )
+            );
+            expect(workersSortableColumnHeader).toHaveAttribute(
+                "aria-sort",
+                "none"
+            );
+        });
+    });
+
+    describe("requirement with single creator rendering", () => {
+        test.each([
+            [
+                "a single requirement",
+                [selectedItem, requirementsWithSingleCreator[0]],
+                [
+                    {
+                        name: requirementsWithSingleCreator[0].name,
+                        creator:
+                            requirementsWithSingleCreator[0].creators[0]
+                                .creator,
+                        amount: requirementsWithSingleCreator[0].amount,
+                        workers:
+                            requirementsWithSingleCreator[0].creators[0]
+                                .workers,
+                    },
+                ],
+            ],
+            [
+                "multiple requirements",
+                items,
+                [
+                    {
+                        name: requirementsWithSingleCreator[0].name,
+                        creator:
+                            requirementsWithSingleCreator[0].creators[0]
+                                .creator,
+                        amount: requirementsWithSingleCreator[0].amount,
+                        workers:
+                            requirementsWithSingleCreator[0].creators[0]
+                                .workers,
+                    },
+                    {
+                        name: requirementsWithSingleCreator[1].name,
+                        creator:
+                            requirementsWithSingleCreator[1].creators[0]
+                                .creator,
+                        amount: requirementsWithSingleCreator[1].amount,
+                        workers:
+                            requirementsWithSingleCreator[1].creators[0]
+                                .workers,
+                    },
+                ],
+            ],
+        ])(
+            "renders each requirement in the table given %s with a single creator",
+            async (
+                _: string,
+                response: RequirementsResponse[],
+                expected: Omit<
+                    SingleCreatorRequirementsTableRow,
+                    "key" | "isExpanded" | "type" | "demands"
+                >[]
+            ) => {
+                server.use(createRequirementsResponseHandler(response));
+
                 render(<Calculator />, expectedGraphQLAPIURL);
                 await selectItemAndWorkers({
                     itemName: selectedItemName,
                     workers: 5,
                 });
-
                 const requirementsTable = await screen.findByRole("table");
+
+                for (const requirement of expected) {
+                    const requirementCell = within(requirementsTable).getByRole(
+                        "cell",
+                        { name: requirement.name }
+                    );
+                    const requirementRow =
+                        requirementCell.parentElement as HTMLElement;
+
+                    expect(requirementCell).toBeVisible();
+                    const cells = within(requirementRow).getAllByRole("cell");
+
+                    expect(cells).toHaveLength(5);
+                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                        requirement.creator
+                    );
+                    expect(cells[Columns.CREATOR]).toBeVisible();
+                    expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
+                        ""
+                    );
+                    expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        requirement.amount.toString()
+                    );
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                        requirement.workers.toString()
+                    );
+                    expect(cells[Columns.WORKERS]).toBeVisible();
+                }
+            }
+        );
+
+        test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementsWithSingleCreator[0].name,
+            });
+
+            expect(
+                within(itemCell).queryByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementsWithSingleCreator[0].name,
+            });
+
+            expect(
+                within(itemCell).queryByRole("button", {
+                    name: expectedExpandCreatorBreakdownLabel,
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        test("does not render a expand button to view demand breakdown if item has no demands", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const itemCell = await screen.findByRole("cell", {
+                name: requirementsWithSingleCreator[0].name,
+            });
+
+            expect(
+                within(itemCell).queryByRole("button", {
+                    name: expectedExpandDemandBreakdownLabel,
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        describe("demand rendering", () => {
+            const requirements = [
+                requirementWithSingleCreatorAndDemands,
+                ...requirementsWithSingleCreator,
+            ];
+
+            beforeEach(() => {
+                server.use(createRequirementsResponseHandler(requirements));
+            });
+
+            test("renders an expand button to view demand breakdown if item has demands", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithSingleCreatorAndDemands.name,
+                });
+
                 expect(
-                    within(requirementsTable).getByRole("button", {
-                        name: columnName,
+                    within(itemCell).getByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
                     })
                 ).toBeVisible();
             });
 
-            test("sets the column as unsorted (default sort) by default", async () => {
+            test("pressing the expand button toggles the button to a collapse button", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
                 await selectItemAndWorkers({
                     itemName: selectedItemName,
                     workers: 5,
                 });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithSingleCreatorAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: itemCell,
+                });
 
+                expect(
+                    await within(itemCell).findByRole("button", {
+                        name: expectedCollapseDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("pressing the collapse button toggles the button back to expand", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithSingleCreatorAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: itemCell,
+                });
+                await clickButton({
+                    label: expectedCollapseDemandBreakdownLabel,
+                    inside: itemCell,
+                });
+
+                expect(
+                    await within(itemCell).findByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("can toggle expansion even if rows sorted", async () => {
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
                 const requirementsTable = await screen.findByRole("table");
-                const sortableColumnHeader = within(
-                    requirementsTable
-                ).getByRole("columnheader", { name: columnName });
-                expect(sortableColumnHeader).toHaveAttribute(
-                    "aria-sort",
-                    "none"
+                const amountColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedAmountColumnName }
                 );
+                await act(async () => {
+                    await user.click(amountColumnHeader);
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithSingleCreatorAndDemands.name,
+                });
+
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: itemCell,
+                });
+
+                expect(
+                    await within(itemCell).findByRole("button", {
+                        name: expectedCollapseDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+                await clickButton({
+                    label: expectedCollapseDemandBreakdownLabel,
+                    inside: itemCell,
+                });
+                expect(
+                    await within(itemCell).findByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("does not show demand breakdown by default", async () => {
+                const demands =
+                    requirementWithSingleCreatorAndDemands.creators[0].demands;
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                expect(rows).toHaveLength(requirements.length + 1);
+                for (const demand of demands) {
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: demand.name,
+                        })
+                    ).not.toBeInTheDocument();
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: demand.amount.toString(),
+                        })
+                    ).not.toBeInTheDocument();
+                }
+            });
+
+            test("expanding the demand breakdown shows demanded item name and amount", async () => {
+                const demands =
+                    requirementWithSingleCreatorAndDemands.creators[0].demands;
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithSingleCreatorAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: itemCell,
+                });
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                expect(rows).toHaveLength(
+                    demands.length + requirements.length + 1
+                );
+                for (let i = 0; i < demands.length; i++) {
+                    const cells = within(rows[i + demands.length]).getAllByRole(
+                        "cell"
+                    );
+
+                    expect(cells).toHaveLength(5);
+                    expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
+                        demands[i].name
+                    );
+                    expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        demands[i].amount.toString()
+                    );
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                }
             });
 
             test.each([
-                ["once", "descending", 1],
-                ["twice", "ascending", 2],
-                ["three times", "none", 3],
+                [
+                    "descending",
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                    ],
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                    ],
+                    1,
+                ],
+                [
+                    "ascending",
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                    ],
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                    ],
+                    2,
+                ],
+                [
+                    "default",
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                    ],
+                    [
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[0],
+                        requirementWithSingleCreatorAndDemands.creators[0]
+                            .demands[1],
+                    ],
+                    3,
+                ],
             ])(
-                "pressing the column header %s sets the column sort to %s",
+                "sorts demand breakdowns in %s order if amount column is sorted in that order",
                 async (
                     _: string,
-                    expectedOrder: string,
+                    unsorted: CreatorDemand[],
+                    expected: CreatorDemand[],
                     numberOfClicks: number
                 ) => {
+                    const overridden: RequirementsResponse = {
+                        ...requirementWithSingleCreatorAndDemands,
+                        creators: [
+                            {
+                                ...requirementWithSingleCreatorAndDemands
+                                    .creators[0],
+                                demands: unsorted,
+                            },
+                        ],
+                    };
+
+                    server.use(
+                        graphql.query<GetItemRequirementsQuery>(
+                            expectedRequirementsQueryName,
+                            (_, res, ctx) => {
+                                return res.once(
+                                    ctx.data({
+                                        requirement: [overridden],
+                                    })
+                                );
+                            }
+                        )
+                    );
+
                     const user = userEvent.setup();
 
                     render(<Calculator />, expectedGraphQLAPIURL);
@@ -412,233 +1007,43 @@ describe("requirements rendering given requirements", () => {
                         workers: 5,
                     });
                     const requirementsTable = await screen.findByRole("table");
-                    const sortableColumnHeader = within(
+                    const amountColumnHeader = within(
                         requirementsTable
                     ).getByRole("columnheader", {
-                        name: columnName,
+                        name: expectedAmountColumnName,
+                    });
+                    await clickButton({
+                        label: expectedExpandDemandBreakdownLabel,
                     });
                     for (let i = 0; i < numberOfClicks; i++) {
                         await act(async () => {
-                            await user.click(sortableColumnHeader);
+                            await user.click(amountColumnHeader);
                         });
                     }
+                    const rows = within(requirementsTable).getAllByRole("row");
 
-                    await waitFor(() =>
-                        expect(sortableColumnHeader).toHaveAttribute(
-                            "aria-sort",
-                            expectedOrder
-                        )
-                    );
+                    for (let i = 0; i < expected.length; i++) {
+                        const expectedRowNumber = i + 2;
+                        const demand = expected[i];
+                        const cells = within(
+                            rows[expectedRowNumber]
+                        ).getAllByRole("cell");
+
+                        expect(
+                            cells[Columns.DEMANDED_ITEM]
+                        ).toHaveAccessibleName(demand.name);
+                        expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                        expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                            demand.amount.toString()
+                        );
+                        expect(cells[Columns.AMOUNT]).toBeVisible();
+                    }
                 }
             );
-        }
-    );
-
-    test("pressing the worker sort resets the amount sort", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
         });
-        const requirementsTable = await screen.findByRole("table");
-        const workersSortableColumnHeader = within(requirementsTable).getByRole(
-            "columnheader",
-            {
-                name: expectedWorkerColumnName,
-            }
-        );
-        const amountSortableColumnHeader = within(requirementsTable).getByRole(
-            "columnheader",
-            {
-                name: expectedAmountColumnName,
-            }
-        );
-        await act(async () => {
-            await user.click(amountSortableColumnHeader);
-        });
-        await waitFor(() =>
-            expect(amountSortableColumnHeader).toHaveAttribute(
-                "aria-sort",
-                "descending"
-            )
-        );
-
-        await act(async () => {
-            await user.click(workersSortableColumnHeader);
-        });
-        await waitFor(() =>
-            expect(workersSortableColumnHeader).toHaveAttribute(
-                "aria-sort",
-                "descending"
-            )
-        );
-        expect(amountSortableColumnHeader).toHaveAttribute("aria-sort", "none");
     });
 
-    test("pressing the amount sort resets the worker sort", async () => {
-        const user = userEvent.setup();
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-        const requirementsTable = await screen.findByRole("table");
-        const workersSortableColumnHeader = within(requirementsTable).getByRole(
-            "columnheader",
-            {
-                name: expectedWorkerColumnName,
-            }
-        );
-        const amountSortableColumnHeader = within(requirementsTable).getByRole(
-            "columnheader",
-            {
-                name: expectedAmountColumnName,
-            }
-        );
-        await act(async () => {
-            await user.click(workersSortableColumnHeader);
-        });
-        await waitFor(() =>
-            expect(workersSortableColumnHeader).toHaveAttribute(
-                "aria-sort",
-                "descending"
-            )
-        );
-
-        await act(async () => {
-            await user.click(amountSortableColumnHeader);
-        });
-        await waitFor(() =>
-            expect(amountSortableColumnHeader).toHaveAttribute(
-                "aria-sort",
-                "descending"
-            )
-        );
-        expect(workersSortableColumnHeader).toHaveAttribute(
-            "aria-sort",
-            "none"
-        );
-    });
-
-    test("renders the sum total of required workers given requirement with multiple creators", async () => {
-        const expectedTotal = "14";
-        server.use(
-            createRequirementsResponseHandler([requirementWithMultipleCreators])
-        );
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-        const requirementsTable = await screen.findByRole("table");
-
-        expect(
-            within(requirementsTable).getByRole("cell", {
-                name: expectedTotal,
-            })
-        ).toBeVisible();
-    });
-
-    test.each([
-        [
-            "a single requirement",
-            [selectedItem, requirementsWithSingleCreator[0]],
-            [
-                {
-                    name: requirementsWithSingleCreator[0].name,
-                    creator:
-                        requirementsWithSingleCreator[0].creators[0].creator,
-                    amount: requirementsWithSingleCreator[0].amount,
-                    workers:
-                        requirementsWithSingleCreator[0].creators[0].workers,
-                },
-            ],
-        ],
-        [
-            "multiple requirements",
-            items,
-            [
-                {
-                    name: requirementsWithSingleCreator[0].name,
-                    creator:
-                        requirementsWithSingleCreator[0].creators[0].creator,
-                    amount: requirementsWithSingleCreator[0].amount,
-                    workers:
-                        requirementsWithSingleCreator[0].creators[0].workers,
-                },
-                {
-                    name: requirementsWithSingleCreator[1].name,
-                    creator:
-                        requirementsWithSingleCreator[1].creators[0].creator,
-                    amount: requirementsWithSingleCreator[1].amount,
-                    workers:
-                        requirementsWithSingleCreator[1].creators[0].workers,
-                },
-            ],
-        ],
-    ])(
-        "renders each requirement in the table given %s with a single creator",
-        async (
-            _: string,
-            response: RequirementsResponse[],
-            expected: SingleCreatorRequirementsTableRow[]
-        ) => {
-            server.use(createRequirementsResponseHandler(response));
-
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            const requirementsTable = await screen.findByRole("table");
-
-            for (const requirement of expected) {
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.name,
-                    })
-                ).toBeVisible();
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.creator,
-                    })
-                ).toBeVisible();
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.amount.toString(),
-                    })
-                );
-                expect(
-                    within(requirementsTable).getByRole("cell", {
-                        name: requirement.workers.toString(),
-                    })
-                ).toBeVisible();
-            }
-        }
-    );
-
-    test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
-        });
-        const itemCell = await screen.findByRole("cell", {
-            name: requirementsWithSingleCreator[0].name,
-        });
-
-        expect(
-            within(itemCell).queryByRole("button", {
-                name: expectedExpandCreatorBreakdownLabel,
-            })
-        ).not.toBeInTheDocument();
-    });
-
-    describe("item with multiple creator rendering", async () => {
+    describe("item with multiple creators rendering", async () => {
         const requirements = [
             requirementWithMultipleCreators,
             ...requirementsWithSingleCreator,
@@ -648,8 +1053,28 @@ describe("requirements rendering given requirements", () => {
             server.use(createRequirementsResponseHandler(requirements));
         });
 
+        test("renders the sum total of required workers given requirement with multiple creators", async () => {
+            const expectedTotal = "14";
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+            const requirementCell = within(requirementsTable).getByRole(
+                "cell",
+                { name: requirementWithMultipleCreators.name }
+            );
+            const requirementRow = requirementCell.parentElement as HTMLElement;
+            const cells = within(requirementRow).getAllByRole("cell");
+
+            expect(cells[Columns.WORKERS]).toHaveAccessibleName(expectedTotal);
+            expect(cells[Columns.WORKERS]).toBeVisible();
+        });
+
         test.each([
-            ["none selected item creators", requirementWithMultipleCreators],
+            ["non-selected item creator", requirementWithMultipleCreators],
             [
                 "selected item creator",
                 createRequirement({
@@ -681,14 +1106,16 @@ describe("requirements rendering given requirements", () => {
                     workers: 5,
                 });
                 const requirementsTable = await screen.findByRole("table");
+                const requirementCell = within(requirementsTable).getByRole(
+                    "cell",
+                    { name: response.name }
+                );
+                const requirementRow =
+                    requirementCell.parentElement as HTMLElement;
+                const cells = within(requirementRow).getAllByRole("cell");
 
-                for (const creator of response.creators) {
-                    expect(
-                        within(requirementsTable).queryByRole("cell", {
-                            name: creator.creator,
-                        })
-                    ).not.toBeInTheDocument();
-                }
+                expect(cells[Columns.CREATOR]).toHaveAccessibleName("");
+                expect(cells[Columns.CREATOR]).toBeVisible();
             }
         );
 
@@ -762,9 +1189,12 @@ describe("requirements rendering given requirements", () => {
             await act(async () => {
                 await user.click(workersColumnHeader);
             });
-            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
             const itemCell = await screen.findByRole("cell", {
                 name: requirementWithMultipleCreators.name,
+            });
+            await clickButton({
+                label: expectedExpandCreatorBreakdownLabel,
+                inside: itemCell,
             });
 
             expect(
@@ -772,7 +1202,10 @@ describe("requirements rendering given requirements", () => {
                     name: expectedCollapseCreatorBreakdownLabel,
                 })
             ).toBeVisible();
-            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+            await clickButton({
+                label: expectedCollapseCreatorBreakdownLabel,
+                inside: itemCell,
+            });
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
@@ -824,36 +1257,26 @@ describe("requirements rendering given requirements", () => {
             expect(rows).toHaveLength(
                 expectedCreators.length + requirements.length + 1
             );
-            expect(
-                within(rows[2]).getByRole("cell", {
-                    name: expectedCreators[0].creator,
-                })
-            );
-            expect(
-                within(rows[2]).getByRole("cell", {
-                    name: expectedCreators[0].amount.toString(),
-                })
-            );
-            expect(
-                within(rows[2]).getByRole("cell", {
-                    name: expectedCreators[0].workers.toString(),
-                })
-            );
-            expect(
-                within(rows[3]).getByRole("cell", {
-                    name: expectedCreators[1].creator,
-                })
-            );
-            expect(
-                within(rows[3]).getByRole("cell", {
-                    name: expectedCreators[1].amount.toString(),
-                })
-            );
-            expect(
-                within(rows[3]).getByRole("cell", {
-                    name: expectedCreators[1].workers.toString(),
-                })
-            );
+
+            for (let i = 0; i < expectedCreators.length; i++) {
+                const cells = within(
+                    rows[i + expectedCreators.length]
+                ).getAllByRole("cell");
+
+                expect(cells).toHaveLength(5);
+                expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                    expectedCreators[i].creator
+                );
+                expect(cells[Columns.CREATOR]).toBeVisible();
+                expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                    expectedCreators[i].amount.toString()
+                );
+                expect(cells[Columns.AMOUNT]).toBeVisible();
+                expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                    expectedCreators[i].workers.toString()
+                );
+                expect(cells[Columns.WORKERS]).toBeVisible();
+            }
         });
 
         test.each([
@@ -942,24 +1365,23 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 for (let i = 0; i < expected.length; i++) {
-                    const expectedRowNumber = i + 2;
-                    const creatorDetails = expected[i];
+                    const cells = within(
+                        rows[i + expected.length]
+                    ).getAllByRole("cell");
 
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.creator,
-                        })
+                    expect(cells).toHaveLength(5);
+                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                        expected[i].creator
                     );
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.amount.toString(),
-                        })
+                    expect(cells[Columns.CREATOR]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        expected[i].amount.toString()
                     );
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.workers.toString(),
-                        })
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                        expected[i].workers.toString()
                     );
+                    expect(cells[Columns.WORKERS]).toBeVisible();
                 }
             }
         );
@@ -1050,27 +1472,241 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 for (let i = 0; i < expected.length; i++) {
-                    const expectedRowNumber = i + 2;
-                    const creatorDetails = expected[i];
+                    const cells = within(
+                        rows[i + expected.length]
+                    ).getAllByRole("cell");
 
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.creator,
-                        })
+                    expect(cells).toHaveLength(5);
+                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                        expected[i].creator
                     );
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.amount.toString(),
-                        })
+                    expect(cells[Columns.CREATOR]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        expected[i].amount.toString()
                     );
-                    expect(
-                        within(rows[expectedRowNumber]).getByRole("cell", {
-                            name: creatorDetails.workers.toString(),
-                        })
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                        expected[i].workers.toString()
                     );
+                    expect(cells[Columns.WORKERS]).toBeVisible();
                 }
             }
         );
+
+        describe("demand rendering", () => {
+            const requirements = [requirementWithMultipleCreatorsAndDemands];
+            const expectedCreatorWithDemands =
+                requirementWithMultipleCreatorsAndDemands.creators[0].creator;
+
+            beforeEach(() => {
+                server.use(createRequirementsResponseHandler(requirements));
+            });
+
+            test("renders an expand button to view demand breakdown if creator has demands", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithMultipleCreatorsAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                    inside: itemCell,
+                });
+                const creatorCell = await screen.findByRole("cell", {
+                    name: expectedCreatorWithDemands,
+                });
+
+                expect(
+                    within(creatorCell).getByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("pressing the expand button toggles the button to a collapse button", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithMultipleCreatorsAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                    inside: itemCell,
+                });
+                const creatorCell = await screen.findByRole("cell", {
+                    name: expectedCreatorWithDemands,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+
+                expect(
+                    within(creatorCell).getByRole("button", {
+                        name: expectedCollapseDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("pressing the collapse button toggles the button back to expand", async () => {
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithMultipleCreatorsAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                    inside: itemCell,
+                });
+                const creatorCell = await screen.findByRole("cell", {
+                    name: expectedCreatorWithDemands,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+                await clickButton({
+                    label: expectedCollapseDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+
+                expect(
+                    await within(creatorCell).findByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("can toggle expansion even if rows sorted", async () => {
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const amountColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    { name: expectedAmountColumnName }
+                );
+                await act(async () => {
+                    await user.click(amountColumnHeader);
+                });
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithMultipleCreatorsAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                    inside: itemCell,
+                });
+                const creatorCell = await screen.findByRole("cell", {
+                    name: expectedCreatorWithDemands,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+                await clickButton({
+                    label: expectedCollapseDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+
+                expect(
+                    await within(creatorCell).findByRole("button", {
+                        name: expectedExpandDemandBreakdownLabel,
+                    })
+                ).toBeVisible();
+            });
+
+            test("does not show demand breakdown by default", async () => {
+                const demands =
+                    requirementWithMultipleCreatorsAndDemands.creators.flatMap(
+                        (creator) => creator.demands
+                    );
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                expect(rows).toHaveLength(requirements.length + 1);
+                for (const demand of demands) {
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: demand.name,
+                        })
+                    ).not.toBeInTheDocument();
+                    expect(
+                        within(requirementsTable).queryByRole("cell", {
+                            name: demand.amount.toString(),
+                        })
+                    ).not.toBeInTheDocument();
+                }
+            });
+
+            test("expanding the demand breakdown shows demanded item name and amount", async () => {
+                const demands =
+                    requirementWithMultipleCreatorsAndDemands.creators[0]
+                        .demands;
+                const expectedOffset =
+                    requirementWithMultipleCreatorsAndDemands.creators.length +
+                    demands.length;
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const itemCell = await screen.findByRole("cell", {
+                    name: requirementWithMultipleCreatorsAndDemands.name,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                    inside: itemCell,
+                });
+                const creatorCell = await screen.findByRole("cell", {
+                    name: expectedCreatorWithDemands,
+                });
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                    inside: creatorCell,
+                });
+                const rows = within(requirementsTable).getAllByRole("row");
+
+                expect(rows).toHaveLength(
+                    expectedOffset + requirements.length + 1
+                );
+                for (let i = 0; i < demands.length; i++) {
+                    const cells = within(
+                        rows[i + expectedOffset - 1]
+                    ).getAllByRole("cell");
+
+                    expect(cells).toHaveLength(5);
+                    expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
+                        demands[i].name
+                    );
+                    expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        demands[i].amount.toString()
+                    );
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                }
+            });
+        });
     });
 
     test.each([
@@ -1313,7 +1949,7 @@ describe("requirements rendering given requirements", () => {
         async (
             _: string,
             unsorted: RequirementsResponse[],
-            sorted: RequirementsTableRow[],
+            sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
             server.use(
@@ -1490,7 +2126,7 @@ describe("requirements rendering given requirements", () => {
         async (
             _: string,
             unsorted: RequirementsResponse[],
-            sorted: RequirementsTableRow[],
+            sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
             server.use(
