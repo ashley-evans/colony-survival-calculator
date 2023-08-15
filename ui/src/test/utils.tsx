@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { render } from "@testing-library/react";
+import { render, within } from "@testing-library/react";
 import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider } from "styled-components";
@@ -66,9 +66,16 @@ function renderWithTestProviders(
     };
 }
 
-async function clickButton({ label }: { label: string }): Promise<void> {
+async function clickButton({
+    label,
+    inside,
+}: {
+    label: string;
+    inside?: HTMLElement;
+}): Promise<void> {
     const user = userEvent.setup();
-    const button = await screen.findByRole("button", { name: label });
+    const container = inside ? within(inside) : screen;
+    const button = await container.findByRole("button", { name: label });
 
     await act(async () => {
         await user.click(button);

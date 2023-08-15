@@ -1,105 +1,89 @@
 import React from "react";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-import { roundOutput } from "../../utils";
-import {
-    CreatorBreakdownRow,
-    ExpandRowIcon,
-    ExpandRowIconContainer,
-    NumberColumnCell,
-    TextColumnCell,
-} from "./styles";
+import { BreakdownRow } from "./styles";
 import {
     MultipleCreatorRequirementsTableRow,
     RequirementsTableRow,
+    RowType,
     SingleCreatorRequirementsTableRow,
-    isSingleCreatorRow,
 } from "./types";
+import { Row } from "./Row";
+import { CreatorBreakdownRow } from "./CreatorBreakdownRow";
 
-type RequirementsRowProps = {
-    row: RequirementsTableRow;
-    toggleCreatorBreakdown: (itemName: string) => void;
-};
+type CreatorRowProps = {
+    row: SingleCreatorRequirementsTableRow;
+} & Pick<RequirementsRowProps, "toggleBreakdown">;
 
-function SingleCreatorRow({ row }: { row: SingleCreatorRequirementsTableRow }) {
-    return (
-        <tr>
-            <TextColumnCell>{row.name}</TextColumnCell>
-            <TextColumnCell>{row.creator}</TextColumnCell>
-            <NumberColumnCell>{roundOutput(row.amount)}</NumberColumnCell>
-            <NumberColumnCell>{Math.ceil(row.workers)}</NumberColumnCell>
-        </tr>
-    );
-}
+function CreatorRow({ row, toggleBreakdown }: CreatorRowProps) {
+    const expansionProperties =
+        row.demands.length > 0
+            ? {
+                  isExpanded: row.isExpanded,
+                  expandLabel: "Expand demand breakdown",
+                  collapseLabel: "Collapse demand breakdown",
+                  toggleExpansion: () => toggleBreakdown(row.key),
+              }
+            : {};
 
-type MultipleCreatorProps = Pick<
-    RequirementsRowProps,
-    "toggleCreatorBreakdown"
-> & {
-    row: MultipleCreatorRequirementsTableRow;
-};
-
-function MultipleCreatorRow({
-    row,
-    toggleCreatorBreakdown,
-}: MultipleCreatorProps) {
     return (
         <>
-            <tr>
-                <TextColumnCell>
-                    <ExpandRowIconContainer
-                        role="button"
-                        aria-label={
-                            row.isExpanded
-                                ? "Collapse creator breakdown"
-                                : "Expand creator breakdown"
-                        }
-                        tabIndex={0}
-                        onClick={() => toggleCreatorBreakdown(row.name)}
-                    >
-                        <ExpandRowIcon
-                            icon={faChevronDown}
-                            expanded={row.isExpanded}
-                        />
-                    </ExpandRowIconContainer>
-
-                    {row.name}
-                </TextColumnCell>
-                <TextColumnCell>
-                    {isSingleCreatorRow(row) ? row.creator : ""}
-                </TextColumnCell>
-                <NumberColumnCell>{roundOutput(row.amount)}</NumberColumnCell>
-                <NumberColumnCell>{Math.ceil(row.workers)}</NumberColumnCell>
-            </tr>
+            <Row row={row} {...expansionProperties} />
             {row.isExpanded
-                ? row.creatorBreakdownRows.map((breakdown) => (
-                      <CreatorBreakdownRow
-                          key={`${row.name}-${breakdown.creator}`}
-                      >
-                          <TextColumnCell></TextColumnCell>
-                          <TextColumnCell>{breakdown.creator}</TextColumnCell>
-                          <NumberColumnCell>
-                              {roundOutput(breakdown.amount)}
-                          </NumberColumnCell>
-                          <NumberColumnCell>
-                              {Math.ceil(breakdown.workers)}
-                          </NumberColumnCell>
-                      </CreatorBreakdownRow>
+                ? row.demands.map(({ key, name, amount }) => (
+                      <BreakdownRow
+                          key={key}
+                          row={{ demandName: name, amount }}
+                      />
                   ))
                 : null}
         </>
     );
 }
 
-function RequirementRow({ row, toggleCreatorBreakdown }: RequirementsRowProps) {
-    return isSingleCreatorRow(row) ? (
-        <SingleCreatorRow row={row} />
-    ) : (
-        <MultipleCreatorRow
-            row={row}
-            toggleCreatorBreakdown={toggleCreatorBreakdown}
-        />
+type MultipleCreatorProps = Pick<RequirementsRowProps, "toggleBreakdown"> & {
+    row: MultipleCreatorRequirementsTableRow;
+};
+
+function MultipleCreatorRow({ row, toggleBreakdown }: MultipleCreatorProps) {
+    return (
+        <>
+            <Row
+                row={row}
+                isExpanded={row.isExpanded}
+                expandLabel="Expand creator breakdown"
+                collapseLabel="Collapse creator breakdown"
+                toggleExpansion={() => toggleBreakdown(row.key)}
+            />
+            {row.isExpanded
+                ? row.creatorBreakdownRows.map((breakdown) => (
+                      <CreatorBreakdownRow
+                          key={breakdown.key}
+                          row={breakdown}
+                          toggleBreakdown={toggleBreakdown}
+                      />
+                  ))
+                : null}
+        </>
     );
+}
+
+export type RequirementsRowProps = {
+    row: RequirementsTableRow;
+    toggleBreakdown: (key: string) => void;
+};
+
+function RequirementRow({ row, toggleBreakdown }: RequirementsRowProps) {
+    switch (row.type) {
+        case RowType.SingleCreator:
+            return <CreatorRow row={row} toggleBreakdown={toggleBreakdown} />;
+        default:
+            return (
+                <MultipleCreatorRow
+                    row={row}
+                    toggleBreakdown={toggleBreakdown}
+                />
+            );
+    }
 }
 
 export { RequirementRow };

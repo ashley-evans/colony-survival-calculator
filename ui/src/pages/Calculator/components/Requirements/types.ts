@@ -1,30 +1,54 @@
+import { GetItemRequirementsQuery } from "../../../../graphql/__generated__/graphql";
+
+export type Requirements = GetItemRequirementsQuery["requirement"];
+
+export enum RowType {
+    SingleCreator = "SingleCreator",
+    MultipleCreator = "MultipleCreator",
+    CreatorBreakdown = "CreatorBreakdown",
+    Demand = "Demand",
+}
+
 export type SortableFields = {
     amount: number;
     workers: number;
 };
 
-export type SingleCreatorRequirementsTableRow = SortableFields & {
+export type NonSortableFields = {
+    key: string;
     name: string;
     creator: string;
+    demandName: string;
 };
+
+export type TableFields = SortableFields & NonSortableFields;
+
+export type DemandTableRow = Pick<TableFields, "name" | "amount" | "key"> & {
+    type: RowType.Demand;
+};
+
+export type SingleCreatorRequirementsTableRow = Omit<
+    TableFields,
+    "demandName"
+> & {
+    isExpanded: boolean;
+    demands: DemandTableRow[];
+    type: RowType.SingleCreator;
+};
+
+export type CreatorBreakdownTableRow = Omit<
+    SingleCreatorRequirementsTableRow,
+    "name" | "type"
+> & { type: RowType.CreatorBreakdown };
 
 export type MultipleCreatorRequirementsTableRow = Omit<
     SingleCreatorRequirementsTableRow,
-    "creator"
+    "creator" | "type" | "demands"
 > & {
-    isExpanded: boolean;
-    creatorBreakdownRows: Omit<SingleCreatorRequirementsTableRow, "name">[];
+    creatorBreakdownRows: CreatorBreakdownTableRow[];
+    type: RowType.MultipleCreator;
 };
 
 export type RequirementsTableRow =
     | SingleCreatorRequirementsTableRow
     | MultipleCreatorRequirementsTableRow;
-
-function isSingleCreatorRow(
-    row: RequirementsTableRow
-): row is SingleCreatorRequirementsTableRow {
-    const casted = row as SingleCreatorRequirementsTableRow;
-    return casted.creator !== undefined;
-}
-
-export { isSingleCreatorRow };

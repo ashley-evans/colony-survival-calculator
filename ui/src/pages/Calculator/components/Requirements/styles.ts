@@ -3,6 +3,7 @@ import {
     FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
+import { Row } from "./Row";
 
 export const TableContainer = styled.div`
     width: 100%;
@@ -80,15 +81,15 @@ export const ExpandRowIconContainer = styled.span`
 `;
 
 interface ExpandRowIconProps extends FontAwesomeIconProps {
-    expanded: boolean;
+    $expanded: boolean;
 }
 
 export const ExpandRowIcon = styled(FontAwesomeIcon)<ExpandRowIconProps>`
     transition: all 0.2s ease-in;
     transform: rotate(-90deg);
 
-    ${({ expanded }) => {
-        if (expanded) {
+    ${({ $expanded }) => {
+        if ($expanded) {
             return css`
                 transform: rotate(0deg);
             `;
@@ -97,5 +98,9 @@ export const ExpandRowIcon = styled(FontAwesomeIcon)<ExpandRowIconProps>`
 `;
 
 export const CreatorBreakdownRow = styled.tr`
+    background-color: ${(props) => props.theme.color.tertiary.on_main};
+`;
+
+export const BreakdownRow = styled(Row)`
     background-color: ${(props) => props.theme.color.tertiary.on_main};
 `;
