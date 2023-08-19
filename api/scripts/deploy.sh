@@ -58,26 +58,21 @@ echo "Switching to environment: $environment"
 terraform -chdir="$infra_dir" workspace select $environment
 
 echo "Building API..."
-npm --prefix $script_parent_dir run build:clean
+yarn --cwd $script_parent_dir run build:clean
 
 echo "Copying package definitions and post-build scripts..."
 folder_diff=$(( $(echo "$src_dir" | tr -cd '/' | wc -c) + 1 ))
-$script_parent_dir/node_modules/.bin/copyfiles -E -u $folder_diff \
-    -e "$src_dir/**/node_modules/**" \
+yarn copyfiles -E -F -u $folder_diff \
+    "$src_dir/**/node_modules/**" \
     "$src_dir/**/package*.json" \
     "$src_dir/**/post-build.sh" \
     $dist_dir
-cp $script_parent_dir/package.json $dist_dir/package.json
-
-echo "Installing dependencies..."
-cp $script_parent_dir/lerna.dist.json $dist_dir/lerna.json
-cd $dist_dir && npx lerna bootstrap --ci -- --production
 
 echo "Bundle code for deployment..."
-cd $dist_dir && npx lerna exec --scope="@colony-survival-calculator/*-function" -- $script_parent_dir/node_modules/.bin/esbuild handler.js --bundle --platform=node --target=$runtime --outfile=dist/index.js
+find $dist_dir -type f -name "handler.js" -exec sh -c 'yarn esbuild "$0" --bundle --platform=node --target=$runtime --outfile="$(dirname "$0")/dist/index.js"' {} \;
 
 echo "Run post-build scripts..."
-cd $dist_dir && npx lerna exec --scope="@colony-survival-calculator/*-function" -- bash -c 'cd . && test -f post-build.sh && ./post-build.sh || true'
+find $dist_dir -type f -name "handler.js" -exec sh -c 'cd "$(dirname $0)" && test -f post-build.sh && ./post-build.sh || true' {} \;
 
 if [ $dryrun ]; then
     echo "Dry run deployment of API for environment: $environment..."
