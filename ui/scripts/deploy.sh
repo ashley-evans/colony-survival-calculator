@@ -68,7 +68,7 @@ else
     rm -rf $dist_dir
 
     echo "Building UI..."
-    npm --prefix $script_parent_dir run build
+    yarn --cwd $script_parent_dir run build
 
     bucket=$(terraform -chdir="$infra_dir" output -raw static_file_bucket_name)
     
