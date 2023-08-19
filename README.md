@@ -31,7 +31,7 @@ chmod u+x $(find . -type f -name "*.sh" | egrep -v "(/node_modules/|/\.husky/)")
 The project uses Lerna to run tasks against packages inside the repository. Running the following command will install all required dependencies for all packages:
 
 ```sh
-npm run ci
+yarn ci
 ```
 
 ### Deploying infrastructure
@@ -39,7 +39,7 @@ npm run ci
 Run the following command to setup the UI infrastructure for development:
 
 ```sh
-npx lerna run deploy -- -e dev
+yarn lerna run deploy -- -e dev
 ```
 
 ### Tearing down infrastructure
@@ -47,5 +47,5 @@ npx lerna run deploy -- -e dev
 Run the following command to remove any deployed UI infrastructure for development:
 
 ```sh
-npx lerna run deploy -- -e dev -t
+yarn lerna run deploy -- -e dev -t
 ```
