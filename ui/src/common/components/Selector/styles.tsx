@@ -44,6 +44,7 @@ export const Menu = styled.div<MenuProps>`
     ${({ theme, isOpen, palette }) => css`
         color: ${theme.color[palette].on_container};
         background-color: ${theme.color[palette].container};
+        border: 2px solid ${theme.color[palette].outline};
         display: ${!isOpen ? "none" : "inline-block"};
     `};
 
@@ -56,7 +57,7 @@ export const Menu = styled.div<MenuProps>`
     border-radius: 0.25rem;
     list-style-type: none;
     cursor: pointer;
-    max-height: 9rem;
+    max-height: 12rem;
     overflow-y: auto;
 `;
 
@@ -64,6 +65,10 @@ export const Item = styled.li<CommonProps>`
     ${({ theme, palette }) => css`
         :hover {
             background-color: ${theme.color[palette].outline};
+        }
+
+        :not(:first-child) {
+            border-top: 2px solid ${theme.color[palette].outline};
         }
     `};
 
