@@ -18,15 +18,18 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Run formatters
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -48,15 +51,18 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Run linters
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -79,18 +85,21 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Lint Commits
               run: |
-                  npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+                  yarn commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
     validate:
         runs-on: ubuntu-latest
         permissions:
@@ -110,15 +119,18 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Run validators
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -140,15 +152,18 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Build Project
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -170,15 +185,18 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Run Unit Tests
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -210,15 +228,18 @@ jobs:
             - uses: hashicorp/setup-terraform@v2
               with:
                   terraform_version: 1.3.7
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Run dry run deployment
               env:
                   TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}
@@ -248,17 +269,20 @@ jobs:
             - uses: actions/setup-node@v3
               with:
                   node-version: "18.12.1"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v3
               with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/package-lock.json') }}
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  npm run ci
+                  yarn install
             - name: Create Tags
               env:
                   GITHUB_TOKEN: ${{ secrets.TAG_TOKEN }}
               run: |
-                  npx semantic-release
+                  yarn semantic-release

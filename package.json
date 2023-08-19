@@ -2,16 +2,25 @@
     "name": "@colony-survival-calculator/root",
     "private": true,
     "version": "0.0.0",
+    "packageManager": "yarn@3.6.1",
+    "workspaces": {
+        "packages": [
+            ".",
+            "ui",
+            "api",
+            "api/src/**"
+        ]
+    },
     "scripts": {
         "cm": "cz",
         "cz": "cz",
-        "i": "npx lerna@^6.6.1 bootstrap --no-ci",
-        "ci": "npx lerna@^6.6.1 bootstrap --ci",
+        "i": "yarn install",
+        "ci": "yarn install --immutable",
         "clean": "rm -rf `find . -type d -name node_modules`",
         "lint": "npmPkgJsonLint .",
         "validate": "./scripts/validate-terraform.sh -r ./infra/",
-        "format:check": "npx prettier --check . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
-        "format:write": "npx prettier --write . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
+        "format:check": "prettier --check . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
+        "format:write": "prettier --write . '!(api|ui)/**/*' && terraform fmt -recursive ./infra/",
         "prepare": "husky install"
     },
     "devDependencies": {
@@ -25,7 +34,7 @@
         "eslint": "^8.37.0",
         "eslint-config-prettier": "^8.8.0",
         "husky": "^8.0.3",
-        "lerna": "^6.6.1",
+        "lerna": "^7.1.5",
         "npm-package-json-lint": "^6.4.0",
         "prettier": "^2.8.7",
         "semantic-release": "^21.0.1",

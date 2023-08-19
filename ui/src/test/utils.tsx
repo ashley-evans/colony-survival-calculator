@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { render, within } from "@testing-library/react";
-import { act, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider } from "styled-components";
 
@@ -77,9 +77,7 @@ async function clickButton({
     const container = inside ? within(inside) : screen;
     const button = await container.findByRole("button", { name: label });
 
-    await act(async () => {
-        await user.click(button);
-    });
+    await user.click(button);
 }
 
 async function typeValue({
@@ -94,9 +92,7 @@ async function typeValue({
         selector: "input",
     });
 
-    await act(async () => {
-        await user.type(input, value);
-    });
+    await user.type(input, value);
 }
 
 async function clearInput({ label }: { label: string }): Promise<void> {
@@ -105,18 +101,14 @@ async function clearInput({ label }: { label: string }): Promise<void> {
         selector: "input",
     });
 
-    await act(async () => {
-        await user.clear(input);
-    });
+    await user.clear(input);
 }
 
 async function openSelectMenu({ label }: { label: string }) {
     const user = userEvent.setup();
     const select = await screen.findByRole("combobox", { name: label });
 
-    await act(async () => {
-        await user.click(select);
-    });
+    await user.click(select);
 }
 
 async function selectOption({
@@ -132,9 +124,7 @@ async function selectOption({
 
     const user = userEvent.setup();
     const option = await screen.findByRole("option", { name: optionName });
-    await act(async () => {
-        await user.click(option);
-    });
+    await user.click(option);
 }
 
 export {

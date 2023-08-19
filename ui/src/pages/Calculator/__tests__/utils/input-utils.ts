@@ -1,4 +1,4 @@
-import { ByRoleMatcher, act, screen } from "@testing-library/react";
+import { ByRoleMatcher, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import {
@@ -25,15 +25,13 @@ async function selectItemAndWorkers({
         selector: "input",
     });
 
-    await act(async () => {
-        if (clear) {
-            await user.clear(workerInput);
-        }
+    if (clear) {
+        await user.clear(workerInput);
+    }
 
-        if (workers) {
-            await user.type(workerInput, workers.toString());
-        }
-    });
+    if (workers) {
+        await user.type(workerInput, workers.toString());
+    }
 
     if (itemName) {
         await selectOption({
@@ -61,7 +59,7 @@ async function clickByName(name: string, matcher: ByRoleMatcher) {
     const user = userEvent.setup();
     const tab = await screen.findByRole(matcher, { name });
 
-    await act(() => user.click(tab));
+    await user.click(tab);
 }
 
 export { clickByName, selectItemAndWorkers, selectOutputUnit, selectTool };

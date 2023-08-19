@@ -1,5 +1,5 @@
 import React from "react";
-import { act, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
 
@@ -626,7 +626,7 @@ describe("given items w/ multiple creators returned", () => {
                         name: expectedItemSelectOverrideLabel,
                     }
                 );
-                await act(() => user.click(itemOverrideSelects[index]));
+                await user.click(itemOverrideSelects[index]);
 
                 expect(
                     screen.queryByRole("option", {
@@ -645,7 +645,7 @@ describe("given items w/ multiple creators returned", () => {
             const removeButtons = await screen.findAllByRole("button", {
                 name: expectedRemoveCreatorOverrideButtonText,
             });
-            await act(() => user.click(removeButtons[0]));
+            await user.click(removeButtons[0]);
             await openSelectMenu({
                 label: expectedItemSelectOverrideLabel,
             });
@@ -885,16 +885,16 @@ describe("given items w/ multiple creators returned", () => {
                 "combobox",
                 { name: expectedCreatorSelectOverrideLabel }
             );
-            await act(() => user.click(creatorOverrideSelects[0]));
+            await user.click(creatorOverrideSelects[0]);
             const firstItemCreatorOption = await screen.findByRole("option", {
                 name: expectedFirstItemOverrides[1].creator,
             });
-            await act(() => user.click(firstItemCreatorOption));
-            await act(() => user.click(creatorOverrideSelects[1]));
+            await user.click(firstItemCreatorOption);
+            await user.click(creatorOverrideSelects[1]);
             const secondItemCreatorOption = await screen.findByRole("option", {
                 name: expectedSecondItemOverrides[1].creator,
             });
-            await act(() => user.click(secondItemCreatorOption));
+            await user.click(secondItemCreatorOption);
             await clickByName(expectedCalculatorTab, "tab");
             await selectItemAndWorkers({
                 itemName: expectedItem,
