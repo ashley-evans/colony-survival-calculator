@@ -4,6 +4,4 @@
 
 set -e
 
-yarn lerna run lint --since=origin/master
-yarn lerna run format:check --since=origin/master
-yarn lerna run validate --since=origin/master
+yarn lerna run lint,format:check,validate --since=origin/master
