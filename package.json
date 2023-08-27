@@ -8,7 +8,8 @@
             ".",
             "ui",
             "api",
-            "api/src/**"
+            "api/src/**",
+            "scripts/**"
         ]
     },
     "scripts": {

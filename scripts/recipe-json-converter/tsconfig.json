@@ -1,0 +1,4 @@
+{
+    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node18/tsconfig"],
+    "exclude": ["jest.config.js"]
+}
