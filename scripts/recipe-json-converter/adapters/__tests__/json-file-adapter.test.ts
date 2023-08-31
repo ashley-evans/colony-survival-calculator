@@ -3,6 +3,7 @@ import fs from "fs";
 import { JSONSchemaType } from "ajv";
 
 import { factory } from "../json-file-adapter";
+import { createDirectory, writeJSONToFile } from "./utils";
 
 type TestType = {
     name: string;
@@ -20,16 +21,6 @@ const testSchema: JSONSchemaType<TestType> = {
 const adapter = factory(testSchema);
 
 const tempDirectory = path.join(__dirname, "./temp");
-
-const createDirectory = (directoryPath: string) => {
-    if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath);
-    }
-};
-
-const writeJSONToFile = (path: string, content: unknown) => {
-    fs.writeFileSync(path, JSON.stringify(content));
-};
 
 beforeAll(() => {
     createDirectory(tempDirectory);
