@@ -4,6 +4,8 @@ import { JSONSchemaType } from "ajv";
 
 import { factory } from "../json-file-adapter";
 import { createDirectory, writeJSONToFile } from "./utils";
+import { Tools, Toolsets } from "../../types";
+import toolsSchema from "../../schemas/tools.json";
 
 type TestType = {
     name: string;
@@ -64,6 +66,17 @@ test("throws an error if the JSON inside the file does not match the provided sc
 test("returns the validated JSON object if JSON matches provided schema", async () => {
     const validJSONFile = path.join(tempDirectory, "valid-json.json");
     const expected: TestType = { name: "test name" };
+    writeJSONToFile(validJSONFile, expected);
+
+    const actual = await adapter(validJSONFile);
+
+    expect(actual).toEqual(expected);
+});
+
+test("returns the validated JSON object if JSON matches provided schema that includes custom tsEnumNames keyword", async () => {
+    const validJSONFile = path.join(tempDirectory, "valid-json.json");
+    const adapter = factory(toolsSchema);
+    const expected: Toolsets = [{ key: "test", usable: [Tools.notools] }];
     writeJSONToFile(validJSONFile, expected);
 
     const actual = await adapter(validJSONFile);

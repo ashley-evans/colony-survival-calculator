@@ -14,6 +14,7 @@ const checkFileExists = async (filePath: string): Promise<boolean> => {
 
 const factory = <T>(schema: Schema): JSONFileReader<T> => {
     const ajv = new Ajv();
+    ajv.addKeyword("tsEnumNames");
     const validate = ajv.compile<T>(schema);
 
     return async (filePath: string): Promise<T> => {
