@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 
-import { findFiles } from "../fs-file-prefix-adapter";
+import { findFiles } from "../fs-file-adapter";
 import { createDirectory, emptyDirectory } from "./utils";
 
 const tempDirectory = path.join(__dirname, "./temp");
@@ -51,12 +51,14 @@ describe("valid root path handling", () => {
             ["test.txt"],
             undefined,
             undefined,
+            undefined,
         ],
         [
             "all files (no extension filter)",
             "multiple files stored",
             ["test-1.txt", "test-2.txt"],
             ["test-1.txt", "test-2.txt"],
+            undefined,
             undefined,
             undefined,
         ],
@@ -67,6 +69,7 @@ describe("valid root path handling", () => {
             ["test-2.json"],
             ".json",
             undefined,
+            undefined,
         ],
         [
             "matching files with test- prefix",
@@ -75,6 +78,7 @@ describe("valid root path handling", () => {
             ["test-1.txt"],
             undefined,
             "test-",
+            undefined,
         ],
         [
             "matching files with test- prefix and .json extension",
@@ -83,6 +87,16 @@ describe("valid root path handling", () => {
             ["test-1.txt"],
             ".txt",
             "test-",
+            undefined,
+        ],
+        [
+            "exact file with given name",
+            "multiple different files",
+            ["test-1.txt", "test-2.txt"],
+            ["test-2.txt"],
+            ".txt",
+            undefined,
+            "test-2",
         ],
     ])(
         "returns absolute paths for %s given %s",
@@ -92,7 +106,8 @@ describe("valid root path handling", () => {
             files: string[],
             expected: string[],
             extension?: string,
-            prefix?: string
+            prefix?: string,
+            exact?: string
         ) => {
             for (const file of files) {
                 const filePath = path.join(tempDirectory, file);
@@ -103,6 +118,7 @@ describe("valid root path handling", () => {
                 root: tempDirectory,
                 fileExtension: extension,
                 prefix,
+                exact,
             });
 
             expect(actual).toHaveLength(expected.length);
