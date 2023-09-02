@@ -17,7 +17,7 @@
                     "required": ["type"]
                 }
             },
-            "result": {
+            "results": {
                 "type": "array",
                 "items": {
                     "type": "object",
@@ -26,11 +26,11 @@
                         "amount": { "type": "number" },
                         "isOptional": { "type": "boolean" },
                         "chance": { "type": "number" }
-                    }
-                },
-                "required": ["type"]
+                    },
+                    "required": ["type"]
+                }
             }
         },
-        "required": ["cooldown", "name", "requires", "result"]
+        "required": ["cooldown", "name", "requires", "results"]
     }
 }

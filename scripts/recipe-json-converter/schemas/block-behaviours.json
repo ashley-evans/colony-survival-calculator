@@ -10,16 +10,20 @@
                     "attachBehaviour": {
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "properties": {
-                                "npcType": { "type": "string" },
-                                "toolset": { "type": "string" }
-                            }
+                            "anyOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "npcType": { "type": "string" },
+                                        "toolset": { "type": "string" }
+                                    }
+                                },
+                                { "type": "string" }
+                            ]
                         }
                     }
                 }
             }
-        },
-        "required": ["baseType"]
+        }
     }
 }
