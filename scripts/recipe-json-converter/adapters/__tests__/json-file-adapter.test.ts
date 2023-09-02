@@ -73,6 +73,22 @@ test("returns the validated JSON object if JSON matches provided schema", async 
     expect(actual).toEqual(expected);
 });
 
+test("returns the validated JSON object if JSON matches provided schema but includes comments", async () => {
+    const validJSONFile = path.join(tempDirectory, "valid-json.json");
+    const expected: TestType = { name: "test name" };
+    const jsonWithComments = `
+    {
+        /* I am a comment */
+        "name": "test name" // I am another comment
+    }
+    `;
+    fs.writeFileSync(validJSONFile, jsonWithComments);
+
+    const actual = await adapter(validJSONFile);
+
+    expect(actual).toEqual(expected);
+});
+
 test("returns the validated JSON object if JSON matches provided schema that includes custom tsEnumNames keyword", async () => {
     const validJSONFile = path.join(tempDirectory, "valid-json.json");
     const adapter = factory(toolsSchema);

@@ -3131,10 +3131,13 @@ __metadata:
     "@tsconfig/node18": ^18.2.1
     "@tsconfig/strictest": ^2.0.1
     "@types/jest": ^29.5.4
+    "@types/jest-when": ^3.5.2
     "@types/yargs": ^17.0.24
     ajv: 8.12.0
     jest: ^29.6.4
+    jest-when: ^3.6.0
     json-schema-to-typescript: ^13.1.1
+    strip-json-comments: 3.1.1
     ts-jest: ^29.1.1
     tsx: ^3.12.7
     yargs: 17.7.2
@@ -6868,6 +6871,15 @@ __metadata:
   dependencies:
     "@types/istanbul-lib-report": "*"
   checksum: f1ad54bc68f37f60b30c7915886b92f86b847033e597f9b34f2415acdbe5ed742fa559a0a40050d74cdba3b6a63c342cac1f3a64dba5b68b66a6941f4abd7903
+  languageName: node
+  linkType: hard
+
+"@types/jest-when@npm:^3.5.2":
+  version: 3.5.2
+  resolution: "@types/jest-when@npm:3.5.2"
+  dependencies:
+    "@types/jest": "*"
+  checksum: 106230dd71ee266bbd7620ab339a7305054e56ba7638f0eff9f222e67a959df0ad68a7f0108156c50f7005881bae59cd5c38b3760c101d060cdb3dac9cd77ee2
   languageName: node
   linkType: hard
 
@@ -13575,6 +13587,15 @@ __metadata:
     jest-util: ^29.6.3
     string-length: ^4.0.1
   checksum: 13c0f96f7e9212e4f3ef2daf3e787045bdcec414061bf286eca934c7f4083fb04d38df9ced9c0edfbe15f3521ca581eb2ed6108c338a0db1f3e1def65687992f
+  languageName: node
+  linkType: hard
+
+"jest-when@npm:^3.6.0":
+  version: 3.6.0
+  resolution: "jest-when@npm:3.6.0"
+  peerDependencies:
+    jest: ">= 25"
+  checksum: ed32ed84e5802bb6fec98966cdf862ce59677551be33d3795e6ac7a6207acf467ed559573d671c8d94c59f7fc0780cf358d2d165d81cdc7d9611250d975ee024
   languageName: node
   linkType: hard
 
