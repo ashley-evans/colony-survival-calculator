@@ -20,4 +20,9 @@ const emptyDirectory = (directoryPath: string) => {
     }
 };
 
-export { createDirectory, writeJSONToFile, emptyDirectory };
+const readJSONFile = (path: string) => {
+    const content = fs.readFileSync(path, "utf-8");
+    return JSON.parse(content);
+};
+
+export { createDirectory, writeJSONToFile, emptyDirectory, readJSONFile };
