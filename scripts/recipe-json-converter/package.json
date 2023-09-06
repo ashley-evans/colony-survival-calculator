@@ -10,7 +10,7 @@
         "format:check": "run -T prettier --check .",
         "format:write": "run -T prettier --write .",
         "lint": "run -T eslint --max-warnings 0 .",
-        "generate": "json2ts -i 'schemas/*.json' -o types/generated/",
+        "generate": "./generate-types.sh",
         "postinstall": "yarn generate"
     },
     "devDependencies": {
@@ -23,7 +23,7 @@
         "jest-when": "^3.6.0",
         "json-schema-to-typescript": "^13.1.1",
         "ts-jest": "^29.1.1",
-        "tsx": "^3.12.7"
+        "tsx": "^3.12.8"
     },
     "dependencies": {
         "ajv": "8.12.0",

@@ -3,11 +3,21 @@ import { when } from "jest-when";
 
 import { RecipeConverterInputs } from "../../interfaces/recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../recipe-converter";
+import {
+    BlockBehaviours,
+    Recipes,
+    PiplizTools,
+    PiplizToolsets,
+    Item,
+    APITools,
+} from "../../types";
+import { Items } from "../../types/generated/items";
 
 const mockFindFiles = jest.fn();
 const mockReadToolFile = jest.fn();
 const mockReadBehaviourFile = jest.fn();
 const mockReadRecipeFile = jest.fn();
+const mockWriteJSON = jest.fn();
 
 const convertRecipes = (input: RecipeConverterInputs) =>
     baseConvertRecipes({
@@ -16,6 +26,7 @@ const convertRecipes = (input: RecipeConverterInputs) =>
         readToolsFile: mockReadToolFile,
         readBehavioursFile: mockReadBehaviourFile,
         readRecipeFile: mockReadRecipeFile,
+        writeJSON: mockWriteJSON,
     });
 
 const input: RecipeConverterInputs = {
@@ -49,6 +60,34 @@ const expectedRecipesFileFindInput = {
     fileExtension: ".json",
 };
 
+const noToolset: PiplizToolsets[number] = {
+    key: "notool",
+    usable: [PiplizTools.notools],
+};
+const defaultToolset: PiplizToolsets[number] = {
+    key: "default",
+    usable: [
+        PiplizTools.notools,
+        PiplizTools.stonetools,
+        PiplizTools.coppertools,
+        PiplizTools.irontools,
+        PiplizTools.bronzetools,
+        PiplizTools.steeltools,
+    ],
+};
+const glassesToolset: PiplizToolsets[number] = {
+    key: "glasses",
+    usable: [PiplizTools.notools, PiplizTools.eyeglasses],
+};
+const machineToolset: PiplizToolsets[number] = {
+    key: "machinetools",
+    usable: [PiplizTools.machinetools],
+};
+
+const consoleLogSpy = jest
+    .spyOn(console, "log")
+    .mockImplementation(() => undefined);
+
 beforeEach(() => {
     when(mockFindFiles)
         .calledWith(expectedToolsetFileFindInput)
@@ -59,6 +98,15 @@ beforeEach(() => {
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
         .mockResolvedValue(recipeFiles);
+
+    mockReadToolFile.mockResolvedValue([
+        noToolset,
+        defaultToolset,
+        glassesToolset,
+        machineToolset,
+    ]);
+    mockReadRecipeFile.mockResolvedValue([]);
+    mockReadBehaviourFile.mockResolvedValue([]);
 });
 
 test("finds the toolset json file in the provided input directory", async () => {
@@ -117,6 +165,16 @@ describe.each([
                 expectedRecipesFileFindInput
             );
         });
+
+        test("does not write any json", async () => {
+            try {
+                await convertRecipes(input);
+            } catch {
+                // Expected
+            }
+
+            expect(mockWriteJSON).not.toHaveBeenCalled();
+        });
     }
 );
 
@@ -171,6 +229,16 @@ describe.each([
                 expectedRecipesFileFindInput
             );
         });
+
+        test("does not write any json", async () => {
+            try {
+                await convertRecipes(input);
+            } catch {
+                // Expected
+            }
+
+            expect(mockWriteJSON).not.toHaveBeenCalled();
+        });
     }
 );
 
@@ -221,4 +289,522 @@ test("does not attempt to parse any recipes given no recipe files found in provi
     await convertRecipes(input);
 
     expect(mockReadRecipeFile).not.toHaveBeenCalled();
+});
+
+describe("recipe to item mapping", () => {
+    beforeEach(() => {
+        when(mockFindFiles)
+            .calledWith(expectedRecipesFileFindInput)
+            .mockResolvedValue([recipeFiles[0]]);
+    });
+
+    test.each([
+        ["default", undefined, 1],
+        ["specified", 2, 2],
+    ])(
+        "writes converted recipe to file given a single recipe with no toolset and no requirements and %s output",
+        async (
+            _: string,
+            specifiedOutput: number | undefined,
+            expectedOutput: number
+        ) => {
+            const creator = "alchemist";
+            const output = "poisondart";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: output,
+                            ...(specifiedOutput
+                                ? { amount: specifiedOutput }
+                                : {}),
+                        },
+                    ],
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: noToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: expectedOutput,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        }
+    );
+
+    test("throws an error if cannot find a toolset for provided creator", async () => {
+        const invalidToolset = "magictools";
+        const output = "poisondart";
+        const creator = "alchemist";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [
+                    {
+                        type: output,
+                    },
+                ],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: invalidToolset,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            `Unknown toolset: ${invalidToolset} required by ${creator}`
+        );
+    });
+
+    test.each([
+        ["no outputs", []],
+        ["missing primary output", [{ type: "another item" }]],
+    ])(
+        "throws an error if recipe has no outputs",
+        async (_: string, results: Recipes[number]["results"]) => {
+            const creator = "alchemist";
+            const output = "poisondart";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [],
+                    results,
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: noToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+            expect.assertions(1);
+            await expect(convertRecipes(input)).rejects.toThrowError(
+                `Unable to find primary output for recipe: ${output} from creator: ${creator}`
+            );
+        }
+    );
+
+    test("throws an error if provided an item with an unknown name", async () => {
+        const creator = "alchemist";
+        const output = "unknown item";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [{ type: output }],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            `User friendly name unavailable for item: ${output}`
+        );
+    });
+
+    test("throws an error if provided an item with an unknown creator", async () => {
+        const creator = "unknown creator";
+        const output = "poisondart";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [{ type: output }],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            `User friendly name unavailable for creator: ${creator}`
+        );
+    });
+
+    test.each([
+        ["default", undefined, 1],
+        ["specified", 2, 2],
+    ])(
+        "writes converted recipe to file given a single recipe with no toolset and no requirements and %s optional output amount",
+        async (
+            _: string,
+            specifiedOutput: number | undefined,
+            expectedOutput: number
+        ) => {
+            const creator = "alchemist";
+            const primaryOutput = "poisondart";
+            const optionalOutput = "gunpowder";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${primaryOutput}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: primaryOutput,
+                        },
+                        {
+                            type: optionalOutput,
+                            isOptional: true,
+                            chance: 0.5,
+                            ...(specifiedOutput
+                                ? { amount: specifiedOutput }
+                                : {}),
+                        },
+                    ],
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: noToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+                optionalOutputs: [
+                    {
+                        name: "Gunpowder",
+                        amount: expectedOutput,
+                        likelihood: 0.5,
+                    },
+                ],
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        }
+    );
+
+    test.each([
+        ["default", undefined, 1],
+        ["specified", 0.5, 0.5],
+    ])(
+        "writes converted recipe to file given a single recipe with no toolset and no requirements and %s optional output likelihood",
+        async (
+            _: string,
+            specifiedLikelihood: number | undefined,
+            expectedLikelihood: number
+        ) => {
+            const creator = "alchemist";
+            const primaryOutput = "poisondart";
+            const optionalOutput = "gunpowder";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${primaryOutput}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: primaryOutput,
+                        },
+                        {
+                            type: optionalOutput,
+                            isOptional: true,
+                            ...(specifiedLikelihood
+                                ? { chance: specifiedLikelihood }
+                                : {}),
+                        },
+                    ],
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: noToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+                optionalOutputs: [
+                    {
+                        name: "Gunpowder",
+                        amount: 1,
+                        likelihood: expectedLikelihood,
+                    },
+                ],
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        }
+    );
+
+    test("throws an error if provided an optional output with an unknown name", async () => {
+        const creator = "alchemist";
+        const output = "poisondart";
+        const optionalOutput = "unknown optional output";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [
+                    { type: output },
+                    { type: optionalOutput, amount: 1 },
+                ],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            `User friendly name unavailable for item: ${optionalOutput}`
+        );
+    });
+
+    describe.each([PiplizTools.machinetools, PiplizTools.eyeglasses])(
+        "handles unknown toolset: %s",
+        (tools: PiplizTools) => {
+            const toolset: PiplizToolsets[number] = {
+                key: tools,
+                usable: [tools],
+            };
+            const creator = "alchemist";
+            const output = "poisondart";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: output,
+                        },
+                    ],
+                },
+            ];
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: tools,
+                            },
+                        ],
+                    },
+                },
+            ];
+
+            beforeEach(() => {
+                mockReadToolFile.mockResolvedValue([toolset]);
+                mockReadRecipeFile.mockResolvedValue(recipes);
+                mockReadBehaviourFile.mockResolvedValue(behaviours);
+            });
+
+            test("does not convert any item that has unknown toolset", async () => {
+                await convertRecipes(input);
+
+                expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+                expect(mockWriteJSON).toHaveBeenCalledWith(
+                    input.outputFilePath,
+                    []
+                );
+            });
+
+            test("logs skipped item to console", async () => {
+                await convertRecipes(input);
+
+                expect(consoleLogSpy).toHaveBeenCalledWith(
+                    `Skipping recipe: ${output} from creator: ${creator} as requires unsupported toolset`
+                );
+            });
+        }
+    );
+
+    test("converts multiple valid recipes", async () => {
+        const firstRecipeOutput = "poisondart";
+        const secondRecipeOutput = "gunpowder";
+        const creator = "alchemist";
+        const recipes: Recipes = [
+            {
+                cooldown: 15,
+                name: `pipliz.${creator}.${firstRecipeOutput}`,
+                requires: [],
+                results: [
+                    {
+                        type: firstRecipeOutput,
+                    },
+                ],
+            },
+            {
+                cooldown: 25,
+                name: `pipliz.${creator}.${secondRecipeOutput}`,
+                requires: [],
+                results: [
+                    {
+                        type: secondRecipeOutput,
+                    },
+                ],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+        const expected: Items = [
+            {
+                name: "Poison dart",
+                createTime: 15,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+            },
+            {
+                name: "Gunpowder",
+                createTime: 25,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+            },
+        ];
+
+        await convertRecipes(input);
+
+        expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+        expect(mockWriteJSON).toHaveBeenCalledWith(
+            input.outputFilePath,
+            expected
+        );
+    });
 });

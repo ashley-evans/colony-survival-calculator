@@ -1,7 +1,26 @@
 import { FileFinder } from "../interfaces/file-finder";
 import { JSONFileReader } from "../interfaces/json-file-reader";
 import { RecipeConverter } from "../interfaces/recipe-converter";
-import { BlockBehaviours, Recipes, Toolsets } from "../types";
+import {
+    BlockBehaviours,
+    Item,
+    NPCToolsetMapping,
+    Recipes,
+    PiplizTools,
+    PiplizToolsets,
+    RecipeResult,
+} from "../types";
+import { UNSUPPORTED_TOOL_ERROR, getMinMaxTools } from "./tool-utils";
+import {
+    getUserFriendlyCreatorName,
+    getUserFriendlyItemName,
+} from "./recipe-dictionary";
+import {
+    filterByCondition,
+    splitPiplizCreator,
+    splitPiplizName,
+} from "./utils";
+import { Items, OptionalOutput } from "../types/generated/items";
 
 const JSON_FILE_EXTENSION = ".json";
 const TOOLSETS_FILE_NAME = "toolsets";
@@ -9,11 +28,13 @@ const BLOCK_BEHAVIOURS_FILE_NAME = "generateblocks";
 const RECIPE_PREFIX = "recipes_";
 const RECIPE_EXCLUSION_SET = new Set<string>(["recipes_merchant.json"]);
 
+type PiplizToolset = PiplizToolsets[number];
+
 const getKnownToolsets = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readToolsFile: JSONFileReader<Toolsets>
-): Promise<Toolsets> => {
+    readToolsFile: JSONFileReader<PiplizToolsets>
+): Promise<PiplizToolsets> => {
     const toolsetFiles = await findFiles({
         root: inputDirectoryPath,
         fileExtension: JSON_FILE_EXTENSION,
@@ -61,7 +82,7 @@ const getKnownRecipes = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
     readRecipeFile: JSONFileReader<Recipes>
-): Promise<Recipes[]> => {
+): Promise<Recipes> => {
     const recipePaths = await findFiles({
         root: inputDirectoryPath,
         fileExtension: JSON_FILE_EXTENSION,
@@ -74,20 +95,181 @@ const getKnownRecipes = async (
         return !RECIPE_EXCLUSION_SET.has(fileName);
     });
 
-    return Promise.all(filtered.map((path) => readRecipeFile(path)));
+    const recipes = await Promise.all(
+        filtered.map((path) => readRecipeFile(path))
+    );
+    return recipes.flat();
+};
+
+const createToolsetMap = (
+    toolsets: PiplizToolsets
+): Map<string, PiplizToolset> =>
+    new Map(toolsets.map((toolset) => [toolset.key, toolset]));
+
+const createNPCToolsetMapping = (
+    blockBehaviours: BlockBehaviours,
+    toolsets: PiplizToolsets
+): Map<string, PiplizTools[]> => {
+    const toolsetMap = createToolsetMap(toolsets);
+    const mappings = blockBehaviours.reduce((acc, current) => {
+        if (!current.baseType?.attachBehaviour) {
+            return acc;
+        }
+
+        const attachBehaviours = current.baseType.attachBehaviour.reduce(
+            (acc, current) => {
+                if (typeof current === "string") {
+                    return acc;
+                }
+
+                if (current.npcType && current.toolset) {
+                    acc.push({
+                        npcType: current.npcType,
+                        toolset: current.toolset,
+                    });
+                }
+
+                return acc;
+            },
+            [] as NPCToolsetMapping[]
+        );
+
+        if (attachBehaviours[0]) {
+            const { toolset: required, npcType } = attachBehaviours[0];
+            const creator = splitPiplizCreator(npcType);
+            const toolset = toolsetMap.get(required);
+            if (!toolset) {
+                throw new Error(
+                    `Unknown toolset: ${required} required by ${creator}`
+                );
+            }
+
+            acc.push([creator, toolset.usable]);
+        }
+
+        return acc;
+    }, [] as [string, PiplizTools[]][]);
+
+    return new Map(mappings);
+};
+
+const mapRecipeToItem = (
+    recipe: Recipes[number],
+    npcToolsetMapping: Map<string, PiplizTools[]>
+): Item => {
+    const { itemName, creator } = splitPiplizName(recipe.name);
+    const tools = npcToolsetMapping.get(creator);
+    if (!tools) {
+        throw new Error(
+            `Unable to find tools for provided creator: ${creator}`
+        );
+    }
+
+    const toolRange = getMinMaxTools(tools);
+
+    const { matching, nonMatching } = filterByCondition(
+        recipe.results,
+        (result) => result.type === itemName
+    );
+    if (matching.length === 0) {
+        throw new Error(
+            `Unable to find primary output for recipe: ${itemName} from creator: ${creator}`
+        );
+    } else if (matching.length > 1) {
+        throw new Error(
+            `Multiple primary outputs specified for: ${itemName} from creator: ${creator}`
+        );
+    }
+
+    const primaryOutputResult = matching[0] as RecipeResult;
+    const output = primaryOutputResult.amount ?? 1;
+    const convertedItemName = getUserFriendlyItemName(itemName);
+    if (!convertedItemName) {
+        throw new Error(`User friendly name unavailable for item: ${itemName}`);
+    }
+
+    const convertedCreator = getUserFriendlyCreatorName(creator);
+    if (!convertedCreator) {
+        throw new Error(
+            `User friendly name unavailable for creator: ${creator}`
+        );
+    }
+
+    const optionalOutputs: OptionalOutput[] = nonMatching.map((result) => {
+        const convertedOptionalOutputName = getUserFriendlyItemName(
+            result.type
+        );
+
+        if (!convertedOptionalOutputName) {
+            throw new Error(
+                `User friendly name unavailable for item: ${result.type}`
+            );
+        }
+
+        const amount = result.amount ?? 1;
+        const likelihood = "chance" in result ? result.chance : 1;
+        return {
+            name: convertedOptionalOutputName,
+            likelihood,
+            amount,
+        };
+    });
+
+    return {
+        name: convertedItemName,
+        creator: convertedCreator,
+        createTime: recipe.cooldown,
+        requires: [],
+        output,
+        ...toolRange,
+        ...(optionalOutputs.length > 0 ? { optionalOutputs } : {}),
+    };
 };
 
 const convertRecipes: RecipeConverter = async ({
     inputDirectoryPath,
+    outputFilePath,
     findFiles,
     readToolsFile,
     readBehavioursFile,
     readRecipeFile,
+    writeJSON,
 }) => {
-    await getKnownToolsets(inputDirectoryPath, findFiles, readToolsFile);
-    await getBlockBehaviours(inputDirectoryPath, findFiles, readBehavioursFile);
-    await getKnownRecipes(inputDirectoryPath, findFiles, readRecipeFile);
+    const toolsets = await getKnownToolsets(
+        inputDirectoryPath,
+        findFiles,
+        readToolsFile
+    );
+    const blockBehaviours = await getBlockBehaviours(
+        inputDirectoryPath,
+        findFiles,
+        readBehavioursFile
+    );
+    const npcToolsetMap = createNPCToolsetMapping(blockBehaviours, toolsets);
+    const recipes = await getKnownRecipes(
+        inputDirectoryPath,
+        findFiles,
+        readRecipeFile
+    );
 
+    const converted = recipes.reduce((acc, current) => {
+        try {
+            acc.push(mapRecipeToItem(current, npcToolsetMap));
+        } catch (ex) {
+            if (ex != UNSUPPORTED_TOOL_ERROR) {
+                throw ex;
+            }
+
+            const { itemName, creator } = splitPiplizName(current.name);
+            console.log(
+                `Skipping recipe: ${itemName} from creator: ${creator} as requires unsupported toolset`
+            );
+        }
+
+        return acc;
+    }, [] as Items);
+
+    await writeJSON(outputFilePath, converted);
     return true;
 };
 

@@ -1,7 +1,10 @@
 {
     "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node18/tsconfig"],
     "compilerOptions": {
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "verbatimModuleSyntax": false,
+        "outDir": "dist"
     },
     "exclude": ["jest.config.js"]
 }

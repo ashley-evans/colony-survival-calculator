@@ -7,10 +7,11 @@ import toolsSchema from "./schemas/tools.json";
 import recipesSchema from "./schemas/recipes.json";
 import behavioursSchema from "./schemas/block-behaviours.json";
 import { JSONFileReader } from "./interfaces/json-file-reader";
-import { BlockBehaviours, Recipes, Toolsets } from "./types";
+import { BlockBehaviours, Recipes, PiplizToolsets } from "./types";
 import { factory as createJSONFileAdapter } from "./adapters/json-file-adapter";
 import { convertRecipes } from "./domain/recipe-converter";
 import { findFiles } from "./adapters/fs-file-adapter";
+import { writeJSONToFile } from "./adapters/json-file-writer";
 
 const parser = yargs(hideBin(process.argv)).options({
     inputDirectory: {
@@ -29,7 +30,7 @@ const parser = yargs(hideBin(process.argv)).options({
     },
 });
 
-const createToolsFileReader = (): JSONFileReader<Toolsets> => {
+const createToolsFileReader = (): JSONFileReader<PiplizToolsets> => {
     return createJSONFileAdapter(toolsSchema);
 };
 
@@ -55,6 +56,7 @@ const createRecipesFileReader = (): JSONFileReader<Recipes> => {
             readBehavioursFile: behavioursReader,
             readRecipeFile: recipesReader,
             findFiles,
+            writeJSON: writeJSONToFile,
         });
 
         process.exit(result ? 0 : 1);

@@ -4,7 +4,7 @@ import { JSONSchemaType } from "ajv";
 
 import { factory } from "../json-file-adapter";
 import { createDirectory, writeJSONToFile } from "./utils";
-import { Tools, Toolsets } from "../../types";
+import { PiplizTools, PiplizToolsets } from "../../types";
 import toolsSchema from "../../schemas/tools.json";
 
 type TestType = {
@@ -92,7 +92,9 @@ test("returns the validated JSON object if JSON matches provided schema but incl
 test("returns the validated JSON object if JSON matches provided schema that includes custom tsEnumNames keyword", async () => {
     const validJSONFile = path.join(tempDirectory, "valid-json.json");
     const adapter = factory(toolsSchema);
-    const expected: Toolsets = [{ key: "test", usable: [Tools.notools] }];
+    const expected: PiplizToolsets = [
+        { key: "test", usable: [PiplizTools.notools] },
+    ];
     writeJSONToFile(validJSONFile, expected);
 
     const actual = await adapter(validJSONFile);
