@@ -738,7 +738,7 @@ describe("recipe to item mapping", () => {
         }
     );
 
-    test("converts multiple valid recipes", async () => {
+    test("writes converted recipe to file given multiple valid recipes", async () => {
         const firstRecipeOutput = "poisondart";
         const secondRecipeOutput = "gunpowder";
         const creator = "alchemist";
@@ -805,6 +805,112 @@ describe("recipe to item mapping", () => {
         expect(mockWriteJSON).toHaveBeenCalledWith(
             input.outputFilePath,
             expected
+        );
+    });
+
+    test.each([
+        ["default", undefined, 1],
+        ["specified", 0.5, 0.5],
+    ])(
+        "writes converted recipe to file given a single recipe with requirement that has %s required amount",
+        async (
+            _: string,
+            specifiedAmount: number | undefined,
+            expectedAmount: number
+        ) => {
+            const creator = "alchemist";
+            const output = "poisondart";
+            const requirement = "gunpowder";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [
+                        {
+                            type: requirement,
+                            ...(specifiedAmount
+                                ? { amount: specifiedAmount }
+                                : {}),
+                        },
+                    ],
+                    results: [
+                        {
+                            type: output,
+                        },
+                    ],
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: noToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: 1,
+                requires: [{ name: "Gunpowder", amount: expectedAmount }],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: "Alchemist",
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        }
+    );
+
+    test("throws an error if provided an requirement with an unknown name", async () => {
+        const creator = "alchemist";
+        const output = "poisondart";
+        const requirement = "unknown requirement";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [
+                    {
+                        type: requirement,
+                    },
+                ],
+                results: [
+                    {
+                        type: output,
+                    },
+                ],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            `User friendly name unavailable for item: ${requirement}`
         );
     });
 });

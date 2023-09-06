@@ -20,7 +20,7 @@ import {
     splitPiplizCreator,
     splitPiplizName,
 } from "./utils";
-import { Items, OptionalOutput } from "../types/generated/items";
+import { Items, OptionalOutput, Requirements } from "../types/generated/items";
 
 const JSON_FILE_EXTENSION = ".json";
 const TOOLSETS_FILE_NAME = "toolsets";
@@ -29,6 +29,7 @@ const RECIPE_PREFIX = "recipes_";
 const RECIPE_EXCLUSION_SET = new Set<string>(["recipes_merchant.json"]);
 
 type PiplizToolset = PiplizToolsets[number];
+type Recipe = Recipes[number];
 
 const getKnownToolsets = async (
     inputDirectoryPath: string,
@@ -153,8 +154,52 @@ const createNPCToolsetMapping = (
     return new Map(mappings);
 };
 
+const mapPiplizRequirementsToAPIRequirements = (
+    requirements: Recipe["requires"]
+): Requirements =>
+    requirements.map((requirement) => {
+        const convertedRequirementName = getUserFriendlyItemName(
+            requirement.type
+        );
+
+        if (!convertedRequirementName) {
+            throw new Error(
+                `User friendly name unavailable for item: ${requirement.type}`
+            );
+        }
+
+        const amount = requirement.amount ?? 1;
+        return {
+            name: convertedRequirementName,
+            amount,
+        };
+    });
+
+const mapPiplizOptionalOutputsToAPIRequirements = (
+    outputs: Recipe["results"]
+): OptionalOutput[] =>
+    outputs.map((result) => {
+        const convertedOptionalOutputName = getUserFriendlyItemName(
+            result.type
+        );
+
+        if (!convertedOptionalOutputName) {
+            throw new Error(
+                `User friendly name unavailable for item: ${result.type}`
+            );
+        }
+
+        const amount = result.amount ?? 1;
+        const likelihood = "chance" in result ? result.chance : 1;
+        return {
+            name: convertedOptionalOutputName,
+            likelihood,
+            amount,
+        };
+    });
+
 const mapRecipeToItem = (
-    recipe: Recipes[number],
+    recipe: Recipe,
     npcToolsetMapping: Map<string, PiplizTools[]>
 ): Item => {
     const { itemName, creator } = splitPiplizName(recipe.name);
@@ -195,31 +240,17 @@ const mapRecipeToItem = (
         );
     }
 
-    const optionalOutputs: OptionalOutput[] = nonMatching.map((result) => {
-        const convertedOptionalOutputName = getUserFriendlyItemName(
-            result.type
-        );
-
-        if (!convertedOptionalOutputName) {
-            throw new Error(
-                `User friendly name unavailable for item: ${result.type}`
-            );
-        }
-
-        const amount = result.amount ?? 1;
-        const likelihood = "chance" in result ? result.chance : 1;
-        return {
-            name: convertedOptionalOutputName,
-            likelihood,
-            amount,
-        };
-    });
+    const requirements = mapPiplizRequirementsToAPIRequirements(
+        recipe.requires
+    );
+    const optionalOutputs =
+        mapPiplizOptionalOutputsToAPIRequirements(nonMatching);
 
     return {
         name: convertedItemName,
         creator: convertedCreator,
         createTime: recipe.cooldown,
-        requires: [],
+        requires: requirements,
         output,
         ...toolRange,
         ...(optionalOutputs.length > 0 ? { optionalOutputs } : {}),
