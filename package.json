@@ -17,7 +17,7 @@
         "cz": "cz",
         "i": "yarn install",
         "ci": "yarn install --immutable",
-        "clean": "rm -rf `find . -type d -name node_modules`",
+        "clean": "find . -type d -name 'node_modules' -exec rm -rf '{}' +",
         "lint": "npmPkgJsonLint .",
         "validate": "./scripts/validate-terraform.sh -r ./infra/",
         "format:check": "prettier --check . '!(api|ui|scripts/recipe-json-converter)/**/*' && terraform fmt -recursive ./infra/",
