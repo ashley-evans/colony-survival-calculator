@@ -358,7 +358,7 @@ describe("recipe to item mapping", () => {
         }
     );
 
-    test("throws an error if cannot find a toolset for provided creator", async () => {
+    test("throws an error if invalid toolset specified for provided creator", async () => {
         const invalidToolset = "magictools";
         const output = "poisondart";
         const creator = "alchemist";
@@ -393,6 +393,69 @@ describe("recipe to item mapping", () => {
         await expect(convertRecipes(input)).rejects.toThrowError(
             `Unknown toolset: ${invalidToolset} required by ${creator}`
         );
+    });
+
+    describe("handles items with no toolset specified", () => {
+        const creator = "alchemist";
+        const output = "poisondart";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [
+                    {
+                        type: output,
+                    },
+                ],
+            },
+        ];
+
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.beekeeper`,
+                            toolset: defaultToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+
+        beforeEach(() => {
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+        });
+
+        test("defaults to default toolset in converted output", async () => {
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.steel,
+                creator: "Alchemist",
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        });
+
+        test("logs message indicating default has taken place", async () => {
+            await convertRecipes(input);
+
+            expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+            expect(consoleLogSpy).toHaveBeenCalledWith(
+                `Defaulting to default toolset for recipe: ${output} from creator: ${creator}`
+            );
+        });
     });
 
     test.each([
@@ -913,4 +976,379 @@ describe("recipe to item mapping", () => {
             `User friendly name unavailable for item: ${requirement}`
         );
     });
+
+    describe("handles known items and known creators", () => {
+        test.each([
+            ["poisondart", "Poison dart"],
+            ["gunpowder", "Gunpowder"],
+            ["hempfibre", "Hemp fibre"],
+            ["wisteriaflower", "Wisteria flower"],
+            ["saltpeter", "Salt peter"],
+            ["charcoal", "Charcoal"],
+            ["sulfur", "Sulfur"],
+            ["vialmineraloil", "Vial of mineral oil"],
+            ["coalore", "Coal ore"],
+            ["potwater", "Pot of water"],
+            ["vialempty", "Empty Vial"],
+            ["potempty", "Empty pot"],
+            ["vialsulphuricacid", "Vial of sulphuric acid"],
+            ["firewood", "Firewood"],
+            ["vialnitricacid", "Vial of nitric acid"],
+            ["nitro", "Nitro"],
+            ["cottonfibre", "Cotton fibre"],
+            ["candle", "Candle"],
+            ["berry", "Berry"],
+            ["berrymeal", "Berry meal"],
+            ["ironbloom", "Iron bloom"],
+            ["ironore", "Iron ore"],
+            ["steelingot", "Steel ingot"],
+            ["ironwrought", "Iron wrought"],
+            ["silicasand", "Silica sand"],
+            ["glasspiece", "Piece of glass"],
+            ["cokes", "Cokes"],
+            ["chest", "Chest"],
+            ["chestresource", "Science chest"],
+            ["copperingot", "Copper ingot"],
+            ["goldingot", "Gold ingot"],
+            ["bronzeingot", "Bronze ingot"],
+            ["chestluxury", "Luxury chest"],
+            ["luxurygarments", "Luxury garments"],
+            ["goldenshield", "Golden shield"],
+            ["monocular", "Monocular"],
+            ["earthenware", "Earthenware"],
+            ["chestprestige", "Prestige chest"],
+            ["tabulator", "Tabulator"],
+            ["guntrap", "Gun trap"],
+            ["steeltools", "Steel tools"],
+            ["chickenraw", "Raw chicken"],
+            ["barley", "Barley"],
+            ["chickenpoop", "Chicken poop"],
+            ["potash", "Pot ash"],
+            ["leavestemperate", "Temperate leaves"],
+            ["dirt", "Dirt"],
+            ["straw", "Straw"],
+            ["grassdry", "Dry grass"],
+            ["grassmid", "Medium Grass"],
+            ["grasswet", "Wet grass"],
+            ["grassmax", "Max grass"],
+            ["cookedmeat", "Cooked meat"],
+            ["rawmeat", "Raw meat"],
+            ["chickenmeal", "Chicken meal"],
+            ["cabbage", "Cabbage"],
+            ["cookedfish", "Cooked fish"],
+            ["rawfish", "Raw fish"],
+            ["bread", "Bread"],
+            ["potflour", "Pot of flour"],
+            ["breadmeal", "Bread meal"],
+            ["coppertools", "Copper tools"],
+            ["planks", "Planks"],
+            ["goldjewellery", "Gold jewellery"],
+            ["copperlockbox", "Copper lockbox"],
+            ["steelparts", "Steel parts"],
+            ["brassparts", "Brass parts"],
+            ["brassingot", "Brass ingot"],
+            ["failsafe", "Failsafe"],
+            ["bronzetools", "Bronze tools"],
+            ["irontools", "Iron tools"],
+            ["leather", "Leather"],
+            ["machinetools", "Machine tools"],
+            ["linen", "Linen"],
+            ["alkanet", "Alkanet"],
+            ["hollyhock", "Hollyhock"],
+            ["wolfsbane", "Wolfsbane"],
+            ["lanternred", "Red lantern"],
+            ["lanternyellow", "Yellow lantern"],
+            ["lanterngreen", "Green lantern"],
+            ["lanternblue", "Blue lantern"],
+            ["lanterncyan", "Cyan lantern"],
+            ["lanternpink", "Pink lantern"],
+            ["planksred", "Red planks"],
+            ["planksgreen", "Green planks"],
+            ["planksblue", "Blue planks"],
+            ["droppertrap", "Dropper trap"],
+            ["projectiletrap", "Projectile trap"],
+            ["projectiletrapammo", "Projectile trap ammo"],
+            ["droppertrapammo", "Dropper trap ammo"],
+            ["alarmbell", "Alarm bell"],
+            ["scrollofknowledge", "Scroll of knowledge"],
+            ["astrolabe", "Astrolabe"],
+            ["compass", "Compass"],
+            ["tabletwisdom", "Tablet of wisdom"],
+            ["eyeglasses", "Eye glasses"],
+            ["bronzelockbox", "Bronze lockbox"],
+            ["steellockbox", "Steel lockbox"],
+            ["ropetrap", "Rope trap"],
+            ["ropetrapammo", "Rope trap ammo"],
+            ["rope", "Rope"],
+            ["caltroptrap", "Caltrop trap"],
+            ["caltrops", "Caltrops"],
+            ["metalgear", "Metal gear"],
+            ["glider", "Glider"],
+            ["glidersteel", "Steel glider"],
+            ["bookofknowledge", "Book of knowledge"],
+            ["elevatorshaft", "Elevator shaft"],
+            ["elevator", "Elevator"],
+            ["elevatorhorizontal", "Horizontal elevator"],
+            ["elevatorshafthorizontal", "Horizontal elevator shaft"],
+            ["wheatporridge", "Wheat porridge"],
+            ["wheat", "Wheat"],
+            ["bow", "Bow"],
+            ["flax", "Flax"],
+            ["copperarrow", "Copper arrow"],
+            ["guardbowdayjob", "Bow guard day job"],
+            ["guardbownightjob", "Bow guard night job"],
+            ["crossbow", "Crossbow"],
+            ["crossbowbolt", "Crossbow bolt"],
+            ["guardcrossbowdayjob", "Crossbow guard day job"],
+            ["guardcrossbownightjob", "Crossbow guard night job"],
+            ["gunpowdertrap", "Gunpowder trap"],
+            ["gunpowdertrapammo", "Gunpowder trap ammo"],
+            ["guntrapammo", "Gun trap ammo"],
+            ["leadingot", "Lead ingot"],
+            ["musket", "Musket"],
+            ["musketammo", "Musket ammo"],
+            ["grenadelauncher", "Grenade launcher"],
+            ["grenadelauncherammo", "Grenade launcher ammo"],
+            ["handcannon", "Hand cannon"],
+            ["handcannonammo", "Hand cannon ammo"],
+            ["guardhandcannondayjob", "Hand cannon guard day job"],
+            ["guardhandcannonnightjob", "Hand cannon guard night job"],
+            ["guardgrenadedayjob", "Grenade guard day job"],
+            ["guardgrenadenightjob", "Grenade guard night job"],
+            ["lanternwhite", "White lantern"],
+            ["lanternorange", "Orange lantern"],
+            ["goldenstatue", "Golden statue"],
+            ["jobblockcrafter", "Job block crafter"],
+            ["firepit", "Firepit"],
+            ["stonerubble", "Stone rubble"],
+            ["merchanthub", "Merchant hub"],
+            ["waterpump", "Water pump"],
+            ["fisherman", "Fisherman"],
+            ["tailorshop", "Tailor shop"],
+            ["statisticsboard", "Statistics board"],
+            ["parchment", "Parchment"],
+            ["toolshop", "Toolshop"],
+            ["sanctifiertable", "Sanctifier table"],
+            ["fletcherbench", "Fletcher bench"],
+            ["npcshop", "NPC shop"],
+            ["copperanvil", "Copper anvil"],
+            ["tannertable", "Tanner table"],
+            ["scribedesk", "Scribe desk"],
+            ["writerdesk", "Writer desk"],
+            ["stove", "Stove"],
+            ["grindstone", "Grindstone"],
+            ["dyertable", "Dyer table"],
+            ["ropebench", "Rope bench"],
+            ["stonemasonworkbench", "Stonemason workbench"],
+            ["jewellerbench", "Jeweller bench"],
+            ["papermakersmould", "Paper makers mould"],
+            ["wisteriajob", "Wisteria job"],
+            ["wisteriaplantempty", "Wisteria plant"],
+            ["alchemisttable", "Alchemist table"],
+            ["guardpoison", "Poison guard"],
+            ["engineerbench", "Engineer bench"],
+            ["trapfixer", "Trap fixer"],
+            ["jobblockcrafteradvanced", "Advanced job block crafter"],
+            ["bloomery", "Bloomery"],
+            ["bricks", "Bricks"],
+            ["kiln", "Kiln"],
+            ["printingpress", "Printing press"],
+            ["chestmaker", "Chest maker"],
+            ["gunsmith", "Gunsmith"],
+            ["compostingbin", "Composting bin"],
+            ["logwall", "Log wall"],
+            ["glassblower", "Glassblower"],
+            ["guardmusketdayjob", "Musket guard day job"],
+            ["guardmusketnightjob", "Musket guard night job"],
+            ["cottonengine", "Cotten engine"],
+            ["metallathe", "Metal lathe"],
+            ["blastfurnace", "Blast furnace"],
+            ["researcherdesk", "Researcher desk"],
+            ["paper", "Paper"],
+            ["bookcase", "Bookcase"],
+            ["colonykit", "Colony kit"],
+            ["outpostbanner", "Outpost banner"],
+            ["carddata", "Card data"],
+            ["clay", "Clay"],
+            ["tabletclay", "Clay tablet"],
+            ["sanctifiedporridge", "Sanctified porridge"],
+            ["sanctifiedbreadmeal", "Sanctified bread meal"],
+            ["sanctifiedchickenmeal", "Sanctified chicken meal"],
+            ["sanctifiedhouse", "Sanctified house"],
+            ["copper", "Copper"],
+            ["goldore", "Gold ore"],
+            ["tin", "Tin"],
+            ["zinc", "Zinc"],
+            ["leadore", "Lead ore"],
+            ["brickslight", "Light bricks"],
+            ["mudbricks", "Mud bricks"],
+            ["quarterblockgrey", "Grey quarter block"],
+            ["stoneblock", "Stone block"],
+            ["darkstone", "Dark stone"],
+            ["stonebricks", "Stone bricks"],
+            ["stonebricksblack", "Black stone bricks"],
+            ["stonebricksbrown", "Brown stone bricks"],
+            ["stonebrickswhite", "White stone bricks"],
+            ["bricksblack", "Black bricks"],
+            ["bricksdarkred", "Dark red bricks"],
+            ["bricksdarkyellow", "Dark yellow bricks"],
+            ["bricksred", "Red bricks"],
+            ["hemp", "Hemp"],
+            ["skin", "Skin"],
+            ["animalcarcass", "Animal carcass"],
+            ["stonetools", "Stone tools"],
+            ["logtemperate", "Temperate log"],
+            ["bed", "Bed"],
+            ["wheatmeal", "Wheat meal"],
+            ["minerjob", "Miner"],
+            ["tinkerertable", "Tinkerer table"],
+            ["sling", "Sling"],
+            ["guardslingerdayjob", "Slinger guard day job"],
+            ["guardslingernightjob", "Slinger guard night job"],
+            ["furnace", "Furnace"],
+            ["splittingstump", "Splitting stump"],
+            ["potterystation", "Pottery station"],
+            ["watergatherer", "Water gatherer"],
+            ["slingbullet", "Sling bullet"],
+            ["crate", "Crate"],
+            ["torch", "Torch"],
+            ["woodfloor", "Wood floor"],
+            ["quarterblockbrowndark", "Dark brown quarter block"],
+            ["quarterblockbrownlight", "Light brown quarter block"],
+        ])(
+            "can handle recipes for item: %s",
+            async (itemName: string, expectedConvertedItemName: string) => {
+                const creator = "alchemist";
+                const recipes: Recipes = [
+                    {
+                        cooldown: 20,
+                        name: `pipliz.${creator}.${itemName}`,
+                        requires: [],
+                        results: [
+                            {
+                                type: itemName,
+                            },
+                        ],
+                    },
+                ];
+                mockReadRecipeFile.mockResolvedValue(recipes);
+                const behaviours: BlockBehaviours = [
+                    {
+                        baseType: {
+                            attachBehaviour: [
+                                {
+                                    npcType: `pipliz.${creator}`,
+                                    toolset: noToolset.key,
+                                },
+                            ],
+                        },
+                    },
+                ];
+                mockReadBehaviourFile.mockResolvedValue(behaviours);
+                const expected: Item = {
+                    name: expectedConvertedItemName,
+                    createTime: 20,
+                    output: 1,
+                    requires: [],
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                    creator: "Alchemist",
+                };
+
+                await convertRecipes(input);
+
+                expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+                expect(mockWriteJSON).toHaveBeenCalledWith(
+                    input.outputFilePath,
+                    [expected]
+                );
+            }
+        );
+
+        test.each([
+            ["alchemist", "Alchemist"],
+            ["beekeeper", "Beekeeper"],
+            ["berryfarmer", "Berry farmer"],
+            ["bloomeryjob", "Bloomery worker"],
+            ["chestmaker", "Chest maker"],
+            ["chickenfarmer", "Chicken farmer"],
+            ["composter", "Composter"],
+            ["cook", "Cook"],
+            ["coppersmith", "Copper smith"],
+            ["dyer", "Dyer"],
+            ["engineer", "Engineer"],
+            ["firepit", "Fire pit cook"],
+            ["fisherman", "Fisherman"],
+            ["fletcher", "Fletcher"],
+            ["glassblower", "Glassblower"],
+            ["grinder", "Grinder"],
+            ["gunsmith", "Gunsmith"],
+            ["jeweller", "Jeweller"],
+            ["jobblockcrafter", "Job block crafter"],
+            ["jobblockcrafteradvanced", "Advanced job block crafter"],
+            ["kilnjob", "Kiln worker"],
+            ["papermaker", "Paper maker"],
+            ["potter", "Potter"],
+            ["roper", "Roper"],
+            ["sanctifier", "Sanctifier"],
+            ["smelter", "Smelter"],
+            ["stonemason", "Stone mason"],
+            ["tailorshop", "Tailor"],
+            ["tanner", "Tanner"],
+            ["tinkerer", "Tinkerer"],
+            ["watergatherer", "Water gatherer"],
+            ["waterpump", "Water pump worker"],
+            ["woodcutter", "Woodcutter"],
+        ])(
+            "can handle recipes from creator: %s",
+            async (creator: string, expectedConvertedCreator: string) => {
+                const itemName = "poisondart";
+                const recipes: Recipes = [
+                    {
+                        cooldown: 20,
+                        name: `pipliz.${creator}.${itemName}`,
+                        requires: [],
+                        results: [
+                            {
+                                type: itemName,
+                            },
+                        ],
+                    },
+                ];
+                mockReadRecipeFile.mockResolvedValue(recipes);
+                const behaviours: BlockBehaviours = [
+                    {
+                        baseType: {
+                            attachBehaviour: [
+                                {
+                                    npcType: `pipliz.${creator}`,
+                                    toolset: noToolset.key,
+                                },
+                            ],
+                        },
+                    },
+                ];
+                mockReadBehaviourFile.mockResolvedValue(behaviours);
+                const expected: Item = {
+                    name: "Poison dart",
+                    createTime: 20,
+                    output: 1,
+                    requires: [],
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                    creator: expectedConvertedCreator,
+                };
+
+                await convertRecipes(input);
+
+                expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+                expect(mockWriteJSON).toHaveBeenCalledWith(
+                    input.outputFilePath,
+                    [expected]
+                );
+            }
+        );
+    });
+
+    // TODO: Need to add specific defaults - Certain items should default to no tools (beekeeper) others should default to default toolset
 });

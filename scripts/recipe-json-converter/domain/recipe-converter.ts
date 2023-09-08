@@ -205,13 +205,14 @@ const mapRecipeToItem = (
     const { itemName, creator } = splitPiplizName(recipe.name);
     const tools = npcToolsetMapping.get(creator);
     if (!tools) {
-        throw new Error(
-            `Unable to find tools for provided creator: ${creator}`
+        console.log(
+            `Defaulting to default toolset for recipe: ${itemName} from creator: ${creator}`
         );
     }
 
-    const toolRange = getMinMaxTools(tools);
-
+    const toolRange = getMinMaxTools(
+        tools ?? [PiplizTools.notools, PiplizTools.steeltools]
+    );
     const { matching, nonMatching } = filterByCondition(
         recipe.results,
         (result) => result.type === itemName
