@@ -411,22 +411,9 @@ describe("recipe to item mapping", () => {
             },
         ];
 
-        const behaviours: BlockBehaviours = [
-            {
-                baseType: {
-                    attachBehaviour: [
-                        {
-                            npcType: `pipliz.beekeeper`,
-                            toolset: defaultToolset.key,
-                        },
-                    ],
-                },
-            },
-        ];
-
         beforeEach(() => {
             mockReadRecipeFile.mockResolvedValue(recipes);
-            mockReadBehaviourFile.mockResolvedValue(behaviours);
+            mockReadBehaviourFile.mockResolvedValue([]);
         });
 
         test("defaults to default toolset in converted output", async () => {
@@ -457,6 +444,47 @@ describe("recipe to item mapping", () => {
             );
         });
     });
+
+    test.each([
+        ["beekeeper", "Beekeeper"],
+        ["berryfarmer", "Berry farmer"],
+        ["chickenfarmer", "Chicken farmer"],
+    ])(
+        "defaults to no toolset if no toolset specified and creator is: %s",
+        async (creator: string, userFriendlyCreator: string) => {
+            const output = "poisondart";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: output,
+                        },
+                    ],
+                },
+            ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue([]);
+            const expected: Item = {
+                name: "Poison dart",
+                createTime: 20,
+                output: 1,
+                requires: [],
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+                creator: userFriendlyCreator,
+            };
+
+            await convertRecipes(input);
+
+            expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+            expect(mockWriteJSON).toHaveBeenCalledWith(input.outputFilePath, [
+                expected,
+            ]);
+        }
+    );
 
     test.each([
         ["no outputs", []],
@@ -1130,7 +1158,7 @@ describe("recipe to item mapping", () => {
             ["toolshop", "Toolshop"],
             ["sanctifiertable", "Sanctifier table"],
             ["fletcherbench", "Fletcher bench"],
-            ["npcshop", "NPC shop"],
+            ["npcshop", "Grocery store"],
             ["copperanvil", "Copper anvil"],
             ["tannertable", "Tanner table"],
             ["scribedesk", "Scribe desk"],
@@ -1168,13 +1196,13 @@ describe("recipe to item mapping", () => {
             ["bookcase", "Bookcase"],
             ["colonykit", "Colony kit"],
             ["outpostbanner", "Outpost banner"],
-            ["carddata", "Card data"],
+            ["carddata", "Punched card"],
             ["clay", "Clay"],
             ["tabletclay", "Clay tablet"],
             ["sanctifiedporridge", "Sanctified porridge"],
             ["sanctifiedbreadmeal", "Sanctified bread meal"],
             ["sanctifiedchickenmeal", "Sanctified chicken meal"],
-            ["sanctifiedhouse", "Sanctified house"],
+            ["sanctifiedhouse", "Sacred storage"],
             ["copper", "Copper"],
             ["goldore", "Gold ore"],
             ["tin", "Tin"],
@@ -1350,5 +1378,6 @@ describe("recipe to item mapping", () => {
         );
     });
 
-    // TODO: Need to add specific defaults - Certain items should default to no tools (beekeeper) others should default to default toolset
+    // TODO: Need to add a script for handling growable items
+    // TODO: Need to add a script for handling mineable items
 });

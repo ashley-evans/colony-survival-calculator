@@ -10,7 +10,11 @@ import {
     PiplizToolsets,
     RecipeResult,
 } from "../types";
-import { UNSUPPORTED_TOOL_ERROR, getMinMaxTools } from "./tool-utils";
+import {
+    UNSUPPORTED_TOOL_ERROR,
+    getDefaultMinMaxTools,
+    getMinMaxTools,
+} from "./tool-utils";
 import {
     getUserFriendlyCreatorName,
     getUserFriendlyItemName,
@@ -210,9 +214,7 @@ const mapRecipeToItem = (
         );
     }
 
-    const toolRange = getMinMaxTools(
-        tools ?? [PiplizTools.notools, PiplizTools.steeltools]
-    );
+    const toolRange = getMinMaxTools(tools ?? getDefaultMinMaxTools(creator));
     const { matching, nonMatching } = filterByCondition(
         recipe.results,
         (result) => result.type === itemName

@@ -150,7 +150,7 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     toolshop: "Toolshop",
     sanctifiertable: "Sanctifier table",
     fletcherbench: "Fletcher bench",
-    npcshop: "NPC shop", // TODO: What is this?
+    npcshop: "Grocery store",
     copperanvil: "Copper anvil",
     tannertable: "Tanner table",
     scribedesk: "Scribe desk",
@@ -188,13 +188,13 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     bookcase: "Bookcase",
     colonykit: "Colony kit",
     outpostbanner: "Outpost banner",
-    carddata: "Card data", // TODO: What is this?
+    carddata: "Punched card",
     clay: "Clay",
     tabletclay: "Clay tablet",
     sanctifiedporridge: "Sanctified porridge",
     sanctifiedbreadmeal: "Sanctified bread meal",
     sanctifiedchickenmeal: "Sanctified chicken meal",
-    sanctifiedhouse: "Sanctified house", // TODO: What is this?
+    sanctifiedhouse: "Sacred storage",
     copper: "Copper",
     goldore: "Gold ore",
     tin: "Tin",

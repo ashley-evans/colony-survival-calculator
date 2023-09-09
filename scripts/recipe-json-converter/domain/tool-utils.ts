@@ -73,4 +73,20 @@ const getMinMaxTools = (
     };
 };
 
-export { getMinMaxTools, SupportedPiplizTools, UNSUPPORTED_TOOL_ERROR };
+const getDefaultMinMaxTools = (creator: string): PiplizTools[] => {
+    switch (creator) {
+        case "beekeeper":
+        case "berryfarmer":
+        case "chickenfarmer":
+            return [PiplizTools.notools];
+        default:
+            return [PiplizTools.notools, PiplizTools.steeltools];
+    }
+};
+
+export {
+    getMinMaxTools,
+    getDefaultMinMaxTools,
+    SupportedPiplizTools,
+    UNSUPPORTED_TOOL_ERROR,
+};
