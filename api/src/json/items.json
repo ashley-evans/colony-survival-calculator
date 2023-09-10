@@ -1,80 +1,2247 @@
 [
     {
+        "name": "Poison dart",
+        "creator": "Alchemist",
+        "createTime": 140,
+        "requires": [
+            { "name": "Hemp fibre", "amount": 1 },
+            { "name": "Wisteria flower", "amount": 1 }
+        ],
+        "output": 2,
+        "minimumTool": "iron",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Gunpowder",
+        "creator": "Alchemist",
+        "createTime": 360,
+        "requires": [
+            { "name": "Salt peter", "amount": 1 },
+            { "name": "Charcoal", "amount": 1 },
+            { "name": "Sulfur", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "iron",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Vial of mineral oil",
+        "creator": "Alchemist",
+        "createTime": 480,
+        "requires": [
+            { "name": "Coal ore", "amount": 1 },
+            { "name": "Pot of water", "amount": 1 },
+            { "name": "Empty Vial", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "iron",
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Vial of sulphuric acid",
+        "creator": "Alchemist",
+        "createTime": 25,
+        "requires": [
+            { "name": "Sulfur", "amount": 1 },
+            { "name": "Pot of water", "amount": 1 },
+            { "name": "Empty Vial", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "iron",
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Vial of nitric acid",
+        "creator": "Alchemist",
+        "createTime": 25,
+        "requires": [
+            { "name": "Salt peter", "amount": 1 },
+            { "name": "Pot of water", "amount": 1 },
+            { "name": "Empty Vial", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "iron",
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Candle",
+        "creator": "Beekeeper",
+        "createTime": 10,
+        "requires": [],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
         "name": "Berry",
+        "creator": "Berry farmer",
         "createTime": 8.5,
-        "output": 1,
         "requires": [],
+        "output": 1,
         "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Berry farmer"
+        "maximumTool": "none"
     },
     {
-        "name": "Berry Meal",
+        "name": "Berry meal",
+        "creator": "Berry farmer",
         "createTime": 8.5,
+        "requires": [{ "name": "Berry", "amount": 8 }],
         "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Iron bloom",
+        "creator": "Bloomery worker",
+        "createTime": 120,
         "requires": [
-            {
-                "name": "Berry",
-                "amount": 8
-            }
+            { "name": "Iron ore", "amount": 3 },
+            { "name": "Charcoal", "amount": 1 }
         ],
+        "output": 1,
         "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Berry farmer"
+        "maximumTool": "steel"
     },
     {
-        "name": "Wheat",
-        "createTime": 870,
-        "output": 100,
+        "name": "Steel ingot",
+        "creator": "Bloomery worker",
+        "createTime": 240,
+        "requires": [
+            { "name": "Iron wrought", "amount": 1 },
+            { "name": "Iron bloom", "amount": 1 },
+            { "name": "Silica sand", "amount": 1 },
+            { "name": "Piece of glass", "amount": 1 },
+            { "name": "Charcoal", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Cokes",
+        "creator": "Bloomery worker",
+        "createTime": 80,
+        "requires": [{ "name": "Coal ore", "amount": 1 }],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Chest",
+        "creator": "Chest maker",
+        "createTime": 240,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Hemp fibre", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Science chest",
+        "creator": "Chest maker",
+        "createTime": 720,
+        "requires": [
+            { "name": "Copper ingot", "amount": 10 },
+            { "name": "Gold ingot", "amount": 3 },
+            { "name": "Bronze ingot", "amount": 2 },
+            { "name": "Iron wrought", "amount": 2 },
+            { "name": "Chest", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Raw chicken",
+        "creator": "Chicken farmer",
+        "createTime": 30,
+        "requires": [{ "name": "Barley", "amount": 15 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Chicken poop",
+        "creator": "Chicken farmer",
+        "createTime": 30,
         "requires": [],
+        "output": 1,
         "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Wheat farmer",
-        "size": {
-            "width": 10,
-            "height": 10
-        }
+        "maximumTool": "none"
     },
     {
-        "name": "Log",
-        "createTime": 435,
-        "output": 44,
-        "requires": [],
+        "name": "Pot ash",
+        "creator": "Composter",
+        "createTime": 30,
+        "requires": [{ "name": "Leaves", "amount": 1 }],
+        "output": 1,
         "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Forester",
-        "size": {
-            "width": 3,
-            "height": 33
-        }
+        "maximumTool": "none"
     },
     {
-        "name": "Planks",
+        "name": "Salt peter",
+        "creator": "Composter",
+        "createTime": 60,
+        "requires": [
+            { "name": "Chicken poop", "amount": 1 },
+            { "name": "Pot of water", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Dirt",
+        "creator": "Composter",
+        "createTime": 10,
+        "requires": [
+            { "name": "Straw", "amount": 1 },
+            { "name": "Leaves", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Dry grass",
+        "creator": "Composter",
+        "createTime": 10,
+        "requires": [
+            { "name": "Straw", "amount": 1 },
+            { "name": "Leaves", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Medium Grass",
+        "creator": "Composter",
+        "createTime": 10,
+        "requires": [
+            { "name": "Straw", "amount": 1 },
+            { "name": "Leaves", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Wet grass",
+        "creator": "Composter",
+        "createTime": 10,
+        "requires": [
+            { "name": "Straw", "amount": 1 },
+            { "name": "Leaves", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Max grass",
+        "creator": "Composter",
+        "createTime": 10,
+        "requires": [
+            { "name": "Straw", "amount": 1 },
+            { "name": "Leaves", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Cooked meat",
+        "creator": "Cook",
+        "createTime": 26,
+        "requires": [
+            { "name": "Raw meat", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Chicken meal",
+        "creator": "Cook",
+        "createTime": 60,
+        "requires": [
+            { "name": "Raw chicken", "amount": 1 },
+            { "name": "Firewood", "amount": 1 },
+            { "name": "Cabbage", "amount": 10 }
+        ],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Cooked fish",
+        "creator": "Cook",
         "createTime": 40,
-        "output": 4,
         "requires": [
-            {
-                "name": "Log",
-                "amount": 1
-            }
+            { "name": "Raw fish", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
         ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bread",
+        "creator": "Cook",
+        "createTime": 20,
+        "requires": [
+            { "name": "Pot of flour", "amount": 1 },
+            { "name": "Firewood", "amount": 1 },
+            { "name": "Pot of water", "amount": 1 }
+        ],
+        "output": 1,
         "minimumTool": "none",
         "maximumTool": "steel",
-        "creator": "Woodcutter"
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 2 }
+        ]
+    },
+    {
+        "name": "Bread meal",
+        "creator": "Cook",
+        "createTime": 48,
+        "requires": [
+            { "name": "Bread", "amount": 1 },
+            { "name": "Berry meal", "amount": 1 }
+        ],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Copper tools",
+        "creator": "Copper smith",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Copper ingot", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Gold jewellery",
+        "creator": "Copper smith",
+        "createTime": 360,
+        "requires": [{ "name": "Gold ingot", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Copper lockbox",
+        "creator": "Copper smith",
+        "createTime": 180,
+        "requires": [
+            { "name": "Copper ingot", "amount": 5 },
+            { "name": "Planks", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Iron wrought",
+        "creator": "Copper smith",
+        "createTime": 120,
+        "requires": [{ "name": "Iron bloom", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Steel parts",
+        "creator": "Copper smith",
+        "createTime": 1200,
+        "requires": [{ "name": "Steel ingot", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Brass parts",
+        "creator": "Copper smith",
+        "createTime": 1000,
+        "requires": [{ "name": "Brass ingot", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Failsafe",
+        "creator": "Copper smith",
+        "createTime": 480,
+        "requires": [
+            { "name": "Copper ingot", "amount": 10 },
+            { "name": "Gold ingot", "amount": 5 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bronze tools",
+        "creator": "Copper smith",
+        "createTime": 360,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 2 },
+            { "name": "Planks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Iron tools",
+        "creator": "Copper smith",
+        "createTime": 150,
+        "requires": [{ "name": "Iron wrought", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Steel tools",
+        "creator": "Copper smith",
+        "createTime": 480,
+        "requires": [
+            { "name": "Steel ingot", "amount": 1 },
+            { "name": "Steel parts", "amount": 1 },
+            { "name": "Leather", "amount": 1 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            { "name": "Empty Vial", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Machine tools",
+        "creator": "Copper smith",
+        "createTime": 360,
+        "requires": [
+            { "name": "Steel parts", "amount": 1 },
+            { "name": "Brass parts", "amount": 1 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "stone",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Red lantern",
+        "creator": "Dyer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Yellow lantern", "amount": 1 },
+            { "name": "Hollyhock", "amount": 100 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Green lantern",
+        "creator": "Dyer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Yellow lantern", "amount": 1 },
+            { "name": "Alkanet", "amount": 50 },
+            { "name": "Wolfsbane", "amount": 50 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Blue lantern",
+        "creator": "Dyer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Yellow lantern", "amount": 1 },
+            { "name": "Alkanet", "amount": 100 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Cyan lantern",
+        "creator": "Dyer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Yellow lantern", "amount": 1 },
+            { "name": "Alkanet", "amount": 70 },
+            { "name": "Wolfsbane", "amount": 30 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Pink lantern",
+        "creator": "Dyer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Yellow lantern", "amount": 1 },
+            { "name": "Alkanet", "amount": 50 },
+            { "name": "Hollyhock", "amount": 50 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Red planks",
+        "creator": "Dyer",
+        "createTime": 100,
+        "requires": [
+            { "name": "Planks", "amount": 5 },
+            { "name": "Hollyhock", "amount": 100 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Green planks",
+        "creator": "Dyer",
+        "createTime": 100,
+        "requires": [
+            { "name": "Planks", "amount": 5 },
+            { "name": "Alkanet", "amount": 50 },
+            { "name": "Wolfsbane", "amount": 50 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Blue planks",
+        "creator": "Dyer",
+        "createTime": 100,
+        "requires": [
+            { "name": "Planks", "amount": 5 },
+            { "name": "Alkanet", "amount": 100 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Dropper trap",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Copper ingot", "amount": 8 },
+            { "name": "Leather", "amount": 3 },
+            { "name": "Gold ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Projectile trap",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 7 },
+            { "name": "Copper ingot", "amount": 5 },
+            { "name": "Gold ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Projectile trap ammo",
+        "creator": "Engineer",
+        "createTime": 60,
+        "requires": [{ "name": "Copper ingot", "amount": 8 }],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dropper trap ammo",
+        "creator": "Engineer",
+        "createTime": 160,
+        "requires": [{ "name": "Copper ingot", "amount": 3 }],
+        "output": 3,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Astrolabe",
+        "creator": "Engineer",
+        "createTime": 240,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 1 },
+            { "name": "Gold ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Eye glasses",
+        "creator": "Engineer",
+        "createTime": 120,
+        "requires": [
+            { "name": "Piece of glass", "amount": 1 },
+            { "name": "Iron wrought", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Monocular",
+        "creator": "Engineer",
+        "createTime": 720,
+        "requires": [
+            { "name": "Piece of glass", "amount": 2 },
+            { "name": "Iron wrought", "amount": 2 },
+            { "name": "Gold ingot", "amount": 1 },
+            { "name": "Brass ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bronze lockbox",
+        "creator": "Engineer",
+        "createTime": 240,
+        "requires": [{ "name": "Bronze ingot", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Steel lockbox",
+        "creator": "Engineer",
+        "createTime": 720,
+        "requires": [
+            { "name": "Brass parts", "amount": 10 },
+            { "name": "Steel parts", "amount": 8 },
+            { "name": "Steel ingot", "amount": 4 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Rope trap",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Steel parts", "amount": 1 },
+            { "name": "Brass parts", "amount": 2 },
+            { "name": "Steel ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Rope trap ammo",
+        "creator": "Engineer",
+        "createTime": 120,
+        "requires": [
+            { "name": "Rope", "amount": 5 },
+            { "name": "Brass ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Caltrop trap",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 10 },
+            { "name": "Iron tools", "amount": 1 },
+            { "name": "Rope", "amount": 3 },
+            { "name": "Leather", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Caltrops",
+        "creator": "Engineer",
+        "createTime": 160,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 3,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Metal gear",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [{ "name": "Iron wrought", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Elevator shaft",
+        "creator": "Engineer",
+        "createTime": 240,
+        "requires": [{ "name": "Iron wrought", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Elevator",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Metal gear", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Horizontal elevator",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 5 },
+            { "name": "Metal gear", "amount": 4 },
+            { "name": "Bronze ingot", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Horizontal elevator shaft",
+        "creator": "Engineer",
+        "createTime": 180,
+        "requires": [
+            { "name": "Iron wrought", "amount": 2 },
+            { "name": "Metal gear", "amount": 1 },
+            { "name": "Bronze ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Wheat porridge",
+        "creator": "Fire pit cook",
+        "createTime": 48,
+        "requires": [
+            { "name": "Wheat", "amount": 3 },
+            { "name": "Pot of water", "amount": 1 },
+            { "name": "Planks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Cooked meat",
+        "creator": "Fire pit cook",
+        "createTime": 35,
+        "requires": [
+            { "name": "Raw meat", "amount": 1 },
+            { "name": "Planks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Raw fish",
+        "creator": "Fisherman",
+        "createTime": 64,
+        "requires": [],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Bow",
+        "creator": "Fletcher",
+        "createTime": 240,
+        "requires": [
+            { "name": "Planks", "amount": 3 },
+            { "name": "Flax", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Copper arrow",
+        "creator": "Fletcher",
+        "createTime": 120,
+        "requires": [
+            { "name": "Copper ingot", "amount": 1 },
+            { "name": "Planks", "amount": 2 }
+        ],
+        "output": 10,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bow guard day job",
+        "creator": "Fletcher",
+        "createTime": 240,
+        "requires": [
+            { "name": "Leather", "amount": 1 },
+            { "name": "Bow", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bow guard night job",
+        "creator": "Fletcher",
+        "createTime": 240,
+        "requires": [
+            { "name": "Leather", "amount": 1 },
+            { "name": "Bow", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Crossbow",
+        "creator": "Fletcher",
+        "createTime": 360,
+        "requires": [
+            { "name": "Leather", "amount": 1 },
+            { "name": "Bow", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Crossbow bolt",
+        "creator": "Fletcher",
+        "createTime": 120,
+        "requires": [
+            { "name": "Copper ingot", "amount": 4 },
+            { "name": "Planks", "amount": 1 }
+        ],
+        "output": 10,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Crossbow guard day job",
+        "creator": "Fletcher",
+        "createTime": 360,
+        "requires": [{ "name": "Crossbow", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Crossbow guard night job",
+        "creator": "Fletcher",
+        "createTime": 360,
+        "requires": [{ "name": "Crossbow", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Piece of glass",
+        "creator": "Glassblower",
+        "createTime": 1000,
+        "requires": [
+            { "name": "Silica sand", "amount": 3 },
+            { "name": "Pot ash", "amount": 1 },
+            { "name": "Charcoal", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Empty Vial",
+        "creator": "Glassblower",
+        "createTime": 240,
+        "requires": [
+            { "name": "Silica sand", "amount": 1 },
+            { "name": "Pot ash", "amount": 1 },
+            { "name": "Charcoal", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Pot of flour",
+        "creator": "Grinder",
+        "createTime": 12.5,
+        "requires": [
+            { "name": "Wheat", "amount": 3 },
+            { "name": "Empty pot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [{ "name": "Straw", "likelihood": 1, "amount": 1 }]
+    },
+    {
+        "name": "Straw",
+        "creator": "Grinder",
+        "createTime": 12.5,
+        "requires": [
+            { "name": "Wheat", "amount": 3 },
+            { "name": "Empty pot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Pot of flour", "likelihood": 1, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Gunpowder trap ammo",
+        "creator": "Gunsmith",
+        "createTime": 240,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Gunpowder", "amount": 2 }
+        ],
+        "output": 10,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Musket",
+        "creator": "Gunsmith",
+        "createTime": 720,
+        "requires": [
+            { "name": "Steel parts", "amount": 1 },
+            { "name": "Brass parts", "amount": 1 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Musket ammo",
+        "creator": "Gunsmith",
+        "createTime": 160,
+        "requires": [
+            { "name": "Lead ingot", "amount": 2 },
+            { "name": "Gunpowder", "amount": 2 }
+        ],
+        "output": 25,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grenade launcher",
+        "creator": "Gunsmith",
+        "createTime": 1000,
+        "requires": [
+            { "name": "Steel ingot", "amount": 1 },
+            { "name": "Steel parts", "amount": 3 },
+            { "name": "Brass parts", "amount": 10 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Hand cannon",
+        "creator": "Gunsmith",
+        "createTime": 720,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Metal gear", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Hand cannon ammo",
+        "creator": "Gunsmith",
+        "createTime": 120,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Hemp fibre", "amount": 1 },
+            { "name": "Iron wrought", "amount": 1 }
+        ],
+        "output": 11,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Hand cannon guard night job",
+        "creator": "Gunsmith",
+        "createTime": 120,
+        "requires": [
+            { "name": "Hand cannon", "amount": 1 },
+            { "name": "Iron wrought", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Hand cannon guard day job",
+        "creator": "Gunsmith",
+        "createTime": 120,
+        "requires": [
+            { "name": "Hand cannon", "amount": 1 },
+            { "name": "Iron wrought", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grenade guard night job",
+        "creator": "Gunsmith",
+        "createTime": 180,
+        "requires": [
+            { "name": "Grenade launcher", "amount": 1 },
+            { "name": "Steel ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grenade guard day job",
+        "creator": "Gunsmith",
+        "createTime": 180,
+        "requires": [
+            { "name": "Grenade launcher", "amount": 1 },
+            { "name": "Steel ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Golden shield",
+        "creator": "Jeweller",
+        "createTime": 2000,
+        "requires": [
+            { "name": "Gold ingot", "amount": 5 },
+            { "name": "Brass ingot", "amount": 1 },
+            { "name": "Bronze ingot", "amount": 1 },
+            { "name": "Leather", "amount": 3 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Yellow lantern",
+        "creator": "Jeweller",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Brass ingot", "amount": 2 },
+            { "name": "Gold ingot", "amount": 1 },
+            { "name": "Hemp fibre", "amount": 3 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "White lantern",
+        "creator": "Jeweller",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Brass ingot", "amount": 2 },
+            { "name": "Gold ingot", "amount": 1 },
+            { "name": "Hemp fibre", "amount": 3 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Orange lantern",
+        "creator": "Jeweller",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Brass ingot", "amount": 2 },
+            { "name": "Gold ingot", "amount": 1 },
+            { "name": "Hemp fibre", "amount": 3 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Golden statue",
+        "creator": "Jeweller",
+        "createTime": 1200,
+        "requires": [
+            { "name": "Gold ingot", "amount": 5 },
+            { "name": "Brass ingot", "amount": 1 },
+            { "name": "Bronze ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Job block crafter",
+        "creator": "Job block crafter",
+        "createTime": 40,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Firepit",
+        "creator": "Job block crafter",
+        "createTime": 75,
+        "requires": [
+            { "name": "Stone rubble", "amount": 10 },
+            { "name": "Planks", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Merchant hub",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Water pump",
+        "creator": "Job block crafter",
+        "createTime": 240,
+        "requires": [{ "name": "Copper ingot", "amount": 10 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Fisherman",
+        "creator": "Job block crafter",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Linen", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Tailor shop",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Stone rubble", "amount": 10 },
+            { "name": "Planks", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Statistics board",
+        "creator": "Job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Planks", "amount": 3 },
+            { "name": "Parchment", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Toolshop",
+        "creator": "Job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Stone rubble", "amount": 4 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Sanctifier table",
+        "creator": "Job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Copper ingot", "amount": 5 },
+            { "name": "Earthenware", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Fletcher bench",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Planks", "amount": 2 },
+            { "name": "Leather", "amount": 1 },
+            { "name": "Linen", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grocery store",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Planks", "amount": 3 },
+            { "name": "Linen", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Copper anvil",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Leather", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Tanner table",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Linen", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Scribe desk",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [{ "name": "Planks", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Writer desk",
+        "creator": "Job block crafter",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Leather", "amount": 1 },
+            { "name": "Copper tools", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stove",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Copper ingot", "amount": 4 },
+            { "name": "Leather", "amount": 1 },
+            { "name": "Linen", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grindstone",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Planks", "amount": 3 },
+            { "name": "Stone rubble", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dyer table",
+        "creator": "Job block crafter",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 4 },
+            { "name": "Leather", "amount": 2 },
+            { "name": "Linen", "amount": 10 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Rope bench",
+        "creator": "Job block crafter",
+        "createTime": 360,
+        "requires": [
+            { "name": "Planks", "amount": 4 },
+            { "name": "Bronze tools", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stonemason workbench",
+        "creator": "Job block crafter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Copper tools", "amount": 1 },
+            { "name": "Linen", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Jeweller bench",
+        "creator": "Job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 5 },
+            { "name": "Rope", "amount": 2 },
+            { "name": "Leather", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Paper makers mould",
+        "creator": "Job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Planks", "amount": 3 },
+            { "name": "Iron wrought", "amount": 1 },
+            { "name": "Rope", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Poison guard",
+        "creator": "Job block crafter",
+        "createTime": 360,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Hemp fibre", "amount": 1 },
+            { "name": "Wisteria flower", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Engineer bench",
+        "creator": "Job block crafter",
+        "createTime": 360,
+        "requires": [
+            { "name": "Copper ingot", "amount": 10 },
+            { "name": "Copper tools", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Trap fixer",
+        "creator": "Job block crafter",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 4 },
+            { "name": "Copper ingot", "amount": 4 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bloomery",
+        "creator": "Advanced job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 3 },
+            { "name": "Bricks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Kiln",
+        "creator": "Advanced job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 3 },
+            { "name": "Bricks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Printing press",
+        "creator": "Advanced job block crafter",
+        "createTime": 1200,
+        "requires": [
+            { "name": "Brass parts", "amount": 5 },
+            { "name": "Steel parts", "amount": 3 },
+            { "name": "Planks", "amount": 10 },
+            { "name": "Lead ingot", "amount": 3 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Chest maker",
+        "creator": "Advanced job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 4 },
+            { "name": "Hemp fibre", "amount": 2 },
+            { "name": "Leather", "amount": 4 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Gunsmith",
+        "creator": "Advanced job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Iron wrought", "amount": 4 },
+            { "name": "Hemp fibre", "amount": 1 },
+            { "name": "Leather", "amount": 2 },
+            { "name": "Metal gear", "amount": 2 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Composting bin",
+        "creator": "Advanced job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Log wall", "amount": 4 },
+            { "name": "Leaves", "amount": 5 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Glassblower",
+        "creator": "Advanced job block crafter",
+        "createTime": 720,
+        "requires": [
+            { "name": "Bricks", "amount": 10 },
+            { "name": "Iron wrought", "amount": 3 },
+            { "name": "Bronze ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Musket guard night job",
+        "creator": "Advanced job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Steel ingot", "amount": 1 },
+            { "name": "Musket", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Musket guard day job",
+        "creator": "Advanced job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Steel ingot", "amount": 1 },
+            { "name": "Musket", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Cotten engine",
+        "creator": "Advanced job block crafter",
+        "createTime": 720,
+        "requires": [
+            { "name": "Steel ingot", "amount": 1 },
+            { "name": "Steel parts", "amount": 2 },
+            { "name": "Brass parts", "amount": 4 },
+            { "name": "Vial of mineral oil", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Metal lathe",
+        "creator": "Advanced job block crafter",
+        "createTime": 720,
+        "requires": [
+            { "name": "Brass parts", "amount": 7 },
+            { "name": "Steel parts", "amount": 3 },
+            { "name": "Steel ingot", "amount": 5 },
+            { "name": "Vial of mineral oil", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Blast furnace",
+        "creator": "Advanced job block crafter",
+        "createTime": 720,
+        "requires": [
+            { "name": "Bricks", "amount": 10 },
+            { "name": "Brass parts", "amount": 12 },
+            { "name": "Steel parts", "amount": 8 },
+            { "name": "Steel ingot", "amount": 4 },
+            { "name": "Vial of mineral oil", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Researcher desk",
+        "creator": "Advanced job block crafter",
+        "createTime": 480,
+        "requires": [
+            { "name": "Planks", "amount": 2 },
+            { "name": "Iron wrought", "amount": 1 },
+            { "name": "Paper", "amount": 8 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Charcoal",
+        "creator": "Kiln worker",
+        "createTime": 100,
+        "requires": [{ "name": "Firewood", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Paper",
+        "creator": "Paper maker",
+        "createTime": 318,
+        "requires": [
+            { "name": "Linen", "amount": 2 },
+            { "name": "Hemp fibre", "amount": 1 }
+        ],
+        "output": 8,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Empty pot",
+        "creator": "Potter",
+        "createTime": 160,
+        "requires": [
+            { "name": "Clay", "amount": 3 },
+            { "name": "Planks", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Clay tablet",
+        "creator": "Potter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Clay", "amount": 3 },
+            { "name": "Pot of water", "amount": 2 }
+        ],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 2 }
+        ]
+    },
+    {
+        "name": "Earthenware",
+        "creator": "Potter",
+        "createTime": 720,
+        "requires": [
+            { "name": "Clay", "amount": 10 },
+            { "name": "Planks", "amount": 3 },
+            { "name": "Pot of water", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 3 }
+        ]
+    },
+    {
+        "name": "Rope",
+        "creator": "Roper",
+        "createTime": 360,
+        "requires": [
+            { "name": "Linen", "amount": 3 },
+            { "name": "Hemp fibre", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Sanctified porridge",
+        "creator": "Sanctifier",
+        "createTime": 5,
+        "requires": [
+            { "name": "Wheat porridge", "amount": 1 },
+            { "name": "Candle", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Sanctified bread meal",
+        "creator": "Sanctifier",
+        "createTime": 5,
+        "requires": [
+            { "name": "Bread meal", "amount": 1 },
+            { "name": "Candle", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Sanctified chicken meal",
+        "creator": "Sanctifier",
+        "createTime": 7,
+        "requires": [
+            { "name": "Chicken meal", "amount": 1 },
+            { "name": "Candle", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Sacred storage",
+        "creator": "Sanctifier",
+        "createTime": 180,
+        "requires": [
+            { "name": "Bronze ingot", "amount": 1 },
+            { "name": "Gold ingot", "amount": 1 },
+            { "name": "Candle", "amount": 10 },
+            { "name": "Linen", "amount": 10 },
+            { "name": "Leather", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Copper ingot",
+        "creator": "Smelter",
+        "createTime": 60,
+        "requires": [
+            { "name": "Copper", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Gold ingot",
+        "creator": "Smelter",
+        "createTime": 100,
+        "requires": [
+            { "name": "Gold ore", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bronze ingot",
+        "creator": "Smelter",
+        "createTime": 400,
+        "requires": [
+            { "name": "Copper ingot", "amount": 2 },
+            { "name": "Tin", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Brass ingot",
+        "creator": "Smelter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Copper", "amount": 2 },
+            { "name": "Zinc", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Lead ingot",
+        "creator": "Smelter",
+        "createTime": 120,
+        "requires": [
+            { "name": "Lead ore", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Light bricks",
+        "creator": "Smelter",
+        "createTime": 80,
+        "requires": [
+            { "name": "Clay", "amount": 4 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Bricks",
+        "creator": "Smelter",
+        "createTime": 80,
+        "requires": [
+            { "name": "Clay", "amount": 4 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Mud bricks",
+        "creator": "Smelter",
+        "createTime": 32,
+        "requires": [
+            { "name": "Clay", "amount": 1 },
+            { "name": "Firewood", "amount": 1 }
+        ],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Grey quarter block",
+        "creator": "Stone mason",
+        "createTime": 80,
+        "requires": [{ "name": "Stone rubble", "amount": 1 }],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stone block",
+        "creator": "Stone mason",
+        "createTime": 80,
+        "requires": [{ "name": "Stone rubble", "amount": 5 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dark stone",
+        "creator": "Stone mason",
+        "createTime": 80,
+        "requires": [{ "name": "Stone rubble", "amount": 5 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stone bricks",
+        "creator": "Stone mason",
+        "createTime": 80,
+        "requires": [{ "name": "Stone rubble", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Black stone bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Stone bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Brown stone bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Stone bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "White stone bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Stone bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Black bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dark red bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dark yellow bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Red bricks",
+        "creator": "Stone mason",
+        "createTime": 20,
+        "requires": [{ "name": "Bricks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Linen",
+        "creator": "Tailor",
+        "createTime": 180,
+        "requires": [{ "name": "Flax", "amount": 6 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Hemp fibre",
+        "creator": "Tailor",
+        "createTime": 360,
+        "requires": [{ "name": "Hemp", "amount": 14 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Skin",
+        "creator": "Tanner",
+        "createTime": 240,
+        "requires": [{ "name": "Animal carcass", "amount": 1 }],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "optionalOutputs": [
+            { "name": "Raw meat", "likelihood": 1, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Raw meat",
+        "creator": "Tanner",
+        "createTime": 240,
+        "requires": [{ "name": "Animal carcass", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "optionalOutputs": [{ "name": "Skin", "likelihood": 1, "amount": 3 }]
+    },
+    {
+        "name": "Leather",
+        "creator": "Tanner",
+        "createTime": 240,
+        "requires": [{ "name": "Skin", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Parchment",
+        "creator": "Tanner",
+        "createTime": 240,
+        "requires": [{ "name": "Skin", "amount": 1 }],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Animal carcass",
+        "creator": "Tanner",
+        "createTime": 60,
+        "requires": [{ "name": "Raw chicken", "amount": 3 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stone tools",
+        "creator": "Tinkerer",
+        "createTime": 37.5,
+        "requires": [{ "name": "Stone rubble", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
     },
     {
         "name": "Planks",
+        "creator": "Tinkerer",
         "createTime": 50,
+        "requires": [{ "name": "Log", "amount": 1 }],
         "output": 4,
-        "requires": [
-            {
-                "name": "Log",
-                "amount": 1
-            }
-        ],
         "minimumTool": "none",
-        "maximumTool": "stone",
-        "creator": "Tinkerer"
+        "maximumTool": "none"
+    },
+    {
+        "name": "Bed",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Planks", "amount": 6 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Wheat meal",
+        "creator": "Tinkerer",
+        "createTime": 40,
+        "requires": [{ "name": "Wheat", "amount": 6 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Miner",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Planks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Tinkerer table",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [
+            { "name": "Log", "amount": 4 },
+            { "name": "Stone rubble", "amount": 4 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Sling",
+        "creator": "Tinkerer",
+        "createTime": 37.5,
+        "requires": [],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Slinger guard day job",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Sling", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Slinger guard night job",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Sling", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Furnace",
+        "creator": "Tinkerer",
+        "createTime": 50,
+        "requires": [{ "name": "Stone rubble", "amount": 5 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Splitting stump",
+        "creator": "Tinkerer",
+        "createTime": 75,
+        "requires": [
+            { "name": "Stone tools", "amount": 1 },
+            { "name": "Log", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Pottery station",
+        "creator": "Tinkerer",
+        "createTime": 240,
+        "requires": [
+            { "name": "Planks", "amount": 5 },
+            { "name": "Clay", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Water gatherer",
+        "creator": "Tinkerer",
+        "createTime": 80,
+        "requires": [{ "name": "Empty pot", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Sling bullet",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Stone rubble", "amount": 1 }],
+        "output": 10,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Crate",
+        "creator": "Tinkerer",
+        "createTime": 25,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Job block crafter",
+        "creator": "Tinkerer",
+        "createTime": 75,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Pot of water",
+        "creator": "Water gatherer",
+        "createTime": 6,
+        "requires": [{ "name": "Empty pot", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Pot of water",
+        "creator": "Water pump worker",
+        "createTime": 16,
+        "requires": [{ "name": "Empty pot", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none"
+    },
+    {
+        "name": "Planks",
+        "creator": "Woodcutter",
+        "createTime": 40,
+        "requires": [{ "name": "Log", "amount": 1 }],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Firewood",
+        "creator": "Woodcutter",
+        "createTime": 40,
+        "requires": [{ "name": "Planks", "amount": 1 }],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Torch",
+        "creator": "Woodcutter",
+        "createTime": 20,
+        "requires": [{ "name": "Firewood", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Wood floor",
+        "creator": "Woodcutter",
+        "createTime": 120,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Log wall",
+        "creator": "Woodcutter",
+        "createTime": 40,
+        "requires": [{ "name": "Log", "amount": 1 }],
+        "output": 3,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Dark brown quarter block",
+        "creator": "Woodcutter",
+        "createTime": 10,
+        "requires": [{ "name": "Planks", "amount": 1 }],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Light brown quarter block",
+        "creator": "Woodcutter",
+        "createTime": 10,
+        "requires": [{ "name": "Planks", "amount": 1 }],
+        "output": 4,
+        "minimumTool": "none",
+        "maximumTool": "steel"
     },
     {
         "name": "Clay",
@@ -86,110 +2253,216 @@
         "creator": "Miner"
     },
     {
-        "name": "Empty Pot",
-        "createTime": 160,
+        "name": "Coal ore",
+        "createTime": 300,
         "output": 1,
-        "requires": [
-            {
-                "name": "Clay",
-                "amount": 3
-            },
-            {
-                "name": "Planks",
-                "amount": 1
-            }
-        ],
-        "minimumTool": "none",
-        "maximumTool": "copper",
-        "creator": "Potter"
-    },
-    {
-        "name": "Pot of Flour",
-        "createTime": 12.5,
-        "output": 1,
-        "requires": [
-            {
-                "name": "Wheat",
-                "amount": 3
-            },
-            {
-                "name": "Empty Pot",
-                "amount": 1
-            }
-        ],
-        "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Grinder"
-    },
-    {
-        "name": "Firewood",
-        "createTime": 40,
-        "output": 3,
-        "requires": [
-            {
-                "name": "Planks",
-                "amount": 1
-            }
-        ],
+        "requires": [],
         "minimumTool": "none",
         "maximumTool": "steel",
-        "creator": "Woodcutter"
+        "creator": "Miner"
     },
     {
-        "name": "Pot of Water",
-        "createTime": 6,
-        "output": 1,
-        "requires": [
-            {
-                "name": "Empty Pot",
-                "amount": 1
-            }
-        ],
-        "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Water gatherer"
-    },
-    {
-        "name": "Pot of Water",
-        "createTime": 16,
-        "output": 1,
-        "requires": [
-            {
-                "name": "Empty Pot",
-                "amount": 1
-            }
-        ],
-        "minimumTool": "none",
-        "maximumTool": "none",
-        "creator": "Water pump worker"
-    },
-    {
-        "name": "Bread",
+        "name": "Copper",
         "createTime": 20,
         "output": 1,
-        "requires": [
-            {
-                "name": "Pot of Flour",
-                "amount": 1
-            },
-            {
-                "name": "Firewood",
-                "amount": 1
-            },
-            {
-                "name": "Pot of Water",
-                "amount": 1
-            }
-        ],
+        "requires": [],
         "minimumTool": "none",
         "maximumTool": "steel",
-        "creator": "Cook",
+        "creator": "Miner"
+    },
+    {
+        "name": "Gold ore",
+        "createTime": 300,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Iron ore",
+        "createTime": 60,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Lead ore",
+        "createTime": 300,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Silica sand",
+        "createTime": 360,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Stone rubble",
+        "createTime": 20,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Sulfur",
+        "createTime": 300,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Tin",
+        "createTime": 300,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Zinc",
+        "createTime": 300,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "steel",
+        "creator": "Miner"
+    },
+    {
+        "name": "Wheat",
+        "createTime": 870,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Wheat farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Flax",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Flax farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Cotton",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Cotton farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Cabbage",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Cabbage farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Alkanet",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Alkanet farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Hollyhock",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Hollyhock farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Wolfsbane",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Wolfsbane farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Barley",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Barley farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Hemp",
+        "createTime": 435,
+        "output": 100,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Hemp farmer",
+        "size": { "height": 10, "width": 10 }
+    },
+    {
+        "name": "Wisteria flower",
+        "createTime": 435,
+        "output": 1,
+        "requires": [],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Wisteria flower farmer"
+    },
+    {
+        "name": "Log",
+        "createTime": 435,
+        "output": 44,
+        "requires": [],
         "optionalOutputs": [
-            {
-                "name": "Empty Pot",
-                "amount": 2,
-                "likelihood": 0.95
-            }
-        ]
+            { "name": "Leaves", "amount": 59.4, "likelihood": 1 }
+        ],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Forester",
+        "size": { "width": 3, "height": 33 }
+    },
+    {
+        "name": "Leaves",
+        "createTime": 435,
+        "output": 59.4,
+        "requires": [],
+        "optionalOutputs": [{ "name": "Log", "amount": 44, "likelihood": 1 }],
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "creator": "Forester",
+        "size": { "width": 3, "height": 33 }
     }
 ]
