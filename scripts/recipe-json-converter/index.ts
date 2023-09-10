@@ -7,17 +7,20 @@ import toolsSchema from "./schemas/tools.json";
 import recipesSchema from "./schemas/recipes.json";
 import behavioursSchema from "./schemas/block-behaviours.json";
 import mineableItemsSchema from "./schemas/mineable-items.json";
+import growablesSchema from "./schemas/growables.json";
 import { JSONFileReader } from "./interfaces/json-file-reader";
 import {
     BlockBehaviours,
     Recipes,
     PiplizToolsets,
     MineableItems,
+    Growables,
 } from "./types";
 import { factory as createJSONFileAdapter } from "./adapters/json-file-adapter";
 import { convertRecipes as baseConvertCraftableRecipes } from "./domain/craftable-recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "./domain/recipe-converter";
 import { convertMineableItems as baseConvertMineableItems } from "./domain/mineable-item-converter";
+import { convertGrowables as baseConvertGrowables } from "./domain/growable-converter";
 import { findFiles } from "./adapters/fs-file-adapter";
 import { writeJSONToFile } from "./adapters/json-file-writer";
 import {
@@ -32,6 +35,10 @@ import {
     MineableItemConverter,
     MineableItemConverterInputs,
 } from "./interfaces/mineable-item-converter";
+import {
+    GrowableConverter,
+    GrowableConverterInputs,
+} from "./interfaces/growable-converter";
 
 const parser = yargs(hideBin(process.argv)).options({
     inputDirectory: {
@@ -96,17 +103,36 @@ const createMineableItemsConverter = (): ((
         });
 };
 
+const createGrowableItemsFileReader = (): JSONFileReader<Growables> => {
+    return createJSONFileAdapter(growablesSchema);
+};
+
+const createGrowablesConverter = (): ((
+    input: GrowableConverterInputs
+) => ReturnType<GrowableConverter>) => {
+    const growablesReader = createGrowableItemsFileReader();
+
+    return (input) =>
+        baseConvertGrowables({
+            ...input,
+            findFiles,
+            readGrowablesFile: growablesReader,
+        });
+};
+
 const createRecipeConverter = (): ((
     input: RecipeConverterInputs
 ) => ReturnType<RecipeConverter>) => {
     const convertCraftableRecipes = createCraftableRecipeConverter();
     const convertMineableItems = createMineableItemsConverter();
+    const convertGrowables = createGrowablesConverter();
 
     return (input) =>
         baseConvertRecipes({
             ...input,
             convertCraftableRecipes,
             convertMineableItems,
+            convertGrowables,
             writeJSON: writeJSONToFile,
         });
 };

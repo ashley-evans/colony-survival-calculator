@@ -4,6 +4,7 @@ import { MineableItemConverter } from "../interfaces/mineable-item-converter";
 import { APITools, Items, MineableItems } from "../types";
 import { JSON_FILE_EXTENSION } from "./constants";
 import { getUserFriendlyItemName } from "./recipe-dictionary";
+import { checkDuplication } from "./utils";
 
 const FILE_NAME = "types";
 
@@ -60,21 +61,6 @@ const convertToItems = (mineable: MineableItems): Items => {
     }, [] as Items);
 };
 
-const checkDuplication = (
-    items: Items
-): { duplicateFound: true; name: string } | { duplicateFound: false } => {
-    const existingSet = new Set<string>();
-    for (const { name } of items) {
-        if (existingSet.has(name)) {
-            return { duplicateFound: true, name };
-        }
-
-        existingSet.add(name);
-    }
-
-    return { duplicateFound: false };
-};
-
 const convertMineableItems: MineableItemConverter = async ({
     inputDirectoryPath,
     findFiles,
@@ -94,7 +80,7 @@ const convertMineableItems: MineableItemConverter = async ({
         );
     }
 
-    return convertToItems(mineable);
+    return converted;
 };
 
 export { convertMineableItems };

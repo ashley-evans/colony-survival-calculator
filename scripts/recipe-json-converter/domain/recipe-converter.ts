@@ -5,11 +5,13 @@ const convertRecipes: RecipeConverter = async ({
     outputFilePath,
     convertCraftableRecipes,
     convertMineableItems,
+    convertGrowables,
     writeJSON,
 }) => {
     const craftable = await convertCraftableRecipes({ inputDirectoryPath });
     const mineable = await convertMineableItems({ inputDirectoryPath });
-    const combined = craftable.concat(mineable);
+    const growables = await convertGrowables({ inputDirectoryPath });
+    const combined = craftable.concat(mineable, growables);
     if (combined.length === 0) {
         return false;
     }

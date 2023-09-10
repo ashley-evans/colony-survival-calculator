@@ -1,3 +1,5 @@
+import { Items } from "../types";
+
 type FilterByConditionResult<T> = { matching: T[]; nonMatching: T[] };
 
 const filterByCondition = <T>(
@@ -39,4 +41,24 @@ const splitPiplizName = (
     return { itemName, creator };
 };
 
-export { filterByCondition, splitPiplizCreator, splitPiplizName };
+const checkDuplication = (
+    items: Items
+): { duplicateFound: true; name: string } | { duplicateFound: false } => {
+    const existingSet = new Set<string>();
+    for (const { name } of items) {
+        if (existingSet.has(name)) {
+            return { duplicateFound: true, name };
+        }
+
+        existingSet.add(name);
+    }
+
+    return { duplicateFound: false };
+};
+
+export {
+    filterByCondition,
+    splitPiplizCreator,
+    splitPiplizName,
+    checkDuplication,
+};

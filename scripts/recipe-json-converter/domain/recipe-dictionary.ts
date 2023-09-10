@@ -235,6 +235,8 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     woodfloor: "Wood floor",
     quarterblockbrowndark: "Dark brown quarter block",
     quarterblockbrownlight: "Light brown quarter block",
+    cotton: "Cotton",
+    wisteriaplant: "Wisteria flower",
 };
 
 const getUserFriendlyItemName = (name: string): string | null => {
@@ -275,6 +277,16 @@ const creatorNameMap: Readonly<Record<string, string>> = {
     watergatherer: "Water gatherer",
     waterpump: "Water pump worker",
     woodcutter: "Woodcutter",
+    wheat: "Wheat farmer",
+    flax: "Flax farmer",
+    cotton: "Cotton farmer",
+    cabbage: "Cabbage farmer",
+    alkanet: "Alkanet farmer",
+    hollyhock: "Hollyhock farmer",
+    wolfsbane: "Wolfsbane farmer",
+    barley: "Barley farmer",
+    hemp: "Hemp farmer",
+    wisteriaplant: "Wisteria flower farmer",
 };
 
 const getUserFriendlyCreatorName = (creator: string): string | null => {

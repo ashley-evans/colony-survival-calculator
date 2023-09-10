@@ -6,6 +6,7 @@ import { APITools, Items } from "../../types";
 
 const mockConvertCrafteableRecipes = jest.fn();
 const mockConvertMineableItems = jest.fn();
+const mockConvertGrowables = jest.fn();
 const mockWriteJSON = jest.fn();
 
 const convertRecipes = (input: RecipeConverterInputs) =>
@@ -13,6 +14,7 @@ const convertRecipes = (input: RecipeConverterInputs) =>
         ...input,
         convertCraftableRecipes: mockConvertCrafteableRecipes,
         convertMineableItems: mockConvertMineableItems,
+        convertGrowables: mockConvertGrowables,
         writeJSON: mockWriteJSON,
     });
 
@@ -54,9 +56,22 @@ const expectedMineableItems: Items = [
     },
 ];
 
+const expectedGrowables: Items = [
+    {
+        name: "Wheat",
+        createTime: 20,
+        output: 1,
+        requires: [],
+        minimumTool: APITools.none,
+        maximumTool: APITools.none,
+        creator: "Wheat farmer",
+    },
+];
+
 beforeEach(() => {
     mockConvertCrafteableRecipes.mockResolvedValue(expectedCraftableRecipes);
     mockConvertMineableItems.mockResolvedValue(expectedMineableItems);
+    mockConvertGrowables.mockResolvedValue(expectedGrowables);
     mockWriteJSON.mockResolvedValue(true);
 });
 
@@ -78,8 +93,18 @@ test("converts all mineable recipes in provided directory", async () => {
     });
 });
 
+test("converts all growable recipes in provided directory", async () => {
+    await convertRecipes(input);
+
+    expect(mockConvertGrowables).toHaveBeenCalledTimes(1);
+    expect(mockConvertGrowables).toHaveBeenCalledWith({
+        inputDirectoryPath: input.inputDirectoryPath,
+    });
+});
+
 test("only writes returned craftable recipes to provided JSON output path if only craftable recipes returned", async () => {
     mockConvertMineableItems.mockResolvedValue([]);
+    mockConvertGrowables.mockResolvedValue([]);
 
     await convertRecipes(input);
 
@@ -92,6 +117,7 @@ test("only writes returned craftable recipes to provided JSON output path if onl
 
 test("only writes returned mineable items to provided JSON output path if only mineable items returned", async () => {
     mockConvertCrafteableRecipes.mockResolvedValue([]);
+    mockConvertGrowables.mockResolvedValue([]);
 
     await convertRecipes(input);
 
@@ -102,8 +128,25 @@ test("only writes returned mineable items to provided JSON output path if only m
     );
 });
 
-test("writes combined craftable recipes and mineable items to provided JSON output path if both returned", async () => {
-    const expected = [...expectedCraftableRecipes, ...expectedMineableItems];
+test("only writes returned growable items to provided JSON output path if only growable items returned", async () => {
+    mockConvertCrafteableRecipes.mockResolvedValue([]);
+    mockConvertMineableItems.mockResolvedValue([]);
+
+    await convertRecipes(input);
+
+    expect(mockWriteJSON).toHaveBeenCalledTimes(1);
+    expect(mockWriteJSON).toHaveBeenCalledWith(
+        input.outputFilePath,
+        expectedGrowables
+    );
+});
+
+test("writes combined recipes to provided JSON output path if both returned", async () => {
+    const expected = [
+        ...expectedCraftableRecipes,
+        ...expectedMineableItems,
+        ...expectedGrowables,
+    ];
 
     await convertRecipes(input);
 
@@ -118,6 +161,7 @@ describe("handles no recipes converted", () => {
     beforeEach(() => {
         mockConvertCrafteableRecipes.mockResolvedValue([]);
         mockConvertMineableItems.mockResolvedValue([]);
+        mockConvertGrowables.mockResolvedValue([]);
     });
 
     test("does not write any files", async () => {

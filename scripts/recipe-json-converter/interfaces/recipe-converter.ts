@@ -2,6 +2,10 @@ import {
     CraftableRecipeConverter,
     CraftableRecipeConverterInputs,
 } from "./craftable-recipe-converter";
+import {
+    GrowableConverter,
+    GrowableConverterInputs,
+} from "./growable-converter";
 import { JSONWriter } from "./json-writer";
 import {
     MineableItemConverter,
@@ -15,6 +19,9 @@ type RecipeConverterDependencies = {
     convertMineableItems: (
         input: MineableItemConverterInputs
     ) => ReturnType<MineableItemConverter>;
+    convertGrowables: (
+        input: GrowableConverterInputs
+    ) => ReturnType<GrowableConverter>;
     writeJSON: JSONWriter;
 };
 
