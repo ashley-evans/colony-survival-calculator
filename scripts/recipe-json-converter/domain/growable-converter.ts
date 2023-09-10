@@ -1,7 +1,7 @@
 import { FileFinder } from "../interfaces/file-finder";
 import { GrowableConverter } from "../interfaces/growable-converter";
 import { JSONFileReader } from "../interfaces/json-file-reader";
-import { APITools, Growables, Item } from "../types";
+import { APITools, Growables, Item, Items } from "../types";
 import { JSON_FILE_EXTENSION } from "./constants";
 import {
     getUserFriendlyCreatorName,
@@ -11,6 +11,37 @@ import { checkDuplication } from "./utils";
 
 const FILE_NAME = "growables";
 const GAME_DAY_SECONDS = 435;
+
+const STATIC_RECIPES: Items = [
+    {
+        name: "Log",
+        createTime: 435,
+        output: 44,
+        requires: [],
+        optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
+        minimumTool: APITools.none,
+        maximumTool: APITools.none,
+        creator: "Forester",
+        size: {
+            width: 3,
+            height: 33,
+        },
+    },
+    {
+        name: "Leaves",
+        createTime: 435,
+        output: 59.4,
+        requires: [],
+        optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
+        minimumTool: APITools.none,
+        maximumTool: APITools.none,
+        creator: "Forester",
+        size: {
+            width: 3,
+            height: 33,
+        },
+    },
+];
 
 const getGrowables = async (
     inputDirectoryPath: string,
@@ -55,6 +86,23 @@ const getExpectedOutput = (name: string): number | null => {
     }
 };
 
+const getExpectedSize = (name: string): NonNullable<Item["size"]> | null => {
+    switch (name) {
+        case "wheat":
+        case "flax":
+        case "cotton":
+        case "cabbage":
+        case "alkanet":
+        case "hollyhock":
+        case "wolfsbane":
+        case "barley":
+        case "hemp":
+            return { height: 10, width: 10 };
+        default:
+            return null;
+    }
+};
+
 const mapToItem = (growable: Growables[number]): Item => {
     const userFriendlyName = getUserFriendlyItemName(growable.identifier);
     if (!userFriendlyName) {
@@ -85,6 +133,7 @@ const mapToItem = (growable: Growables[number]): Item => {
     }
 
     const createTime = daysToGrow * GAME_DAY_SECONDS;
+    const size = getExpectedSize(growable.identifier);
     return {
         name: userFriendlyName,
         createTime,
@@ -93,6 +142,7 @@ const mapToItem = (growable: Growables[number]): Item => {
         minimumTool: APITools.none,
         maximumTool: APITools.none,
         creator,
+        ...(size ? { size } : {}),
     };
 };
 
@@ -107,7 +157,9 @@ const convertGrowables: GrowableConverter = async ({
         readGrowablesFile
     );
 
-    const converted = growables.map((growable) => mapToItem(growable));
+    const converted = growables
+        .map((growable) => mapToItem(growable))
+        .concat(STATIC_RECIPES);
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(

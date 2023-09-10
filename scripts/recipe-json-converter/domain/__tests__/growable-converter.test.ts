@@ -25,6 +25,43 @@ const expectedGrowablesFileFindInput = {
     fileExtension: ".json",
 };
 
+const expectedStaticLogRecipe: Item = {
+    name: "Log",
+    createTime: 435,
+    output: 44,
+    requires: [],
+    // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
+    optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
+    minimumTool: APITools.none,
+    maximumTool: APITools.none,
+    creator: "Forester",
+    size: {
+        width: 3,
+        height: 33,
+    },
+};
+
+const expectedStaticLeavesRecipe: Item = {
+    name: "Leaves",
+    createTime: 435,
+    // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
+    output: 59.4,
+    requires: [],
+    optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
+    minimumTool: APITools.none,
+    maximumTool: APITools.none,
+    creator: "Forester",
+    size: {
+        width: 3,
+        height: 33,
+    },
+};
+
+const expectedStaticRecipes = [
+    expectedStaticLogRecipe,
+    expectedStaticLeavesRecipe,
+];
+
 beforeEach(() => {
     mockFindFiles.mockResolvedValue([growablesFile]);
     const defaultGrowablesFileContent: Growables = [];
@@ -68,24 +105,44 @@ test("parses the JSON found in the growables file", async () => {
     expect(mockReadGrowablesFile).toHaveBeenCalledWith(growablesFile);
 });
 
+test("always includes static log and leaves recipe regardless of whether included in recipes files", async () => {
+    const actual = await convertGrowables(input);
+
+    expect(actual).toHaveLength(2);
+    expect(actual).toEqual(expect.arrayContaining(expectedStaticRecipes));
+});
+
 test.each([
-    ["wheat", "Wheat", "Wheat farmer", 100],
-    ["flax", "Flax", "Flax farmer", 100],
-    ["cotton", "Cotton", "Cotton farmer", 100],
-    ["cabbage", "Cabbage", "Cabbage farmer", 100],
-    ["alkanet", "Alkanet", "Alkanet farmer", 100],
-    ["hollyhock", "Hollyhock", "Hollyhock farmer", 100],
-    ["wolfsbane", "Wolfsbane", "Wolfsbane farmer", 100],
-    ["barley", "Barley", "Barley farmer", 100],
-    ["hemp", "Hemp", "Hemp farmer", 100],
-    ["wisteriaplant", "Wisteria flower", "Wisteria flower farmer", 1],
+    ["wheat", "Wheat", "Wheat farmer", 100, { height: 10, width: 10 }],
+    ["flax", "Flax", "Flax farmer", 100, { height: 10, width: 10 }],
+    ["cotton", "Cotton", "Cotton farmer", 100, { height: 10, width: 10 }],
+    ["cabbage", "Cabbage", "Cabbage farmer", 100, { height: 10, width: 10 }],
+    ["alkanet", "Alkanet", "Alkanet farmer", 100, { height: 10, width: 10 }],
+    [
+        "hollyhock",
+        "Hollyhock",
+        "Hollyhock farmer",
+        100,
+        { height: 10, width: 10 },
+    ],
+    [
+        "wolfsbane",
+        "Wolfsbane",
+        "Wolfsbane farmer",
+        100,
+        { height: 10, width: 10 },
+    ],
+    ["barley", "Barley", "Barley farmer", 100, { height: 10, width: 10 }],
+    ["hemp", "Hemp", "Hemp farmer", 100, { height: 10, width: 10 }],
+    ["wisteriaplant", "Wisteria flower", "Wisteria flower farmer", 1, null],
 ])(
     "returns converted recipe given single growable (%s) found in file (2 stages)",
     async (
         piplizName: string,
         expectedName: string,
         expectedCreator: string,
-        expectedOutput: number
+        expectedOutput: number,
+        expectedSize: { height: number; width: number } | null
     ) => {
         const growables: Growables = [
             { identifier: piplizName, stages: [{}, {}] },
@@ -99,12 +156,13 @@ test.each([
             minimumTool: APITools.none,
             maximumTool: APITools.none,
             creator: expectedCreator,
+            ...(expectedSize ? { size: expectedSize } : {}),
         };
 
         const actual = await convertGrowables(input);
 
-        expect(actual).toHaveLength(1);
-        expect(actual[0]).toEqual(expected);
+        expect(actual).toHaveLength(1 + expectedStaticRecipes.length);
+        expect(actual).toContainEqual(expected);
     }
 );
 
@@ -121,12 +179,16 @@ test("returns converted recipe given single growable with more than 2 stages", a
         minimumTool: APITools.none,
         maximumTool: APITools.none,
         creator: "Wheat farmer",
+        size: {
+            width: 10,
+            height: 10,
+        },
     };
 
     const actual = await convertGrowables(input);
 
-    expect(actual).toHaveLength(1);
-    expect(actual[0]).toEqual(expected);
+    expect(actual).toHaveLength(1 + expectedStaticRecipes.length);
+    expect(actual).toContainEqual(expected);
 });
 
 test("throws an error if provided growable with unknown user friendly name", async () => {
@@ -196,6 +258,10 @@ test("converts multiple items given multiple growables found in file", async () 
             minimumTool: APITools.none,
             maximumTool: APITools.none,
             creator: "Wheat farmer",
+            size: {
+                width: 10,
+                height: 10,
+            },
         },
         {
             name: "Flax",
@@ -205,12 +271,16 @@ test("converts multiple items given multiple growables found in file", async () 
             minimumTool: APITools.none,
             maximumTool: APITools.none,
             creator: "Flax farmer",
+            size: {
+                width: 10,
+                height: 10,
+            },
         },
     ];
 
     const actual = await convertGrowables(input);
 
-    expect(actual).toHaveLength(expected.length);
+    expect(actual).toHaveLength(expected.length + expectedStaticRecipes.length);
     expect(actual).toEqual(expect.arrayContaining(expected));
 });
 
