@@ -2,7 +2,7 @@ import path from "path";
 
 import { RecipeConverterInputs } from "../../interfaces/recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../recipe-converter";
-import { APITools, Items } from "../../types";
+import { APITools, Item, Items } from "../../types";
 
 const mockConvertCrafteableRecipes = jest.fn();
 const mockConvertMineableItems = jest.fn();
@@ -67,6 +67,10 @@ const expectedGrowables: Items = [
         creator: "Wheat farmer",
     },
 ];
+
+const consoleLogSpy = jest
+    .spyOn(console, "log")
+    .mockImplementation(() => undefined);
 
 beforeEach(() => {
     mockConvertCrafteableRecipes.mockResolvedValue(expectedCraftableRecipes);
@@ -154,6 +158,131 @@ test("writes combined recipes to provided JSON output path if both returned", as
     expect(mockWriteJSON).toHaveBeenCalledWith(
         input.outputFilePath,
         expect.arrayContaining(expected)
+    );
+});
+
+describe("handles directly non-creatable items", () => {
+    const itemWithUnknownRequirement: Item = {
+        name: "Test item",
+        createTime: 2,
+        requires: [{ name: "Unknown item", amount: 1 }],
+        output: 1,
+        minimumTool: APITools.none,
+        maximumTool: APITools.steel,
+        creator: "Test creator",
+    };
+
+    beforeEach(() => {
+        mockConvertCrafteableRecipes.mockResolvedValue([
+            itemWithUnknownRequirement,
+        ]);
+    });
+
+    test("filters out any item that depends on an item that does not exist", async () => {
+        await convertRecipes(input);
+
+        expect(mockWriteJSON).not.toHaveBeenCalledWith(
+            input.outputFilePath,
+            expect.arrayContaining([itemWithUnknownRequirement])
+        );
+    });
+
+    test("writes a message to console to indicate recipe removed", async () => {
+        await convertRecipes(input);
+
+        expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`
+        );
+    });
+});
+
+describe("handles non-creatable items due to nested unknown item", () => {
+    const itemWithUnknownRequirement: Item = {
+        name: "Test item",
+        createTime: 2,
+        requires: [{ name: "Unknown item", amount: 1 }],
+        output: 1,
+        minimumTool: APITools.none,
+        maximumTool: APITools.steel,
+        creator: "Test creator",
+    };
+    const itemWithNestedUnknownRequirement: Item = {
+        name: "Another test item",
+        createTime: 2,
+        requires: [{ name: itemWithUnknownRequirement.name, amount: 1 }],
+        output: 1,
+        minimumTool: APITools.none,
+        maximumTool: APITools.steel,
+        creator: "Test creator",
+    };
+
+    beforeEach(() => {
+        mockConvertCrafteableRecipes.mockResolvedValue([
+            itemWithNestedUnknownRequirement,
+            itemWithUnknownRequirement,
+        ]);
+    });
+
+    test("filters out any item that depends on an item that does not exist", async () => {
+        await convertRecipes(input);
+
+        expect(mockWriteJSON).not.toHaveBeenCalledWith(
+            input.outputFilePath,
+            expect.arrayContaining([itemWithNestedUnknownRequirement])
+        );
+        expect(mockWriteJSON).not.toHaveBeenCalledWith(
+            input.outputFilePath,
+            expect.arrayContaining([itemWithUnknownRequirement])
+        );
+    });
+
+    test("writes a message to console to indicate recipe removed", async () => {
+        await convertRecipes(input);
+
+        expect(consoleLogSpy).toHaveBeenCalledTimes(2);
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`
+        );
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+            `Removed recipe: ${itemWithNestedUnknownRequirement.name} from ${itemWithNestedUnknownRequirement.creator} as depends on item that cannot be created`
+        );
+    });
+});
+
+test("filters out any item that depends on an item that cannot be created because it depends on an item that does not exist", async () => {
+    const itemWithUnknownRequirement: Item = {
+        name: "Test item",
+        createTime: 2,
+        requires: [{ name: "Unknown item", amount: 1 }],
+        output: 1,
+        minimumTool: APITools.none,
+        maximumTool: APITools.steel,
+        creator: "Test creator",
+    };
+    const itemWithNestedUnknownRequirement: Item = {
+        name: "Another test item",
+        createTime: 2,
+        requires: [{ name: itemWithUnknownRequirement.name, amount: 1 }],
+        output: 1,
+        minimumTool: APITools.none,
+        maximumTool: APITools.steel,
+        creator: "Test creator",
+    };
+    mockConvertCrafteableRecipes.mockResolvedValue([
+        itemWithNestedUnknownRequirement,
+        itemWithUnknownRequirement,
+    ]);
+
+    await convertRecipes(input);
+
+    expect(mockWriteJSON).not.toHaveBeenCalledWith(
+        input.outputFilePath,
+        expect.arrayContaining([itemWithNestedUnknownRequirement])
+    );
+    expect(mockWriteJSON).not.toHaveBeenCalledWith(
+        input.outputFilePath,
+        expect.arrayContaining([itemWithUnknownRequirement])
     );
 });
 
