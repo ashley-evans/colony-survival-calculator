@@ -1,18 +1,17 @@
-import { BlockBehaviours, Recipes, PiplizToolsets } from "../types";
-import { FileFinder } from "./file-finder";
-import { JSONFileReader } from "./json-file-reader";
+import {
+    CraftableRecipeConverter,
+    CraftableRecipeConverterInputs,
+} from "./craftable-recipe-converter";
 import { JSONWriter } from "./json-writer";
 
 type RecipeConverterDependencies = {
-    findFiles: FileFinder;
-    readToolsFile: JSONFileReader<PiplizToolsets>;
-    readRecipeFile: JSONFileReader<Recipes>;
-    readBehavioursFile: JSONFileReader<BlockBehaviours>;
+    convertCraftableRecipes: (
+        input: CraftableRecipeConverterInputs
+    ) => ReturnType<CraftableRecipeConverter>;
     writeJSON: JSONWriter;
 };
 
-type RecipeConverterInputs = {
-    inputDirectoryPath: string;
+type RecipeConverterInputs = CraftableRecipeConverterInputs & {
     outputFilePath: string;
 };
 
@@ -23,7 +22,7 @@ interface RecipeConverter {
     (params: RecipeConverterParameters): Promise<boolean>;
 }
 
-export type {
+export {
     RecipeConverter,
     RecipeConverterDependencies,
     RecipeConverterInputs,

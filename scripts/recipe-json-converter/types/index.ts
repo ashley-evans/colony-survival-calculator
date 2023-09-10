@@ -4,7 +4,14 @@ import {
     Tools as PiplizTools,
     Toolsets as PiplizToolsets,
 } from "./generated/tools";
-import { Item, Tools as APITools } from "./generated/items";
+import {
+    Item,
+    Items,
+    Requirement,
+    Requirements,
+    OptionalOutput,
+    Tools as APITools,
+} from "./generated/items";
 
 type NPCToolsetMapping = {
     npcType: string;
@@ -16,6 +23,10 @@ type RecipeResult = Recipes[number]["results"][number];
 export {
     NPCToolsetMapping,
     Item,
+    Items,
+    Requirement,
+    Requirements,
+    OptionalOutput,
     PiplizTools,
     PiplizToolsets,
     APITools,
