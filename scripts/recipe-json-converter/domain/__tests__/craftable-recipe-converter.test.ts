@@ -1330,6 +1330,48 @@ describe("recipe to item mapping", () => {
         );
     });
 
-    // TODO: Need to add a script for handling growable items
-    // TODO: Need to add a script for handling mineable items
+    test("throws an error if more than one recipe for same item and creator", async () => {
+        const sameItemName = "stonerubble";
+        const sameItemCreator = "alchemist";
+        const expectedError = `Multiple recipes for item: Stone rubble from creator: Alchemist, please remove one`;
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${sameItemCreator}.${sameItemName}`,
+                requires: [],
+                results: [
+                    {
+                        type: sameItemName,
+                    },
+                ],
+            },
+            {
+                cooldown: 15,
+                name: `pipliz.${sameItemCreator}.${sameItemName}`,
+                requires: [],
+                results: [
+                    {
+                        type: sameItemName,
+                    },
+                ],
+            },
+        ];
+        mockReadRecipeFile.mockResolvedValue(recipes);
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${sameItemCreator}`,
+                            toolset: noToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+        mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(expectedError);
+    });
 });

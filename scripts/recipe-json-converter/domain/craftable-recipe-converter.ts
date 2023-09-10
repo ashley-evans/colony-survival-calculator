@@ -23,6 +23,7 @@ import {
     getUserFriendlyItemName,
 } from "./recipe-dictionary";
 import {
+    checkDuplication,
     filterByCondition,
     splitPiplizCreator,
     splitPiplizName,
@@ -302,6 +303,13 @@ const convertRecipes: CraftableRecipeConverter = async ({
 
         return acc;
     }, [] as Items);
+
+    const containsDuplicate = checkDuplication(converted);
+    if (containsDuplicate.duplicateFound) {
+        throw new Error(
+            `Multiple recipes for item: ${containsDuplicate.name} from creator: ${containsDuplicate.creator}, please remove one`
+        );
+    }
 
     return converted;
 };

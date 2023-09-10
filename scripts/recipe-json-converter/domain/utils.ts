@@ -43,14 +43,17 @@ const splitPiplizName = (
 
 const checkDuplication = (
     items: Items
-): { duplicateFound: true; name: string } | { duplicateFound: false } => {
+):
+    | { duplicateFound: true; name: string; creator: string }
+    | { duplicateFound: false } => {
     const existingSet = new Set<string>();
-    for (const { name } of items) {
-        if (existingSet.has(name)) {
-            return { duplicateFound: true, name };
+    for (const { name, creator } of items) {
+        const hash = JSON.stringify({ name, creator });
+        if (existingSet.has(hash)) {
+            return { duplicateFound: true, name, creator };
         }
 
-        existingSet.add(name);
+        existingSet.add(hash);
     }
 
     return { duplicateFound: false };
