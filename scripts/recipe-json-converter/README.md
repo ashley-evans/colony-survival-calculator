@@ -42,3 +42,5 @@ Tinkerer's recipe's needs to be updated to:
 Woodcutters' recipe's needs to be updated to:
 
 -   Only include one planks recipe, remove entry for: `plankstiaga`
+
+Mineable items file (`types.json`) needs to be updated to only include one stone rubble mining recipe, remove entry for `darkstone`

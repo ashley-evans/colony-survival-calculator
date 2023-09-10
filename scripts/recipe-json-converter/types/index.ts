@@ -1,4 +1,5 @@
 export * from "./generated/block-behaviours";
+export * from "./generated/mineable-items";
 import { Recipes } from "./generated/recipes";
 import {
     Tools as PiplizTools,

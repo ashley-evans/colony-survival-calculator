@@ -27,8 +27,8 @@ import {
     splitPiplizCreator,
     splitPiplizName,
 } from "./utils";
+import { JSON_FILE_EXTENSION } from "./constants";
 
-const JSON_FILE_EXTENSION = ".json";
 const TOOLSETS_FILE_NAME = "toolsets";
 const BLOCK_BEHAVIOURS_FILE_NAME = "generateblocks";
 const RECIPE_PREFIX = "recipes_";

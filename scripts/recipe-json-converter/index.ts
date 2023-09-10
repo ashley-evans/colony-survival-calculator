@@ -6,11 +6,18 @@ import { hideBin } from "yargs/helpers";
 import toolsSchema from "./schemas/tools.json";
 import recipesSchema from "./schemas/recipes.json";
 import behavioursSchema from "./schemas/block-behaviours.json";
+import mineableItemsSchema from "./schemas/mineable-items.json";
 import { JSONFileReader } from "./interfaces/json-file-reader";
-import { BlockBehaviours, Recipes, PiplizToolsets } from "./types";
+import {
+    BlockBehaviours,
+    Recipes,
+    PiplizToolsets,
+    MineableItems,
+} from "./types";
 import { factory as createJSONFileAdapter } from "./adapters/json-file-adapter";
 import { convertRecipes as baseConvertCraftableRecipes } from "./domain/craftable-recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "./domain/recipe-converter";
+import { convertMineableItems as baseConvertMineableItems } from "./domain/mineable-item-converter";
 import { findFiles } from "./adapters/fs-file-adapter";
 import { writeJSONToFile } from "./adapters/json-file-writer";
 import {
@@ -21,6 +28,10 @@ import {
     RecipeConverter,
     RecipeConverterInputs,
 } from "./interfaces/recipe-converter";
+import {
+    MineableItemConverter,
+    MineableItemConverterInputs,
+} from "./interfaces/mineable-item-converter";
 
 const parser = yargs(hideBin(process.argv)).options({
     inputDirectory: {
@@ -68,15 +79,34 @@ const createCraftableRecipeConverter = (): ((
         });
 };
 
+const createMineableItemsFileReader = (): JSONFileReader<MineableItems> => {
+    return createJSONFileAdapter(mineableItemsSchema);
+};
+
+const createMineableItemsConverter = (): ((
+    input: MineableItemConverterInputs
+) => ReturnType<MineableItemConverter>) => {
+    const mineableItemsReader = createMineableItemsFileReader();
+
+    return (input) =>
+        baseConvertMineableItems({
+            ...input,
+            findFiles,
+            readMineableItemsFile: mineableItemsReader,
+        });
+};
+
 const createRecipeConverter = (): ((
     input: RecipeConverterInputs
 ) => ReturnType<RecipeConverter>) => {
     const convertCraftableRecipes = createCraftableRecipeConverter();
+    const convertMineableItems = createMineableItemsConverter();
 
     return (input) =>
         baseConvertRecipes({
             ...input,
             convertCraftableRecipes,
+            convertMineableItems,
             writeJSON: writeJSONToFile,
         });
 };

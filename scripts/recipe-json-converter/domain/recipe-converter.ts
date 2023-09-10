@@ -4,14 +4,17 @@ const convertRecipes: RecipeConverter = async ({
     inputDirectoryPath,
     outputFilePath,
     convertCraftableRecipes,
+    convertMineableItems,
     writeJSON,
 }) => {
     const craftable = await convertCraftableRecipes({ inputDirectoryPath });
-    if (craftable.length === 0) {
+    const mineable = await convertMineableItems({ inputDirectoryPath });
+    const combined = craftable.concat(mineable);
+    if (combined.length === 0) {
         return false;
     }
 
-    return writeJSON(outputFilePath, craftable);
+    return writeJSON(outputFilePath, combined);
 };
 
 export { convertRecipes };
