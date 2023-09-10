@@ -26,3 +26,7 @@ lerna-debug.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Temporary test files
+
+**/temp/**

@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "array",
+    "title": "Toolsets",
+    "items": {
+        "type": "object",
+        "properties": {
+            "key": {
+                "type": "string"
+            },
+            "usable": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/tools"
+                }
+            }
+        },
+        "required": ["key", "usable"]
+    },
+    "definitions": {
+        "tools": {
+            "title": "Tools",
+            "type": "string",
+            "tsEnumNames": [
+                "steeltools",
+                "bronzetools",
+                "irontools",
+                "coppertools",
+                "stonetools",
+                "notools",
+                "machinetools",
+                "eyeglasses"
+            ],
+            "enum": [
+                "steeltools",
+                "bronzetools",
+                "irontools",
+                "coppertools",
+                "stonetools",
+                "notools",
+                "machinetools",
+                "eyeglasses"
+            ]
+        }
+    }
+}
