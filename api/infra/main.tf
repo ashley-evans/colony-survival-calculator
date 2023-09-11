@@ -341,6 +341,7 @@ resource "aws_lambda_function" "query_requirements_lambda" {
   runtime       = var.runtime
   handler       = "index.handler"
   architectures = local.architectures
+  memory_size   = 1536
 
   source_code_hash = data.archive_file.query_requirements_lambda.output_base64sha256
 
