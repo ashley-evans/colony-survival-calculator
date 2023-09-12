@@ -1,7 +1,18 @@
 import { ToolSchemaMap } from "../../common/modifiers";
 import { OutputUnit } from "../../common/output";
-import type { QueryRequirementArgs, Requirement } from "../../graphql/schema";
+import type {
+    QueryRequirementArgs,
+    RequirementResult,
+} from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
+import {
+    INVALID_ITEM_NAME_ERROR,
+    INVALID_WORKERS_ERROR,
+    UNKNOWN_ITEM_ERROR,
+    TOOL_LEVEL_ERROR_PREFIX,
+    MULTIPLE_OVERRIDE_ERROR_PREFIX,
+    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
+} from "./domain/errors";
 import { queryRequirements } from "./domain/query-requirements";
 
 const INVALID_ARGUMENT_ERROR =
@@ -13,9 +24,25 @@ const amountFields = new Set([
     "creators/demands/amount",
 ]);
 
+const exactUserErrors = new Set([
+    INVALID_ITEM_NAME_ERROR,
+    INVALID_WORKERS_ERROR,
+    UNKNOWN_ITEM_ERROR,
+    TOOL_LEVEL_ERROR_PREFIX,
+    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
+]);
+
+const isUserError = ({ message }: Error): boolean => {
+    return (
+        exactUserErrors.has(message) ||
+        message.startsWith(MULTIPLE_OVERRIDE_ERROR_PREFIX) ||
+        message.startsWith(TOOL_LEVEL_ERROR_PREFIX)
+    );
+};
+
 const handler: GraphQLEventHandler<
     QueryRequirementArgs,
-    Requirement[]
+    RequirementResult
 > = async (event) => {
     const { name, workers, unit, maxAvailableTool, creatorOverrides } =
         event.arguments;
@@ -29,15 +56,27 @@ const handler: GraphQLEventHandler<
         throw new Error(INVALID_ARGUMENT_ERROR);
     }
 
-    return await queryRequirements({
-        name,
-        workers,
-        ...(unit ? { unit: OutputUnit[unit] } : {}),
-        ...(maxAvailableTool
-            ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
-            : {}),
-        ...(creatorOverrides ? { creatorOverrides } : {}),
-    });
+    try {
+        const requirements = await queryRequirements({
+            name,
+            workers,
+            ...(unit ? { unit: OutputUnit[unit] } : {}),
+            ...(maxAvailableTool
+                ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
+                : {}),
+            ...(creatorOverrides ? { creatorOverrides } : {}),
+        });
+
+        return {
+            requirements,
+        };
+    } catch (ex) {
+        if (ex instanceof Error && isUserError(ex)) {
+            return { message: ex.message };
+        }
+
+        throw ex;
+    }
 };
 
 export { handler };

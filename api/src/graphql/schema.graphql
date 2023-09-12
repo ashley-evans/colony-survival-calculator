@@ -1,3 +1,11 @@
+interface BaseError {
+    message: String!
+}
+
+type UserError implements BaseError {
+    message: String!
+}
+
 type FarmSize {
     width: Int!
     height: Int!
@@ -37,6 +45,12 @@ type Requirement {
     creators: [RequirementCreator!]!
 }
 
+type Requirements {
+    requirements: [Requirement!]!
+}
+
+union RequirementResult = Requirements | UserError
+
 enum OutputUnit {
     SECONDS
     MINUTES
@@ -72,7 +86,7 @@ type Query {
         maxAvailableTool: Tools
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
-    ): [Requirement!]!
+    ): RequirementResult!
     output(
         name: ID!
         workers: Int!
