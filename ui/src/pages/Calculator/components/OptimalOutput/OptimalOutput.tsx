@@ -12,6 +12,7 @@ import { DesiredOutputText } from "./styles";
 import {
     DEFAULT_DEBOUNCE,
     OutputUnitDisplayMappings,
+    isUserError,
     roundOutput,
 } from "../../utils";
 
@@ -25,7 +26,14 @@ type OptimalOutputProps = {
 
 const GET_OPTIMAL_OUTPUT = gql(`
     query GetOptimalOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: Tools, $creator: String) {
-        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, creator: $creator)
+        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, creator: $creator) {
+            ... on OptimalOutput {
+                amount
+            }
+            ... on UserError {
+                message
+            }
+        }
     }
 `);
 
@@ -81,9 +89,11 @@ function OptimalOutput({
         return <></>;
     }
 
-    return (
+    return isUserError(data.output) ? (
+        <span role="alert">{data.output.message}</span>
+    ) : (
         <DesiredOutputText>
-            {createOutputMessage(data.output, outputUnit)}
+            {createOutputMessage(data.output.amount, outputUnit)}
         </DesiredOutputText>
     );
 }

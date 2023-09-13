@@ -32,6 +32,10 @@ import {
     Tools,
 } from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
+import {
+    createOutputResponseHandler,
+    createRequirementsResponseHandler,
+} from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedLoadingMessage = "Loading overrides...";
@@ -87,12 +91,8 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [] }));
-    }),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: 5.2 }));
-    }),
+    createRequirementsResponseHandler([]),
+    createOutputResponseHandler(5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({

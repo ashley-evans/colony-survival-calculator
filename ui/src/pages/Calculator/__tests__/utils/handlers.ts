@@ -1,9 +1,13 @@
 import { graphql } from "msw";
 import {
     GetItemRequirementsQuery,
+    GetOptimalOutputQuery,
     Requirement,
 } from "../../../../graphql/__generated__/graphql";
-import { expectedRequirementsQueryName } from "./constants";
+import {
+    expectedOutputQueryName,
+    expectedRequirementsQueryName,
+} from "./constants";
 
 const createRequirementsResponseHandler = (requirements: Requirement[]) =>
     graphql.query<GetItemRequirementsQuery>(
@@ -37,11 +41,39 @@ const createRequirementsUserErrorHandler = (message: string) =>
 
 const createRequirementsUnexpectedErrorHandler = (message: string) =>
     graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res.once(ctx.errors([{ message: message }]));
+        return res(ctx.errors([{ message: message }]));
+    });
+
+const createOutputResponseHandler = (amount: number) =>
+    graphql.query<GetOptimalOutputQuery>(
+        expectedOutputQueryName,
+        (_, res, ctx) => {
+            return res(
+                ctx.data({ output: { __typename: "OptimalOutput", amount } })
+            );
+        }
+    );
+
+const createOutputUserErrorHandler = (message: string) =>
+    graphql.query<GetOptimalOutputQuery>(
+        expectedOutputQueryName,
+        (_, res, ctx) => {
+            return res(
+                ctx.data({ output: { __typename: "UserError", message } })
+            );
+        }
+    );
+
+const createOutputUnexpectedErrorHandler = (message: string) =>
+    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+        return res(ctx.errors([{ message: message }]));
     });
 
 export {
     createRequirementsResponseHandler,
     createRequirementsUserErrorHandler,
     createRequirementsUnexpectedErrorHandler,
+    createOutputResponseHandler,
+    createOutputUserErrorHandler,
+    createOutputUnexpectedErrorHandler,
 };

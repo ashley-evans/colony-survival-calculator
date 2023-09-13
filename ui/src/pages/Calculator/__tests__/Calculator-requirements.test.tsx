@@ -27,7 +27,6 @@ import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
     expectedRequirementsQueryName,
-    expectedOutputQueryName,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
     expectedCreatorOverrideQueryName,
@@ -38,6 +37,7 @@ import Requirements, {
     SingleCreatorRequirementsTableRow,
 } from "../components/Requirements";
 import {
+    createOutputResponseHandler,
     createRequirementsResponseHandler,
     createRequirementsUnexpectedErrorHandler,
     createRequirementsUserErrorHandler,
@@ -222,9 +222,7 @@ const server = setupServer(
         return res(ctx.data({ item: [] }));
     }),
     createRequirementsResponseHandler([requirementsWithSingleCreator[0]]),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: expectedOutput }));
-    }),
+    createOutputResponseHandler(expectedOutput),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
