@@ -51,6 +51,12 @@ type Requirements {
 
 union RequirementResult = Requirements | UserError
 
+type OptimalOutput {
+    amount: Float!
+}
+
+union OutputResult = OptimalOutput | UserError
+
 enum OutputUnit {
     SECONDS
     MINUTES
@@ -93,7 +99,7 @@ type Query {
         unit: OutputUnit!
         maxAvailableTool: Tools
         creator: String
-    ): Float!
+    ): OutputResult!
 }
 
 schema {

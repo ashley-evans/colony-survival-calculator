@@ -265,6 +265,7 @@ test.each([
         "Invalid workers",
         "Invalid number of workers provided, must be a positive number",
     ],
+    ["Unknown item", "Unknown item provided"],
     [
         "Minimum tool",
         "Unable to create item with available tools, minimum tool is: Steel",

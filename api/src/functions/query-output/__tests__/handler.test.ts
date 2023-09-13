@@ -119,8 +119,30 @@ test("returns the calculated output", async () => {
 
     const actual = await handler(validEvent);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toEqual({ __typename: "OptimalOutput", amount: expected });
 });
+
+test.each([
+    ["Invalid item", "Invalid item name provided, must be a non-empty string"],
+    [
+        "Invalid workers",
+        "Invalid number of workers provided, must be a positive number",
+    ],
+    ["Unknown item", "Unknown item provided"],
+    [
+        "Minimum tool",
+        "Unable to create item with available tools, minimum tool is: Steel",
+    ],
+])(
+    "returns a user if known error: %s occurs while fetching item requirements",
+    async (_: string, error: string) => {
+        mockCalculateOutput.mockRejectedValue(new Error(error));
+
+        const actual = await handler(validEvent);
+
+        expect(actual).toEqual({ __typename: "UserError", message: error });
+    }
+);
 
 test("throws an error if any unhandled exceptions occur while calculating output", async () => {
     const expectedError = new Error("test error");
