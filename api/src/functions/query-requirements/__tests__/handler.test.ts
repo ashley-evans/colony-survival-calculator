@@ -253,6 +253,7 @@ test.each([
             fail();
         }
 
+        expect(actual.__typename).toEqual("Requirements");
         expect(actual.requirements).toHaveLength(expected.length);
         expect(actual.requirements).toEqual(expect.arrayContaining(expected));
     }
@@ -287,7 +288,7 @@ test.each([
             fail();
         }
 
-        expect(actual.message).toEqual(error);
+        expect(actual).toEqual({ __typename: "UserError", message: error });
     }
 );
 

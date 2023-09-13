@@ -68,11 +68,12 @@ const handler: GraphQLEventHandler<
         });
 
         return {
+            __typename: "Requirements",
             requirements,
         };
     } catch (ex) {
         if (ex instanceof Error && isUserError(ex)) {
-            return { message: ex.message };
+            return { __typename: "UserError", message: ex.message };
         }
 
         throw ex;
