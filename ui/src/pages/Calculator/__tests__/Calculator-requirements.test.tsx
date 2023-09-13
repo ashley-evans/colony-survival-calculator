@@ -18,8 +18,9 @@ import {
 } from "../../../test";
 import {
     CreatorDemand,
-    GetItemRequirementsQuery,
     OutputUnit,
+    Requirement,
+    RequirementCreator,
 } from "../../../graphql/__generated__/graphql";
 import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
@@ -36,9 +37,11 @@ import Requirements, {
     RequirementsTableRow,
     SingleCreatorRequirementsTableRow,
 } from "../components/Requirements";
-
-type RequirementsResponse = GetItemRequirementsQuery["requirement"][number];
-type RequirementCreator = RequirementsResponse["creators"][number];
+import {
+    createRequirementsResponseHandler,
+    createRequirementsUnexpectedErrorHandler,
+    createRequirementsUserErrorHandler,
+} from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedRequirementsHeading = "Requirements:";
@@ -97,7 +100,7 @@ function createRequirement({
     name: string;
     amount: number;
     creators: RequirementCreator[];
-}): RequirementsResponse {
+}): Requirement {
     return {
         name,
         amount,
@@ -105,19 +108,7 @@ function createRequirement({
     };
 }
 
-const createRequirementsResponseHandler = (response: RequirementsResponse[]) =>
-    graphql.query<GetItemRequirementsQuery>(
-        expectedRequirementsQueryName,
-        (_, res, ctx) => {
-            return res.once(
-                ctx.data({
-                    requirement: response,
-                })
-            );
-        }
-    );
-
-const requirementsWithSingleCreator: RequirementsResponse[] = [
+const requirementsWithSingleCreator: Requirement[] = [
     createRequirement({
         name: "Required Item 1",
         amount: 30,
@@ -230,14 +221,7 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query<GetItemRequirementsQuery>(
-        expectedRequirementsQueryName,
-        (_, res, ctx) => {
-            return res(
-                ctx.data({ requirement: [requirementsWithSingleCreator[0]] })
-            );
-        }
-    ),
+    createRequirementsResponseHandler([requirementsWithSingleCreator[0]]),
     graphql.query(expectedOutputQueryName, (_, res, ctx) => {
         return res(ctx.data({ output: expectedOutput }));
     }),
@@ -630,7 +614,7 @@ describe("requirements rendering given requirements", () => {
             "renders each requirement in the table given %s with a single creator",
             async (
                 _: string,
-                response: RequirementsResponse[],
+                response: Requirement[],
                 expected: Omit<
                     SingleCreatorRequirementsTableRow,
                     "key" | "isExpanded" | "type" | "demands"
@@ -963,7 +947,7 @@ describe("requirements rendering given requirements", () => {
                     expected: CreatorDemand[],
                     numberOfClicks: number
                 ) => {
-                    const overridden: RequirementsResponse = {
+                    const overridden: Requirement = {
                         ...requirementWithSingleCreatorAndDemands,
                         creators: [
                             {
@@ -974,18 +958,7 @@ describe("requirements rendering given requirements", () => {
                         ],
                     };
 
-                    server.use(
-                        graphql.query<GetItemRequirementsQuery>(
-                            expectedRequirementsQueryName,
-                            (_, res, ctx) => {
-                                return res.once(
-                                    ctx.data({
-                                        requirement: [overridden],
-                                    })
-                                );
-                            }
-                        )
-                    );
+                    server.use(createRequirementsResponseHandler([overridden]));
 
                     const user = userEvent.setup();
 
@@ -1083,7 +1056,7 @@ describe("requirements rendering given requirements", () => {
             ],
         ])(
             "does not render the creator by default for any item that is created by %s",
-            async (_: string, response: RequirementsResponse) => {
+            async (_: string, response: Requirement) => {
                 server.use(createRequirementsResponseHandler([response]));
 
                 render(<Calculator />, expectedGraphQLAPIURL);
@@ -1309,21 +1282,12 @@ describe("requirements rendering given requirements", () => {
                 numberOfClicks: number
             ) => {
                 server.use(
-                    graphql.query<GetItemRequirementsQuery>(
-                        expectedRequirementsQueryName,
-                        (_, res, ctx) => {
-                            return res.once(
-                                ctx.data({
-                                    requirement: [
-                                        {
-                                            ...requirementWithMultipleCreators,
-                                            creators: unsorted,
-                                        },
-                                    ],
-                                })
-                            );
-                        }
-                    )
+                    createRequirementsResponseHandler([
+                        {
+                            ...requirementWithMultipleCreators,
+                            creators: unsorted,
+                        },
+                    ])
                 );
 
                 const user = userEvent.setup();
@@ -1414,21 +1378,12 @@ describe("requirements rendering given requirements", () => {
                 numberOfClicks: number
             ) => {
                 server.use(
-                    graphql.query<GetItemRequirementsQuery>(
-                        expectedRequirementsQueryName,
-                        (_, res, ctx) => {
-                            return res.once(
-                                ctx.data({
-                                    requirement: [
-                                        {
-                                            ...requirementWithMultipleCreators,
-                                            creators: unsorted,
-                                        },
-                                    ],
-                                })
-                            );
-                        }
-                    )
+                    createRequirementsResponseHandler([
+                        {
+                            ...requirementWithMultipleCreators,
+                            creators: unsorted,
+                        },
+                    ])
                 );
 
                 const user = userEvent.setup();
@@ -1715,28 +1670,19 @@ describe("requirements rendering given requirements", () => {
         ],
     ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(
-                        ctx.data({
-                            requirement: [
-                                createRequirement({
-                                    name: "test item name",
-                                    amount: actual,
-                                    creators: [
-                                        createRequirementCreator({
-                                            recipeName: "test item name",
-                                            amount: actual,
-                                            workers: 1,
-                                        }),
-                                    ],
-                                }),
-                            ],
-                        })
-                    );
-                }
-            )
+            createRequirementsResponseHandler([
+                createRequirement({
+                    name: "test item name",
+                    amount: actual,
+                    creators: [
+                        createRequirementCreator({
+                            recipeName: "test item name",
+                            amount: actual,
+                            workers: 1,
+                        }),
+                    ],
+                }),
+            ])
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1757,28 +1703,19 @@ describe("requirements rendering given requirements", () => {
         const actualWorkers = 3.14;
         const expectedWorkers = "4";
         server.use(
-            graphql.query<GetItemRequirementsQuery>(
-                expectedRequirementsQueryName,
-                (_, res, ctx) => {
-                    return res.once(
-                        ctx.data({
-                            requirement: [
-                                createRequirement({
-                                    name: "test item name",
-                                    amount: 30,
-                                    creators: [
-                                        createRequirementCreator({
-                                            recipeName: "test item name",
-                                            amount: 30,
-                                            workers: actualWorkers,
-                                        }),
-                                    ],
-                                }),
-                            ],
-                        })
-                    );
-                }
-            )
+            createRequirementsResponseHandler([
+                createRequirement({
+                    name: "test item name",
+                    amount: 30,
+                    creators: [
+                        createRequirementCreator({
+                            recipeName: "test item name",
+                            amount: 30,
+                            workers: actualWorkers,
+                        }),
+                    ],
+                }),
+            ])
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1926,18 +1863,11 @@ describe("requirements rendering given requirements", () => {
         "displays the items in %s order by workers if workers column is sorted in that order",
         async (
             _: string,
-            unsorted: RequirementsResponse[],
+            unsorted: Requirement[],
             sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
-            server.use(
-                graphql.query<GetItemRequirementsQuery>(
-                    expectedRequirementsQueryName,
-                    (_, res, ctx) => {
-                        return res.once(ctx.data({ requirement: unsorted }));
-                    }
-                )
-            );
+            server.use(createRequirementsResponseHandler(unsorted));
 
             const user = userEvent.setup();
 
@@ -2101,18 +2031,11 @@ describe("requirements rendering given requirements", () => {
         "displays the items in %s order by amount if amount column is sorted in that order",
         async (
             _: string,
-            unsorted: RequirementsResponse[],
+            unsorted: Requirement[],
             sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
-            server.use(
-                graphql.query<GetItemRequirementsQuery>(
-                    expectedRequirementsQueryName,
-                    (_, res, ctx) => {
-                        return res.once(ctx.data({ requirement: unsorted }));
-                    }
-                )
-            );
+            server.use(createRequirementsResponseHandler(unsorted));
 
             const user = userEvent.setup();
 
@@ -2146,56 +2069,66 @@ describe("requirements rendering given requirements", () => {
     );
 });
 
-describe("error handling", async () => {
-    beforeEach(() => {
-        server.use(
-            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-                return res.once(ctx.errors([{ message: "Error Message" }]));
-            })
-        );
-    });
-
-    test("renders an error message if an error occurs while fetching requirements", async () => {
-        const expectedErrorMessage =
-            "An error occurred while fetching requirements, please change item/workers and try again.";
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
+describe.each([
+    [
+        "unexpected",
+        () => createRequirementsUnexpectedErrorHandler("Unexpected"),
+        "An error occurred while fetching requirements, please change item/workers and try again.",
+    ],
+    [
+        "user",
+        () =>
+            createRequirementsUserErrorHandler(
+                "A user friendly error occurred"
+            ),
+        "A user friendly error occurred",
+    ],
+])(
+    "handles %s errors while fetching requirements",
+    async (_: string, handler, expected: string) => {
+        beforeEach(() => {
+            server.use(handler());
         });
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedErrorMessage
-        );
-    });
+        test("renders an error message", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
 
-    test("does not render the requirements section header", async () => {
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
+            expect(await screen.findByRole("alert")).toHaveTextContent(
+                expected
+            );
         });
-        await screen.findByText(expectedOutputText);
 
-        expect(
-            screen.queryByRole("heading", {
-                name: expectedRequirementsHeading,
-            })
-        ).not.toBeInTheDocument();
-    });
+        test("does not render the requirements section header", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            await screen.findByText(expectedOutputText);
 
-    test("does not render the requirements table", async () => {
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: selectedItemName,
-            workers: 5,
+            expect(
+                screen.queryByRole("heading", {
+                    name: expectedRequirementsHeading,
+                })
+            ).not.toBeInTheDocument();
         });
-        await screen.findByText(expectedOutputText);
 
-        expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    });
-});
+        test("does not render the requirements table", async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            await screen.findByText(expectedOutputText);
+
+            expect(screen.queryByRole("table")).not.toBeInTheDocument();
+        });
+    }
+);
 
 describe("debounces requirement requests", () => {
     beforeAll(() => {

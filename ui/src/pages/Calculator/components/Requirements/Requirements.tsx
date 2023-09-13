@@ -22,7 +22,7 @@ import {
     OutputUnit,
     Tools,
 } from "../../../../graphql/__generated__/graphql";
-import { DEFAULT_DEBOUNCE } from "../../utils";
+import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { RequirementRow } from "./RequirementRow";
 import {
     ValidSortDirections,
@@ -51,17 +51,24 @@ const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
 const GET_ITEM_REQUIREMENTS = gql(`
     query GetItemRequirements($name: ID!, $workers: Int!, $maxAvailableTool: Tools, $creatorOverrides: [CreatorOverride!], $unit: OutputUnit) {
         requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides, unit: $unit) {
-            name
-            amount
-            creators {
-                name
-                creator
-                workers
-                amount
-                demands {
+            ... on Requirements {
+                requirements {
                     name
                     amount
+                    creators {
+                        name
+                        creator
+                        workers
+                        amount
+                        demands {
+                            name
+                            amount
+                        }
+                    }
                 }
+            }
+            ... on UserError {
+                message
             }
         }
     }
@@ -126,11 +133,14 @@ function Requirements({
     ]);
 
     useEffect(() => {
+        if (!data?.requirement || isUserError(data.requirement)) {
+            return;
+        }
+
         const filtered = removeSelectedItemRows(
             selectedItemName,
-            data?.requirement
+            data.requirement.requirements
         );
-
         setRows(mapRequirementsToRows(filtered));
     }, [data]);
 
@@ -141,6 +151,10 @@ function Requirements({
                 item/workers and try again.
             </span>
         );
+    }
+
+    if (data?.requirement && isUserError(data.requirement)) {
+        return <span role="alert">{data.requirement.message}</span>;
     }
 
     if (loading || rows.length === 0) {
