@@ -16,20 +16,26 @@ import {
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedOutputPrefix,
-    expectedOutputQueryName,
     expectedOutputUnitLabel,
-    expectedRequirementsQueryName,
     expectedSettingsTab,
     expectedSettingsTabHeader,
     clickByName,
     selectItemAndWorkers,
     selectOutputUnit,
     expectedCreatorOverrideQueryName,
+    expectedCalculatorOutputQueryName,
+    expectedLoadingOutputMessage,
+    expectedRequirementsHeading,
 } from "./utils";
 import { OutputUnit } from "../../../graphql/__generated__/graphql";
 
 import Calculator from "../Calculator";
-import OptimalOutput from "../components/OptimalOutput";
+import {
+    createCalculatorOutputErrorHandler,
+    createCalculatorOutputResponseHandler,
+    createCalculatorOutputUserErrorHandler,
+} from "./utils/handlers";
+import Output from "../components/Output";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
@@ -41,12 +47,7 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [] }));
-    }),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: 5.2 }));
-    }),
+    createCalculatorOutputResponseHandler([], 5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
@@ -131,13 +132,13 @@ test("does not reset the currently selected output unit after changing tabs", as
     ).toHaveTextContent(expected);
 });
 
-test("queries optimal output if item and workers inputted with default unit selected", async () => {
+test("queries calculator output if item and workers inputted with default unit selected", async () => {
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedOutputQueryName
+        expectedCalculatorOutputQueryName
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -155,13 +156,13 @@ test("queries optimal output if item and workers inputted with default unit sele
     });
 });
 
-test("queries optimal output if item and workers inputted with non-default unit selected", async () => {
+test("queries calculator output if item and workers inputted with non-default unit selected", async () => {
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedOutputQueryName
+        expectedCalculatorOutputQueryName
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -193,7 +194,7 @@ test("renders the clear input button if workers inputted", async () => {
 
 test("does not render the optimal output message if output has not been received yet", async () => {
     server.use(
-        graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+        graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
             return res(ctx.delay("infinite"));
         })
     );
@@ -205,6 +206,7 @@ test("does not render the optimal output message if output has not been received
         workers: 5,
     });
 
+    expect(await screen.findByText(expectedLoadingOutputMessage)).toBeVisible();
     expect(
         screen.queryByText(expectedOutputPrefix, { exact: false })
     ).not.toBeInTheDocument();
@@ -223,11 +225,7 @@ test.each([
         expectedUnit: string
     ) => {
         const expectedOutput = `${expectedOutputPrefix} ${expected} per ${expectedUnit}`;
-        server.use(
-            graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-                return res(ctx.data({ output: expected }));
-            })
-        );
+        server.use(createCalculatorOutputResponseHandler([], expected));
 
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectOutputUnit(selectedUnit);
@@ -268,11 +266,7 @@ test.each([
     ],
 ])("%s", async (_: string, actual: number, expected: string) => {
     const expectedOutput = `${expectedOutputPrefix} ${expected} per minute`;
-    server.use(
-        graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-            return res(ctx.data({ output: actual }));
-        })
-    );
+    server.use(createCalculatorOutputResponseHandler([], actual));
 
     render(<Calculator />);
     await selectItemAndWorkers({
@@ -286,11 +280,7 @@ test.each([
 test("clears the optimal output message if the workers is changed to an invalid value", async () => {
     const output = 28.1;
     const expectedOutput = `${expectedOutputPrefix} ${output} per minute`;
-    server.use(
-        graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-            return res(ctx.data({ output }));
-        })
-    );
+    server.use(createCalculatorOutputResponseHandler([], output));
 
     render(<Calculator />);
     await selectItemAndWorkers({
@@ -305,45 +295,119 @@ test("clears the optimal output message if the workers is changed to an invalid 
     ).not.toBeInTheDocument();
 });
 
-describe("error handling", async () => {
-    beforeEach(() => {
-        server.use(
-            graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-                return res.once(ctx.errors([{ message: "Error Message" }]));
-            })
-        );
-    });
-
-    test("renders an error message if an error occurs while fetching optimal output", async () => {
-        const expectedErrorMessage =
-            "An error occurred while calculating optimal output, please change item/workers/output unit and try again.";
-
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
-            itemName: item.name,
-            workers: 5,
+describe.each([
+    [
+        "unexpected",
+        () => createCalculatorOutputErrorHandler("Unexpected"),
+        "An error occurred while calculating output, please change item/workers/output unit and try again.",
+        "error message",
+    ],
+    [
+        "combined consistent user",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                requirementsUserError: "Consistent user error",
+                amountUserError: "Consistent user error",
+            }),
+        "Consistent user error",
+        "one error message",
+    ],
+    [
+        "inconsistent user error",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                requirementsUserError: "Requirements user error",
+                amountUserError: "Amount user error",
+            }),
+        "Requirements user error",
+        "the error message from requirements query",
+    ],
+    [
+        "only amount query user errors",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                requirements: [],
+                amountUserError: "Amount user error",
+            }),
+        "Amount user error",
+        "the error message from amount query",
+    ],
+    [
+        "only requirements query user errors",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                requirementsUserError: "Requirements user error",
+                amount: 5.2,
+            }),
+        "Requirements user error",
+        "the error message from requirements query",
+    ],
+])(
+    "handles %s errors while fetching output",
+    async (
+        _: string,
+        handler,
+        expected: string,
+        expectedErrorTestText: string
+    ) => {
+        beforeEach(() => {
+            server.use(handler());
         });
 
-        expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedErrorMessage
-        );
-    });
+        test(`renders the ${expectedErrorTestText} if an error occurs while fetching optimal output`, async () => {
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: item.name,
+                workers: 5,
+            });
 
-    test("does not render the optimal output message if an error occurs while fetching optimal output", async () => {
-        render(<Calculator />);
-        await selectItemAndWorkers({
-            itemName: item.name,
-            workers: 5,
+            expect(await screen.findByRole("alert")).toHaveTextContent(
+                expected
+            );
         });
-        await screen.findByRole("alert");
 
-        expect(
-            screen.queryByText(expectedOutputPrefix, { exact: false })
-        ).not.toBeInTheDocument();
-    });
-});
+        test("does not render the optimal output message", async () => {
+            render(<Calculator />);
+            await selectItemAndWorkers({
+                itemName: item.name,
+                workers: 5,
+            });
+            await screen.findByRole("alert");
 
-describe("debounces optimal output requests", () => {
+            expect(
+                screen.queryByText(expectedOutputPrefix, { exact: false })
+            ).not.toBeInTheDocument();
+        });
+
+        test("does not render the requirements section header", async () => {
+            render(<Calculator />);
+            await selectItemAndWorkers({
+                itemName: item.name,
+                workers: 5,
+            });
+            await screen.findByRole("alert");
+
+            expect(
+                screen.queryByRole("heading", {
+                    name: expectedRequirementsHeading,
+                })
+            ).not.toBeInTheDocument();
+        });
+
+        test("does not render the requirements table", async () => {
+            render(<Calculator />);
+            await selectItemAndWorkers({
+                itemName: item.name,
+                workers: 5,
+            });
+            await screen.findByRole("alert");
+
+            expect(screen.queryByRole("table")).not.toBeInTheDocument();
+        });
+    }
+);
+
+describe("debounces output requests", () => {
     beforeAll(() => {
         vi.useFakeTimers();
     });
@@ -355,13 +419,13 @@ describe("debounces optimal output requests", () => {
             server,
             "POST",
             expectedGraphQLAPIURL,
-            expectedOutputQueryName,
+            expectedCalculatorOutputQueryName,
             { name: expectedItemName, workers: 3, unit: expectedOutputUnit }
         );
 
         const { rerender } = rtlRender(
             wrapWithTestProviders(
-                <OptimalOutput
+                <Output
                     itemName={expectedItemName}
                     workers={1}
                     outputUnit={expectedOutputUnit}
@@ -371,7 +435,7 @@ describe("debounces optimal output requests", () => {
         );
         rerender(
             wrapWithTestProviders(
-                <OptimalOutput
+                <Output
                     itemName={expectedItemName}
                     workers={2}
                     outputUnit={expectedOutputUnit}
@@ -381,7 +445,7 @@ describe("debounces optimal output requests", () => {
         );
         rerender(
             wrapWithTestProviders(
-                <OptimalOutput
+                <Output
                     itemName={expectedItemName}
                     workers={3}
                     outputUnit={expectedOutputUnit}

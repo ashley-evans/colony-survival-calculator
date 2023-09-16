@@ -7,7 +7,7 @@ import {
     NumberColumnCell,
     TextColumnCell,
 } from "./styles";
-import { roundOutput } from "../../utils";
+import { roundOutput } from "../../../../utils";
 import { TableFields } from "./types";
 
 type RowProps = {

@@ -7,6 +7,8 @@ import type {
     Requirement as GraphQLRequirement,
     Tools,
     OutputUnit as GraphQLOutputUnit,
+    RequirementResult,
+    UserError,
 } from "../../../graphql/schema";
 import type { Requirement } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
@@ -19,6 +21,12 @@ jest.mock("../domain/query-requirements", () => ({
 }));
 
 const mockQueryRequirements = queryRequirements as jest.Mock;
+
+const isUserError = (
+    requirementResult: RequirementResult
+): requirementResult is UserError => {
+    return "message" in requirementResult;
+};
 
 const expectedItemName = "test name";
 const expectedAmount = 4;
@@ -241,13 +249,51 @@ test.each([
         const event = createMockEvent({ name: "test", workers: 1 });
 
         const actual = await handler(event);
+        if (isUserError(actual)) {
+            fail();
+        }
 
-        expect(actual).toHaveLength(expected.length);
-        expect(actual).toEqual(expect.arrayContaining(expected));
+        expect(actual.__typename).toEqual("Requirements");
+        expect(actual.requirements).toHaveLength(expected.length);
+        expect(actual.requirements).toEqual(expect.arrayContaining(expected));
     }
 );
 
-test("throws the exception if an exception occurs while fetching item requirements", async () => {
+test.each([
+    ["Invalid item", "Invalid item name provided, must be a non-empty string"],
+    [
+        "Invalid workers",
+        "Invalid number of workers provided, must be a positive number",
+    ],
+    ["Unknown item", "Unknown item provided"],
+    [
+        "Minimum tool",
+        "Unable to create item with available tools, minimum tool is: Steel",
+    ],
+    [
+        "Duplicate override",
+        "Invalid input: More than one creator override provided for: test",
+    ],
+    [
+        "Not craft-able due to override",
+        "Invalid input, item is not creatable with current overrides",
+    ],
+])(
+    "returns a user if known error: %s occurs while fetching item requirements",
+    async (_: string, error: string) => {
+        mockQueryRequirements.mockRejectedValue(new Error(error));
+        const event = createMockEvent({ name: "test", workers: 1 });
+
+        const actual = await handler(event);
+        if (!isUserError(actual)) {
+            fail();
+        }
+
+        expect(actual).toEqual({ __typename: "UserError", message: error });
+    }
+);
+
+test("throws the exception if an unknown exception occurs while fetching item requirements", async () => {
     const expectedError = new Error("expected error");
     mockQueryRequirements.mockRejectedValue(expectedError);
     const event = createMockEvent({ name: "test", workers: 1 });

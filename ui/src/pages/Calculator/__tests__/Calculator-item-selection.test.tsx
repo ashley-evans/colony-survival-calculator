@@ -11,8 +11,6 @@ import {
     selectOption,
 } from "../../../test/utils";
 import {
-    expectedRequirementsQueryName,
-    expectedOutputQueryName,
     expectedItemNameQueryName,
     expectedOutputUnitLabel,
     expectedItemSelectLabel,
@@ -27,6 +25,7 @@ import {
     expectedCreatorOverrideQueryName,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
+import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedMissingItemsError = "Unable to fetch known items";
@@ -44,12 +43,7 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [] }));
-    }),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: 5.2 }));
-    }),
+    createCalculatorOutputResponseHandler([], 5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({

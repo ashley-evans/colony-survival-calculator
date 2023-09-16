@@ -8,8 +8,6 @@ import {
     expectedCalculatorTab,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
-    expectedOutputQueryName,
-    expectedRequirementsQueryName,
     expectedSettingsTab,
     expectedSettingsTabHeader,
     expectedToolSelectLabel,
@@ -17,6 +15,7 @@ import {
     selectItemAndWorkers,
     selectTool,
     expectedCreatorOverrideQueryName,
+    expectedCalculatorOutputQueryName,
 } from "./utils";
 import {
     openSelectMenu,
@@ -25,6 +24,7 @@ import {
 import Calculator from "../Calculator";
 import { waitForRequest } from "../../../helpers/utils";
 import { OutputUnit, Tools } from "../../../graphql/__generated__/graphql";
+import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
@@ -36,12 +36,7 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [] }));
-    }),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: 5.2 }));
-    }),
+    createCalculatorOutputResponseHandler([], 5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
@@ -110,14 +105,14 @@ test("updates the selected tool if selected is changed", async () => {
     ).toBeVisible();
 });
 
-test("queries optimal output with provided tool if non default selected", async () => {
+test("queries calculator with provided tool if non default selected", async () => {
     const expectedTool = Tools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedOutputQueryName
+        expectedCalculatorOutputQueryName
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -143,7 +138,7 @@ test("queries optimal output again if tool is changed after first query", async 
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedOutputQueryName,
+        expectedCalculatorOutputQueryName,
         {
             name: item.name,
             workers: expectedWorkers,
@@ -170,7 +165,7 @@ test("queries requirements with provided tool if non default selected", async ()
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedRequirementsQueryName
+        expectedCalculatorOutputQueryName
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -196,12 +191,12 @@ test("queries requirements again if tool is changed after first query", async ()
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedRequirementsQueryName,
+        expectedCalculatorOutputQueryName,
         {
             name: item.name,
             workers: expectedWorkers,
-            maxAvailableTool: expectedTool,
             unit: OutputUnit.Minutes,
+            maxAvailableTool: expectedTool,
         }
     );
 

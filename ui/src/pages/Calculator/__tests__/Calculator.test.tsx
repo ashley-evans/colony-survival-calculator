@@ -6,8 +6,6 @@ import { setupServer } from "msw/node";
 import Calculator from "../Calculator";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import {
-    expectedRequirementsQueryName,
-    expectedOutputQueryName,
     expectedItemNameQueryName,
     selectItemAndWorkers,
     expectedItemSelectLabel,
@@ -23,6 +21,7 @@ import {
     expectedCreatorOverrideQueryName,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
+import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const itemWithoutFarmSize: ItemName = { name: "item w/o farm" };
 const itemWithFarmSize: ItemName = { name: "item with farm" };
@@ -46,12 +45,7 @@ const server = setupServer(
 
         return res(ctx.data({ item: [] }));
     }),
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ requirement: [] }));
-    }),
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
-        return res(ctx.data({ output: 5.2 }));
-    }),
+    createCalculatorOutputResponseHandler([], 5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({

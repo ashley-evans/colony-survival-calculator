@@ -1,7 +1,3 @@
-import { GetItemRequirementsQuery } from "../../../../graphql/__generated__/graphql";
-
-export type Requirements = GetItemRequirementsQuery["requirement"];
-
 export enum RowType {
     SingleCreator = "SingleCreator",
     MultipleCreator = "MultipleCreator",

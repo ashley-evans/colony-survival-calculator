@@ -3,11 +3,11 @@ import update from "immutability-helper";
 import {
     CreatorBreakdownTableRow,
     DemandTableRow,
-    Requirements,
     RequirementsTableRow,
     RowType,
     SortableFields,
 } from "./types";
+import { Requirement } from "../../../../../../graphql/__generated__/graphql";
 
 export type ValidSortDirections = "none" | "ascending" | "descending";
 
@@ -83,7 +83,7 @@ function sortBy(
 }
 
 function mapRequirementsToRows(
-    requirements: Readonly<Requirements>
+    requirements: Readonly<Requirement[]>
 ): RequirementsTableRow[] {
     return requirements.reduce((acc, requirement) => {
         const totalWorkers = requirement.creators.reduce(
@@ -139,8 +139,8 @@ function mapRequirementsToRows(
 
 function removeSelectedItemRows(
     selectedItemName: string,
-    requirements: Readonly<Requirements> | undefined
-): Requirements {
+    requirements: Readonly<Requirement[]> | undefined
+): Requirement[] {
     if (!requirements) {
         return [];
     }
@@ -153,7 +153,7 @@ function removeSelectedItemRows(
         }
 
         return acc;
-    }, [] as Requirements);
+    }, [] as Requirement[]);
 }
 
 type CreatorRowIndex = {

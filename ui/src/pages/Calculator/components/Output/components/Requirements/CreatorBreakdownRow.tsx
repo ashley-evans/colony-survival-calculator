@@ -11,7 +11,7 @@ import {
     ExpandRowIconContainer,
     ExpandRowIcon,
 } from "./styles";
-import { roundOutput } from "../../utils";
+import { roundOutput } from "../../../../utils";
 
 type CreatorBreakdownRowProps = {
     row: CreatorBreakdownTableRow;
