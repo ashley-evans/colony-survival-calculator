@@ -4,7 +4,6 @@ import { useQuery } from "@apollo/client";
 import ItemSelector from "./components/ItemSelector";
 import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
-import Requirements from "./components/Requirements";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
 import {
@@ -13,10 +12,10 @@ import {
     OutputUnit,
     Tools,
 } from "../../graphql/__generated__/graphql";
-import OptimalOutput from "./components/OptimalOutput";
 import { gql } from "../../graphql/__generated__";
 import ToolSelector from "./components/ToolSelector";
 import CreatorOverrides from "./components/CreatorOverrides";
+import Output from "./components/Output";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -128,22 +127,13 @@ function CalculatorTab({
                             {itemDetailsData?.item[0].size.height}
                         </span>
                     ) : null}
-                    {workers != undefined && selectedItem ? (
-                        <OptimalOutput
+                    {workers && selectedItem ? (
+                        <Output
                             itemName={selectedItem}
                             workers={workers}
                             outputUnit={selectedOutputUnit}
                             maxAvailableTool={selectedTool}
                             creatorOverrides={selectedCreatorOverrides}
-                        />
-                    ) : null}
-                    {workers && selectedItem ? (
-                        <Requirements
-                            selectedItemName={selectedItem}
-                            workers={workers}
-                            maxAvailableTool={selectedTool}
-                            creatorOverrides={selectedCreatorOverrides}
-                            unit={selectedOutputUnit}
                         />
                     ) : null}
                 </>

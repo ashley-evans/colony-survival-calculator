@@ -1,50 +1,32 @@
 import React from "react";
 import { graphql } from "msw";
 import { setupServer } from "msw/node";
-import {
-    screen,
-    within,
-    render as rtlRender,
-    act,
-    waitFor,
-} from "@testing-library/react";
+import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
 
-import {
-    clickButton,
-    renderWithTestProviders as render,
-    wrapWithTestProviders,
-} from "../../../test";
+import { clickButton, renderWithTestProviders as render } from "../../../test";
 import {
     CreatorDemand,
-    OutputUnit,
     Requirement,
     RequirementCreator,
 } from "../../../graphql/__generated__/graphql";
-import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
-    expectedRequirementsQueryName,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
     expectedCreatorOverrideQueryName,
-    selectOutputUnit,
+    expectedCalculatorOutputQueryName,
+    expectedLoadingOutputMessage,
+    expectedRequirementsHeading,
 } from "./utils";
-import Requirements, {
+import {
     RequirementsTableRow,
     SingleCreatorRequirementsTableRow,
-} from "../components/Requirements";
-import {
-    createOutputResponseHandler,
-    createRequirementsResponseHandler,
-    createRequirementsUnexpectedErrorHandler,
-    createRequirementsUserErrorHandler,
-} from "./utils/handlers";
+} from "../components/Output/components/Requirements";
+import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const expectedRequirementsHeading = "Requirements:";
 const expectedItemNameColumnName = "Item";
 const expectedCreatorColumnName = "Creator";
 const expectedDemandedItemColumName = "Demand";
@@ -191,7 +173,6 @@ const requirementWithMultipleCreatorsAndDemands = createRequirement({
     ],
 });
 
-const expectedWorkers = 5;
 const selectedItemName = "Selected Item";
 const selectedItemCreator = "Selected Item Creator";
 const selectedItem = createRequirement({
@@ -221,8 +202,10 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    createRequirementsResponseHandler([requirementsWithSingleCreator[0]]),
-    createOutputResponseHandler(expectedOutput),
+    createCalculatorOutputResponseHandler(
+        [requirementsWithSingleCreator[0]],
+        expectedOutput
+    ),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
@@ -241,56 +224,14 @@ beforeEach(() => {
     server.events.removeAllListeners();
 });
 
-test("queries requirements if item and workers inputted with default unit selected", async () => {
-    const expectedRequest = waitForRequest(
-        server,
-        "POST",
-        expectedGraphQLAPIURL,
-        expectedRequirementsQueryName
-    );
-
-    render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({
-        itemName: selectedItemName,
-        workers: expectedWorkers,
-    });
-    const { matchedRequestDetails } = await expectedRequest;
-
-    expect(matchedRequestDetails.variables).toEqual({
-        name: selectedItemName,
-        workers: expectedWorkers,
-        maxAvailableTool: "NONE",
-        unit: OutputUnit.Minutes,
-    });
-});
-
-test("queries requirements if item and workers inputted with non-default unit selected", async () => {
-    const expectedRequest = waitForRequest(
-        server,
-        "POST",
-        expectedGraphQLAPIURL,
-        expectedRequirementsQueryName
-    );
-
-    render(<Calculator />, expectedGraphQLAPIURL);
-    await selectOutputUnit(OutputUnit.GameDays);
-    await selectItemAndWorkers({
-        itemName: selectedItemName,
-        workers: expectedWorkers,
-    });
-    const { matchedRequestDetails } = await expectedRequest;
-
-    expect(matchedRequestDetails.variables).toEqual({
-        name: selectedItemName,
-        workers: expectedWorkers,
-        unit: OutputUnit.GameDays,
-        maxAvailableTool: "NONE",
-    });
-});
-
 describe("item w/o requirements handling", async () => {
     beforeEach(() => {
-        server.use(createRequirementsResponseHandler([selectedItem]));
+        server.use(
+            createCalculatorOutputResponseHandler(
+                [selectedItem],
+                expectedOutput
+            )
+        );
     });
 
     test("does not render the requirements section header", async () => {
@@ -323,7 +264,7 @@ describe("item w/o requirements handling", async () => {
 describe("response delay handling", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
+            graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
                 return res.once(ctx.delay("infinite"));
             })
         );
@@ -335,8 +276,10 @@ describe("response delay handling", () => {
             itemName: selectedItemName,
             workers: 5,
         });
-        await screen.findByText(expectedOutputText);
 
+        expect(
+            await screen.findByText(expectedLoadingOutputMessage)
+        ).toBeVisible();
         expect(
             screen.queryByRole("heading", {
                 name: expectedRequirementsHeading,
@@ -350,8 +293,10 @@ describe("response delay handling", () => {
             itemName: selectedItemName,
             workers: 5,
         });
-        await screen.findByText(expectedOutputText);
 
+        expect(
+            await screen.findByText(expectedLoadingOutputMessage)
+        ).toBeVisible();
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
 });
@@ -618,7 +563,12 @@ describe("requirements rendering given requirements", () => {
                     "key" | "isExpanded" | "type" | "demands"
                 >[]
             ) => {
-                server.use(createRequirementsResponseHandler(response));
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        response,
+                        expectedOutput
+                    )
+                );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
                 await selectItemAndWorkers({
@@ -717,7 +667,12 @@ describe("requirements rendering given requirements", () => {
             ];
 
             beforeEach(() => {
-                server.use(createRequirementsResponseHandler(requirements));
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        requirements,
+                        expectedOutput
+                    )
+                );
             });
 
             test("renders an expand button to view demand breakdown if item has demands", async () => {
@@ -956,7 +911,12 @@ describe("requirements rendering given requirements", () => {
                         ],
                     };
 
-                    server.use(createRequirementsResponseHandler([overridden]));
+                    server.use(
+                        createCalculatorOutputResponseHandler(
+                            [overridden],
+                            expectedOutput
+                        )
+                    );
 
                     const user = userEvent.setup();
 
@@ -1007,7 +967,12 @@ describe("requirements rendering given requirements", () => {
         ];
 
         beforeEach(() => {
-            server.use(createRequirementsResponseHandler(requirements));
+            server.use(
+                createCalculatorOutputResponseHandler(
+                    requirements,
+                    expectedOutput
+                )
+            );
         });
 
         test("renders the sum total of required workers given requirement with multiple creators", async () => {
@@ -1055,7 +1020,12 @@ describe("requirements rendering given requirements", () => {
         ])(
             "does not render the creator by default for any item that is created by %s",
             async (_: string, response: Requirement) => {
-                server.use(createRequirementsResponseHandler([response]));
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        [response],
+                        expectedOutput
+                    )
+                );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
                 await selectItemAndWorkers({
@@ -1280,12 +1250,15 @@ describe("requirements rendering given requirements", () => {
                 numberOfClicks: number
             ) => {
                 server.use(
-                    createRequirementsResponseHandler([
-                        {
-                            ...requirementWithMultipleCreators,
-                            creators: unsorted,
-                        },
-                    ])
+                    createCalculatorOutputResponseHandler(
+                        [
+                            {
+                                ...requirementWithMultipleCreators,
+                                creators: unsorted,
+                            },
+                        ],
+                        expectedOutput
+                    )
                 );
 
                 const user = userEvent.setup();
@@ -1376,12 +1349,15 @@ describe("requirements rendering given requirements", () => {
                 numberOfClicks: number
             ) => {
                 server.use(
-                    createRequirementsResponseHandler([
-                        {
-                            ...requirementWithMultipleCreators,
-                            creators: unsorted,
-                        },
-                    ])
+                    createCalculatorOutputResponseHandler(
+                        [
+                            {
+                                ...requirementWithMultipleCreators,
+                                creators: unsorted,
+                            },
+                        ],
+                        expectedOutput
+                    )
                 );
 
                 const user = userEvent.setup();
@@ -1432,7 +1408,12 @@ describe("requirements rendering given requirements", () => {
                 requirementWithMultipleCreatorsAndDemands.creators[0].creator;
 
             beforeEach(() => {
-                server.use(createRequirementsResponseHandler(requirements));
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        requirements,
+                        expectedOutput
+                    )
+                );
             });
 
             test("renders an expand button to view demand breakdown if creator has demands", async () => {
@@ -1668,19 +1649,22 @@ describe("requirements rendering given requirements", () => {
         ],
     ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
-            createRequirementsResponseHandler([
-                createRequirement({
-                    name: "test item name",
-                    amount: actual,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item name",
-                            amount: actual,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-            ])
+            createCalculatorOutputResponseHandler(
+                [
+                    createRequirement({
+                        name: "test item name",
+                        amount: actual,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "test item name",
+                                amount: actual,
+                                workers: 1,
+                            }),
+                        ],
+                    }),
+                ],
+                expectedOutput
+            )
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1701,19 +1685,22 @@ describe("requirements rendering given requirements", () => {
         const actualWorkers = 3.14;
         const expectedWorkers = "4";
         server.use(
-            createRequirementsResponseHandler([
-                createRequirement({
-                    name: "test item name",
-                    amount: 30,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item name",
-                            amount: 30,
-                            workers: actualWorkers,
-                        }),
-                    ],
-                }),
-            ])
+            createCalculatorOutputResponseHandler(
+                [
+                    createRequirement({
+                        name: "test item name",
+                        amount: 30,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "test item name",
+                                amount: 30,
+                                workers: actualWorkers,
+                            }),
+                        ],
+                    }),
+                ],
+                expectedOutput
+            )
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1865,7 +1852,9 @@ describe("requirements rendering given requirements", () => {
             sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
-            server.use(createRequirementsResponseHandler(unsorted));
+            server.use(
+                createCalculatorOutputResponseHandler(unsorted, expectedOutput)
+            );
 
             const user = userEvent.setup();
 
@@ -2033,7 +2022,9 @@ describe("requirements rendering given requirements", () => {
             sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
             numberOfClicks: number
         ) => {
-            server.use(createRequirementsResponseHandler(unsorted));
+            server.use(
+                createCalculatorOutputResponseHandler(unsorted, expectedOutput)
+            );
 
             const user = userEvent.setup();
 
@@ -2065,127 +2056,6 @@ describe("requirements rendering given requirements", () => {
             }
         }
     );
-});
-
-describe.each([
-    [
-        "unexpected",
-        () => createRequirementsUnexpectedErrorHandler("Unexpected"),
-        "An error occurred while fetching requirements, please change item/workers and try again.",
-    ],
-    [
-        "user",
-        () =>
-            createRequirementsUserErrorHandler(
-                "A user friendly error occurred"
-            ),
-        "A user friendly error occurred",
-    ],
-])(
-    "handles %s errors while fetching requirements",
-    async (_: string, handler, expected: string) => {
-        beforeEach(() => {
-            server.use(handler());
-        });
-
-        test("renders an error message", async () => {
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-
-            expect(await screen.findByRole("alert")).toHaveTextContent(
-                expected
-            );
-        });
-
-        test("does not render the requirements section header", async () => {
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            await screen.findByText(expectedOutputText);
-
-            expect(
-                screen.queryByRole("heading", {
-                    name: expectedRequirementsHeading,
-                })
-            ).not.toBeInTheDocument();
-        });
-
-        test("does not render the requirements table", async () => {
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            await screen.findByText(expectedOutputText);
-
-            expect(screen.queryByRole("table")).not.toBeInTheDocument();
-        });
-    }
-);
-
-describe("debounces requirement requests", () => {
-    beforeAll(() => {
-        vi.useFakeTimers();
-    });
-
-    test("only requests requirements every 500ms on worker change", async () => {
-        const expectedItemName = "test item";
-        const expectedLastRequest = waitForRequest(
-            server,
-            "POST",
-            expectedGraphQLAPIURL,
-            expectedRequirementsQueryName,
-            { name: expectedItemName, workers: 3, unit: OutputUnit.Minutes }
-        );
-
-        const { rerender } = rtlRender(
-            wrapWithTestProviders(
-                <Requirements
-                    selectedItemName={expectedItemName}
-                    workers={1}
-                    unit={OutputUnit.Minutes}
-                />,
-                expectedGraphQLAPIURL
-            )
-        );
-        rerender(
-            wrapWithTestProviders(
-                <Requirements
-                    selectedItemName={expectedItemName}
-                    workers={2}
-                    unit={OutputUnit.Minutes}
-                />,
-                expectedGraphQLAPIURL
-            )
-        );
-        rerender(
-            wrapWithTestProviders(
-                <Requirements
-                    selectedItemName={expectedItemName}
-                    workers={3}
-                    unit={OutputUnit.Minutes}
-                />,
-                expectedGraphQLAPIURL
-            )
-        );
-        act(() => {
-            vi.advanceTimersByTime(500);
-        });
-        const { detailsUpToMatch } = await expectedLastRequest;
-
-        expect(detailsUpToMatch).not.toContainEqual(
-            expect.objectContaining({ workers: 2 })
-        );
-    });
-
-    afterAll(() => {
-        vi.useRealTimers();
-    });
 });
 
 afterAll(() => {

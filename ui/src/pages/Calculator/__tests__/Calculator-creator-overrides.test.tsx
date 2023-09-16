@@ -11,8 +11,6 @@ import {
     selectOption,
 } from "../../../test/utils";
 import {
-    expectedRequirementsQueryName,
-    expectedOutputQueryName,
     expectedItemNameQueryName,
     ItemName,
     clickByName,
@@ -24,6 +22,7 @@ import {
     expectedCalculatorTab,
     expectedCalculatorTabHeader,
     selectItemAndWorkers,
+    expectedCalculatorOutputQueryName,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import {
@@ -32,10 +31,7 @@ import {
     Tools,
 } from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
-import {
-    createOutputResponseHandler,
-    createRequirementsResponseHandler,
-} from "./utils/handlers";
+import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const expectedLoadingMessage = "Loading overrides...";
@@ -91,8 +87,7 @@ const server = setupServer(
     graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
         return res(ctx.data({ item: [] }));
     }),
-    createRequirementsResponseHandler([]),
-    createOutputResponseHandler(5.2),
+    createCalculatorOutputResponseHandler([], 5.2),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
         return res(
             ctx.data({
@@ -849,9 +844,10 @@ describe("given items w/ multiple creators returned", () => {
             await expect(expectedRequest).resolves.not.toThrow();
         });
 
-        test("provides all creator overrides when querying requirements", async () => {
+        test("provides all creator overrides when querying calculator output", async () => {
             const user = userEvent.setup();
             const expectedItem = expectedSecondItemName;
+            const expectedCreator = expectedSecondItemOverrides[1].creator;
             const expectedWorkers = 5;
             const expectedOverrides: CreatorOverride[] = [
                 {
@@ -860,7 +856,7 @@ describe("given items w/ multiple creators returned", () => {
                 },
                 {
                     itemName: expectedSecondItemName,
-                    creator: expectedSecondItemOverrides[1].creator,
+                    creator: expectedCreator,
                 },
             ];
             const expectedTool = Tools.None;
@@ -868,14 +864,7 @@ describe("given items w/ multiple creators returned", () => {
                 server,
                 "POST",
                 expectedGraphQLAPIURL,
-                expectedRequirementsQueryName,
-                {
-                    name: expectedItem,
-                    workers: expectedWorkers,
-                    maxAvailableTool: expectedTool,
-                    creatorOverrides: expectedOverrides,
-                    unit: OutputUnit.Minutes,
-                }
+                expectedCalculatorOutputQueryName
             );
 
             await renderSettingsTab();
@@ -900,11 +889,19 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
+            const { matchedRequestDetails } = await expectedRequest;
 
-            await expect(expectedRequest).resolves.not.toThrow();
+            expect(matchedRequestDetails.variables).toEqual({
+                name: expectedItem,
+                workers: expectedWorkers,
+                unit: OutputUnit.Minutes,
+                maxAvailableTool: expectedTool,
+                outputCreator: expectedCreator,
+                creatorOverrides: expectedOverrides,
+            });
         });
 
-        test("returns to querying requirements without creator overrides if removed", async () => {
+        test("returns to querying calculator output without creator overrides if removed", async () => {
             const expectedItem = expectedSecondItemName;
             const expectedWorkers = 5;
             const expectedTool = Tools.None;
@@ -912,12 +909,12 @@ describe("given items w/ multiple creators returned", () => {
                 server,
                 "POST",
                 expectedGraphQLAPIURL,
-                expectedRequirementsQueryName,
+                expectedCalculatorOutputQueryName,
                 {
                     name: expectedItem,
                     workers: expectedWorkers,
-                    maxAvailableTool: expectedTool,
                     unit: OutputUnit.Minutes,
+                    maxAvailableTool: expectedTool,
                 }
             );
 
@@ -944,18 +941,17 @@ describe("given items w/ multiple creators returned", () => {
             const expectedWorkers = 5;
             const expectedTool = Tools.None;
             const expectedOutputUnit = OutputUnit.Minutes;
+            const expectedOverrides: CreatorOverride[] = [
+                {
+                    itemName: expectedSecondItemName,
+                    creator: expectedCreator,
+                },
+            ];
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
                 expectedGraphQLAPIURL,
-                expectedOutputQueryName,
-                {
-                    name: expectedItem,
-                    workers: expectedWorkers,
-                    unit: expectedOutputUnit,
-                    maxAvailableTool: expectedTool,
-                    creator: expectedCreator,
-                }
+                expectedCalculatorOutputQueryName
             );
 
             await renderSettingsTab();
@@ -973,51 +969,16 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
+            const { matchedRequestDetails } = await expectedRequest;
 
-            await expect(expectedRequest).resolves.not.toThrow();
-        });
-
-        test("returns to querying optimal recipe if applicable override is removed", async () => {
-            const expectedItem = expectedSecondItemName;
-            const expectedWorkers = 5;
-            const expectedTool = Tools.None;
-            const expectedOutputUnit = OutputUnit.Minutes;
-            const expectedRequest = waitForRequest(
-                server,
-                "POST",
-                expectedGraphQLAPIURL,
-                expectedOutputQueryName,
-                {
-                    name: expectedItem,
-                    workers: expectedWorkers,
-                    unit: expectedOutputUnit,
-                    maxAvailableTool: expectedTool,
-                }
-            );
-
-            await renderSettingsTab();
-            await clickByName(expectedAddCreatorOverrideButtonText, "button");
-            await selectOption({
-                label: expectedItemSelectOverrideLabel,
-                optionName: expectedItem,
-            });
-            await selectOption({
-                label: expectedCreatorSelectOverrideLabel,
-                optionName: expectedSecondItemOverrides[1].creator,
-            });
-            await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({
-                itemName: expectedItem,
+            expect(matchedRequestDetails.variables).toEqual({
+                name: expectedItem,
                 workers: expectedWorkers,
+                unit: expectedOutputUnit,
+                maxAvailableTool: expectedTool,
+                outputCreator: expectedCreator,
+                creatorOverrides: expectedOverrides,
             });
-            await clickByName(expectedSettingsTab, "tab");
-            await clickByName(
-                expectedRemoveCreatorOverrideButtonText,
-                "button"
-            );
-            await clickByName(expectedCalculatorTab, "tab");
-
-            await expect(expectedRequest).resolves.not.toThrow();
         });
     });
 });

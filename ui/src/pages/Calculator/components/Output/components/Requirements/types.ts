@@ -1,7 +1,3 @@
-import { Requirements as WrappedRequirements } from "../../../../graphql/__generated__/graphql";
-
-export type Requirements = WrappedRequirements["requirements"];
-
 export enum RowType {
     SingleCreator = "SingleCreator",
     MultipleCreator = "MultipleCreator",

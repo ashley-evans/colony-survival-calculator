@@ -1,79 +1,92 @@
 import { graphql } from "msw";
 import {
-    GetItemRequirementsQuery,
-    GetOptimalOutputQuery,
+    GetCalculatorOutputQuery,
     Requirement,
 } from "../../../../graphql/__generated__/graphql";
-import {
-    expectedOutputQueryName,
-    expectedRequirementsQueryName,
-} from "./constants";
+import { expectedCalculatorOutputQueryName } from "./constants";
 
-const createRequirementsResponseHandler = (requirements: Requirement[]) =>
-    graphql.query<GetItemRequirementsQuery>(
-        expectedRequirementsQueryName,
-        (_, res, ctx) => {
-            return res(
+const createCalculatorOutputResponseHandler = (
+    requirements: Requirement[],
+    amount: number
+) =>
+    graphql.query<GetCalculatorOutputQuery>(
+        expectedCalculatorOutputQueryName,
+        (_, res, ctx) =>
+            res(
                 ctx.data({
-                    requirement: {
-                        __typename: "Requirements",
-                        requirements,
-                    },
+                    output: { __typename: "OptimalOutput", amount },
+                    requirement: { __typename: "Requirements", requirements },
                 })
-            );
-        }
+            )
     );
 
-const createRequirementsUserErrorHandler = (message: string) =>
-    graphql.query<GetItemRequirementsQuery>(
-        expectedRequirementsQueryName,
-        (_, res, ctx) => {
-            return res(
+const createCalculatorOutputUserErrorHandler = (
+    input:
+        | { amount: number; requirementsUserError: string }
+        | { requirements: Requirement[]; amountUserError: string }
+        | { requirementsUserError: string; amountUserError: string }
+) => {
+    if ("amount" in input) {
+        return graphql.query<GetCalculatorOutputQuery>(
+            expectedCalculatorOutputQueryName,
+            (_, res, ctx) =>
+                res(
+                    ctx.data({
+                        output: {
+                            __typename: "OptimalOutput",
+                            amount: input.amount,
+                        },
+                        requirement: {
+                            __typename: "UserError",
+                            message: input.requirementsUserError,
+                        },
+                    })
+                )
+        );
+    } else if ("requirements" in input) {
+        return graphql.query<GetCalculatorOutputQuery>(
+            expectedCalculatorOutputQueryName,
+            (_, res, ctx) =>
+                res(
+                    ctx.data({
+                        output: {
+                            __typename: "UserError",
+                            message: input.amountUserError,
+                        },
+                        requirement: {
+                            __typename: "Requirements",
+                            requirements: input.requirements,
+                        },
+                    })
+                )
+        );
+    }
+
+    return graphql.query<GetCalculatorOutputQuery>(
+        expectedCalculatorOutputQueryName,
+        (_, res, ctx) =>
+            res(
                 ctx.data({
+                    output: {
+                        __typename: "UserError",
+                        message: input.amountUserError,
+                    },
                     requirement: {
                         __typename: "UserError",
-                        message,
+                        message: input.requirementsUserError,
                     },
                 })
-            );
-        }
+            )
     );
+};
 
-const createRequirementsUnexpectedErrorHandler = (message: string) =>
-    graphql.query(expectedRequirementsQueryName, (_, res, ctx) => {
-        return res(ctx.errors([{ message: message }]));
-    });
-
-const createOutputResponseHandler = (amount: number) =>
-    graphql.query<GetOptimalOutputQuery>(
-        expectedOutputQueryName,
-        (_, res, ctx) => {
-            return res(
-                ctx.data({ output: { __typename: "OptimalOutput", amount } })
-            );
-        }
-    );
-
-const createOutputUserErrorHandler = (message: string) =>
-    graphql.query<GetOptimalOutputQuery>(
-        expectedOutputQueryName,
-        (_, res, ctx) => {
-            return res(
-                ctx.data({ output: { __typename: "UserError", message } })
-            );
-        }
-    );
-
-const createOutputUnexpectedErrorHandler = (message: string) =>
-    graphql.query(expectedOutputQueryName, (_, res, ctx) => {
+const createCalculatorOutputErrorHandler = (message: string) =>
+    graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
         return res(ctx.errors([{ message: message }]));
     });
 
 export {
-    createRequirementsResponseHandler,
-    createRequirementsUserErrorHandler,
-    createRequirementsUnexpectedErrorHandler,
-    createOutputResponseHandler,
-    createOutputUserErrorHandler,
-    createOutputUnexpectedErrorHandler,
+    createCalculatorOutputResponseHandler,
+    createCalculatorOutputUserErrorHandler,
+    createCalculatorOutputErrorHandler,
 };
