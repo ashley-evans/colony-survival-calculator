@@ -114,18 +114,13 @@ function Output({
         return <LoadingMessage>Calculating output...</LoadingMessage>;
     }
 
-    if (isUserError(data.output) && isUserError(data.requirement)) {
-        const outputErrorMessage = data.output.message;
-        const requirementErrorMessage = data.requirement.message;
-        if (outputErrorMessage === requirementErrorMessage) {
-            return <ErrorMessage>{outputErrorMessage}</ErrorMessage>;
-        }
-
-        return <ErrorMessage>{requirementErrorMessage}</ErrorMessage>;
+    if (
+        (isUserError(data.output) && isUserError(data.requirement)) ||
+        isUserError(data.requirement)
+    ) {
+        return <ErrorMessage>{data.requirement.message}</ErrorMessage>;
     } else if (isUserError(data.output)) {
         return <ErrorMessage>{data.output.message}</ErrorMessage>;
-    } else if (isUserError(data.requirement)) {
-        return <ErrorMessage>{data.requirement.message}</ErrorMessage>;
     }
 
     return (
