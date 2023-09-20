@@ -10,6 +10,7 @@ import { useDebounce } from "use-debounce";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { OptimalOutput, Requirements } from "./components";
 import { LoadingMessage } from "./styles";
+import RequirementsSankey from "./components/RequirementsSankey";
 
 type OptimalProps = {
     itemName: string;
@@ -127,6 +128,10 @@ function Output({
         <>
             <OptimalOutput amount={data.output.amount} unit={outputUnit} />
             <Requirements
+                requirements={data.requirement.requirements}
+                selectedItemName={itemName}
+            />
+            <RequirementsSankey
                 requirements={data.requirement.requirements}
                 selectedItemName={itemName}
             />
