@@ -75,6 +75,7 @@ function RequirementsSankey({
                 enableLinkGradient={true}
                 margin={{ top: 16, bottom: 16, right: 16, left: 16 }}
                 linkOpacity={theme.type === "dark" ? 0.25 : 1}
+                linkBlendMode="normal"
             />
         </SankeyContainer>
     );
