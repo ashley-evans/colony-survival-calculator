@@ -15,6 +15,7 @@ type SurfaceTone = {
 
 declare module "styled-components" {
     export interface DefaultTheme {
+        type: "light" | "dark";
         container: {
             padding: string;
         };

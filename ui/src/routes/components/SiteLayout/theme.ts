@@ -12,6 +12,7 @@ const common: Pick<DefaultTheme, "container" | "typography"> = {
 
 const lightTheme: DefaultTheme = {
     ...common,
+    type: "light",
     color: {
         primary: {
             main: "#00677f",
@@ -57,6 +58,7 @@ const lightTheme: DefaultTheme = {
 
 const darkTheme: DefaultTheme = {
     ...common,
+    type: "dark",
     color: {
         primary: {
             main: "#5bd5fa",
