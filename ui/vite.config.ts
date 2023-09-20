@@ -9,7 +9,7 @@ export default defineConfig({
     test: {
         globals: true,
         environment: "jsdom",
-        setupFiles: "./src/test/setup.ts",
+        setupFiles: "./src/test/setup.tsx",
     },
     // Required as part of workaround detailed here:
     // https://github.com/aws-amplify/amplify-js/issues/9639#issuecomment-1271955246
