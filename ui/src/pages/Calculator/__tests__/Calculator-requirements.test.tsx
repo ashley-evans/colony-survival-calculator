@@ -5,11 +5,7 @@ import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { clickButton, renderWithTestProviders as render } from "../../../test";
-import {
-    CreatorDemand,
-    Requirement,
-    RequirementCreator,
-} from "../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../graphql/__generated__/graphql";
 import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
@@ -23,10 +19,7 @@ import {
     createRequirement,
     createRequirementCreator,
 } from "./utils";
-import {
-    RequirementsTableRow,
-    SingleCreatorRequirementsTableRow,
-} from "../components/Output/components/Requirements";
+import { SingleCreatorRequirementsTableRow } from "../components/Output/components/Requirements";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
@@ -48,7 +41,7 @@ enum Columns {
     WORKERS = 4,
 }
 
-const requirementsWithSingleCreator: Requirement[] = [
+const requirementsWithSingleCreator = [
     createRequirement({
         name: "Required Item 1",
         amount: 30,
@@ -133,20 +126,31 @@ const requirementWithMultipleCreatorsAndDemands = createRequirement({
 
 const selectedItemName = "Selected Item";
 const selectedItemCreator = "Selected Item Creator";
-const selectedItem = createRequirement({
-    name: selectedItemName,
-    amount: 90,
-    creators: [
-        createRequirementCreator({
-            recipeName: selectedItemName,
-            creator: selectedItemCreator,
-            amount: 90,
-            workers: 20,
-        }),
-    ],
-});
+const selectedItemAmount = 90;
+const selectedItemWorkers = 20;
 
-const items = [selectedItem, ...requirementsWithSingleCreator];
+const createRequirements = (requirements: Requirement[]): Requirement[] => {
+    const selectedItem = createRequirement({
+        name: selectedItemName,
+        amount: selectedItemAmount,
+        creators: [
+            createRequirementCreator({
+                recipeName: selectedItemName,
+                creator: selectedItemCreator,
+                amount: selectedItemAmount,
+                workers: selectedItemWorkers,
+                demands: requirements.map((requirement) => ({
+                    name: requirement.name,
+                    amount: requirement.amount,
+                })),
+            }),
+        ],
+    });
+
+    return [selectedItem, ...requirements];
+};
+
+const items = createRequirements(requirementsWithSingleCreator);
 
 const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
@@ -161,7 +165,7 @@ const server = setupServer(
         return res(ctx.data({ item: [] }));
     }),
     createCalculatorOutputResponseHandler(
-        [requirementsWithSingleCreator[0]],
+        createRequirements([requirementsWithSingleCreator[0]]),
         expectedOutput
     ),
     graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
@@ -186,7 +190,7 @@ describe("item w/o requirements handling", async () => {
     beforeEach(() => {
         server.use(
             createCalculatorOutputResponseHandler(
-                [selectedItem],
+                createRequirements([]),
                 expectedOutput
             )
         );
@@ -471,8 +475,14 @@ describe("requirements rendering given requirements", () => {
         test.each([
             [
                 "a single requirement",
-                [selectedItem, requirementsWithSingleCreator[0]],
+                createRequirements([requirementsWithSingleCreator[0]]),
                 [
+                    {
+                        name: selectedItemName,
+                        creator: selectedItemCreator,
+                        amount: selectedItemAmount,
+                        workers: selectedItemWorkers,
+                    },
                     {
                         name: requirementsWithSingleCreator[0].name,
                         creator:
@@ -489,6 +499,12 @@ describe("requirements rendering given requirements", () => {
                 "multiple requirements",
                 items,
                 [
+                    {
+                        name: selectedItemName,
+                        creator: selectedItemCreator,
+                        amount: selectedItemAmount,
+                        workers: selectedItemWorkers,
+                    },
                     {
                         name: requirementsWithSingleCreator[0].name,
                         creator:
@@ -534,7 +550,9 @@ describe("requirements rendering given requirements", () => {
                     workers: 5,
                 });
                 const requirementsTable = await screen.findByRole("table");
+                const rows = within(requirementsTable).getAllByRole("row");
 
+                expect(rows).toHaveLength(expected.length + 1);
                 for (const requirement of expected) {
                     const requirementCell = within(requirementsTable).getByRole(
                         "cell",
@@ -800,121 +818,6 @@ describe("requirements rendering given requirements", () => {
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                 }
             });
-
-            test.each([
-                [
-                    "descending",
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                    ],
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                    ],
-                    1,
-                ],
-                [
-                    "ascending",
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                    ],
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                    ],
-                    2,
-                ],
-                [
-                    "default",
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                    ],
-                    [
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[0],
-                        requirementWithSingleCreatorAndDemands.creators[0]
-                            .demands[1],
-                    ],
-                    3,
-                ],
-            ])(
-                "sorts demand breakdowns in %s order if amount column is sorted in that order",
-                async (
-                    _: string,
-                    unsorted: CreatorDemand[],
-                    expected: CreatorDemand[],
-                    numberOfClicks: number
-                ) => {
-                    const overridden: Requirement = {
-                        ...requirementWithSingleCreatorAndDemands,
-                        creators: [
-                            {
-                                ...requirementWithSingleCreatorAndDemands
-                                    .creators[0],
-                                demands: unsorted,
-                            },
-                        ],
-                    };
-
-                    server.use(
-                        createCalculatorOutputResponseHandler(
-                            [overridden],
-                            expectedOutput
-                        )
-                    );
-
-                    const user = userEvent.setup();
-
-                    render(<Calculator />, expectedGraphQLAPIURL);
-                    await selectItemAndWorkers({
-                        itemName: selectedItemName,
-                        workers: 5,
-                    });
-                    const requirementsTable = await screen.findByRole("table");
-                    const amountColumnHeader = within(
-                        requirementsTable
-                    ).getByRole("columnheader", {
-                        name: expectedAmountColumnName,
-                    });
-                    await clickButton({
-                        label: expectedExpandDemandBreakdownLabel,
-                    });
-                    for (let i = 0; i < numberOfClicks; i++) {
-                        await user.click(amountColumnHeader);
-                    }
-                    const rows = within(requirementsTable).getAllByRole("row");
-
-                    for (let i = 0; i < expected.length; i++) {
-                        const expectedRowNumber = i + 2;
-                        const demand = expected[i];
-                        const cells = within(
-                            rows[expectedRowNumber]
-                        ).getAllByRole("cell");
-
-                        expect(
-                            cells[Columns.DEMANDED_ITEM]
-                        ).toHaveAccessibleName(demand.name);
-                        expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
-                        expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                            demand.amount.toString()
-                        );
-                        expect(cells[Columns.AMOUNT]).toBeVisible();
-                    }
-                }
-            );
         });
     });
 
@@ -955,32 +858,12 @@ describe("requirements rendering given requirements", () => {
 
         test.each([
             ["non-selected item creator", requirementWithMultipleCreators],
-            [
-                "selected item creator",
-                createRequirement({
-                    name: "test item",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: selectedItemName,
-                            creator: selectedItemCreator,
-                            amount: 15,
-                            workers: 2,
-                        }),
-                        createRequirementCreator({
-                            recipeName: "test item",
-                            amount: 5,
-                            workers: 2,
-                        }),
-                    ],
-                }),
-            ],
         ])(
             "does not render the creator by default for any item that is created by %s",
             async (_: string, response: Requirement) => {
                 server.use(
                     createCalculatorOutputResponseHandler(
-                        [response],
+                        createRequirements([response]),
                         expectedOutput
                     )
                 );
@@ -1162,204 +1045,6 @@ describe("requirements rendering given requirements", () => {
             }
         });
 
-        test.each([
-            [
-                "descending",
-                [
-                    requirementWithMultipleCreators.creators[1],
-                    requirementWithMultipleCreators.creators[0],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                1,
-            ],
-            [
-                "ascending",
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[1],
-                    requirementWithMultipleCreators.creators[0],
-                ],
-                2,
-            ],
-            [
-                "default",
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                3,
-            ],
-        ])(
-            "sorts creator breakdowns in %s order if amount column is sorted in that order",
-            async (
-                _: string,
-                unsorted: RequirementCreator[],
-                expected: RequirementCreator[],
-                numberOfClicks: number
-            ) => {
-                server.use(
-                    createCalculatorOutputResponseHandler(
-                        [
-                            {
-                                ...requirementWithMultipleCreators,
-                                creators: unsorted,
-                            },
-                        ],
-                        expectedOutput
-                    )
-                );
-
-                const user = userEvent.setup();
-
-                render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
-                    itemName: selectedItemName,
-                    workers: 5,
-                });
-                const requirementsTable = await screen.findByRole("table");
-                const amountColumnHeader = within(requirementsTable).getByRole(
-                    "columnheader",
-                    { name: expectedAmountColumnName }
-                );
-                await clickButton({
-                    label: expectedExpandCreatorBreakdownLabel,
-                });
-                for (let i = 0; i < numberOfClicks; i++) {
-                    await user.click(amountColumnHeader);
-                }
-                const rows = within(requirementsTable).getAllByRole("row");
-
-                for (let i = 0; i < expected.length; i++) {
-                    const cells = within(
-                        rows[i + expected.length]
-                    ).getAllByRole("cell");
-
-                    expect(cells).toHaveLength(5);
-                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                        expected[i].creator
-                    );
-                    expect(cells[Columns.CREATOR]).toBeVisible();
-                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        expected[i].amount.toString()
-                    );
-                    expect(cells[Columns.AMOUNT]).toBeVisible();
-                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                        expected[i].workers.toString()
-                    );
-                    expect(cells[Columns.WORKERS]).toBeVisible();
-                }
-            }
-        );
-
-        test.each([
-            [
-                "descending",
-                [
-                    requirementWithMultipleCreators.creators[1],
-                    requirementWithMultipleCreators.creators[0],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                1,
-            ],
-            [
-                "ascending",
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[1],
-                    requirementWithMultipleCreators.creators[0],
-                ],
-                2,
-            ],
-            [
-                "default",
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                [
-                    requirementWithMultipleCreators.creators[0],
-                    requirementWithMultipleCreators.creators[1],
-                ],
-                3,
-            ],
-        ])(
-            "sorts creator breakdowns in %s order if worker column is sorted in that order",
-            async (
-                _: string,
-                unsorted: RequirementCreator[],
-                expected: RequirementCreator[],
-                numberOfClicks: number
-            ) => {
-                server.use(
-                    createCalculatorOutputResponseHandler(
-                        [
-                            {
-                                ...requirementWithMultipleCreators,
-                                creators: unsorted,
-                            },
-                        ],
-                        expectedOutput
-                    )
-                );
-
-                const user = userEvent.setup();
-
-                render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
-                    itemName: selectedItemName,
-                    workers: 5,
-                });
-                const requirementsTable = await screen.findByRole("table");
-                const workersColumnHeader = within(requirementsTable).getByRole(
-                    "columnheader",
-                    { name: expectedWorkerColumnName }
-                );
-                await clickButton({
-                    label: expectedExpandCreatorBreakdownLabel,
-                });
-                for (let i = 0; i < numberOfClicks; i++) {
-                    await user.click(workersColumnHeader);
-                }
-                const rows = within(requirementsTable).getAllByRole("row");
-
-                for (let i = 0; i < expected.length; i++) {
-                    const cells = within(
-                        rows[i + expected.length]
-                    ).getAllByRole("cell");
-
-                    expect(cells).toHaveLength(5);
-                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                        expected[i].creator
-                    );
-                    expect(cells[Columns.CREATOR]).toBeVisible();
-                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        expected[i].amount.toString()
-                    );
-                    expect(cells[Columns.AMOUNT]).toBeVisible();
-                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                        expected[i].workers.toString()
-                    );
-                    expect(cells[Columns.WORKERS]).toBeVisible();
-                }
-            }
-        );
-
         describe("demand rendering", () => {
             const requirements = [requirementWithMultipleCreatorsAndDemands];
             const expectedCreatorWithDemands =
@@ -1368,7 +1053,7 @@ describe("requirements rendering given requirements", () => {
             beforeEach(() => {
                 server.use(
                     createCalculatorOutputResponseHandler(
-                        requirements,
+                        createRequirements(requirements),
                         expectedOutput
                     )
                 );
@@ -1512,7 +1197,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const rows = within(requirementsTable).getAllByRole("row");
 
-                expect(rows).toHaveLength(requirements.length + 1);
+                expect(rows).toHaveLength(requirements.length + 2);
                 for (const demand of demands) {
                     expect(
                         within(requirementsTable).queryByRole("cell", {
@@ -1533,7 +1218,8 @@ describe("requirements rendering given requirements", () => {
                         .demands;
                 const expectedOffset =
                     requirementWithMultipleCreatorsAndDemands.creators.length +
-                    demands.length;
+                    demands.length +
+                    1;
 
                 render(<Calculator />, expectedGraphQLAPIURL);
                 await selectItemAndWorkers({
@@ -1608,7 +1294,7 @@ describe("requirements rendering given requirements", () => {
     ])("%s", async (_: string, actual: number, expected: string) => {
         server.use(
             createCalculatorOutputResponseHandler(
-                [
+                createRequirements([
                     createRequirement({
                         name: "test item name",
                         amount: actual,
@@ -1620,7 +1306,7 @@ describe("requirements rendering given requirements", () => {
                             }),
                         ],
                     }),
-                ],
+                ]),
                 expectedOutput
             )
         );
@@ -1644,7 +1330,7 @@ describe("requirements rendering given requirements", () => {
         const expectedWorkers = "4";
         server.use(
             createCalculatorOutputResponseHandler(
-                [
+                createRequirements([
                     createRequirement({
                         name: "test item name",
                         amount: 30,
@@ -1656,7 +1342,7 @@ describe("requirements rendering given requirements", () => {
                             }),
                         ],
                     }),
-                ],
+                ]),
                 expectedOutput
             )
         );
@@ -1675,345 +1361,781 @@ describe("requirements rendering given requirements", () => {
         ).toBeVisible();
     });
 
-    test.each([
-        [
-            "descending",
+    describe("handles sorting", () => {
+        test.each([
             [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 10,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 20,
-                            workers: 2,
-                        }),
-                    ],
-                }),
+                "descending",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                ],
+                1,
             ],
             [
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 10,
-                    workers: 2,
-                },
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 20,
-                    workers: 1,
-                },
+                "ascending",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                ],
+                2,
             ],
-            1,
-        ],
-        [
-            "ascending",
             [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 10,
-                            workers: 2,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 20,
-                            workers: 1,
-                        }),
-                    ],
-                }),
+                "default",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                ],
+                3,
             ],
-            [
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 20,
-                    workers: 1,
-                },
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 10,
-                    workers: 2,
-                },
-            ],
-            2,
-        ],
-        [
-            "default",
-            [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 10,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 20,
-                            workers: 2,
-                        }),
-                    ],
-                }),
-            ],
-            [
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 10,
-                    workers: 1,
-                },
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 20,
-                    workers: 2,
-                },
-            ],
-            3,
-        ],
-    ])(
-        "displays the items in %s order by workers if workers column is sorted in that order",
-        async (
-            _: string,
-            unsorted: Requirement[],
-            sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
-            numberOfClicks: number
-        ) => {
-            server.use(
-                createCalculatorOutputResponseHandler(unsorted, expectedOutput)
-            );
+        ])(
+            "sorts rows and breakdowns in %s order if workers column is sorted in that order",
+            async (
+                _: string,
+                unsorted: Requirement[],
+                expected: {
+                    name: string;
+                    creator: string;
+                    demand: string;
+                    amount: number;
+                    workers: string;
+                }[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        unsorted,
+                        expectedOutput
+                    )
+                );
 
-            const user = userEvent.setup();
+                const user = userEvent.setup();
 
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            const requirementsTable = await screen.findByRole("table");
-            const workersColumnHeader = within(requirementsTable).getByRole(
-                "columnheader",
-                { name: expectedWorkerColumnName }
-            );
-            for (let i = 0; i < numberOfClicks; i++) {
-                await user.click(workersColumnHeader);
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const workersColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    {
+                        name: expectedWorkerColumnName,
+                    }
+                );
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await user.click(workersColumnHeader);
+                }
+
+                const rows = within(requirementsTable).getAllByRole("row");
+                for (let i = 0; i < expected.length; i++) {
+                    const row = expected[i];
+                    const cells = within(rows[i + 1]).getAllByRole("cell");
+
+                    expect(cells[Columns.ITEM_NAME]).toHaveAccessibleName(
+                        row.name
+                    );
+                    expect(cells[Columns.ITEM_NAME]).toBeVisible();
+                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                        row.creator
+                    );
+                    expect(cells[Columns.CREATOR]).toBeVisible();
+                    expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
+                        row.demand
+                    );
+                    expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        row.amount.toString()
+                    );
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                        row.workers
+                    );
+                    expect(cells[Columns.WORKERS]).toBeVisible();
+                }
             }
-            const requirementRows = await within(
-                requirementsTable
-            ).findAllByRole("row");
+        );
 
-            for (let i = 0; i < sorted.length; i++) {
-                const currentRow = requirementRows[i + 1];
-                expect(
-                    within(currentRow).getByText(sorted[i].name)
-                ).toBeVisible();
-                expect(
-                    within(currentRow).getByText(sorted[i].workers)
-                ).toBeVisible();
+        test.each([
+            [
+                "descending",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                ],
+                1,
+            ],
+            [
+                "ascending",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                ],
+                2,
+            ],
+            [
+                "default",
+                [
+                    createRequirement({
+                        name: "Test item 1",
+                        amount: 25,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 1",
+                                amount: 20,
+                                workers: 10,
+                                demands: [
+                                    createCreatorDemands("Test item 2", 45),
+                                    createCreatorDemands("Test item 3", 20),
+                                ],
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 2",
+                        amount: 45,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                                creator: "Test item 2 - Creator 2",
+                            }),
+                            createRequirementCreator({
+                                recipeName: "Test item 2",
+                                amount: 25,
+                                workers: 15,
+                                demands: [],
+                                creator: "Test item 2 - Creator 1",
+                            }),
+                        ],
+                    }),
+                    createRequirement({
+                        name: "Test item 3",
+                        amount: 20,
+                        creators: [
+                            createRequirementCreator({
+                                recipeName: "Test item 3",
+                                amount: 20,
+                                workers: 10,
+                                demands: [],
+                            }),
+                        ],
+                    }),
+                ],
+                [
+                    {
+                        name: "Test item 1",
+                        creator: "Test item 1 creator",
+                        demand: "",
+                        amount: 25,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 2",
+                        amount: 45,
+                        workers: "",
+                    },
+                    {
+                        name: "",
+                        creator: "",
+                        demand: "Test item 3",
+                        amount: 20,
+                        workers: "",
+                    },
+                    {
+                        name: "Test item 2",
+                        creator: "",
+                        demand: "",
+                        amount: 45,
+                        workers: "25",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 2",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                    {
+                        name: "",
+                        creator: "Test item 2 - Creator 1",
+                        demand: "",
+                        amount: 25,
+                        workers: "15",
+                    },
+                    {
+                        name: "Test item 3",
+                        creator: "Test item 3 creator",
+                        demand: "",
+                        amount: 20,
+                        workers: "10",
+                    },
+                ],
+                3,
+            ],
+        ])(
+            "sorts rows and breakdowns in %s order if amount column is sorted in that order",
+            async (
+                _: string,
+                unsorted: Requirement[],
+                expected: {
+                    name: string;
+                    creator: string;
+                    demand: string;
+                    amount: number;
+                    workers: string;
+                }[],
+                numberOfClicks: number
+            ) => {
+                server.use(
+                    createCalculatorOutputResponseHandler(
+                        unsorted,
+                        expectedOutput
+                    )
+                );
+
+                const user = userEvent.setup();
+
+                render(<Calculator />, expectedGraphQLAPIURL);
+                await selectItemAndWorkers({
+                    itemName: selectedItemName,
+                    workers: 5,
+                });
+                const requirementsTable = await screen.findByRole("table");
+                const amountColumnHeader = within(requirementsTable).getByRole(
+                    "columnheader",
+                    {
+                        name: expectedAmountColumnName,
+                    }
+                );
+                await clickButton({
+                    label: expectedExpandDemandBreakdownLabel,
+                });
+                await clickButton({
+                    label: expectedExpandCreatorBreakdownLabel,
+                });
+                for (let i = 0; i < numberOfClicks; i++) {
+                    await user.click(amountColumnHeader);
+                }
+
+                const rows = within(requirementsTable).getAllByRole("row");
+                for (let i = 0; i < expected.length; i++) {
+                    const row = expected[i];
+                    const cells = within(rows[i + 1]).getAllByRole("cell");
+
+                    expect(cells[Columns.ITEM_NAME]).toHaveAccessibleName(
+                        row.name
+                    );
+                    expect(cells[Columns.ITEM_NAME]).toBeVisible();
+                    expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                        row.creator
+                    );
+                    expect(cells[Columns.CREATOR]).toBeVisible();
+                    expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
+                        row.demand
+                    );
+                    expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+                    expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                        row.amount.toString()
+                    );
+                    expect(cells[Columns.AMOUNT]).toBeVisible();
+                    expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                        row.workers
+                    );
+                    expect(cells[Columns.WORKERS]).toBeVisible();
+                }
             }
-        }
-    );
-
-    test.each([
-        [
-            "descending",
-            [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 10,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 20,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-            ],
-            [
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 20,
-                    workers: 1,
-                },
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 10,
-                    workers: 1,
-                },
-            ],
-            1,
-        ],
-        [
-            "ascending",
-            [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 20,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 10,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-            ],
-            [
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 10,
-                    workers: 1,
-                },
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 20,
-                    workers: 1,
-                },
-            ],
-            2,
-        ],
-        [
-            "default",
-            [
-                createRequirement({
-                    name: "test item 1",
-                    amount: 10,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 1",
-                            amount: 10,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-                createRequirement({
-                    name: "test item 2",
-                    amount: 20,
-                    creators: [
-                        createRequirementCreator({
-                            recipeName: "test item 2",
-                            amount: 20,
-                            workers: 1,
-                        }),
-                    ],
-                }),
-            ],
-            [
-                {
-                    name: "test item 1",
-                    creator: "test item 1 creator",
-                    amount: 10,
-                    workers: 1,
-                },
-                {
-                    name: "test item 2",
-                    creator: "test item 2 creator",
-                    amount: 20,
-                    workers: 1,
-                },
-            ],
-            3,
-        ],
-    ])(
-        "displays the items in %s order by amount if amount column is sorted in that order",
-        async (
-            _: string,
-            unsorted: Requirement[],
-            sorted: Omit<RequirementsTableRow, "key" | "type" | "isExpanded">[],
-            numberOfClicks: number
-        ) => {
-            server.use(
-                createCalculatorOutputResponseHandler(unsorted, expectedOutput)
-            );
-
-            const user = userEvent.setup();
-
-            render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
-                itemName: selectedItemName,
-                workers: 5,
-            });
-            const requirementsTable = await screen.findByRole("table");
-            const amountColumnHeader = within(requirementsTable).getByRole(
-                "columnheader",
-                { name: expectedAmountColumnName }
-            );
-            for (let i = 0; i < numberOfClicks; i++) {
-                await user.click(amountColumnHeader);
-            }
-            const requirementRows = await within(
-                requirementsTable
-            ).findAllByRole("row");
-
-            for (let i = 0; i < sorted.length; i++) {
-                const currentRow = requirementRows[i + 1];
-                expect(
-                    within(currentRow).getByText(sorted[i].name)
-                ).toBeVisible();
-                expect(
-                    within(currentRow).getByText(sorted[i].amount)
-                ).toBeVisible();
-            }
-        }
-    );
+        );
+    });
 });
 
 afterAll(() => {

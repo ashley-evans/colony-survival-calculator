@@ -137,25 +137,6 @@ function mapRequirementsToRows(
     }, [] as RequirementsTableRow[]);
 }
 
-function removeSelectedItemRows(
-    selectedItemName: string,
-    requirements: Readonly<Requirement[]> | undefined
-): Requirement[] {
-    if (!requirements) {
-        return [];
-    }
-
-    return requirements.reduce((acc, current) => {
-        if (current.name !== selectedItemName) {
-            acc.push({
-                ...current,
-            });
-        }
-
-        return acc;
-    }, [] as Requirement[]);
-}
-
 type CreatorRowIndex = {
     type: RowType.SingleCreator | RowType.MultipleCreator;
     index: number;
@@ -224,6 +205,5 @@ export {
     sortDirectionOrderMap,
     sortBy,
     mapRequirementsToRows,
-    removeSelectedItemRows,
     toggleBreakdown,
 };
