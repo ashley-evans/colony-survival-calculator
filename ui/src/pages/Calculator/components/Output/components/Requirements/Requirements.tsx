@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useEffect, useState } from "react";
+import React, { MouseEventHandler, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     IconDefinition,
@@ -17,7 +17,6 @@ import {
 import { RequirementRow } from "./RequirementRow";
 import {
     ValidSortDirections,
-    removeSelectedItemRows,
     sortBy,
     sortDirectionOrderMap,
     mapRequirementsToRows,
@@ -27,7 +26,6 @@ import { RequirementsTableRow } from "./types";
 import { Requirement } from "../../../../../../graphql/__generated__/graphql";
 
 type RequirementsProps = {
-    selectedItemName: string;
     requirements: Requirement[];
 };
 
@@ -37,12 +35,14 @@ const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
     ascending: faSortAsc,
 };
 
-function Requirements({ selectedItemName, requirements }: RequirementsProps) {
+function Requirements({ requirements }: RequirementsProps) {
     const [amountSortDirection, setAmountSortDirection] =
         useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
-    const [rows, setRows] = useState<RequirementsTableRow[]>([]);
+    const [rows, setRows] = useState<RequirementsTableRow[]>(
+        mapRequirementsToRows(requirements)
+    );
 
     const changeAmountSortDirection: MouseEventHandler = (event) => {
         event.stopPropagation();
@@ -61,12 +61,7 @@ function Requirements({ selectedItemName, requirements }: RequirementsProps) {
         setRows([...updated]);
     };
 
-    useEffect(() => {
-        const filtered = removeSelectedItemRows(selectedItemName, requirements);
-        setRows(mapRequirementsToRows(filtered));
-    }, [requirements, selectedItemName]);
-
-    if (rows.length === 0) {
+    if (rows.length <= 1) {
         return <></>;
     }
 

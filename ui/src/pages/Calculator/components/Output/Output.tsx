@@ -127,10 +127,7 @@ function Output({
     return (
         <>
             <OptimalOutput amount={data.output.amount} unit={outputUnit} />
-            <Requirements
-                requirements={data.requirement.requirements}
-                selectedItemName={itemName}
-            />
+            <Requirements requirements={data.requirement.requirements} />
             <RequirementsSankey
                 requirements={data.requirement.requirements}
                 selectedItemName={itemName}
