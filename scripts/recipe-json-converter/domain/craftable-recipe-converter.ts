@@ -31,7 +31,7 @@ import {
 import { JSON_FILE_EXTENSION } from "./constants";
 
 const TOOLSETS_FILE_NAME = "toolsets";
-const BLOCK_BEHAVIOURS_FILE_NAME = "generateblocks";
+const BLOCK_BEHAVIOURS_PREFIX = "generateblocks";
 const RECIPE_PREFIX = "recipes_";
 const RECIPE_EXCLUSION_SET = new Set<string>(["recipes_merchant.json"]);
 
@@ -70,20 +70,20 @@ const getBlockBehaviours = async (
     const blockBehavioursFiles = await findFiles({
         root: inputDirectoryPath,
         fileExtension: JSON_FILE_EXTENSION,
-        exact: BLOCK_BEHAVIOURS_FILE_NAME,
+        prefix: BLOCK_BEHAVIOURS_PREFIX,
     });
 
     if (blockBehavioursFiles.length === 0) {
         throw new Error(
-            `No ${BLOCK_BEHAVIOURS_FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`
-        );
-    } else if (blockBehavioursFiles.length > 1) {
-        throw new Error(
-            `Multiple ${BLOCK_BEHAVIOURS_FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`
+            `No ${BLOCK_BEHAVIOURS_PREFIX}*${JSON_FILE_EXTENSION} file(s) found in provided directory`
         );
     }
 
-    return readBehavioursFile(blockBehavioursFiles[0] as string);
+    const behaviours = await Promise.all(
+        blockBehavioursFiles.map((path) => readBehavioursFile(path))
+    );
+
+    return behaviours.flat();
 };
 
 const getKnownRecipes = async (
@@ -106,6 +106,7 @@ const getKnownRecipes = async (
     const recipes = await Promise.all(
         filtered.map((path) => readRecipeFile(path))
     );
+
     return recipes.flat();
 };
 
