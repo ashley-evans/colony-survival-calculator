@@ -5,7 +5,7 @@
 Requires the following Colony Survival files to be placed in a single folder for reading:
 
 -   `toolsets.json`
--   All `generateblocks_*.json`
+-   All `generateblocks*.json`
 -   All `recipes_*.json` files
 -   `types.json`
 -   `growables.json`
