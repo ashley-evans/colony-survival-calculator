@@ -75,6 +75,144 @@
         ]
     },
     {
+        "name": "Door",
+        "creator": "Artist",
+        "createTime": 180,
+        "requires": [
+            { "name": "Planks", "amount": 2 },
+            { "name": "Copper ingot", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Sign",
+        "creator": "Artist",
+        "createTime": 360,
+        "requires": [{ "name": "Planks", "amount": 4 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Crown Moulding",
+        "creator": "Artist",
+        "createTime": 100,
+        "requires": [{ "name": "Planks", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Wooden stairs",
+        "creator": "Artist",
+        "createTime": 120,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Stone stairs",
+        "creator": "Artist",
+        "createTime": 180,
+        "requires": [{ "name": "Stone rubble", "amount": 5 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Window",
+        "creator": "Artist",
+        "createTime": 180,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Flower box",
+        "creator": "Artist",
+        "createTime": 240,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Pillar",
+        "creator": "Artist",
+        "createTime": 360,
+        "requires": [{ "name": "Stone bricks", "amount": 4 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Architrave",
+        "creator": "Artist",
+        "createTime": 360,
+        "requires": [{ "name": "Stone bricks", "amount": 4 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Corbel",
+        "creator": "Artist",
+        "createTime": 360,
+        "requires": [{ "name": "Stone bricks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Paint stripper",
+        "creator": "Artist",
+        "createTime": 360,
+        "requires": [{ "name": "Iron tools", "amount": 1 }],
+        "output": 100,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "White paint",
+        "creator": "Artist",
+        "createTime": 40,
+        "requires": [{ "name": "Hemp", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Red paint",
+        "creator": "Artist",
+        "createTime": 40,
+        "requires": [{ "name": "Hollyhock", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Blue paint",
+        "creator": "Artist",
+        "createTime": 40,
+        "requires": [{ "name": "Alkanet", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Green paint",
+        "creator": "Artist",
+        "createTime": 40,
+        "requires": [{ "name": "Wolfsbane", "amount": 1 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
         "name": "Candle",
         "creator": "Beekeeper",
         "createTime": 10,
@@ -590,6 +728,18 @@
         "maximumTool": "steel"
     },
     {
+        "name": "Street light",
+        "creator": "Engineer",
+        "createTime": 360,
+        "requires": [
+            { "name": "Iron wrought", "amount": 1 },
+            { "name": "Piece of glass", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
         "name": "Dropper trap ammo",
         "creator": "Engineer",
         "createTime": 160,
@@ -740,26 +890,48 @@
         "maximumTool": "steel"
     },
     {
-        "name": "Horizontal elevator",
+        "name": "Rail station",
         "creator": "Engineer",
         "createTime": 480,
         "requires": [
             { "name": "Iron wrought", "amount": 5 },
-            { "name": "Metal gear", "amount": 4 },
-            { "name": "Bronze ingot", "amount": 2 }
+            { "name": "Metal gear", "amount": 4 }
         ],
         "output": 1,
         "minimumTool": "copper",
         "maximumTool": "steel"
     },
     {
-        "name": "Horizontal elevator shaft",
+        "name": "Rails",
         "creator": "Engineer",
         "createTime": 180,
         "requires": [
             { "name": "Iron wrought", "amount": 2 },
-            { "name": "Metal gear", "amount": 1 },
-            { "name": "Bronze ingot", "amount": 1 }
+            { "name": "Metal gear", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Rail gate",
+        "creator": "Engineer",
+        "createTime": 180,
+        "requires": [
+            { "name": "Iron wrought", "amount": 4 },
+            { "name": "Metal gear", "amount": 8 }
+        ],
+        "output": 1,
+        "minimumTool": "copper",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Archimedean Screw",
+        "creator": "Engineer",
+        "createTime": 480,
+        "requires": [
+            { "name": "Planks", "amount": 10 },
+            { "name": "Copper ingot", "amount": 5 }
         ],
         "output": 1,
         "minimumTool": "copper",
@@ -796,7 +968,7 @@
     {
         "name": "Raw fish",
         "creator": "Fisherman",
-        "createTime": 64,
+        "createTime": 125,
         "requires": [],
         "output": 1,
         "minimumTool": "none",
@@ -1150,6 +1322,18 @@
         "requires": [
             { "name": "Planks", "amount": 1 },
             { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
+    },
+    {
+        "name": "Artist's Workbench",
+        "creator": "Job block crafter",
+        "createTime": 240,
+        "requires": [
+            { "name": "Planks", "amount": 4 },
+            { "name": "Copper tools", "amount": 1 }
         ],
         "output": 1,
         "minimumTool": "none",
@@ -1635,6 +1819,38 @@
         "output": 8,
         "minimumTool": "none",
         "maximumTool": "steel"
+    },
+    {
+        "name": "Tiled roof",
+        "creator": "Potter",
+        "createTime": 80,
+        "requires": [
+            { "name": "Clay", "amount": 5 },
+            { "name": "Planks", "amount": 2 },
+            { "name": "Pot of water", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
+    },
+    {
+        "name": "Blue tiled roof",
+        "creator": "Potter",
+        "createTime": 80,
+        "requires": [
+            { "name": "Clay", "amount": 5 },
+            { "name": "Planks", "amount": 2 },
+            { "name": "Pot of water", "amount": 1 }
+        ],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "none",
+        "optionalOutputs": [
+            { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
+        ]
     },
     {
         "name": "Empty pot",
@@ -2179,6 +2395,15 @@
         "output": 1,
         "minimumTool": "none",
         "maximumTool": "none"
+    },
+    {
+        "name": "Fence",
+        "creator": "Woodcutter",
+        "createTime": 100,
+        "requires": [{ "name": "Planks", "amount": 2 }],
+        "output": 1,
+        "minimumTool": "none",
+        "maximumTool": "steel"
     },
     {
         "name": "Planks",

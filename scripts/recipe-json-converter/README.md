@@ -5,7 +5,7 @@
 Requires the following Colony Survival files to be placed in a single folder for reading:
 
 -   `toolsets.json`
--   `generateblocks.json`
+-   All `generateblocks_*.json`
 -   All `recipes_*.json` files
 -   `types.json`
 -   `growables.json`
@@ -16,14 +16,27 @@ This can be found in Colony Survival's steam folder.
 
 The following amendments must be made to the Colony Survival files before executing the script:
 
+Artist's recipe's needs to be updated to:
+
+-   Rename all usages of `stonebricksnew` with `stonebricks`
+-   Align result type and names for sign recipe:
+    -   Update `signitem` to `sign`
+
+Artist sign recipe needs to be manually updated to align result type and name:
+
+-   Update `signitem` to `sign`
+
 Berry farmer recipe needs to be manually updated as does not follow same naming convention as other recipes
 
 -   Update: `gather` to `berry`
 -   Update creator: `berry` to `berryfarmer`
 
-Engineer's elevator recipe needs to be manually updated to align result type and name:
+Engineer's recipe's needs to be updated to:
 
--   Update: `elevatorstation` to `elevator`
+-   Rename `lantern` recipe to `streetlight`
+    -   Including updating `lanternitem` result to `streetlight`
+-   Align result type and names for elevator recipe:
+    -   Update `elevatorstation` to `elevator`
 
 Grinder's flour pot recipe needs to be manually duplicated to have:
 
@@ -53,7 +66,7 @@ Tanner's process recipe needs to be manually duplicated to have:
 
 Tinkerer's recipe's needs to be updated to:
 
--   Only include one planks recipe, remove entry for: `plankstiaga`
+-   Only include one planks recipe, remove entry for: `plankstaiga`
 -   Only include one tinkerer table recipe, remove entry for: `tinkerertabletaiga`
 -   Align result type and name for: slinger jobs:
     -   Update: `slingday` to: `guardslingerdayjob`

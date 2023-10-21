@@ -48,7 +48,7 @@ const expectedToolsetFileFindInput = {
 };
 const expectedBlockBehavioursFileFindInput = {
     root: input.inputDirectoryPath,
-    exact: "generateblocks",
+    prefix: "generateblocks",
     fileExtension: ".json",
 };
 const expectedRecipesFileFindInput = {
@@ -182,42 +182,46 @@ test("finds the block behaviours file in the provided input directory", async ()
     );
 });
 
-describe.each([
-    [
-        "more than one",
-        ["generateblocks.json", "generateblocks.json"],
-        "Multiple generateblocks.json files found, ensure only one exists",
-    ],
-    ["no", [], "No generateblocks.json file found in provided directory"],
-])(
-    "handles %s block behaviour file found",
-    (_: string, filesFound: string[], expectedError: string) => {
-        beforeEach(() => {
-            when(mockFindFiles)
-                .calledWith(expectedBlockBehavioursFileFindInput)
-                .mockResolvedValue(filesFound);
-        });
+describe("handles no block behaviour file found", () => {
+    beforeEach(() => {
+        when(mockFindFiles)
+            .calledWith(expectedBlockBehavioursFileFindInput)
+            .mockResolvedValue([]);
+    });
 
-        test("throws an error", async () => {
-            expect.assertions(1);
-            await expect(convertRecipes(input)).rejects.toThrowError(
-                expectedError
-            );
-        });
+    test("throws an error", async () => {
+        expect.assertions(1);
+        await expect(convertRecipes(input)).rejects.toThrowError(
+            "No generateblocks*.json file(s) found in provided directory"
+        );
+    });
 
-        test("does not attempt to find recipe files", async () => {
-            try {
-                await convertRecipes(input);
-            } catch {
-                // Expected
-            }
+    test("does not attempt to find recipe files", async () => {
+        try {
+            await convertRecipes(input);
+        } catch {
+            // Expected
+        }
 
-            expect(mockFindFiles).not.toHaveBeenCalledWith(
-                expectedRecipesFileFindInput
-            );
-        });
+        expect(mockFindFiles).not.toHaveBeenCalledWith(
+            expectedRecipesFileFindInput
+        );
+    });
+});
+
+test("parses each block behaviour file returned if multiple found", async () => {
+    const expected = ["generateblocks.json", "generateblocks_decorative.json"];
+    when(mockFindFiles)
+        .calledWith(expectedBlockBehavioursFileFindInput)
+        .mockResolvedValue(expected);
+
+    await convertRecipes(input);
+
+    expect(mockReadBehaviourFile).toHaveBeenCalledTimes(expected.length);
+    for (const file of expected) {
+        expect(mockReadBehaviourFile).toHaveBeenCalledWith(file);
     }
-);
+});
 
 test("parses the JSON found in the block behaviour file", async () => {
     await convertRecipes(input);
@@ -1074,8 +1078,7 @@ describe("recipe to item mapping", () => {
             ["bookofknowledge", "Book of knowledge"],
             ["elevatorshaft", "Elevator shaft"],
             ["elevator", "Elevator"],
-            ["elevatorhorizontal", "Horizontal elevator"],
-            ["elevatorshafthorizontal", "Horizontal elevator shaft"],
+            ["elevatorhorizontal", "Rail station"],
             ["wheatporridge", "Wheat porridge"],
             ["wheat", "Wheat"],
             ["bow", "Bow"],
@@ -1201,6 +1204,29 @@ describe("recipe to item mapping", () => {
             ["woodfloor", "Wood floor"],
             ["quarterblockbrowndark", "Dark brown quarter block"],
             ["quarterblockbrownlight", "Light brown quarter block"],
+            ["doorclosed", "Door"],
+            ["sign", "Sign"],
+            ["mouldingitem", "Crown Moulding"],
+            ["woodstair", "Wooden stairs"],
+            ["stonestair", "Stone stairs"],
+            ["window", "Window"],
+            ["flowerboxitem", "Flower box"],
+            ["pillar", "Pillar"],
+            ["architrave", "Architrave"],
+            ["corbel", "Corbel"],
+            ["paintstripped", "Paint stripper"],
+            ["paintwhite", "White paint"],
+            ["paintred", "Red paint"],
+            ["paintblue", "Blue paint"],
+            ["paintgreen", "Green paint"],
+            ["streetlight", "Street light"],
+            ["railitem", "Rails"],
+            ["railgate", "Rail gate"],
+            ["watersponge", "Archimedean Screw"],
+            ["artisttable", "Artist's Workbench"],
+            ["rooftool", "Tiled roof"],
+            ["rooftoolblue", "Blue tiled roof"],
+            ["fence", "Fence"],
         ])(
             "can handle recipes for item: %s",
             async (itemName: string, expectedConvertedItemName: string) => {
@@ -1282,6 +1308,7 @@ describe("recipe to item mapping", () => {
             ["watergatherer", "Water gatherer"],
             ["waterpump", "Water pump worker"],
             ["woodcutter", "Woodcutter"],
+            ["artist", "Artist"],
         ])(
             "can handle recipes from creator: %s",
             async (creator: string, expectedConvertedCreator: string) => {

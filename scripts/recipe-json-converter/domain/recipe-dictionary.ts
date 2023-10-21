@@ -108,8 +108,7 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     bookofknowledge: "Book of knowledge",
     elevatorshaft: "Elevator shaft",
     elevator: "Elevator",
-    elevatorhorizontal: "Horizontal elevator",
-    elevatorshafthorizontal: "Horizontal elevator shaft",
+    elevatorhorizontal: "Rail station",
     wheatporridge: "Wheat porridge",
     wheat: "Wheat",
     bow: "Bow",
@@ -237,6 +236,29 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     quarterblockbrownlight: "Light brown quarter block",
     cotton: "Cotton",
     wisteriaplant: "Wisteria flower",
+    doorclosed: "Door",
+    sign: "Sign",
+    mouldingitem: "Crown Moulding",
+    woodstair: "Wooden stairs",
+    stonestair: "Stone stairs",
+    window: "Window",
+    flowerboxitem: "Flower box",
+    pillar: "Pillar",
+    architrave: "Architrave",
+    corbel: "Corbel",
+    paintstripped: "Paint stripper",
+    paintwhite: "White paint",
+    paintred: "Red paint",
+    paintblue: "Blue paint",
+    paintgreen: "Green paint",
+    streetlight: "Street light",
+    railitem: "Rails",
+    railgate: "Rail gate",
+    watersponge: "Archimedean Screw",
+    artisttable: "Artist's Workbench",
+    rooftool: "Tiled roof",
+    rooftoolblue: "Blue tiled roof",
+    fence: "Fence",
 };
 
 const getUserFriendlyItemName = (name: string): string | null => {
@@ -287,6 +309,7 @@ const creatorNameMap: Readonly<Record<string, string>> = {
     barley: "Barley farmer",
     hemp: "Hemp farmer",
     wisteriaplant: "Wisteria flower farmer",
+    artist: "Artist",
 };
 
 const getUserFriendlyCreatorName = (creator: string): string | null => {
