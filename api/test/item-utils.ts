@@ -1,9 +1,9 @@
 import {
+    DefaultToolset,
     Item,
     OptionalOutput,
     Requirement,
     Requirements,
-    Tools,
 } from "../src/types";
 
 function createRequirements(name: string, amount: number): Requirement {
@@ -34,8 +34,8 @@ function createItem({
     createTime,
     output,
     requirements,
-    minimumTool = Tools.none,
-    maximumTool = Tools.none,
+    minimumTool = DefaultToolset.none,
+    maximumTool = DefaultToolset.none,
     creator = `${name} creator`,
     optionalOutputs,
     width,
@@ -45,8 +45,8 @@ function createItem({
     createTime: number;
     output: number;
     requirements: Requirements;
-    minimumTool?: Tools;
-    maximumTool?: Tools;
+    minimumTool?: DefaultToolset;
+    maximumTool?: DefaultToolset;
     creator?: string;
     optionalOutputs?: OptionalOutput[];
     width?: number;
@@ -59,8 +59,11 @@ function createItem({
         creator,
         requires: requirements,
         ...(width && height ? { size: { width, height } } : {}),
-        minimumTool,
-        maximumTool,
+        toolset: {
+            type: "default",
+            minimumTool,
+            maximumTool,
+        },
         ...(optionalOutputs ? { optionalOutputs } : {}),
     };
 }

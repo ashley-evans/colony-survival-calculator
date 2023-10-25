@@ -48,9 +48,7 @@ const mapPiplizTool = (tool: PiplizTools): SupportedPiplizTools | null => {
     }
 };
 
-const getMinMaxTools = (
-    tools: PiplizTools[]
-): Pick<Item, "minimumTool" | "maximumTool"> => {
+const getMinMaxTools = (tools: PiplizTools[]): Item["toolset"] => {
     let minimumTool = SupportedPiplizTools.steeltools;
     let maximumTool = SupportedPiplizTools.notools;
     for (const tool of tools) {
@@ -68,6 +66,7 @@ const getMinMaxTools = (
     }
 
     return {
+        type: "default",
         minimumTool: ToolMap[minimumTool],
         maximumTool: ToolMap[maximumTool],
     };

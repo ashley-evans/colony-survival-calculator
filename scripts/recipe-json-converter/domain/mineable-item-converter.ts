@@ -52,8 +52,11 @@ const convertToItems = (mineable: MineableItems): Items => {
             createTime: current.customData.minerMiningTime,
             output: 1,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.steel,
+            },
             creator: "Miner",
         });
 

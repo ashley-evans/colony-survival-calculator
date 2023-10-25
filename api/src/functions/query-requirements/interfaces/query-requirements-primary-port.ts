@@ -1,5 +1,5 @@
 import { OutputUnit } from "../../../common/output";
-import { Tools } from "../../../types";
+import { DefaultToolset } from "../../../types";
 
 type CreatorOverride = {
     itemName: string;
@@ -30,7 +30,7 @@ interface QueryRequirementsPrimaryPort {
         name: string;
         workers: number;
         unit?: OutputUnit;
-        maxAvailableTool?: Tools;
+        maxAvailableTool?: DefaultToolset;
         creatorOverrides?: CreatorOverride[];
     }): Promise<Requirement[]>;
 }

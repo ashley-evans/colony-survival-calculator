@@ -1,36 +1,36 @@
 import { Tools as GraphQLSchemaTools } from "../../graphql/schema";
-import { Tools as JSONSchemaTools } from "../../types";
+import { DefaultToolset } from "../../types";
 
-const ToolModifierValues: Readonly<Record<JSONSchemaTools, number>> = {
-    [JSONSchemaTools.none]: 1,
-    [JSONSchemaTools.stone]: 2,
-    [JSONSchemaTools.copper]: 4,
-    [JSONSchemaTools.iron]: 5.3,
-    [JSONSchemaTools.bronze]: 6.15,
-    [JSONSchemaTools.steel]: 8,
+const ToolModifierValues: Readonly<Record<DefaultToolset, number>> = {
+    [DefaultToolset.none]: 1,
+    [DefaultToolset.stone]: 2,
+    [DefaultToolset.copper]: 4,
+    [DefaultToolset.iron]: 5.3,
+    [DefaultToolset.bronze]: 6.15,
+    [DefaultToolset.steel]: 8,
 };
 
-const ToolSchemaMap: Record<GraphQLSchemaTools, JSONSchemaTools> = {
-    NONE: JSONSchemaTools.none,
-    STONE: JSONSchemaTools.stone,
-    COPPER: JSONSchemaTools.copper,
-    IRON: JSONSchemaTools.iron,
-    BRONZE: JSONSchemaTools.bronze,
-    STEEL: JSONSchemaTools.steel,
+const ToolSchemaMap: Record<GraphQLSchemaTools, DefaultToolset> = {
+    NONE: DefaultToolset.none,
+    STONE: DefaultToolset.stone,
+    COPPER: DefaultToolset.copper,
+    IRON: DefaultToolset.iron,
+    BRONZE: DefaultToolset.bronze,
+    STEEL: DefaultToolset.steel,
 };
 
-const GraphQLToolsSchemaMap: Record<JSONSchemaTools, GraphQLSchemaTools> = {
-    [JSONSchemaTools.none]: "NONE",
-    [JSONSchemaTools.stone]: "STONE",
-    [JSONSchemaTools.copper]: "COPPER",
-    [JSONSchemaTools.iron]: "IRON",
-    [JSONSchemaTools.bronze]: "BRONZE",
-    [JSONSchemaTools.steel]: "STEEL",
+const GraphQLToolsSchemaMap: Record<DefaultToolset, GraphQLSchemaTools> = {
+    [DefaultToolset.none]: "NONE",
+    [DefaultToolset.stone]: "STONE",
+    [DefaultToolset.copper]: "COPPER",
+    [DefaultToolset.iron]: "IRON",
+    [DefaultToolset.bronze]: "BRONZE",
+    [DefaultToolset.steel]: "STEEL",
 };
 
 function isAvailableToolSufficient(
-    minimum: JSONSchemaTools,
-    available: JSONSchemaTools
+    minimum: DefaultToolset,
+    available: DefaultToolset
 ): boolean {
     const minimumToolModifier = ToolModifierValues[minimum];
     const availableToolModifier = ToolModifierValues[available];
@@ -38,8 +38,8 @@ function isAvailableToolSufficient(
 }
 
 function getMaxToolModifier(
-    maximum: JSONSchemaTools,
-    available: JSONSchemaTools
+    maximum: DefaultToolset,
+    available: DefaultToolset
 ): number {
     const maximumToolModifier = ToolModifierValues[maximum];
     const availableToolModifier = ToolModifierValues[available];

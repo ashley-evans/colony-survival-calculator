@@ -19,8 +19,11 @@ const STATIC_RECIPES: Items = [
         output: 44,
         requires: [],
         optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Forester",
         size: {
             width: 3,
@@ -33,8 +36,11 @@ const STATIC_RECIPES: Items = [
         output: 59.4,
         requires: [],
         optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Forester",
         size: {
             width: 3,
@@ -139,8 +145,11 @@ const mapToItem = (growable: Growables[number]): Item => {
         createTime,
         output: expectedOutput,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator,
         ...(size ? { size } : {}),
     };

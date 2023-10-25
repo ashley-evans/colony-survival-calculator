@@ -8,8 +8,11 @@
             { "name": "Wisteria flower", "amount": 1 }
         ],
         "output": 2,
-        "minimumTool": "iron",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Gunpowder",
@@ -21,8 +24,11 @@
             { "name": "Sulfur", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "iron",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Vial of mineral oil",
@@ -34,8 +40,11 @@
             { "name": "Empty Vial", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "iron",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -51,8 +60,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "iron",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -68,8 +80,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "iron",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -83,8 +98,11 @@
             { "name": "Copper ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Sign",
@@ -92,8 +110,11 @@
         "createTime": 360,
         "requires": [{ "name": "Planks", "amount": 4 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Crown Moulding",
@@ -101,8 +122,11 @@
         "createTime": 100,
         "requires": [{ "name": "Planks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Wooden stairs",
@@ -110,8 +134,11 @@
         "createTime": 120,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stone stairs",
@@ -119,8 +146,11 @@
         "createTime": 180,
         "requires": [{ "name": "Stone rubble", "amount": 5 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Window",
@@ -128,8 +158,11 @@
         "createTime": 180,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Flower box",
@@ -137,8 +170,11 @@
         "createTime": 240,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Pillar",
@@ -146,8 +182,11 @@
         "createTime": 360,
         "requires": [{ "name": "Stone bricks", "amount": 4 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Architrave",
@@ -155,8 +194,11 @@
         "createTime": 360,
         "requires": [{ "name": "Stone bricks", "amount": 4 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Corbel",
@@ -164,8 +206,11 @@
         "createTime": 360,
         "requires": [{ "name": "Stone bricks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Paint stripper",
@@ -173,8 +218,11 @@
         "createTime": 360,
         "requires": [{ "name": "Iron tools", "amount": 1 }],
         "output": 100,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "White paint",
@@ -182,8 +230,11 @@
         "createTime": 40,
         "requires": [{ "name": "Hemp", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Red paint",
@@ -191,8 +242,11 @@
         "createTime": 40,
         "requires": [{ "name": "Hollyhock", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Blue paint",
@@ -200,8 +254,11 @@
         "createTime": 40,
         "requires": [{ "name": "Alkanet", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Green paint",
@@ -209,8 +266,11 @@
         "createTime": 40,
         "requires": [{ "name": "Wolfsbane", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Candle",
@@ -218,8 +278,11 @@
         "createTime": 10,
         "requires": [],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Berry",
@@ -227,8 +290,11 @@
         "createTime": 8.5,
         "requires": [],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Berry meal",
@@ -236,8 +302,11 @@
         "createTime": 8.5,
         "requires": [{ "name": "Berry", "amount": 8 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Iron bloom",
@@ -248,8 +317,11 @@
             { "name": "Charcoal", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Steel ingot",
@@ -263,8 +335,11 @@
             { "name": "Charcoal", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Cokes",
@@ -272,8 +347,11 @@
         "createTime": 80,
         "requires": [{ "name": "Coal ore", "amount": 1 }],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Chest",
@@ -284,8 +362,11 @@
             { "name": "Hemp fibre", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Science chest",
@@ -299,8 +380,11 @@
             { "name": "Chest", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Raw chicken",
@@ -308,8 +392,11 @@
         "createTime": 30,
         "requires": [{ "name": "Barley", "amount": 15 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Chicken poop",
@@ -317,8 +404,11 @@
         "createTime": 30,
         "requires": [],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Pot ash",
@@ -326,8 +416,11 @@
         "createTime": 30,
         "requires": [{ "name": "Leaves", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Salt peter",
@@ -338,8 +431,11 @@
             { "name": "Pot of water", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -353,8 +449,11 @@
             { "name": "Leaves", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Dry grass",
@@ -365,8 +464,11 @@
             { "name": "Leaves", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Medium Grass",
@@ -377,8 +479,11 @@
             { "name": "Leaves", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Wet grass",
@@ -389,8 +494,11 @@
             { "name": "Leaves", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Max grass",
@@ -401,8 +509,11 @@
             { "name": "Leaves", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Cooked meat",
@@ -413,8 +524,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Chicken meal",
@@ -426,8 +540,11 @@
             { "name": "Cabbage", "amount": 10 }
         ],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Cooked fish",
@@ -438,8 +555,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bread",
@@ -451,8 +571,11 @@
             { "name": "Pot of water", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 2 }
         ]
@@ -466,8 +589,11 @@
             { "name": "Berry meal", "amount": 1 }
         ],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Copper tools",
@@ -478,8 +604,11 @@
             { "name": "Copper ingot", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Gold jewellery",
@@ -487,8 +616,11 @@
         "createTime": 360,
         "requires": [{ "name": "Gold ingot", "amount": 1 }],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Copper lockbox",
@@ -499,8 +631,11 @@
             { "name": "Planks", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Iron wrought",
@@ -508,8 +643,11 @@
         "createTime": 120,
         "requires": [{ "name": "Iron bloom", "amount": 2 }],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Steel parts",
@@ -517,8 +655,11 @@
         "createTime": 1200,
         "requires": [{ "name": "Steel ingot", "amount": 1 }],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Brass parts",
@@ -526,8 +667,11 @@
         "createTime": 1000,
         "requires": [{ "name": "Brass ingot", "amount": 1 }],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Failsafe",
@@ -538,8 +682,11 @@
             { "name": "Gold ingot", "amount": 5 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bronze tools",
@@ -550,8 +697,11 @@
             { "name": "Planks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Iron tools",
@@ -559,8 +709,11 @@
         "createTime": 150,
         "requires": [{ "name": "Iron wrought", "amount": 3 }],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Steel tools",
@@ -573,8 +726,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Empty Vial", "likelihood": 0.95, "amount": 1 }
         ]
@@ -589,8 +745,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "stone",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "stone",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Red lantern",
@@ -601,8 +760,11 @@
             { "name": "Hollyhock", "amount": 100 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Green lantern",
@@ -614,8 +776,11 @@
             { "name": "Wolfsbane", "amount": 50 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Blue lantern",
@@ -626,8 +791,11 @@
             { "name": "Alkanet", "amount": 100 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Cyan lantern",
@@ -639,8 +807,11 @@
             { "name": "Wolfsbane", "amount": 30 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Pink lantern",
@@ -652,8 +823,11 @@
             { "name": "Hollyhock", "amount": 50 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Red planks",
@@ -664,8 +838,11 @@
             { "name": "Hollyhock", "amount": 100 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Green planks",
@@ -677,8 +854,11 @@
             { "name": "Wolfsbane", "amount": 50 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Blue planks",
@@ -689,8 +869,11 @@
             { "name": "Alkanet", "amount": 100 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Dropper trap",
@@ -702,8 +885,11 @@
             { "name": "Gold ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Projectile trap",
@@ -715,8 +901,11 @@
             { "name": "Gold ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Projectile trap ammo",
@@ -724,8 +913,11 @@
         "createTime": 60,
         "requires": [{ "name": "Copper ingot", "amount": 8 }],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Street light",
@@ -736,8 +928,11 @@
             { "name": "Piece of glass", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dropper trap ammo",
@@ -745,8 +940,11 @@
         "createTime": 160,
         "requires": [{ "name": "Copper ingot", "amount": 3 }],
         "output": 3,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Astrolabe",
@@ -757,8 +955,11 @@
             { "name": "Gold ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Eye glasses",
@@ -769,8 +970,11 @@
             { "name": "Iron wrought", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Monocular",
@@ -783,8 +987,11 @@
             { "name": "Brass ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bronze lockbox",
@@ -792,8 +999,11 @@
         "createTime": 240,
         "requires": [{ "name": "Bronze ingot", "amount": 3 }],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Steel lockbox",
@@ -805,8 +1015,11 @@
             { "name": "Steel ingot", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rope trap",
@@ -818,8 +1031,11 @@
             { "name": "Steel ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rope trap ammo",
@@ -830,8 +1046,11 @@
             { "name": "Brass ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Caltrop trap",
@@ -844,8 +1063,11 @@
             { "name": "Leather", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Caltrops",
@@ -856,8 +1078,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 3,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Metal gear",
@@ -865,8 +1090,11 @@
         "createTime": 480,
         "requires": [{ "name": "Iron wrought", "amount": 2 }],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Elevator shaft",
@@ -874,8 +1102,11 @@
         "createTime": 240,
         "requires": [{ "name": "Iron wrought", "amount": 2 }],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Elevator",
@@ -886,8 +1117,11 @@
             { "name": "Metal gear", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rail station",
@@ -898,8 +1132,11 @@
             { "name": "Metal gear", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rails",
@@ -910,8 +1147,11 @@
             { "name": "Metal gear", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rail gate",
@@ -922,8 +1162,11 @@
             { "name": "Metal gear", "amount": 8 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Archimedean Screw",
@@ -934,8 +1177,11 @@
             { "name": "Copper ingot", "amount": 5 }
         ],
         "output": 1,
-        "minimumTool": "copper",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Wheat porridge",
@@ -947,8 +1193,11 @@
             { "name": "Planks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -962,8 +1211,11 @@
             { "name": "Planks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Raw fish",
@@ -971,8 +1223,11 @@
         "createTime": 125,
         "requires": [],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Bow",
@@ -983,8 +1238,11 @@
             { "name": "Flax", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Copper arrow",
@@ -995,8 +1253,11 @@
             { "name": "Planks", "amount": 2 }
         ],
         "output": 10,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bow guard day job",
@@ -1007,8 +1268,11 @@
             { "name": "Bow", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bow guard night job",
@@ -1019,8 +1283,11 @@
             { "name": "Bow", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Crossbow",
@@ -1031,8 +1298,11 @@
             { "name": "Bow", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Crossbow bolt",
@@ -1043,8 +1313,11 @@
             { "name": "Planks", "amount": 1 }
         ],
         "output": 10,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Crossbow guard day job",
@@ -1052,8 +1325,11 @@
         "createTime": 360,
         "requires": [{ "name": "Crossbow", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Crossbow guard night job",
@@ -1061,8 +1337,11 @@
         "createTime": 360,
         "requires": [{ "name": "Crossbow", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Piece of glass",
@@ -1074,8 +1353,11 @@
             { "name": "Charcoal", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Empty Vial",
@@ -1087,8 +1369,11 @@
             { "name": "Charcoal", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Pot of flour",
@@ -1099,8 +1384,11 @@
             { "name": "Empty pot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [{ "name": "Straw", "likelihood": 1, "amount": 1 }]
     },
     {
@@ -1112,8 +1400,11 @@
             { "name": "Empty pot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Pot of flour", "likelihood": 1, "amount": 1 }
         ]
@@ -1127,8 +1418,11 @@
             { "name": "Gunpowder", "amount": 2 }
         ],
         "output": 10,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Musket",
@@ -1140,8 +1434,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Musket ammo",
@@ -1152,8 +1449,11 @@
             { "name": "Gunpowder", "amount": 2 }
         ],
         "output": 25,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grenade launcher",
@@ -1166,8 +1466,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Hand cannon",
@@ -1178,8 +1481,11 @@
             { "name": "Metal gear", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Hand cannon ammo",
@@ -1191,8 +1497,11 @@
             { "name": "Iron wrought", "amount": 1 }
         ],
         "output": 11,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Hand cannon guard night job",
@@ -1203,8 +1512,11 @@
             { "name": "Iron wrought", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Hand cannon guard day job",
@@ -1215,8 +1527,11 @@
             { "name": "Iron wrought", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grenade guard night job",
@@ -1227,8 +1542,11 @@
             { "name": "Steel ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grenade guard day job",
@@ -1239,8 +1557,11 @@
             { "name": "Steel ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Golden shield",
@@ -1254,8 +1575,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Yellow lantern",
@@ -1269,8 +1593,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "White lantern",
@@ -1284,8 +1611,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Orange lantern",
@@ -1299,8 +1629,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Golden statue",
@@ -1312,8 +1645,11 @@
             { "name": "Bronze ingot", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Job block crafter",
@@ -1324,8 +1660,11 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Artist's Workbench",
@@ -1336,8 +1675,11 @@
             { "name": "Copper tools", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Firepit",
@@ -1348,8 +1690,11 @@
             { "name": "Planks", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Merchant hub",
@@ -1360,8 +1705,11 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Water pump",
@@ -1369,8 +1717,11 @@
         "createTime": 240,
         "requires": [{ "name": "Copper ingot", "amount": 10 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Fisherman",
@@ -1381,8 +1732,11 @@
             { "name": "Linen", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Tailor shop",
@@ -1393,8 +1747,11 @@
             { "name": "Planks", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Statistics board",
@@ -1405,8 +1762,11 @@
             { "name": "Parchment", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Toolshop",
@@ -1417,8 +1777,11 @@
             { "name": "Stone rubble", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Sanctifier table",
@@ -1429,8 +1792,11 @@
             { "name": "Earthenware", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Fletcher bench",
@@ -1442,8 +1808,11 @@
             { "name": "Linen", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grocery store",
@@ -1454,8 +1823,11 @@
             { "name": "Linen", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Copper anvil",
@@ -1466,8 +1838,11 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Tanner table",
@@ -1478,8 +1853,11 @@
             { "name": "Linen", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Scribe desk",
@@ -1487,8 +1865,11 @@
         "createTime": 120,
         "requires": [{ "name": "Planks", "amount": 3 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Writer desk",
@@ -1500,8 +1881,11 @@
             { "name": "Copper tools", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stove",
@@ -1513,8 +1897,11 @@
             { "name": "Linen", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grindstone",
@@ -1525,8 +1912,11 @@
             { "name": "Stone rubble", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dyer table",
@@ -1538,8 +1928,11 @@
             { "name": "Linen", "amount": 10 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Rope bench",
@@ -1550,8 +1943,11 @@
             { "name": "Bronze tools", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stonemason workbench",
@@ -1562,8 +1958,11 @@
             { "name": "Linen", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Jeweller bench",
@@ -1575,8 +1974,11 @@
             { "name": "Leather", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Paper makers mould",
@@ -1588,8 +1990,11 @@
             { "name": "Rope", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Poison guard",
@@ -1601,8 +2006,11 @@
             { "name": "Wisteria flower", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Engineer bench",
@@ -1613,8 +2021,11 @@
             { "name": "Copper tools", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Trap fixer",
@@ -1625,8 +2036,11 @@
             { "name": "Copper ingot", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bloomery",
@@ -1637,8 +2051,11 @@
             { "name": "Bricks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Kiln",
@@ -1649,8 +2066,11 @@
             { "name": "Bricks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Printing press",
@@ -1664,8 +2084,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Chest maker",
@@ -1677,8 +2100,11 @@
             { "name": "Leather", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Gunsmith",
@@ -1691,8 +2117,11 @@
             { "name": "Metal gear", "amount": 2 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Composting bin",
@@ -1703,8 +2132,11 @@
             { "name": "Leaves", "amount": 5 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Glassblower",
@@ -1716,8 +2148,11 @@
             { "name": "Bronze ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Musket guard night job",
@@ -1728,8 +2163,11 @@
             { "name": "Musket", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Musket guard day job",
@@ -1740,8 +2178,11 @@
             { "name": "Musket", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Cotten engine",
@@ -1754,8 +2195,11 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Metal lathe",
@@ -1768,8 +2212,11 @@
             { "name": "Vial of mineral oil", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Blast furnace",
@@ -1783,8 +2230,11 @@
             { "name": "Vial of mineral oil", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Researcher desk",
@@ -1796,8 +2246,11 @@
             { "name": "Paper", "amount": 8 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Charcoal",
@@ -1805,8 +2258,11 @@
         "createTime": 100,
         "requires": [{ "name": "Firewood", "amount": 3 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Paper",
@@ -1817,8 +2273,11 @@
             { "name": "Hemp fibre", "amount": 1 }
         ],
         "output": 8,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Tiled roof",
@@ -1830,8 +2289,11 @@
             { "name": "Pot of water", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -1846,8 +2308,11 @@
             { "name": "Pot of water", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 1 }
         ]
@@ -1861,8 +2326,11 @@
             { "name": "Planks", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Clay tablet",
@@ -1873,8 +2341,11 @@
             { "name": "Pot of water", "amount": 2 }
         ],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 2 }
         ]
@@ -1889,8 +2360,11 @@
             { "name": "Pot of water", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 3 }
         ]
@@ -1904,8 +2378,11 @@
             { "name": "Hemp fibre", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Sanctified porridge",
@@ -1916,8 +2393,11 @@
             { "name": "Candle", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Sanctified bread meal",
@@ -1928,8 +2408,11 @@
             { "name": "Candle", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Sanctified chicken meal",
@@ -1940,8 +2423,11 @@
             { "name": "Candle", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Sacred storage",
@@ -1955,8 +2441,11 @@
             { "name": "Leather", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Copper ingot",
@@ -1967,8 +2456,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Gold ingot",
@@ -1979,8 +2471,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bronze ingot",
@@ -1992,8 +2487,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Brass ingot",
@@ -2005,8 +2503,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Lead ingot",
@@ -2017,8 +2518,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Light bricks",
@@ -2029,8 +2533,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Bricks",
@@ -2041,8 +2548,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Mud bricks",
@@ -2053,8 +2563,11 @@
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Grey quarter block",
@@ -2062,8 +2575,11 @@
         "createTime": 80,
         "requires": [{ "name": "Stone rubble", "amount": 1 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stone block",
@@ -2071,8 +2587,11 @@
         "createTime": 80,
         "requires": [{ "name": "Stone rubble", "amount": 5 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dark stone",
@@ -2080,8 +2599,11 @@
         "createTime": 80,
         "requires": [{ "name": "Stone rubble", "amount": 5 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stone bricks",
@@ -2089,8 +2611,11 @@
         "createTime": 80,
         "requires": [{ "name": "Stone rubble", "amount": 3 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Black stone bricks",
@@ -2098,8 +2623,11 @@
         "createTime": 20,
         "requires": [{ "name": "Stone bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Brown stone bricks",
@@ -2107,8 +2635,11 @@
         "createTime": 20,
         "requires": [{ "name": "Stone bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "White stone bricks",
@@ -2116,8 +2647,11 @@
         "createTime": 20,
         "requires": [{ "name": "Stone bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Black bricks",
@@ -2125,8 +2659,11 @@
         "createTime": 20,
         "requires": [{ "name": "Bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dark red bricks",
@@ -2134,8 +2671,11 @@
         "createTime": 20,
         "requires": [{ "name": "Bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dark yellow bricks",
@@ -2143,8 +2683,11 @@
         "createTime": 20,
         "requires": [{ "name": "Bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Red bricks",
@@ -2152,8 +2695,11 @@
         "createTime": 20,
         "requires": [{ "name": "Bricks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Linen",
@@ -2161,8 +2707,11 @@
         "createTime": 180,
         "requires": [{ "name": "Flax", "amount": 6 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Hemp fibre",
@@ -2170,8 +2719,11 @@
         "createTime": 360,
         "requires": [{ "name": "Hemp", "amount": 14 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Skin",
@@ -2179,8 +2731,11 @@
         "createTime": 240,
         "requires": [{ "name": "Animal carcass", "amount": 1 }],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [
             { "name": "Raw meat", "likelihood": 1, "amount": 1 }
         ]
@@ -2191,8 +2746,11 @@
         "createTime": 240,
         "requires": [{ "name": "Animal carcass", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "optionalOutputs": [{ "name": "Skin", "likelihood": 1, "amount": 3 }]
     },
     {
@@ -2201,8 +2759,11 @@
         "createTime": 240,
         "requires": [{ "name": "Skin", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Parchment",
@@ -2210,8 +2771,11 @@
         "createTime": 240,
         "requires": [{ "name": "Skin", "amount": 1 }],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Animal carcass",
@@ -2219,8 +2783,11 @@
         "createTime": 60,
         "requires": [{ "name": "Raw chicken", "amount": 3 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Stone tools",
@@ -2228,8 +2795,11 @@
         "createTime": 37.5,
         "requires": [{ "name": "Stone rubble", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Planks",
@@ -2237,8 +2807,11 @@
         "createTime": 50,
         "requires": [{ "name": "Log", "amount": 1 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Bed",
@@ -2246,8 +2819,11 @@
         "createTime": 25,
         "requires": [{ "name": "Planks", "amount": 6 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Wheat meal",
@@ -2255,8 +2831,11 @@
         "createTime": 40,
         "requires": [{ "name": "Wheat", "amount": 6 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Miner",
@@ -2264,8 +2843,11 @@
         "createTime": 25,
         "requires": [{ "name": "Planks", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Tinkerer table",
@@ -2276,8 +2858,11 @@
             { "name": "Stone rubble", "amount": 4 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Sling",
@@ -2285,8 +2870,11 @@
         "createTime": 37.5,
         "requires": [],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Slinger guard day job",
@@ -2294,8 +2882,11 @@
         "createTime": 25,
         "requires": [{ "name": "Sling", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Slinger guard night job",
@@ -2303,8 +2894,11 @@
         "createTime": 25,
         "requires": [{ "name": "Sling", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Furnace",
@@ -2312,8 +2906,11 @@
         "createTime": 50,
         "requires": [{ "name": "Stone rubble", "amount": 5 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Splitting stump",
@@ -2324,8 +2921,11 @@
             { "name": "Log", "amount": 1 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Pottery station",
@@ -2336,8 +2936,11 @@
             { "name": "Clay", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Water gatherer",
@@ -2345,8 +2948,11 @@
         "createTime": 80,
         "requires": [{ "name": "Empty pot", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Sling bullet",
@@ -2354,8 +2960,11 @@
         "createTime": 25,
         "requires": [{ "name": "Stone rubble", "amount": 1 }],
         "output": 10,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Crate",
@@ -2363,8 +2972,11 @@
         "createTime": 25,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Job block crafter",
@@ -2375,8 +2987,11 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Pot of water",
@@ -2384,8 +2999,11 @@
         "createTime": 6,
         "requires": [{ "name": "Empty pot", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Pot of water",
@@ -2393,8 +3011,11 @@
         "createTime": 16,
         "requires": [{ "name": "Empty pot", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "none"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        }
     },
     {
         "name": "Fence",
@@ -2402,8 +3023,11 @@
         "createTime": 100,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Planks",
@@ -2411,8 +3035,11 @@
         "createTime": 40,
         "requires": [{ "name": "Log", "amount": 1 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Firewood",
@@ -2420,8 +3047,11 @@
         "createTime": 40,
         "requires": [{ "name": "Planks", "amount": 1 }],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Torch",
@@ -2429,8 +3059,11 @@
         "createTime": 20,
         "requires": [{ "name": "Firewood", "amount": 1 }],
         "output": 1,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Wood floor",
@@ -2438,8 +3071,11 @@
         "createTime": 120,
         "requires": [{ "name": "Planks", "amount": 2 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Log wall",
@@ -2447,8 +3083,11 @@
         "createTime": 40,
         "requires": [{ "name": "Log", "amount": 1 }],
         "output": 3,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Dark brown quarter block",
@@ -2456,8 +3095,11 @@
         "createTime": 10,
         "requires": [{ "name": "Planks", "amount": 1 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Light brown quarter block",
@@ -2465,16 +3107,22 @@
         "createTime": 10,
         "requires": [{ "name": "Planks", "amount": 1 }],
         "output": 4,
-        "minimumTool": "none",
-        "maximumTool": "steel"
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
     },
     {
         "name": "Clay",
         "createTime": 20,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2482,8 +3130,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2491,8 +3142,11 @@
         "createTime": 20,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2500,8 +3154,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2509,8 +3166,11 @@
         "createTime": 60,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2518,8 +3178,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2527,8 +3190,11 @@
         "createTime": 360,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2536,8 +3202,11 @@
         "createTime": 20,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2545,8 +3214,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2554,8 +3226,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2563,8 +3238,11 @@
         "createTime": 300,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "steel",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
         "creator": "Miner"
     },
     {
@@ -2572,8 +3250,11 @@
         "createTime": 870,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Wheat farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2582,8 +3263,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Flax farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2592,8 +3276,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Cotton farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2602,8 +3289,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Cabbage farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2612,8 +3302,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Alkanet farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2622,8 +3315,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Hollyhock farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2632,8 +3328,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Wolfsbane farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2642,8 +3341,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Barley farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2652,8 +3354,11 @@
         "createTime": 435,
         "output": 100,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Hemp farmer",
         "size": { "height": 10, "width": 10 }
     },
@@ -2662,8 +3367,11 @@
         "createTime": 435,
         "output": 1,
         "requires": [],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Wisteria flower farmer"
     },
     {
@@ -2674,8 +3382,11 @@
         "optionalOutputs": [
             { "name": "Leaves", "amount": 59.4, "likelihood": 1 }
         ],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Forester",
         "size": { "width": 3, "height": 33 }
     },
@@ -2685,8 +3396,11 @@
         "output": 59.4,
         "requires": [],
         "optionalOutputs": [{ "name": "Log", "amount": 44, "likelihood": 1 }],
-        "minimumTool": "none",
-        "maximumTool": "none",
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
+        },
         "creator": "Forester",
         "size": { "width": 3, "height": 33 }
     }

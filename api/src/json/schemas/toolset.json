@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "toolset.json",
+    "title": "Toolset",
+    "description": "",
+    "type": "object",
+    "oneOf": [
+        {
+            "type": "object",
+            "properties": {
+                "type": { "const": "default" },
+                "minimumTool": {
+                    "$ref": "#/definitions/defaultToolset"
+                },
+                "maximumTool": {
+                    "$ref": "#/definitions/defaultToolset"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["type", "minimumTool", "maximumTool"]
+        }
+    ],
+    "definitions": {
+        "defaultToolset": {
+            "title": "DefaultToolset",
+            "description": "",
+            "type": "string",
+            "tsEnumNames": [
+                "none",
+                "stone",
+                "copper",
+                "iron",
+                "bronze",
+                "steel"
+            ],
+            "enum": ["none", "stone", "copper", "iron", "bronze", "steel"]
+        }
+    }
+}

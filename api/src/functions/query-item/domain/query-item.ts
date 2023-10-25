@@ -2,7 +2,7 @@ import {
     getMaxToolModifier,
     isAvailableToolSufficient,
 } from "../../../common/modifiers";
-import { Item, Items, Tools } from "../../../types";
+import { Item, Items, DefaultToolset } from "../../../types";
 import {
     queryItemByCreatorCount,
     queryItemByField,
@@ -16,19 +16,28 @@ const INVALID_FILTER_ERROR =
     "Invalid filter combination provided: Cannot filter by minimum creator and creator name";
 
 function calculateOutput(
-    item: Pick<Item, "maximumTool" | "createTime" | "output">,
-    maxAvailableTool: Tools
+    item: Pick<Item, "toolset" | "createTime" | "output">,
+    maxAvailableTool: DefaultToolset
 ): number {
-    const modifier = getMaxToolModifier(item.maximumTool, maxAvailableTool);
+    const modifier = getMaxToolModifier(
+        item.toolset.maximumTool,
+        maxAvailableTool
+    );
     return item.output / (item.createTime / modifier);
 }
 
-function filterByOptimal(items: Items, maxAvailableTool?: Tools): Items {
+function filterByOptimal(
+    items: Items,
+    maxAvailableTool?: DefaultToolset
+): Items {
     const itemMap = new Map<string, Item>();
     for (const item of items) {
         if (
             maxAvailableTool &&
-            !isAvailableToolSufficient(item.minimumTool, maxAvailableTool)
+            !isAvailableToolSufficient(
+                item.toolset.minimumTool,
+                maxAvailableTool
+            )
         ) {
             continue;
         }
@@ -41,11 +50,11 @@ function filterByOptimal(items: Items, maxAvailableTool?: Tools): Items {
 
         const currentOptimalOutput = calculateOutput(
             currentOptimalItem,
-            maxAvailableTool ?? currentOptimalItem.maximumTool
+            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool
         );
         const itemOutput = calculateOutput(
             item,
-            maxAvailableTool ?? item.maximumTool
+            maxAvailableTool ?? item.toolset.maximumTool
         );
 
         if (itemOutput > currentOptimalOutput) {

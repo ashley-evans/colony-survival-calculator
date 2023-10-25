@@ -12,7 +12,7 @@ import {
     Requirement,
     Requirements,
     OptionalOutput,
-    Tools as APITools,
+    DefaultToolset as APITools,
 } from "./generated/items";
 
 type NPCToolsetMapping = {

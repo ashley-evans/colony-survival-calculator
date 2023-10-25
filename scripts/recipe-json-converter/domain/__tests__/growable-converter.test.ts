@@ -32,8 +32,11 @@ const expectedStaticLogRecipe: Item = {
     requires: [],
     // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
     optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
-    minimumTool: APITools.none,
-    maximumTool: APITools.none,
+    toolset: {
+        type: "default",
+        minimumTool: APITools.none,
+        maximumTool: APITools.none,
+    },
     creator: "Forester",
     size: {
         width: 3,
@@ -48,8 +51,11 @@ const expectedStaticLeavesRecipe: Item = {
     output: 59.4,
     requires: [],
     optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
-    minimumTool: APITools.none,
-    maximumTool: APITools.none,
+    toolset: {
+        type: "default",
+        minimumTool: APITools.none,
+        maximumTool: APITools.none,
+    },
     creator: "Forester",
     size: {
         width: 3,
@@ -153,8 +159,11 @@ test.each([
             createTime: 435,
             output: expectedOutput,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+            },
             creator: expectedCreator,
             ...(expectedSize ? { size: expectedSize } : {}),
         };
@@ -176,8 +185,11 @@ test("returns converted recipe given single growable with more than 2 stages", a
         createTime: 870,
         output: 100,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Wheat farmer",
         size: {
             width: 10,
@@ -255,8 +267,11 @@ test("converts multiple items given multiple growables found in file", async () 
             createTime: 870,
             output: 100,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+            },
             creator: "Wheat farmer",
             size: {
                 width: 10,
@@ -268,8 +283,11 @@ test("converts multiple items given multiple growables found in file", async () 
             createTime: 435,
             output: 100,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.none,
+            },
             creator: "Flax farmer",
             size: {
                 width: 10,

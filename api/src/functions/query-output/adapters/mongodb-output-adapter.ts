@@ -29,8 +29,7 @@ const queryOutputDetails: OutputDatabasePort = async ({ name, creator }) => {
             _id: 0,
             createTime: 1,
             output: 1,
-            minimumTool: 1,
-            maximumTool: 1,
+            toolset: 1,
         })
         .toArray();
 };

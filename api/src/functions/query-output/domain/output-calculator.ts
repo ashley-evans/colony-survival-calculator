@@ -4,7 +4,7 @@ import {
     isAvailableToolSufficient,
 } from "../../../common/modifiers";
 import { OutputUnit, OutputUnitSecondMappings } from "../../../common/output";
-import { Tools } from "../../../types";
+import { DefaultToolset } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
@@ -32,20 +32,21 @@ async function getItemOutputDetails(
 
 function filterCreatableItems(
     items: ItemOutputDetails[],
-    maxAvailableTool: Tools
+    maxAvailableTool: DefaultToolset
 ): ItemOutputDetails[] {
-    return items.filter(({ minimumTool }) =>
-        isAvailableToolSufficient(minimumTool, maxAvailableTool)
+    return items.filter(({ toolset }) =>
+        isAvailableToolSufficient(toolset.minimumTool, maxAvailableTool)
     );
 }
 
-function getMinimumToolRequired(items: ItemOutputDetails[]): Tools {
-    let minimum = Tools.steel;
-    for (const item of items) {
+function getMinimumToolRequired(items: ItemOutputDetails[]): DefaultToolset {
+    let minimum = DefaultToolset.steel;
+    for (const { toolset } of items) {
         if (
-            ToolModifierValues[item.minimumTool] < ToolModifierValues[minimum]
+            ToolModifierValues[toolset.minimumTool] <
+            ToolModifierValues[minimum]
         ) {
-            minimum = item.minimumTool;
+            minimum = toolset.minimumTool;
         }
     }
 
@@ -56,16 +57,16 @@ function getMaxOutput(
     items: ItemOutputDetails[],
     workers: number,
     unit: OutputUnit,
-    maxAvailableTool: Tools
+    maxAvailableTool: DefaultToolset
 ): number {
     let maximumOutputPerSecond = 0;
-    for (const item of items) {
+    for (const { output, createTime, toolset } of items) {
         const toolModifier = getMaxToolModifier(
-            item.maximumTool,
+            toolset.maximumTool,
             maxAvailableTool
         );
 
-        const outputPerSecond = item.output / (item.createTime / toolModifier);
+        const outputPerSecond = output / (createTime / toolModifier);
         if (maximumOutputPerSecond < outputPerSecond) {
             maximumOutputPerSecond = outputPerSecond;
         }
@@ -80,7 +81,7 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     name,
     workers,
     unit,
-    maxAvailableTool = Tools.none,
+    maxAvailableTool = DefaultToolset.none,
     creator,
 }) => {
     if (name === "") {

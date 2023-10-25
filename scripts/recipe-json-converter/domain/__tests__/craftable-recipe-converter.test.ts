@@ -325,8 +325,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: expectedOutput,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
             };
 
@@ -401,8 +404,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.steel,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.steel,
+                },
                 creator: "Alchemist",
             };
 
@@ -449,8 +455,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: userFriendlyCreator,
             };
 
@@ -615,8 +624,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
                 optionalOutputs: [
                     {
@@ -685,8 +697,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
                 optionalOutputs: [
                     {
@@ -842,8 +857,11 @@ describe("recipe to item mapping", () => {
                 createTime: 15,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
             },
             {
@@ -851,8 +869,11 @@ describe("recipe to item mapping", () => {
                 createTime: 25,
                 output: 1,
                 requires: [],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
             },
         ];
@@ -914,8 +935,11 @@ describe("recipe to item mapping", () => {
                 createTime: 20,
                 output: 1,
                 requires: [{ name: "Gunpowder", amount: expectedAmount }],
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                toolset: {
+                    type: "default",
+                    minimumTool: APITools.none,
+                    maximumTool: APITools.none,
+                },
                 creator: "Alchemist",
             };
 
@@ -1262,8 +1286,11 @@ describe("recipe to item mapping", () => {
                     createTime: 20,
                     output: 1,
                     requires: [],
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    toolset: {
+                        type: "default",
+                        minimumTool: APITools.none,
+                        maximumTool: APITools.none,
+                    },
                     creator: "Alchemist",
                 };
 
@@ -1344,8 +1371,11 @@ describe("recipe to item mapping", () => {
                     createTime: 20,
                     output: 1,
                     requires: [],
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    toolset: {
+                        type: "default",
+                        minimumTool: APITools.none,
+                        maximumTool: APITools.none,
+                    },
                     creator: expectedConvertedCreator,
                 };
 

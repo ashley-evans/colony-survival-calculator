@@ -7,5 +7,6 @@ json_folder="$script_parent_dir/src/json"
 schema_folder="$json_folder/schemas"
 
 npx --yes ajv-cli validate -s "$schema_folder/items.json" \
+    -r "$schema_folder/toolset.json" \
     -d "$json_folder/items.json" \
     -c "$script_dir/ts-json-keywords.js"

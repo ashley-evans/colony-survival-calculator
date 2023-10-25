@@ -161,6 +161,8 @@ resource "aws_lambda_function" "add_item_lambda" {
   runtime       = var.runtime
   handler       = "index.handler"
   architectures = local.architectures
+  timeout       = 10
+  memory_size   = 256
 
   source_code_hash = data.archive_file.add_item_lambda.output_base64sha256
 

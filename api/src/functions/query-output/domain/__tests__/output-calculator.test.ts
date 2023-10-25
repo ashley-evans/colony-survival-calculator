@@ -1,7 +1,7 @@
 import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
-import { Tools } from "../../../../types";
+import { DefaultToolset, Toolset } from "../../../../types";
 import { OutputUnit } from "../../../../common/output";
 
 jest.mock("../../adapters/mongodb-output-adapter", () => ({
@@ -13,14 +13,16 @@ const mockQueryOutputDetails = queryOutputDetails as jest.Mock;
 function createItemOutputDetails(
     createTime: number,
     output: number,
-    minimumTool: Tools = Tools.none,
-    maximumTool: Tools = Tools.none
+    toolset: Toolset = {
+        type: "default",
+        minimumTool: DefaultToolset.none,
+        maximumTool: DefaultToolset.none,
+    }
 ): ItemOutputDetails {
     return {
         createTime,
         output,
-        minimumTool,
-        maximumTool,
+        toolset,
     };
 }
 
@@ -160,15 +162,39 @@ test.each([
 
 describe("handles tool modifiers", () => {
     test.each([
-        ["stone min, none provided", Tools.stone, Tools.none],
-        ["copper min, stone provided", Tools.copper, Tools.stone],
-        ["iron min, copper provided", Tools.iron, Tools.copper],
-        ["bronze min, iron provided", Tools.bronze, Tools.iron],
-        ["steel min, bronze provided", Tools.steel, Tools.bronze],
+        ["stone min, none provided", DefaultToolset.stone, DefaultToolset.none],
+        [
+            "copper min, stone provided",
+            DefaultToolset.copper,
+            DefaultToolset.stone,
+        ],
+        [
+            "iron min, copper provided",
+            DefaultToolset.iron,
+            DefaultToolset.copper,
+        ],
+        [
+            "bronze min, iron provided",
+            DefaultToolset.bronze,
+            DefaultToolset.iron,
+        ],
+        [
+            "steel min, bronze provided",
+            DefaultToolset.steel,
+            DefaultToolset.bronze,
+        ],
     ])(
         "throws an error if the provided tool is less than minimum required tool of item (%s)",
-        async (_: string, minimum: Tools, provided: Tools) => {
-            const details = createItemOutputDetails(2, 3, minimum, Tools.steel);
+        async (
+            _: string,
+            minimum: DefaultToolset,
+            provided: DefaultToolset
+        ) => {
+            const details = createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: minimum,
+                maximumTool: DefaultToolset.steel,
+            });
             mockQueryOutputDetails.mockResolvedValue([details]);
             const expectedError = new Error(
                 `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`
@@ -187,21 +213,20 @@ describe("handles tool modifiers", () => {
     );
 
     test.each([
-        [Tools.none, 450],
-        [Tools.stone, 900],
-        [Tools.copper, 1800],
-        [Tools.iron, 2385],
-        [Tools.bronze, 2767.5],
-        [Tools.steel, 3600],
+        [DefaultToolset.none, 450],
+        [DefaultToolset.stone, 900],
+        [DefaultToolset.copper, 1800],
+        [DefaultToolset.iron, 2385],
+        [DefaultToolset.bronze, 2767.5],
+        [DefaultToolset.steel, 3600],
     ])(
         "returns the expected output for item given applicable tool: %s",
-        async (provided: Tools, expected: number) => {
-            const details = createItemOutputDetails(
-                2,
-                3,
-                Tools.none,
-                Tools.steel
-            );
+        async (provided: DefaultToolset, expected: number) => {
+            const details = createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
+            });
             mockQueryOutputDetails.mockResolvedValue([details]);
 
             const actual = await calculateOutput({
@@ -217,14 +242,18 @@ describe("handles tool modifiers", () => {
 
     test("returns output for max applicable tool for item if provided tool is better than max", async () => {
         const expected = 1800;
-        const details = createItemOutputDetails(2, 3, Tools.none, Tools.copper);
+        const details = createItemOutputDetails(2, 3, {
+            type: "default",
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.copper,
+        });
         mockQueryOutputDetails.mockResolvedValue([details]);
 
         const actual = await calculateOutput({
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -235,8 +264,16 @@ describe("multiple recipe handling", () => {
     test("returns maximum output when an item has more than one recipe", async () => {
         const expected = 3600;
         const recipes = [
-            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
-            createItemOutputDetails(1, 3, Tools.none, Tools.copper),
+            createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.copper,
+            }),
+            createItemOutputDetails(1, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.copper,
+            }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
@@ -244,7 +281,7 @@ describe("multiple recipe handling", () => {
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -253,8 +290,16 @@ describe("multiple recipe handling", () => {
     test("factors max available tool into max output calculation given recipe w/ lower base output but higher modified", async () => {
         const expected = 1800;
         const recipes = [
-            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
-            createItemOutputDetails(1, 3, Tools.none, Tools.stone),
+            createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.copper,
+            }),
+            createItemOutputDetails(1, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.stone,
+            }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
@@ -262,7 +307,7 @@ describe("multiple recipe handling", () => {
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -271,8 +316,16 @@ describe("multiple recipe handling", () => {
     test("ignores more optimal recipes if cannot be created by provided max tool", async () => {
         const expected = 450;
         const recipes = [
-            createItemOutputDetails(2, 3, Tools.none, Tools.copper),
-            createItemOutputDetails(1, 3, Tools.stone, Tools.stone),
+            createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.copper,
+            }),
+            createItemOutputDetails(1, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.stone,
+                maximumTool: DefaultToolset.stone,
+            }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
@@ -280,7 +333,7 @@ describe("multiple recipe handling", () => {
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: Tools.none,
+            maxAvailableTool: DefaultToolset.none,
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -288,11 +341,19 @@ describe("multiple recipe handling", () => {
 
     test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
         const recipes = [
-            createItemOutputDetails(2, 3, Tools.copper, Tools.copper),
-            createItemOutputDetails(1, 3, Tools.stone, Tools.stone),
+            createItemOutputDetails(2, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.copper,
+            }),
+            createItemOutputDetails(1, 3, {
+                type: "default",
+                minimumTool: DefaultToolset.stone,
+                maximumTool: DefaultToolset.stone,
+            }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
-        const expectedError = `Unable to create item with available tools, minimum tool is: ${Tools.stone}`;
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${DefaultToolset.stone}`;
 
         expect.assertions(1);
         await expect(
@@ -300,7 +361,7 @@ describe("multiple recipe handling", () => {
                 name: validItemName,
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
-                maxAvailableTool: Tools.none,
+                maxAvailableTool: DefaultToolset.none,
             })
         ).rejects.toThrow(expectedError);
     });

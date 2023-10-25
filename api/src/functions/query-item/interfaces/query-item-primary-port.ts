@@ -1,7 +1,7 @@
-import type { Items, Tools } from "../../../types";
+import type { Items, DefaultToolset } from "../../../types";
 
 type OptimalFilter = {
-    maxAvailableTool?: Tools | undefined;
+    maxAvailableTool?: DefaultToolset | undefined;
 };
 
 type QueryFilters = {

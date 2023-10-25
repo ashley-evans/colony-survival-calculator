@@ -3,7 +3,7 @@ import { mock } from "jest-mock-extended";
 
 import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
-import { Tools as DomainTools, type Items } from "../../../types";
+import { DefaultToolset as DomainTools, type Items } from "../../../types";
 import { createItem } from "../../../../test";
 import type {
     Item,

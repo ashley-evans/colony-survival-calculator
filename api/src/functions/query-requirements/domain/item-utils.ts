@@ -4,18 +4,18 @@ import {
     ToolModifierValues,
     getMaxToolModifier,
 } from "../../../common/modifiers";
-import { Item, Items, Tools } from "../../../types";
+import { Item, Items, DefaultToolset } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
 import { INTERNAL_SERVER_ERROR } from "./errors";
 
 const ROOT_GRAPH_KEY = "root";
 
 function calculateCreateTime(
-    item: Pick<Item, "maximumTool" | "createTime">,
-    availableTool: Tools
+    { toolset, createTime }: Pick<Item, "toolset" | "createTime">,
+    availableTool: DefaultToolset
 ) {
-    const toolModifier = getMaxToolModifier(item.maximumTool, availableTool);
-    return item.createTime / toolModifier;
+    const toolModifier = getMaxToolModifier(toolset.maximumTool, availableTool);
+    return createTime / toolModifier;
 }
 
 function filterByMinimumTool(items: Items): Items {
@@ -28,8 +28,8 @@ function filterByMinimumTool(items: Items): Items {
         }
 
         if (
-            ToolModifierValues[item.minimumTool] <
-            ToolModifierValues[currentOptimalItem.minimumTool]
+            ToolModifierValues[item.toolset.minimumTool] <
+            ToolModifierValues[currentOptimalItem.toolset.minimumTool]
         ) {
             itemMap.set(item.name, item);
         }
@@ -38,14 +38,14 @@ function filterByMinimumTool(items: Items): Items {
     return Array.from(itemMap.values());
 }
 
-function getLowestRequiredTool(items: Items): Tools {
-    let currentLowestTool = Tools.none;
+function getLowestRequiredTool(items: Items): DefaultToolset {
+    let currentLowestTool = DefaultToolset.none;
     for (const item of items) {
         if (
-            ToolModifierValues[item.minimumTool] >
+            ToolModifierValues[item.toolset.minimumTool] >
             ToolModifierValues[currentLowestTool]
         ) {
-            currentLowestTool = item.minimumTool;
+            currentLowestTool = item.toolset.minimumTool;
         }
     }
 
