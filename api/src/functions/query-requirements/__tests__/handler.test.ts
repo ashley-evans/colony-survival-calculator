@@ -13,7 +13,7 @@ import type {
 import type { Requirement } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
-import { Tools as SchemaTools } from "../../../types";
+import { DefaultToolset as SchemaTools } from "../../../types";
 import { OutputUnit } from "../../../common/output";
 
 jest.mock("../domain/query-requirements", () => ({

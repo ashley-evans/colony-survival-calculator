@@ -1,6 +1,7 @@
 import Ajv from "ajv";
 
 import ItemsSchema from "../../../json/schemas/items.json";
+import ToolsetSchema from "../../../json/schemas/toolset.json";
 import { Items } from "../../../types";
 import { storeItem } from "../adapters/store-item";
 import type { AddItemPrimaryPort } from "../interfaces/add-item-primary-port";
@@ -8,7 +9,7 @@ import { ToolModifierValues } from "../../../common/modifiers";
 
 const ajv = new Ajv();
 ajv.addKeyword("tsEnumNames");
-const validateItems = ajv.compile<Items>(ItemsSchema);
+const validateItems = ajv.addSchema(ToolsetSchema).compile<Items>(ItemsSchema);
 
 function parseItems(input: string): Items {
     try {
@@ -58,9 +59,8 @@ function validateOptionalOutputs(items: Items): void {
 
 function validateTools(items: Items): void {
     for (const item of items) {
-        ToolModifierValues;
-        const minToolValue = ToolModifierValues[item.minimumTool];
-        const maxToolValue = ToolModifierValues[item.maximumTool];
+        const minToolValue = ToolModifierValues[item.toolset.minimumTool];
+        const maxToolValue = ToolModifierValues[item.toolset.maximumTool];
         if (minToolValue > maxToolValue) {
             throw new Error(
                 `Invalid item: ${item.name}, minimum tool is better than maximum tool`

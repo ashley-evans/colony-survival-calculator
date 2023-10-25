@@ -14,7 +14,7 @@ jest.mock("@colony-survival-calculator/mongodb-client", async () => {
 });
 
 import mockClient from "@colony-survival-calculator/mongodb-client";
-import { Items, Tools } from "../../../../types";
+import { Items, DefaultToolset } from "../../../../types";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 
 const validItemName = "test item";
@@ -88,16 +88,19 @@ test.each([
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.copper,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.copper,
             }),
         ],
         [
             {
                 createTime: 5,
                 output: 3,
-                minimumTool: Tools.none,
-                maximumTool: Tools.copper,
+                toolset: {
+                    type: "default" as const,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.copper,
+                },
             },
         ],
     ],
@@ -110,24 +113,27 @@ test.each([
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.steel,
             }),
             createItem({
                 name: "another item",
                 createTime: 2,
                 output: 1,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             }),
         ],
         [
             {
                 createTime: 5,
                 output: 3,
-                minimumTool: Tools.copper,
-                maximumTool: Tools.steel,
+                toolset: {
+                    type: "default" as const,
+                    minimumTool: DefaultToolset.copper,
+                    maximumTool: DefaultToolset.steel,
+                },
             },
         ],
     ],
@@ -171,17 +177,23 @@ test.each([
 );
 
 test("only returns output details related to provided creator if item is created by more than one creator", async () => {
-    const expected = {
+    const expected: ItemOutputDetails = {
         createTime: 1,
         output: 3,
-        minimumTool: Tools.stone,
-        maximumTool: Tools.copper,
+        toolset: {
+            type: "default",
+            minimumTool: DefaultToolset.stone,
+            maximumTool: DefaultToolset.copper,
+        },
     };
     const expectedItem = createItem({
-        ...expected,
         name: validItemName,
         requirements: [],
         creator: validCreatorName,
+        createTime: expected.createTime,
+        output: expected.output,
+        minimumTool: expected.toolset.minimumTool,
+        maximumTool: expected.toolset.maximumTool,
     });
     const stored = [
         expectedItem,

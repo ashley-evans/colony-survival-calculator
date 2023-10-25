@@ -2,7 +2,7 @@ import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
-import { Items, Tools } from "../../../../types";
+import { Items, DefaultToolset } from "../../../../types";
 
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
@@ -97,8 +97,8 @@ describe.each([
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: "test", amount: 1 }],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
                 creator: "Test Creator 1",
             }),
         ],
@@ -111,8 +111,8 @@ describe.each([
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: "test", amount: 1 }],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.bronze,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.bronze,
                 creator: "Test Creator 1",
             }),
             createItem({
@@ -120,8 +120,8 @@ describe.each([
                 createTime: 1,
                 output: 4,
                 requirements: [{ name: "world", amount: 3 }],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
                 creator: "Test Creator 2",
             }),
         ],
@@ -153,16 +153,16 @@ test("removes any old entries prior to storing new items", async () => {
         createTime: 1,
         output: 2,
         requirements: [],
-        minimumTool: Tools.none,
-        maximumTool: Tools.none,
+        minimumTool: DefaultToolset.none,
+        maximumTool: DefaultToolset.none,
     });
     const newItem = createItem({
         name: "new",
         createTime: 2,
         output: 3,
         requirements: [],
-        minimumTool: Tools.bronze,
-        maximumTool: Tools.steel,
+        minimumTool: DefaultToolset.bronze,
+        maximumTool: DefaultToolset.steel,
     });
     const { storeItem } = await import("../store-item");
 

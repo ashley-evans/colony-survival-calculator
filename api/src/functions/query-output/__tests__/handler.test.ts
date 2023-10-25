@@ -8,7 +8,7 @@ import type {
     QueryOutputArgs,
     Tools,
 } from "../../../graphql/schema";
-import { Tools as SchemaTools } from "../../../types";
+import { DefaultToolset as SchemaTools } from "../../../types";
 
 jest.mock("../domain/output-calculator", () => ({
     calculateOutput: jest.fn(),

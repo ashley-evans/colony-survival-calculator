@@ -3,7 +3,7 @@ import {
     queryItemByCreatorCount,
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
-import { Tools, type Items } from "../../../../types";
+import { DefaultToolset, type Items } from "../../../../types";
 import { createItem } from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
@@ -195,7 +195,7 @@ describe("field queries", () => {
                 createTime: 1,
                 output: 5,
                 requirements: [],
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             const received = [
                 expected,
@@ -204,7 +204,7 @@ describe("field queries", () => {
                     createTime: 1,
                     output: 8,
                     requirements: [],
-                    maximumTool: Tools.copper,
+                    maximumTool: DefaultToolset.copper,
                 }),
             ];
             mockQueryItemByField.mockResolvedValue(received);
@@ -222,7 +222,7 @@ describe("field queries", () => {
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             const received = [
                 expected,
@@ -231,13 +231,13 @@ describe("field queries", () => {
                     createTime: 1,
                     output: 3,
                     requirements: [],
-                    maximumTool: Tools.copper,
+                    maximumTool: DefaultToolset.copper,
                 }),
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: Tools.steel },
+                optimal: { maxAvailableTool: DefaultToolset.steel },
             });
 
             expect(actual).toHaveLength(1);
@@ -251,8 +251,8 @@ describe("field queries", () => {
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             });
             const received = [
                 expected,
@@ -261,14 +261,14 @@ describe("field queries", () => {
                     createTime: 1,
                     output: 3,
                     requirements: [],
-                    minimumTool: Tools.steel,
-                    maximumTool: Tools.steel,
+                    minimumTool: DefaultToolset.steel,
+                    maximumTool: DefaultToolset.steel,
                 }),
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: Tools.none },
+                optimal: { maxAvailableTool: DefaultToolset.none },
             });
 
             expect(actual).toHaveLength(1);
@@ -468,7 +468,7 @@ describe("creator count queries", () => {
                 createTime: 1,
                 output: 5,
                 requirements: [],
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             const received = [
                 expected,
@@ -477,7 +477,7 @@ describe("creator count queries", () => {
                     createTime: 1,
                     output: 8,
                     requirements: [],
-                    maximumTool: Tools.copper,
+                    maximumTool: DefaultToolset.copper,
                 }),
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
@@ -498,7 +498,7 @@ describe("creator count queries", () => {
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             const received = [
                 expected,
@@ -507,14 +507,14 @@ describe("creator count queries", () => {
                     createTime: 1,
                     output: 3,
                     requirements: [],
-                    maximumTool: Tools.copper,
+                    maximumTool: DefaultToolset.copper,
                 }),
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: Tools.steel },
+                optimal: { maxAvailableTool: DefaultToolset.steel },
             });
 
             expect(actual).toHaveLength(1);
@@ -528,8 +528,8 @@ describe("creator count queries", () => {
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             });
             const received = [
                 expected,
@@ -538,15 +538,15 @@ describe("creator count queries", () => {
                     createTime: 1,
                     output: 3,
                     requirements: [],
-                    minimumTool: Tools.steel,
-                    maximumTool: Tools.steel,
+                    minimumTool: DefaultToolset.steel,
+                    maximumTool: DefaultToolset.steel,
                 }),
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: Tools.none },
+                optimal: { maxAvailableTool: DefaultToolset.none },
             });
 
             expect(actual).toHaveLength(1);

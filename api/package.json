@@ -15,7 +15,7 @@
         "lint": "run -T eslint --max-warnings 0 .",
         "test": "jest",
         "test:watch": "jest --watch",
-        "generate:json-schema-types": "json2ts -i 'src/json/schemas/*.json' -o src/types/generated/",
+        "generate:json-schema-types": "json2ts --cwd ./src/json/schemas -i 'src/json/schemas/*.json' -o src/types/generated/",
         "generate:graphql-schema-types": "graphql-codegen --config ./codegen.ts",
         "generate": "yarn generate:json-schema-types && yarn generate:graphql-schema-types",
         "postinstall": "yarn generate"

@@ -2,7 +2,7 @@ import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
-import { Items, Tools } from "../../../../types";
+import { Items, DefaultToolset } from "../../../../types";
 
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
@@ -83,8 +83,8 @@ test("returns only the specified item if only that item is stored in the items c
         createTime: 2,
         output: 3,
         requirements: [],
-        minimumTool: Tools.none,
-        maximumTool: Tools.steel,
+        minimumTool: DefaultToolset.none,
+        maximumTool: DefaultToolset.steel,
     });
     await storeItems([{ ...stored }]);
     const { queryRequirements } = await import(
@@ -106,16 +106,16 @@ test.each([
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.steel,
             }),
             createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 4,
                 requirements: [{ name: "required item 1", amount: 4 }],
-                minimumTool: Tools.stone,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.stone,
+                maximumTool: DefaultToolset.steel,
             }),
         ],
         [
@@ -124,16 +124,16 @@ test.each([
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.steel,
             }),
             createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 4,
                 requirements: [{ name: "required item 1", amount: 4 }],
-                minimumTool: Tools.stone,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.stone,
+                maximumTool: DefaultToolset.steel,
             }),
         ],
     ],
@@ -249,16 +249,16 @@ test.each([
                 createTime: 3,
                 output: 4,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             }),
             createItem({
                 name: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [{ name: "required item 2", amount: 5 }],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.bronze,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.bronze,
             }),
             createItem({
                 name: validItemName,
@@ -273,16 +273,16 @@ test.each([
                 createTime: 3,
                 output: 4,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             }),
             createItem({
                 name: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [{ name: "required item 2", amount: 5 }],
-                minimumTool: Tools.copper,
-                maximumTool: Tools.bronze,
+                minimumTool: DefaultToolset.copper,
+                maximumTool: DefaultToolset.bronze,
             }),
             createItem({
                 name: validItemName,

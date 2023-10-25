@@ -1,6 +1,6 @@
 import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 
-import { Item, Items, Tools } from "../../../types";
+import { Item, Items, DefaultToolset } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime, groupItemsByName } from "./item-utils";
 import { isAvailableToolSufficient } from "../../../common/modifiers";
@@ -43,10 +43,10 @@ function createVariableName({
 
 function filterCreatable(
     items: Readonly<Items>,
-    maxAvailableTool: Tools
+    maxAvailableTool: DefaultToolset
 ): Items {
     return items.filter((item) =>
-        isAvailableToolSufficient(item.minimumTool, maxAvailableTool)
+        isAvailableToolSufficient(item.toolset.minimumTool, maxAvailableTool)
     );
 }
 
@@ -77,7 +77,7 @@ function createRecipeOutputVariableName(
 
 function createDemandVariables(
     items: Readonly<Items>,
-    maxAvailableTool: Tools,
+    maxAvailableTool: DefaultToolset,
     inputItemName: string
 ): Variables {
     const recipeMap = groupItemsByName(items);
@@ -262,7 +262,7 @@ function computeRequirementVertices(
     inputItemName: string,
     workers: number,
     requirements: Items,
-    maxAvailableTool: Tools
+    maxAvailableTool: DefaultToolset
 ): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);

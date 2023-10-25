@@ -1,9 +1,6 @@
 import type { Item } from "../../../types";
 
-type ItemOutputDetails = Pick<
-    Item,
-    "createTime" | "output" | "minimumTool" | "maximumTool"
->;
+type ItemOutputDetails = Pick<Item, "createTime" | "output" | "toolset">;
 
 interface OutputDatabasePort {
     (input: { name: string; creator?: string }): Promise<ItemOutputDetails[]>;

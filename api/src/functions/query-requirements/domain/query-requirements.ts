@@ -5,7 +5,7 @@ import type {
     RequirementRecipe,
 } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
-import { Items, Tools } from "../../../types";
+import { Items, DefaultToolset } from "../../../types";
 import { isAvailableToolSufficient } from "../../../common/modifiers";
 import { Requirement } from "../interfaces/query-requirements-primary-port";
 import {
@@ -235,7 +235,7 @@ function applyOutputUnit(
 const queryRequirements: QueryRequirementsPrimaryPort = async ({
     name,
     workers,
-    maxAvailableTool = Tools.none,
+    maxAvailableTool = DefaultToolset.none,
     unit = OutputUnit.SECONDS,
     creatorOverrides,
 }) => {

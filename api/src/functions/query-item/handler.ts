@@ -29,9 +29,9 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
 
     try {
         const items = await queryItem(filters);
-        return items.map(({ maximumTool, minimumTool, ...rest }) => ({
-            maximumTool: GraphQLToolsSchemaMap[maximumTool],
-            minimumTool: GraphQLToolsSchemaMap[minimumTool],
+        return items.map(({ toolset, ...rest }) => ({
+            maximumTool: GraphQLToolsSchemaMap[toolset.maximumTool],
+            minimumTool: GraphQLToolsSchemaMap[toolset.minimumTool],
             ...rest,
         }));
     } catch (ex) {

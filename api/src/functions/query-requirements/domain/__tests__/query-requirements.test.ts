@@ -1,7 +1,7 @@
 import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem } from "../../../../../test";
-import { Tools } from "../../../../types";
+import { DefaultToolset } from "../../../../types";
 import { Requirement } from "../../interfaces/query-requirements-primary-port";
 import { OutputUnit } from "../../../../common/output";
 
@@ -559,21 +559,41 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
 describe("handles tool modifiers", () => {
     test.each([
-        ["stone min, none provided", Tools.stone, Tools.none],
-        ["copper min, stone provided", Tools.copper, Tools.stone],
-        ["iron min, copper provided", Tools.iron, Tools.copper],
-        ["bronze min, iron provided", Tools.bronze, Tools.iron],
-        ["steel min, bronze provided", Tools.steel, Tools.bronze],
+        ["stone min, none provided", DefaultToolset.stone, DefaultToolset.none],
+        [
+            "copper min, stone provided",
+            DefaultToolset.copper,
+            DefaultToolset.stone,
+        ],
+        [
+            "iron min, copper provided",
+            DefaultToolset.iron,
+            DefaultToolset.copper,
+        ],
+        [
+            "bronze min, iron provided",
+            DefaultToolset.bronze,
+            DefaultToolset.iron,
+        ],
+        [
+            "steel min, bronze provided",
+            DefaultToolset.steel,
+            DefaultToolset.bronze,
+        ],
     ])(
         "throws an error if the provided tool is less the minimum requirement for the specified item (%s)",
-        async (_: string, minimum: Tools, provided: Tools) => {
+        async (
+            _: string,
+            minimum: DefaultToolset,
+            provided: DefaultToolset
+        ) => {
             const item = createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
                 requirements: [],
                 minimumTool: minimum,
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([item]);
             const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
@@ -590,29 +610,49 @@ describe("handles tool modifiers", () => {
     );
 
     test.each([
-        ["stone min, none provided", Tools.stone, Tools.none],
-        ["copper min, stone provided", Tools.copper, Tools.stone],
-        ["iron min, copper provided", Tools.iron, Tools.copper],
-        ["bronze min, iron provided", Tools.bronze, Tools.iron],
-        ["steel min, bronze provided", Tools.steel, Tools.bronze],
+        ["stone min, none provided", DefaultToolset.stone, DefaultToolset.none],
+        [
+            "copper min, stone provided",
+            DefaultToolset.copper,
+            DefaultToolset.stone,
+        ],
+        [
+            "iron min, copper provided",
+            DefaultToolset.iron,
+            DefaultToolset.copper,
+        ],
+        [
+            "bronze min, iron provided",
+            DefaultToolset.bronze,
+            DefaultToolset.iron,
+        ],
+        [
+            "steel min, bronze provided",
+            DefaultToolset.steel,
+            DefaultToolset.bronze,
+        ],
     ])(
         "throws an error if the provided tool is less the minimum requirement for any item's requirements (%s)",
-        async (_: string, minimum: Tools, provided: Tools) => {
+        async (
+            _: string,
+            minimum: DefaultToolset,
+            provided: DefaultToolset
+        ) => {
             const requiredItem = createItem({
                 name: "another item",
                 createTime: 2,
                 output: 3,
                 requirements: [],
                 minimumTool: minimum,
-                maximumTool: Tools.steel,
+                maximumTool: DefaultToolset.steel,
             });
             const item = createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: requiredItem.name, amount: 3 }],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([
                 item,
@@ -632,22 +672,22 @@ describe("handles tool modifiers", () => {
     );
 
     test("throws an error with lowest required tool in message given multiple items w/ unmet tool requirements", async () => {
-        const expectedMinimumTool = Tools.iron;
+        const expectedMinimumTool = DefaultToolset.iron;
         const requiredItem = createItem({
             name: "another item",
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: Tools.stone,
-            maximumTool: Tools.steel,
+            minimumTool: DefaultToolset.stone,
+            maximumTool: DefaultToolset.steel,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: Tools.iron,
-            maximumTool: Tools.steel,
+            minimumTool: DefaultToolset.iron,
+            maximumTool: DefaultToolset.steel,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([requiredItem, item]);
         const expectedError = `Unable to create item with available tools, minimum tool is: ${expectedMinimumTool}`;
@@ -659,16 +699,16 @@ describe("handles tool modifiers", () => {
     });
 
     test.each([
-        [Tools.none, 7.5, 5],
-        [Tools.stone, 15, 10],
-        [Tools.copper, 30, 20],
-        [Tools.iron, 39.75, 26.5],
-        [Tools.bronze, 46.125, 30.75],
-        [Tools.steel, 60, 40],
+        [DefaultToolset.none, 7.5, 5],
+        [DefaultToolset.stone, 15, 10],
+        [DefaultToolset.copper, 30, 20],
+        [DefaultToolset.iron, 39.75, 26.5],
+        [DefaultToolset.bronze, 46.125, 30.75],
+        [DefaultToolset.steel, 60, 40],
     ])(
         "returns expected output for requirement given item with applicable tool: %s and requirement with no tools",
         async (
-            provided: Tools,
+            provided: DefaultToolset,
             expectedOutput: number,
             expectedWorkers: number
         ) => {
@@ -678,16 +718,16 @@ describe("handles tool modifiers", () => {
                 createTime: 2,
                 output: 3,
                 requirements: [],
-                minimumTool: Tools.none,
-                maximumTool: Tools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             });
             const item = createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: requiredItem.name, amount: 3 }],
-                minimumTool: Tools.none,
-                maximumTool: Tools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([
                 item,
@@ -720,23 +760,23 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: Tools.none,
-            maximumTool: Tools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: Tools.none,
-            maximumTool: Tools.copper,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.copper,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
             actual,
@@ -755,23 +795,23 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: Tools.none,
-            maximumTool: Tools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: Tools.none,
-            maximumTool: Tools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
             actual,
@@ -788,23 +828,23 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: Tools.none,
-            maximumTool: Tools.copper,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.copper,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: Tools.none,
-            maximumTool: Tools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
             actual,
@@ -1103,7 +1143,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: Tools.stone,
+            maximumTool: DefaultToolset.stone,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1111,7 +1151,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            maximumTool: Tools.steel,
+            maximumTool: DefaultToolset.steel,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1122,7 +1162,7 @@ describe("multiple recipe handling", () => {
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: Tools.steel,
+            maxAvailableTool: DefaultToolset.steel,
         });
 
         expect(actual).toEqual([
@@ -1168,7 +1208,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: Tools.stone,
+            maximumTool: DefaultToolset.stone,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1176,8 +1216,8 @@ describe("multiple recipe handling", () => {
             output: 6,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            minimumTool: Tools.steel,
-            maximumTool: Tools.steel,
+            minimumTool: DefaultToolset.steel,
+            maximumTool: DefaultToolset.steel,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1304,8 +1344,8 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: Tools.stone,
-            minimumTool: Tools.stone,
+            maximumTool: DefaultToolset.stone,
+            minimumTool: DefaultToolset.stone,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1313,15 +1353,15 @@ describe("multiple recipe handling", () => {
             output: 6,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            minimumTool: Tools.steel,
-            maximumTool: Tools.steel,
+            minimumTool: DefaultToolset.steel,
+            maximumTool: DefaultToolset.steel,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
             moreOptimalItemRecipe,
             requiredItem,
         ]);
-        const expectedError = `Unable to create item with available tools, minimum tool is: ${Tools.stone}`;
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${DefaultToolset.stone}`;
 
         expect.assertions(1);
         await expect(
