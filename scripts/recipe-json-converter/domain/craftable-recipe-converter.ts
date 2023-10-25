@@ -218,7 +218,7 @@ const mapRecipeToItem = (
         );
     }
 
-    const toolRange = getMinMaxTools(tools ?? getDefaultMinMaxTools(creator));
+    const toolset = getMinMaxTools(tools ?? getDefaultMinMaxTools(creator));
     const { matching, nonMatching } = filterByCondition(
         recipe.results,
         (result) => result.type === itemName
@@ -259,7 +259,7 @@ const mapRecipeToItem = (
         createTime: recipe.cooldown,
         requires: requirements,
         output,
-        ...toolRange,
+        toolset,
         ...(optionalOutputs.length > 0 ? { optionalOutputs } : {}),
     };
 };

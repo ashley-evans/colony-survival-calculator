@@ -99,8 +99,11 @@ test.each([
             createTime: 20,
             output: 1,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.steel,
+            },
             creator: "Miner",
         };
 
@@ -127,8 +130,11 @@ test("ignores non-mineable items found in mineable items file", async () => {
         createTime: 20,
         output: 1,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Miner",
     };
 
@@ -160,8 +166,11 @@ test("converts multiple items given multiple mineable items found in file", asyn
             createTime: 20,
             output: 1,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.steel,
+            },
             creator: "Miner",
         },
         {
@@ -169,8 +178,11 @@ test("converts multiple items given multiple mineable items found in file", asyn
             createTime: 50,
             output: 1,
             requires: [],
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            toolset: {
+                type: "default",
+                minimumTool: APITools.none,
+                maximumTool: APITools.steel,
+            },
             creator: "Miner",
         },
     ];

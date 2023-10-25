@@ -29,8 +29,11 @@ const expectedCraftableRecipes: Items = [
         createTime: 15,
         output: 1,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Alchemist",
     },
     {
@@ -38,8 +41,11 @@ const expectedCraftableRecipes: Items = [
         createTime: 25,
         output: 1,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Alchemist",
     },
 ];
@@ -50,8 +56,11 @@ const expectedMineableItems: Items = [
         createTime: 20,
         output: 1,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Miner",
     },
 ];
@@ -62,8 +71,11 @@ const expectedGrowables: Items = [
         createTime: 20,
         output: 1,
         requires: [],
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.none,
+        },
         creator: "Wheat farmer",
     },
 ];
@@ -167,8 +179,11 @@ describe("handles directly non-creatable items", () => {
         createTime: 2,
         requires: [{ name: "Unknown item", amount: 1 }],
         output: 1,
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Test creator",
     };
 
@@ -203,8 +218,11 @@ describe("handles non-creatable items due to nested unknown item", () => {
         createTime: 2,
         requires: [{ name: "Unknown item", amount: 1 }],
         output: 1,
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Test creator",
     };
     const itemWithNestedUnknownRequirement: Item = {
@@ -212,8 +230,11 @@ describe("handles non-creatable items due to nested unknown item", () => {
         createTime: 2,
         requires: [{ name: itemWithUnknownRequirement.name, amount: 1 }],
         output: 1,
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Test creator",
     };
 
@@ -256,8 +277,11 @@ test("filters out any item that depends on an item that cannot be created becaus
         createTime: 2,
         requires: [{ name: "Unknown item", amount: 1 }],
         output: 1,
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Test creator",
     };
     const itemWithNestedUnknownRequirement: Item = {
@@ -265,8 +289,11 @@ test("filters out any item that depends on an item that cannot be created becaus
         createTime: 2,
         requires: [{ name: itemWithUnknownRequirement.name, amount: 1 }],
         output: 1,
-        minimumTool: APITools.none,
-        maximumTool: APITools.steel,
+        toolset: {
+            type: "default",
+            minimumTool: APITools.none,
+            maximumTool: APITools.steel,
+        },
         creator: "Test creator",
     };
     mockConvertCrafteableRecipes.mockResolvedValue([
