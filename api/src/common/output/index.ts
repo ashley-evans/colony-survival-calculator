@@ -1,3 +1,6 @@
+import { ToolModifierValues, getMaxToolModifier } from "..";
+import { DefaultToolset, Item } from "../../types";
+
 enum OutputUnit {
     SECONDS = "SECONDS",
     MINUTES = "MINUTES",
@@ -10,4 +13,16 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.GAME_DAYS]: 435,
 };
 
-export { OutputUnit, OutputUnitSecondMappings };
+function calculateOutput(
+    item: Pick<Item, "toolset" | "createTime" | "output">,
+    maxAvailableTool: DefaultToolset
+): number {
+    const modifier =
+        item.toolset.type === "machine"
+            ? ToolModifierValues["machine"]
+            : getMaxToolModifier(item.toolset.maximumTool, maxAvailableTool);
+
+    return item.output / (item.createTime / modifier);
+}
+
+export { OutputUnit, OutputUnitSecondMappings, calculateOutput };

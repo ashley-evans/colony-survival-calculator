@@ -4,7 +4,7 @@ import {
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
 import { DefaultToolset, type Items } from "../../../../types";
-import { createItem } from "../../../../../test";
+import { createItem, createItemWithMachineTools } from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
 jest.mock("../../adapters/mongodb-query-item", () => ({
@@ -273,6 +273,120 @@ describe("field queries", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
+        });
+
+        test("ignores any item that requires machine tools if no machine tools are available even if more optimal", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
+            });
+            const received = [
+                expected,
+                createItemWithMachineTools({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: { hasMachineTools: false },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test.each([
+            ["default behaviour", undefined],
+            ["has machine tools", true],
+        ])(
+            "returns item with machine tools if more optimal (%s)",
+            async (_: string, hasMachineTools: boolean | undefined) => {
+                const itemName = "item 1";
+                const expected = createItemWithMachineTools({
+                    name: itemName,
+                    createTime: 1,
+                    output: 2,
+                    requirements: [],
+                });
+                const received = [
+                    expected,
+                    createItem({
+                        name: itemName,
+                        createTime: 1,
+                        output: 2,
+                        requirements: [],
+                    }),
+                ];
+                mockQueryItemByField.mockResolvedValue(received);
+
+                const actual = await queryItem({
+                    optimal: { hasMachineTools },
+                });
+
+                expect(actual).toHaveLength(1);
+                expect(actual[0]).toEqual(expected);
+            }
+        );
+
+        test("prefers optimal recipe regardless of whether item has recipe with machine tools", async () => {
+            const itemName = "item 1";
+            const expected = createItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
+            });
+            const received = [
+                expected,
+                createItemWithMachineTools({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: {
+                    hasMachineTools: true,
+                    maxAvailableTool: DefaultToolset.steel,
+                },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns nothing if only recipe requires machine tools and no machine tools are available", async () => {
+            const received = [
+                createItemWithMachineTools({
+                    name: "test item",
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: {
+                    hasMachineTools: false,
+                },
+            });
+
+            expect(actual).toHaveLength(0);
         });
     });
 

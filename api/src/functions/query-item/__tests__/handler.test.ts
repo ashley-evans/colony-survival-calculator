@@ -4,12 +4,13 @@ import { mock } from "jest-mock-extended";
 import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
 import { DefaultToolset as DomainTools, type Items } from "../../../types";
-import { createItem } from "../../../../test";
+import { createItem, createItemWithMachineTools } from "../../../../test";
 import type {
     Item,
     ItemsFilters,
     OptimalFilter,
     QueryItemArgs,
+    AvailableTools,
     Tools,
 } from "../../../graphql/schema";
 import { QueryFilters } from "../interfaces/query-item-primary-port";
@@ -20,9 +21,13 @@ jest.mock("../domain/query-item", () => ({
 
 const mockQueryItem = queryItem as jest.Mock;
 
-function createOptimalFilter(maxAvailableTool?: Tools): OptimalFilter {
+function createOptimalFilter(
+    maxAvailableTool?: AvailableTools,
+    hasMachineTools?: boolean
+): OptimalFilter {
     return {
         maxAvailableTool: maxAvailableTool ?? null,
+        hasMachineTools: hasMachineTools ?? null,
     };
 }
 
@@ -135,6 +140,28 @@ test.each([
             optimal: { maxAvailableTool: DomainTools.steel },
         },
     ],
+    [
+        "an optimal filter specified w/ machine tool indication (true)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, true),
+            })
+        ),
+        {
+            optimal: { hasMachineTools: true },
+        },
+    ],
+    [
+        "an optimal filter specified w/ machine tool indication (false)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, false),
+            })
+        ),
+        {
+            optimal: { hasMachineTools: false },
+        },
+    ],
 ])(
     "calls the domain to fetch items given an event with %s",
     async (
@@ -174,6 +201,12 @@ test.each([
                 minimumTool: DomainTools.copper,
                 maximumTool: DomainTools.bronze,
             }),
+            createItemWithMachineTools({
+                name: "test 3",
+                createTime: 6,
+                output: 8,
+                requirements: [],
+            }),
         ],
         [
             {
@@ -193,6 +226,15 @@ test.each([
                 creator: "test 2 creator",
                 minimumTool: "COPPER" as Tools,
                 maximumTool: "BRONZE" as Tools,
+            },
+            {
+                name: "test 3",
+                createTime: 6,
+                output: 8,
+                requires: [],
+                creator: "test 3 creator",
+                minimumTool: "MACHINE" as Tools,
+                maximumTool: "MACHINE" as Tools,
             },
         ],
     ],
@@ -221,6 +263,14 @@ test.each([
                 minimumTool: DomainTools.copper,
                 maximumTool: DomainTools.bronze,
             }),
+            createItemWithMachineTools({
+                name: "test 3",
+                createTime: 6,
+                output: 8,
+                requirements: [],
+                width: 5,
+                height: 6,
+            }),
         ],
         [
             {
@@ -248,6 +298,19 @@ test.each([
                 creator: "test 2 creator",
                 minimumTool: "COPPER" as Tools,
                 maximumTool: "BRONZE" as Tools,
+            },
+            {
+                name: "test 3",
+                createTime: 6,
+                output: 8,
+                requires: [],
+                size: {
+                    width: 5,
+                    height: 6,
+                },
+                creator: "test 3 creator",
+                minimumTool: "MACHINE" as Tools,
+                maximumTool: "MACHINE" as Tools,
             },
         ],
     ],

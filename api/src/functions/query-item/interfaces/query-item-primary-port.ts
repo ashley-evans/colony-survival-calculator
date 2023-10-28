@@ -2,6 +2,7 @@ import type { Items, DefaultToolset } from "../../../types";
 
 type OptimalFilter = {
     maxAvailableTool?: DefaultToolset | undefined;
+    hasMachineTools?: boolean | undefined;
 };
 
 type QueryFilters = {
