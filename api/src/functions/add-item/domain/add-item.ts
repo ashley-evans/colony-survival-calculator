@@ -59,6 +59,10 @@ function validateOptionalOutputs(items: Items): void {
 
 function validateTools(items: Items): void {
     for (const item of items) {
+        if (item.toolset.type === "machine") {
+            continue;
+        }
+
         const minToolValue = ToolModifierValues[item.toolset.minimumTool];
         const maxToolValue = ToolModifierValues[item.toolset.maximumTool];
         if (minToolValue > maxToolValue) {
