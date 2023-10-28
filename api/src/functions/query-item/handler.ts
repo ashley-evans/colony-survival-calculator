@@ -44,6 +44,7 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
     try {
         const items = await queryItem(filters);
         return items.map(({ toolset, ...rest }) => ({
+            __typename: "Item",
             maximumTool: GraphQLToolsSchemaMap[toolset.maximumTool],
             minimumTool: GraphQLToolsSchemaMap[toolset.minimumTool],
             ...rest,

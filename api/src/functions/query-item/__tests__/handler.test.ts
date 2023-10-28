@@ -210,6 +210,7 @@ test.each([
         ],
         [
             {
+                __typename: "Item" as const,
                 name: "test 1",
                 createTime: 1,
                 output: 3,
@@ -219,6 +220,7 @@ test.each([
                 maximumTool: "STEEL" as Tools,
             },
             {
+                __typename: "Item" as const,
                 name: "test 2",
                 createTime: 4,
                 output: 6,
@@ -228,6 +230,7 @@ test.each([
                 maximumTool: "BRONZE" as Tools,
             },
             {
+                __typename: "Item" as const,
                 name: "test 3",
                 createTime: 6,
                 output: 8,
@@ -274,6 +277,7 @@ test.each([
         ],
         [
             {
+                __typename: "Item" as const,
                 name: "test 1",
                 createTime: 1,
                 output: 3,
@@ -287,6 +291,7 @@ test.each([
                 maximumTool: "STEEL" as Tools,
             },
             {
+                __typename: "Item" as const,
                 name: "test 2",
                 createTime: 4,
                 output: 6,
@@ -300,6 +305,7 @@ test.each([
                 maximumTool: "BRONZE" as Tools,
             },
             {
+                __typename: "Item" as const,
                 name: "test 3",
                 createTime: 6,
                 output: 8,
