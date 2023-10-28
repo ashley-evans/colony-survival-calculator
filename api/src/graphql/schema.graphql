@@ -24,7 +24,7 @@ enum Tools {
 type Item {
     name: ID!
     createTime: Float!
-    output: Int!
+    output: Float!
     creator: String!
     minimumTool: Tools!
     maximumTool: Tools!
