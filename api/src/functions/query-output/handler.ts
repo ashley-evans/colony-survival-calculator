@@ -1,8 +1,7 @@
 import type { OutputResult, QueryOutputArgs } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { calculateOutput } from "./domain/output-calculator";
-import { ToolSchemaMap } from "../../common/modifiers";
-import { OutputUnit } from "../../common/output";
+import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
 import {
     INVALID_ITEM_NAME_ERROR,
     INVALID_WORKERS_ERROR,
@@ -26,7 +25,8 @@ const isUserError = ({ message }: Error): boolean => {
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
     event
 ) => {
-    const { name, workers, unit, maxAvailableTool, creator } = event.arguments;
+    const { name, workers, unit, maxAvailableTool, creator, hasMachineTools } =
+        event.arguments;
 
     try {
         const output = await calculateOutput({
@@ -34,7 +34,13 @@ const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
             workers,
             unit: OutputUnit[unit],
             ...(maxAvailableTool
-                ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
+                ? {
+                      maxAvailableTool:
+                          AvailableToolsSchemaMap[maxAvailableTool],
+                  }
+                : {}),
+            ...(hasMachineTools !== undefined && hasMachineTools !== null
+                ? { hasMachineTools }
                 : {}),
             ...(creator ? { creator } : {}),
         });

@@ -108,7 +108,8 @@ type Query {
         name: ID!
         workers: Int!
         unit: OutputUnit!
-        maxAvailableTool: Tools
+        maxAvailableTool: AvailableTools
+        hasMachineTools: Boolean
         creator: String
     ): OutputResult!
 }

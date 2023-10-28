@@ -45,7 +45,7 @@ function isAvailableDefaultToolSufficient(
 function isAvailableToolSufficient(
     available: DefaultToolset,
     hasMachineTools: boolean,
-    item: Item
+    item: Pick<Item, "toolset">
 ) {
     if (item.toolset.type === "machine") {
         return hasMachineTools;

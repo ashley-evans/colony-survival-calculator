@@ -192,8 +192,8 @@ test("only returns output details related to provided creator if item is created
         creator: validCreatorName,
         createTime: expected.createTime,
         output: expected.output,
-        minimumTool: expected.toolset.minimumTool,
-        maximumTool: expected.toolset.maximumTool,
+        minimumTool: expected.toolset.minimumTool as DefaultToolset,
+        maximumTool: expected.toolset.maximumTool as DefaultToolset,
     });
     const stored = [
         expectedItem,

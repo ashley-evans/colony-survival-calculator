@@ -7,6 +7,7 @@ interface QueryOutputPrimaryPort {
         workers: number;
         unit: OutputUnit;
         maxAvailableTool?: DefaultToolset;
+        hasMachineTools?: boolean;
         creator?: string;
     }): Promise<number>;
 }

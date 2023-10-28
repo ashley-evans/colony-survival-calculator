@@ -1,10 +1,11 @@
 import {
     ToolModifierValues,
-    getMaxToolModifier,
     isAvailableToolSufficient,
-} from "../../../common/modifiers";
-import { OutputUnit, OutputUnitSecondMappings } from "../../../common/output";
-import { DefaultToolset } from "../../../types";
+    OutputUnit,
+    OutputUnitSecondMappings,
+    calculateOutput as calculateItemOutput,
+} from "../../../common";
+import { AllToolsets, DefaultToolset, MachineToolset } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
@@ -32,16 +33,21 @@ async function getItemOutputDetails(
 
 function filterCreatableItems(
     items: ItemOutputDetails[],
-    maxAvailableTool: DefaultToolset
+    maxAvailableTool: DefaultToolset,
+    hasMachineTools: boolean
 ): ItemOutputDetails[] {
-    return items.filter(({ toolset }) =>
-        isAvailableToolSufficient(toolset.minimumTool, maxAvailableTool)
+    return items.filter((item) =>
+        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
     );
 }
 
-function getMinimumToolRequired(items: ItemOutputDetails[]): DefaultToolset {
+function getMinimumToolRequired(items: ItemOutputDetails[]): AllToolsets {
     let minimum = DefaultToolset.steel;
     for (const { toolset } of items) {
+        if (toolset.type === "machine") {
+            return MachineToolset.machine;
+        }
+
         if (
             ToolModifierValues[toolset.minimumTool] <
             ToolModifierValues[minimum]
@@ -60,13 +66,8 @@ function getMaxOutput(
     maxAvailableTool: DefaultToolset
 ): number {
     let maximumOutputPerSecond = 0;
-    for (const { output, createTime, toolset } of items) {
-        const toolModifier = getMaxToolModifier(
-            toolset.maximumTool,
-            maxAvailableTool
-        );
-
-        const outputPerSecond = output / (createTime / toolModifier);
+    for (const item of items) {
+        const outputPerSecond = calculateItemOutput(item, maxAvailableTool);
         if (maximumOutputPerSecond < outputPerSecond) {
             maximumOutputPerSecond = outputPerSecond;
         }
@@ -82,6 +83,7 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     workers,
     unit,
     maxAvailableTool = DefaultToolset.none,
+    hasMachineTools = false,
     creator,
 }) => {
     if (name === "") {
@@ -99,11 +101,16 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
 
     const creatableRecipes = filterCreatableItems(
         outputDetails,
-        maxAvailableTool
+        maxAvailableTool,
+        hasMachineTools
     );
     if (creatableRecipes.length === 0) {
         const minimumTool = getMinimumToolRequired(outputDetails);
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${minimumTool}`);
+        const errorSuffix =
+            minimumTool === "machine"
+                ? "requires machine tools"
+                : `minimum tool is: ${minimumTool}`;
+        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
     }
 
     return getMaxOutput(creatableRecipes, workers, unit, maxAvailableTool);

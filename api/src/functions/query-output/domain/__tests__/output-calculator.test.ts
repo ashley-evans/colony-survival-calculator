@@ -1,7 +1,7 @@
 import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
-import { DefaultToolset, Toolset } from "../../../../types";
+import { DefaultToolset, MachineToolset, Toolset } from "../../../../types";
 import { OutputUnit } from "../../../../common/output";
 
 jest.mock("../../adapters/mongodb-output-adapter", () => ({
@@ -253,6 +253,95 @@ describe("handles tool modifiers", () => {
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
+            maxAvailableTool: DefaultToolset.steel,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+});
+
+describe("handles machine tool recipes", () => {
+    const machineToolDetails = createItemOutputDetails(5, 10, {
+        type: "machine",
+        minimumTool: MachineToolset.machine,
+        maximumTool: MachineToolset.machine,
+    });
+    const expectedRequiredToolsError = new Error(
+        "Unable to create item with available tools, requires machine tools"
+    );
+
+    beforeEach(() => {
+        mockQueryOutputDetails.mockResolvedValue([machineToolDetails]);
+    });
+
+    test.each([
+        ["default", undefined],
+        ["specified", false],
+    ])(
+        "throws an error if the item can only be produced by machine tools are not available (%s)",
+        async (_: string, hasMachineTools: boolean | undefined) => {
+            expect.assertions(1);
+            await expect(
+                calculateOutput({
+                    name: validItemName,
+                    workers: validWorkers,
+                    unit: OutputUnit.MINUTES,
+                    ...(hasMachineTools !== undefined
+                        ? { hasMachineTools }
+                        : {}),
+                })
+            ).rejects.toThrow(expectedRequiredToolsError);
+        }
+    );
+
+    test("returns expected output if machine tools are required and available", async () => {
+        const expected = 600;
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasMachineTools: true,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("ignores recipe with machine tool requirement if another available tool can be used", async () => {
+        const expected = 75;
+        const otherDetails = createItemOutputDetails(20, 5);
+        mockQueryOutputDetails.mockResolvedValue([
+            machineToolDetails,
+            otherDetails,
+        ]);
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasMachineTools: false,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("returns optimal recipe even if one recipe uses machine tools", async () => {
+        const expected = 1200;
+        const otherDetails = createItemOutputDetails(10, 5, {
+            type: "default",
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
+        });
+        mockQueryOutputDetails.mockResolvedValue([
+            machineToolDetails,
+            otherDetails,
+        ]);
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasMachineTools: true,
             maxAvailableTool: DefaultToolset.steel,
         });
 
