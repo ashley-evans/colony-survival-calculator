@@ -8,6 +8,7 @@ export const expectedItemSelectLabel = "Item:";
 export const expectedWorkerInputLabel = "Workers:";
 export const expectedOutputUnitLabel = "Desired output units:";
 export const expectedToolSelectLabel = "Tools:";
+export const expectedMachineToolCheckboxLabel = "Machine tools available?";
 export const expectedOutputPrefix = "Optimal output:";
 export const expectedFarmSizeNotePrefix = "Calculations use optimal farm size:";
 export const expectedLoadingOutputMessage = "Calculating output...";
