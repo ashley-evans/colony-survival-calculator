@@ -5,7 +5,7 @@ import ToolsetSchema from "../../../json/schemas/toolset.json";
 import { Items } from "../../../types";
 import { storeItem } from "../adapters/store-item";
 import type { AddItemPrimaryPort } from "../interfaces/add-item-primary-port";
-import { ToolModifierValues } from "../../../common/modifiers";
+import { ToolModifierValues } from "../../../common";
 
 const ajv = new Ajv();
 ajv.addKeyword("tsEnumNames");

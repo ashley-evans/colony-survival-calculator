@@ -1,4 +1,4 @@
-import { OutputUnit } from "../../../common/output";
+import { OutputUnit } from "../../../common";
 import { DefaultToolset } from "../../../types";
 
 interface QueryOutputPrimaryPort {

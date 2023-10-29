@@ -1,7 +1,4 @@
-import {
-    GraphQLToolsSchemaMap,
-    AvailableToolsSchemaMap,
-} from "../../common/modifiers";
+import { GraphQLToolsSchemaMap, AvailableToolsSchemaMap } from "../../common";
 import type { Item, QueryItemArgs, OptimalFilter } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { queryItem } from "./domain/query-item";

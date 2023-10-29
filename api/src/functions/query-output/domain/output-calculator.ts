@@ -1,11 +1,11 @@
 import {
-    ToolModifierValues,
     isAvailableToolSufficient,
     OutputUnit,
     OutputUnitSecondMappings,
     calculateOutput as calculateItemOutput,
+    getMinimumToolRequired,
 } from "../../../common";
-import { AllToolsets, DefaultToolset, MachineToolset } from "../../../types";
+import { DefaultToolset } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
@@ -39,24 +39,6 @@ function filterCreatableItems(
     return items.filter((item) =>
         isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
     );
-}
-
-function getMinimumToolRequired(items: ItemOutputDetails[]): AllToolsets {
-    let minimum = DefaultToolset.steel;
-    for (const { toolset } of items) {
-        if (toolset.type === "machine") {
-            return MachineToolset.machine;
-        }
-
-        if (
-            ToolModifierValues[toolset.minimumTool] <
-            ToolModifierValues[minimum]
-        ) {
-            minimum = toolset.minimumTool;
-        }
-    }
-
-    return minimum;
 }
 
 function getMaxOutput(
@@ -105,11 +87,14 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
         hasMachineTools
     );
     if (creatableRecipes.length === 0) {
-        const minimumTool = getMinimumToolRequired(outputDetails);
-        const errorSuffix =
-            minimumTool === "machine"
-                ? "requires machine tools"
-                : `minimum tool is: ${minimumTool}`;
+        const { needsMachineTools, minimumDefault } = getMinimumToolRequired(
+            outputDetails.map((details) => ({ ...details, name }))
+        );
+
+        const errorSuffix = needsMachineTools
+            ? "requires machine tools"
+            : `minimum tool is: ${minimumDefault}`;
+
         throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
     }
 

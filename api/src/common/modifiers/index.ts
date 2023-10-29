@@ -2,7 +2,7 @@ import {
     AvailableTools,
     Tools as GraphQLSchemaTools,
 } from "../../graphql/schema";
-import { AllToolsets, DefaultToolset, Item, MachineToolset } from "../../types";
+import { AllToolsets, DefaultToolset, MachineToolset } from "../../types";
 
 const ToolModifierValues: Readonly<Record<AllToolsets, number>> = {
     [DefaultToolset.none]: 1,
@@ -33,30 +33,6 @@ const GraphQLToolsSchemaMap: Record<AllToolsets, GraphQLSchemaTools> = {
     [MachineToolset.machine]: "MACHINE",
 };
 
-function isAvailableDefaultToolSufficient(
-    minimum: DefaultToolset,
-    available: DefaultToolset
-): boolean {
-    const minimumToolModifier = ToolModifierValues[minimum];
-    const availableToolModifier = ToolModifierValues[available];
-    return availableToolModifier >= minimumToolModifier;
-}
-
-function isAvailableToolSufficient(
-    available: DefaultToolset,
-    hasMachineTools: boolean,
-    item: Pick<Item, "toolset">
-) {
-    if (item.toolset.type === "machine") {
-        return hasMachineTools;
-    }
-
-    return isAvailableDefaultToolSufficient(
-        item.toolset.minimumTool,
-        available
-    );
-}
-
 function getMaxToolModifier(
     maximum: DefaultToolset,
     available: DefaultToolset
@@ -72,7 +48,5 @@ export {
     AvailableToolsSchemaMap,
     GraphQLToolsSchemaMap,
     ToolModifierValues,
-    isAvailableToolSufficient,
-    isAvailableDefaultToolSufficient,
     getMaxToolModifier,
 };

@@ -100,7 +100,8 @@ type Query {
     requirement(
         name: ID!
         workers: Int!
-        maxAvailableTool: Tools
+        maxAvailableTool: AvailableTools
+        hasMachineTools: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
     ): RequirementResult!

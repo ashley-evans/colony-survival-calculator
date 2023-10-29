@@ -2,7 +2,7 @@ import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 import { DefaultToolset, MachineToolset, Toolset } from "../../../../types";
-import { OutputUnit } from "../../../../common/output";
+import { OutputUnit } from "../../../../common";
 
 jest.mock("../../adapters/mongodb-output-adapter", () => ({
     queryOutputDetails: jest.fn(),

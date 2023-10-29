@@ -5,16 +5,16 @@ import type {
     CreatorOverride,
     QueryRequirementArgs,
     Requirement as GraphQLRequirement,
-    Tools,
     OutputUnit as GraphQLOutputUnit,
     RequirementResult,
     UserError,
+    AvailableTools,
 } from "../../../graphql/schema";
 import type { Requirement } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 import { DefaultToolset as SchemaTools } from "../../../types";
-import { OutputUnit } from "../../../common/output";
+import { OutputUnit } from "../../../common";
 
 jest.mock("../domain/query-requirements", () => ({
     queryRequirements: jest.fn(),
@@ -35,13 +35,15 @@ function createMockEvent({
     name,
     workers,
     maxAvailableTool,
+    hasMachineTools,
     creatorOverrides,
     unit,
     selectionSetList = ["name"],
 }: {
     name: string;
     workers: number;
-    maxAvailableTool?: Tools;
+    maxAvailableTool?: AvailableTools;
+    hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
     selectionSetList?: string[];
@@ -53,6 +55,7 @@ function createMockEvent({
         workers,
         maxAvailableTool: maxAvailableTool ?? null,
         creatorOverrides: creatorOverrides ?? null,
+        hasMachineTools: hasMachineTools ?? null,
         unit: unit ?? null,
     };
 
@@ -78,7 +81,7 @@ test("calls the domain to fetch requirements for provided event w/o tool modifie
     });
 });
 
-test.each<[Tools, SchemaTools]>([
+test.each<[AvailableTools, SchemaTools]>([
     ["NONE", SchemaTools.none],
     ["STONE", SchemaTools.stone],
     ["COPPER", SchemaTools.copper],
@@ -87,7 +90,7 @@ test.each<[Tools, SchemaTools]>([
     ["STEEL", SchemaTools.steel],
 ])(
     "calls the domain to fetch requirements for provided event w/ %s tool modifier",
-    async (provided: Tools, expectedTool: SchemaTools) => {
+    async (provided: AvailableTools, expectedTool: SchemaTools) => {
         const event = createMockEvent({
             name: expectedItemName,
             workers: expectedAmount,
@@ -101,6 +104,29 @@ test.each<[Tools, SchemaTools]>([
             name: expectedItemName,
             workers: expectedAmount,
             maxAvailableTool: expectedTool,
+        });
+    }
+);
+
+test.each([
+    ["available", true],
+    ["unavailable", false],
+])(
+    "calls the domain to fetch requirements given machine tool %s",
+    async (_: string, hasMachineTools: boolean) => {
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedAmount,
+            hasMachineTools,
+        });
+
+        await handler(event);
+
+        expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+        expect(mockQueryRequirements).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedAmount,
+            hasMachineTools,
         });
     }
 );
