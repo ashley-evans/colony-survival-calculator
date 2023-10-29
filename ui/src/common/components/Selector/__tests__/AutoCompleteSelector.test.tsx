@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 import { Item, createItem, itemToKey, itemToDisplayText } from "./utils";
 import { AutoCompleteSelector } from "../AutoCompleteSelector";
 import {
-    clickButton,
+    click,
     renderWithTestProviders as render,
     typeValue,
     wrapWithTestProviders,
@@ -161,7 +161,7 @@ test.each([
                 itemToDisplayText={itemToDisplayText}
             />
         );
-        await clickButton({ label: expectedToggleLabelText });
+        await click({ label: expectedToggleLabelText });
 
         expect(await screen.findAllByRole("option")).toHaveLength(items.length);
         for (const item of items) {
@@ -464,7 +464,7 @@ test("clears the currently entered value if the clear input button is pressed", 
         />
     );
     await typeValue({ label: expectedLabelText, value: expectedRemovedValue });
-    await clickButton({ label: expectedClearLabelText });
+    await click({ label: expectedClearLabelText });
 
     await waitFor(() =>
         expect(

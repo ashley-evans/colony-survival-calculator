@@ -3,7 +3,7 @@ import { screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
-    clickButton,
+    click,
     renderWithTestProviders as render,
     typeValue,
     clearInput,
@@ -248,7 +248,7 @@ test("clears the currently entered value if the clear input button is pressed", 
         />
     );
     await typeValue({ label: expectedLabelText, value: expectedRemovedValue });
-    await clickButton({ label: expectedClearLabel });
+    await click({ label: expectedClearLabel });
 
     await waitFor(() =>
         expect(
@@ -269,7 +269,7 @@ test("provides undefined to change handler if input is cleared", async () => {
         />
     );
     await typeValue({ label: expectedLabelText, value: "123" });
-    await clickButton({ label: expectedClearLabel });
+    await click({ label: expectedClearLabel });
 
     expect(mockOnChangeHandler).toHaveBeenLastCalledWith(undefined);
 });
