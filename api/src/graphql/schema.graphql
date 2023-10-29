@@ -11,10 +11,20 @@ type FarmSize {
     height: Int!
 }
 
+enum Tools {
+    NONE
+    STONE
+    COPPER
+    IRON
+    BRONZE
+    STEEL
+    MACHINE
+}
+
 type Item {
     name: ID!
     createTime: Float!
-    output: Int!
+    output: Float!
     creator: String!
     minimumTool: Tools!
     maximumTool: Tools!
@@ -63,7 +73,7 @@ enum OutputUnit {
     GAME_DAYS
 }
 
-enum Tools {
+enum AvailableTools {
     NONE
     STONE
     COPPER
@@ -73,7 +83,8 @@ enum Tools {
 }
 
 input OptimalFilter {
-    maxAvailableTool: Tools
+    maxAvailableTool: AvailableTools
+    hasMachineTools: Boolean
 }
 
 input ItemsFilters {
@@ -89,7 +100,8 @@ type Query {
     requirement(
         name: ID!
         workers: Int!
-        maxAvailableTool: Tools
+        maxAvailableTool: AvailableTools
+        hasMachineTools: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
     ): RequirementResult!
@@ -97,7 +109,8 @@ type Query {
         name: ID!
         workers: Int!
         unit: OutputUnit!
-        maxAvailableTool: Tools
+        maxAvailableTool: AvailableTools
+        hasMachineTools: Boolean
         creator: String
     ): OutputResult!
 }

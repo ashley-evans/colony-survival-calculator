@@ -3,7 +3,7 @@ import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 import { Item, Items, DefaultToolset } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime, groupItemsByName } from "./item-utils";
-import { isAvailableToolSufficient } from "../../../common/modifiers";
+import { isAvailableToolSufficient } from "../../../common";
 
 export const WORKERS_PROPERTY = "workers";
 export const REQUIREMENT_PREFIX = "requirement-";
@@ -43,10 +43,11 @@ function createVariableName({
 
 function filterCreatable(
     items: Readonly<Items>,
-    maxAvailableTool: DefaultToolset
+    maxAvailableTool: DefaultToolset,
+    hasMachineTools: boolean
 ): Items {
     return items.filter((item) =>
-        isAvailableToolSufficient(item.toolset.minimumTool, maxAvailableTool)
+        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
     );
 }
 
@@ -262,7 +263,8 @@ function computeRequirementVertices(
     inputItemName: string,
     workers: number,
     requirements: Items,
-    maxAvailableTool: DefaultToolset
+    maxAvailableTool: DefaultToolset,
+    hasMachineTools: boolean
 ): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);
@@ -270,7 +272,11 @@ function computeRequirementVertices(
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
-    const createAbleItems = filterCreatable(requirements, maxAvailableTool);
+    const createAbleItems = filterCreatable(
+        requirements,
+        maxAvailableTool,
+        hasMachineTools
+    );
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,

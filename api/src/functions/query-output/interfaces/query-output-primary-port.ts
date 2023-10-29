@@ -1,4 +1,4 @@
-import { OutputUnit } from "../../../common/output";
+import { OutputUnit } from "../../../common";
 import { DefaultToolset } from "../../../types";
 
 interface QueryOutputPrimaryPort {
@@ -7,6 +7,7 @@ interface QueryOutputPrimaryPort {
         workers: number;
         unit: OutputUnit;
         maxAvailableTool?: DefaultToolset;
+        hasMachineTools?: boolean;
         creator?: string;
     }): Promise<number>;
 }

@@ -1,9 +1,11 @@
 import {
     DefaultToolset,
     Item,
+    MachineToolset,
     OptionalOutput,
     Requirement,
     Requirements,
+    Toolset,
 } from "../src/types";
 
 function createRequirements(name: string, amount: number): Requirement {
@@ -29,29 +31,29 @@ function createOptionalOutput({
     };
 }
 
-function createItem({
-    name,
-    createTime,
-    output,
-    requirements,
-    minimumTool = DefaultToolset.none,
-    maximumTool = DefaultToolset.none,
-    creator = `${name} creator`,
-    optionalOutputs,
-    width,
-    height,
-}: {
+type ItemFactoryInputs = {
     name: string;
     createTime: number;
     output: number;
     requirements: Requirements;
-    minimumTool?: DefaultToolset;
-    maximumTool?: DefaultToolset;
+    toolset: Toolset;
     creator?: string;
     optionalOutputs?: OptionalOutput[];
     width?: number;
     height?: number;
-}): Item {
+};
+
+function baseCreateItem({
+    name,
+    createTime,
+    output,
+    requirements,
+    toolset,
+    creator = `${name} creator`,
+    optionalOutputs,
+    width,
+    height,
+}: ItemFactoryInputs): Item {
     return {
         name,
         createTime,
@@ -59,13 +61,44 @@ function createItem({
         creator,
         requires: requirements,
         ...(width && height ? { size: { width, height } } : {}),
-        toolset: {
-            type: "default",
-            minimumTool,
-            maximumTool,
-        },
+        toolset,
         ...(optionalOutputs ? { optionalOutputs } : {}),
     };
 }
 
-export { createItem, createRequirements, createOptionalOutput };
+function createItem(
+    input: Omit<ItemFactoryInputs, "toolset"> & {
+        minimumTool?: DefaultToolset;
+        maximumTool?: DefaultToolset;
+    }
+): Item {
+    const { minimumTool, maximumTool, ...rest } = input;
+    return baseCreateItem({
+        ...rest,
+        toolset: {
+            type: "default",
+            minimumTool: minimumTool ?? DefaultToolset.none,
+            maximumTool: maximumTool ?? DefaultToolset.none,
+        },
+    });
+}
+
+function createItemWithMachineTools(
+    input: Omit<ItemFactoryInputs, "toolset">
+): Item {
+    return baseCreateItem({
+        ...input,
+        toolset: {
+            type: "machine",
+            minimumTool: MachineToolset.machine,
+            maximumTool: MachineToolset.machine,
+        },
+    });
+}
+
+export {
+    createItem,
+    createItemWithMachineTools,
+    createRequirements,
+    createOptionalOutput,
+};

@@ -7,10 +7,10 @@ import OutputUnitSelector from "./components/OutputUnitSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
 import {
+    AvailableTools,
     CreatorOverride,
     ItemsFilters,
     OutputUnit,
-    Tools,
 } from "../../graphql/__generated__/graphql";
 import { gql } from "../../graphql/__generated__";
 import ToolSelector from "./components/ToolSelector";
@@ -39,14 +39,14 @@ type StateProp<S> = [S, (value: S) => void];
 type CalculatorTabProps = {
     itemState: StateProp<string | undefined>;
     workersState: StateProp<number | undefined>;
-    toolState: StateProp<Tools>;
+    toolState: StateProp<AvailableTools>;
     outputUnitState: StateProp<OutputUnit>;
     selectedCreatorOverrides: CreatorOverride[];
 };
 
 function getItemDetailsFilters(
     item?: string,
-    tool?: Tools,
+    tool?: AvailableTools,
     overrides?: CreatorOverride[]
 ): ItemsFilters {
     const creator = overrides
@@ -185,7 +185,7 @@ function Calculator() {
 
     const selectedItemState = useState<string>();
     const workersState = useState<number>();
-    const selectedToolState = useState<Tools>(Tools.None);
+    const selectedToolState = useState<AvailableTools>(AvailableTools.None);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
     const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
 

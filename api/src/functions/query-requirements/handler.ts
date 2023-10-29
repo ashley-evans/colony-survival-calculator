@@ -1,5 +1,4 @@
-import { ToolSchemaMap } from "../../common/modifiers";
-import { OutputUnit } from "../../common/output";
+import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
 import type {
     QueryRequirementArgs,
     RequirementResult,
@@ -43,8 +42,14 @@ const handler: GraphQLEventHandler<
     QueryRequirementArgs,
     RequirementResult
 > = async (event) => {
-    const { name, workers, unit, maxAvailableTool, creatorOverrides } =
-        event.arguments;
+    const {
+        name,
+        workers,
+        unit,
+        maxAvailableTool,
+        creatorOverrides,
+        hasMachineTools,
+    } = event.arguments;
     const { selectionSetList } = event.info;
 
     const selectedAmountFields = selectionSetList.filter((value) =>
@@ -61,7 +66,13 @@ const handler: GraphQLEventHandler<
             workers,
             ...(unit ? { unit: OutputUnit[unit] } : {}),
             ...(maxAvailableTool
-                ? { maxAvailableTool: ToolSchemaMap[maxAvailableTool] }
+                ? {
+                      maxAvailableTool:
+                          AvailableToolsSchemaMap[maxAvailableTool],
+                  }
+                : {}),
+            ...(hasMachineTools !== null && hasMachineTools !== undefined
+                ? { hasMachineTools }
                 : {}),
             ...(creatorOverrides ? { creatorOverrides } : {}),
         });

@@ -1,13 +1,11 @@
-import {
-    getMaxToolModifier,
-    isAvailableToolSufficient,
-} from "../../../common/modifiers";
+import { calculateOutput, isAvailableToolSufficient } from "../../../common";
 import { Item, Items, DefaultToolset } from "../../../types";
 import {
     queryItemByCreatorCount,
     queryItemByField,
 } from "../adapters/mongodb-query-item";
 import type {
+    OptimalFilter,
     QueryFilters,
     QueryItemPrimaryPort,
 } from "../interfaces/query-item-primary-port";
@@ -15,29 +13,14 @@ import type {
 const INVALID_FILTER_ERROR =
     "Invalid filter combination provided: Cannot filter by minimum creator and creator name";
 
-function calculateOutput(
-    item: Pick<Item, "toolset" | "createTime" | "output">,
-    maxAvailableTool: DefaultToolset
-): number {
-    const modifier = getMaxToolModifier(
-        item.toolset.maximumTool,
-        maxAvailableTool
-    );
-    return item.output / (item.createTime / modifier);
-}
-
-function filterByOptimal(
-    items: Items,
-    maxAvailableTool?: DefaultToolset
-): Items {
+function filterByOptimal(items: Items, filters: OptimalFilter): Items {
     const itemMap = new Map<string, Item>();
+    const maxAvailableTool = filters.maxAvailableTool ?? DefaultToolset.steel;
+    const hasMachineTools = filters.hasMachineTools ?? true;
+
     for (const item of items) {
         if (
-            maxAvailableTool &&
-            !isAvailableToolSufficient(
-                item.toolset.minimumTool,
-                maxAvailableTool
-            )
+            !isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
         ) {
             continue;
         }
@@ -79,7 +62,7 @@ const queryItem: QueryItemPrimaryPort = async (
             : queryItemByField(filters?.name, filters?.creator));
 
         if (filters?.optimal) {
-            return filterByOptimal(items, filters.optimal.maxAvailableTool);
+            return filterByOptimal(items, filters.optimal);
         }
 
         return items;

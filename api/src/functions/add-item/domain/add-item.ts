@@ -5,7 +5,7 @@ import ToolsetSchema from "../../../json/schemas/toolset.json";
 import { Items } from "../../../types";
 import { storeItem } from "../adapters/store-item";
 import type { AddItemPrimaryPort } from "../interfaces/add-item-primary-port";
-import { ToolModifierValues } from "../../../common/modifiers";
+import { ToolModifierValues } from "../../../common";
 
 const ajv = new Ajv();
 ajv.addKeyword("tsEnumNames");
@@ -59,6 +59,10 @@ function validateOptionalOutputs(items: Items): void {
 
 function validateTools(items: Items): void {
     for (const item of items) {
+        if (item.toolset.type === "machine") {
+            continue;
+        }
+
         const minToolValue = ToolModifierValues[item.toolset.minimumTool];
         const maxToolValue = ToolModifierValues[item.toolset.maximumTool];
         if (minToolValue > maxToolValue) {

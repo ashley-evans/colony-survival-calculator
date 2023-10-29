@@ -6,7 +6,11 @@ import type {
 } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
 import { Items, DefaultToolset } from "../../../types";
-import { isAvailableToolSufficient } from "../../../common/modifiers";
+import {
+    hasMinimumRequiredTools,
+    OutputUnit,
+    OutputUnitSecondMappings,
+} from "../../../common";
 import { Requirement } from "../interfaces/query-requirements-primary-port";
 import {
     VertexOutput,
@@ -25,13 +29,7 @@ import {
     TOOL_LEVEL_ERROR_PREFIX,
     UNKNOWN_ITEM_ERROR,
 } from "./errors";
-import {
-    canCreateItem,
-    filterByCreatorOverrides,
-    filterByMinimumTool,
-    getLowestRequiredTool,
-} from "./item-utils";
-import { OutputUnit, OutputUnitSecondMappings } from "../../../common/output";
+import { canCreateItem, filterByCreatorOverrides } from "./item-utils";
 
 function findMultipleOverrides(
     overrides?: CreatorOverride[]
@@ -236,6 +234,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
     name,
     workers,
     maxAvailableTool = DefaultToolset.none,
+    hasMachineTools = false,
     unit = OutputUnit.SECONDS,
     creatorOverrides,
 }) => {
@@ -265,18 +264,25 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         creatorOverrides
     );
 
-    const lowestToolRequired = getLowestRequiredTool(
-        filterByMinimumTool(overriddenRequirements)
+    const required = hasMinimumRequiredTools(
+        overriddenRequirements,
+        maxAvailableTool,
+        hasMachineTools
     );
-    if (!isAvailableToolSufficient(lowestToolRequired, maxAvailableTool)) {
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${lowestToolRequired}`);
+    if (!required.hasRequired) {
+        const errorSuffix =
+            required.requiredTool === "machine"
+                ? "requires machine tools"
+                : `minimum tool is: ${required.requiredTool}`;
+        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
     }
 
     const result = computeRequirementVertices(
         name,
         workers,
         overriddenRequirements,
-        maxAvailableTool
+        maxAvailableTool,
+        hasMachineTools
     );
 
     const mapped = mapResults(result);

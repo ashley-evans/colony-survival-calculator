@@ -1,4 +1,4 @@
-import { OutputUnit } from "../../../common/output";
+import { OutputUnit } from "../../../common";
 import { DefaultToolset } from "../../../types";
 
 type CreatorOverride = {
@@ -31,6 +31,7 @@ interface QueryRequirementsPrimaryPort {
         workers: number;
         unit?: OutputUnit;
         maxAvailableTool?: DefaultToolset;
+        hasMachineTools?: boolean;
         creatorOverrides?: CreatorOverride[];
     }): Promise<Requirement[]>;
 }

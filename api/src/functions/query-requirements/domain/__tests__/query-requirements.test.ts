@@ -1,9 +1,9 @@
 import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
-import { createItem } from "../../../../../test";
+import { createItem, createItemWithMachineTools } from "../../../../../test";
 import { DefaultToolset } from "../../../../types";
 import { Requirement } from "../../interfaces/query-requirements-primary-port";
-import { OutputUnit } from "../../../../common/output";
+import { OutputUnit } from "../../../../common";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: jest.fn(),
@@ -2002,4 +2002,128 @@ describe("handles multiple output units", () => {
             expect(actual).toEqual(expected);
         }
     );
+});
+
+describe("handles machine tools", () => {
+    const machineToolsItem = createItemWithMachineTools({
+        name: "machine tools item",
+        createTime: 4,
+        output: 2,
+        requirements: [],
+    });
+    const baseItem = createItem({
+        name: "base item",
+        createTime: 2,
+        output: 6,
+        requirements: [{ name: machineToolsItem.name, amount: 5 }],
+    });
+    const expectedRequiredToolsError = new Error(
+        "Unable to create item with available tools, requires machine tools"
+    );
+
+    beforeEach(() => {
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            baseItem,
+            machineToolsItem,
+        ]);
+    });
+
+    describe.each([
+        ["specified", false],
+        ["default", undefined],
+    ])(
+        "handles lacking machine tools (%s)",
+        (_: string, hasMachineTools: boolean | undefined) => {
+            test("throws an error when base item requires machine tools and they are not available", async () => {
+                mockMongoDBQueryRequirements.mockResolvedValue([
+                    machineToolsItem,
+                ]);
+
+                expect.assertions(1);
+                await expect(
+                    queryRequirements({
+                        name: machineToolsItem.name,
+                        workers: validWorkers,
+                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                    })
+                ).rejects.toThrow(expectedRequiredToolsError);
+            });
+
+            test("throws an error when required item requires machine tools and they are not available", async () => {
+                expect.assertions(1);
+                await expect(
+                    queryRequirements({
+                        name: baseItem.name,
+                        workers: validWorkers,
+                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                    })
+                ).rejects.toThrow(expectedRequiredToolsError);
+            });
+        }
+    );
+
+    test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
+        const expectedError = `Unable to create item with available tools, minimum tool is: ${DefaultToolset.steel}`;
+        const baseItemSteelMin = createItem({
+            name: "base item",
+            createTime: 3,
+            output: 5,
+            requirements: [{ name: machineToolsItem.name, amount: 5 }],
+            minimumTool: DefaultToolset.steel,
+            maximumTool: DefaultToolset.steel,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            baseItemSteelMin,
+            machineToolsItem,
+        ]);
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                name: baseItem.name,
+                workers: validWorkers,
+                hasMachineTools: true,
+                maxAvailableTool: DefaultToolset.iron,
+            })
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("returns expected requirements if machine tools are required and available", async () => {
+        const actual = await queryRequirements({
+            name: baseItem.name,
+            workers: validWorkers,
+            hasMachineTools: true,
+        });
+
+        expect(actual).toEqual([
+            {
+                name: baseItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: baseItem.name,
+                        creator: baseItem.creator,
+                        amount: 15,
+                        workers: 5,
+                        demands: [
+                            { name: machineToolsItem.name, amount: 12.5 },
+                        ],
+                    },
+                ],
+            },
+            {
+                name: machineToolsItem.name,
+                amount: 12.5,
+                creators: [
+                    {
+                        name: machineToolsItem.name,
+                        creator: machineToolsItem.creator,
+                        amount: 12.5,
+                        workers: 25,
+                        demands: [],
+                    },
+                ],
+            },
+        ]);
+    });
 });

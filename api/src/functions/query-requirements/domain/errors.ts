@@ -3,8 +3,7 @@ const INVALID_ITEM_NAME_ERROR =
 const INVALID_WORKERS_ERROR =
     "Invalid number of workers provided, must be a positive number";
 const UNKNOWN_ITEM_ERROR = "Unknown item provided";
-const TOOL_LEVEL_ERROR_PREFIX =
-    "Unable to create item with available tools, minimum tool is:";
+const TOOL_LEVEL_ERROR_PREFIX = "Unable to create item with available tools,";
 const MULTIPLE_OVERRIDE_ERROR_PREFIX =
     "Invalid input: More than one creator override provided for:";
 const INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR =

@@ -1,12 +1,13 @@
 import { Graph } from "graph-data-structure";
 
+import { DefaultToolset, Item, Items } from "../../../types";
+import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
+import { INTERNAL_SERVER_ERROR } from "./errors";
 import {
     ToolModifierValues,
     getMaxToolModifier,
-} from "../../../common/modifiers";
-import { Item, Items, DefaultToolset } from "../../../types";
-import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
-import { INTERNAL_SERVER_ERROR } from "./errors";
+    groupItemsByName,
+} from "../../../common";
 
 const ROOT_GRAPH_KEY = "root";
 
@@ -14,54 +15,12 @@ function calculateCreateTime(
     { toolset, createTime }: Pick<Item, "toolset" | "createTime">,
     availableTool: DefaultToolset
 ) {
+    if (toolset.type === "machine") {
+        return createTime / ToolModifierValues["machine"];
+    }
+
     const toolModifier = getMaxToolModifier(toolset.maximumTool, availableTool);
     return createTime / toolModifier;
-}
-
-function filterByMinimumTool(items: Items): Items {
-    const itemMap = new Map<string, Item>();
-    for (const item of items) {
-        const currentOptimalItem = itemMap.get(item.name);
-        if (!currentOptimalItem) {
-            itemMap.set(item.name, item);
-            continue;
-        }
-
-        if (
-            ToolModifierValues[item.toolset.minimumTool] <
-            ToolModifierValues[currentOptimalItem.toolset.minimumTool]
-        ) {
-            itemMap.set(item.name, item);
-        }
-    }
-
-    return Array.from(itemMap.values());
-}
-
-function getLowestRequiredTool(items: Items): DefaultToolset {
-    let currentLowestTool = DefaultToolset.none;
-    for (const item of items) {
-        if (
-            ToolModifierValues[item.toolset.minimumTool] >
-            ToolModifierValues[currentLowestTool]
-        ) {
-            currentLowestTool = item.toolset.minimumTool;
-        }
-    }
-
-    return currentLowestTool;
-}
-
-type RecipeMap = Map<string, Items>;
-
-function groupItemsByName(items: Readonly<Items>): RecipeMap {
-    const itemRecipes = new Map<string, Items>();
-    for (const item of items) {
-        const recipes = itemRecipes.get(item.name) ?? [];
-        itemRecipes.set(item.name, [...recipes, item]);
-    }
-
-    return itemRecipes;
 }
 
 function getUniqueItemKey(item: Pick<Item, "name" | "creator">): string {
@@ -189,11 +148,8 @@ function canCreateItem(name: string, items: Items): boolean {
 }
 
 export {
-    RecipeMap,
     calculateCreateTime,
     canCreateItem,
-    filterByMinimumTool,
     filterByCreatorOverrides,
-    getLowestRequiredTool,
     groupItemsByName,
 };

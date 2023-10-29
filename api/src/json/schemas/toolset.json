@@ -18,6 +18,20 @@
             },
             "additionalProperties": false,
             "required": ["type", "minimumTool", "maximumTool"]
+        },
+        {
+            "type": "object",
+            "properties": {
+                "type": { "const": "machine" },
+                "minimumTool": {
+                    "$ref": "#/definitions/machineToolset"
+                },
+                "maximumTool": {
+                    "$ref": "#/definitions/machineToolset"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["type", "minimumTool", "maximumTool"]
         }
     ],
     "definitions": {
@@ -34,6 +48,13 @@
                 "steel"
             ],
             "enum": ["none", "stone", "copper", "iron", "bronze", "steel"]
+        },
+        "machineToolset": {
+            "title": "MachineToolset",
+            "description": "",
+            "type": "string",
+            "tsEnumNames": ["machine"],
+            "enum": ["machine"]
         }
     }
 }

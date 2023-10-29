@@ -6,7 +6,7 @@ import { calculateOutput } from "../domain/output-calculator";
 import type {
     OutputUnit,
     QueryOutputArgs,
-    Tools,
+    AvailableTools,
 } from "../../../graphql/schema";
 import { DefaultToolset as SchemaTools } from "../../../types";
 
@@ -20,7 +20,8 @@ function createMockEvent(
     name: string,
     workers: number,
     unit: OutputUnit,
-    maxAvailableTool?: Tools,
+    maxAvailableTool?: AvailableTools,
+    hasMachineTools?: boolean,
     creator?: string
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
@@ -29,6 +30,7 @@ function createMockEvent(
         workers,
         unit,
         maxAvailableTool: maxAvailableTool ?? null,
+        hasMachineTools: hasMachineTools ?? null,
         creator: creator ?? null,
     };
 
@@ -60,7 +62,7 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
     });
 });
 
-test.each<[Tools, SchemaTools]>([
+test.each<[AvailableTools, SchemaTools]>([
     ["NONE", SchemaTools.none],
     ["STONE", SchemaTools.stone],
     ["COPPER", SchemaTools.copper],
@@ -69,7 +71,7 @@ test.each<[Tools, SchemaTools]>([
     ["STEEL", SchemaTools.steel],
 ])(
     "calls the domain to calculate output given a valid event w/ %s tool",
-    async (provided: Tools, expectedTool: SchemaTools) => {
+    async (provided: AvailableTools, expectedTool: SchemaTools) => {
         const expectedItemName = "another test item";
         const expectedWorkers = 2;
         const expectedUnit = "MINUTES";
@@ -99,6 +101,7 @@ test("calls the domain to calculate output given a valid event w/ specific creat
         expectedWorkers,
         expectedUnit,
         undefined,
+        undefined,
         expectedCreator
     );
 
@@ -112,6 +115,35 @@ test("calls the domain to calculate output given a valid event w/ specific creat
         creator: expectedCreator,
     });
 });
+
+test.each([
+    ["available", true],
+    ["unavailable", false],
+])(
+    "calls the domain to calculate output given machine tool %s",
+    async (_: string, hasMachineTools: boolean) => {
+        const expectedCreator = "test item creator";
+        const event = createMockEvent(
+            expectedItemName,
+            expectedWorkers,
+            expectedUnit,
+            undefined,
+            hasMachineTools,
+            expectedCreator
+        );
+
+        await handler(event);
+
+        expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
+        expect(mockCalculateOutput).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            creator: expectedCreator,
+            hasMachineTools,
+        });
+    }
+);
 
 test("returns the calculated output", async () => {
     const expected = 5;

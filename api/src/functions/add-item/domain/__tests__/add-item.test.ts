@@ -1,5 +1,9 @@
-import { Items, Item, DefaultToolset } from "../../../../types";
-import { createItem, createOptionalOutput } from "../../../../../test";
+import { Items, Item, DefaultToolset, MachineToolset } from "../../../../types";
+import {
+    createItem,
+    createItemWithMachineTools,
+    createOptionalOutput,
+} from "../../../../../test";
 
 import { storeItem } from "../../adapters/store-item";
 
@@ -42,8 +46,19 @@ const validItemWithOptionalOutputs = createItem({
         }),
     ],
 });
+const validItemWithMachineTools = createItemWithMachineTools({
+    name: "test item w/ machine tools",
+    createTime: 5,
+    output: 2,
+    requirements: [],
+});
 
-const validItems = [validItem, validItemWithReqs, validItemWithOptionalOutputs];
+const validItems = [
+    validItem,
+    validItemWithReqs,
+    validItemWithOptionalOutputs,
+    validItemWithMachineTools,
+];
 
 const errorLogSpy = jest
     .spyOn(console, "error")
@@ -893,6 +908,74 @@ describe.each([
             },
         ]),
     ],
+    [
+        "an item with specified machine tools but invalid minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "machine",
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: MachineToolset.machine,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
+    [
+        "an item with specified machine tools but invalid maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "machine",
+                    minimumTool: MachineToolset.machine,
+                    maximumTool: DefaultToolset.none,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
+    [
+        "an item with specified default tools but machine tools specified as minimum",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "default",
+                    minimumTool: MachineToolset.machine,
+                    maximumTool: DefaultToolset.none,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
+    [
+        "an item with specified default tools but machine tools specified as maximum",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "default",
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: MachineToolset.machine,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
 ])(
     "handles invalid input (schema validation) given %s",
     (_: string, input: string) => {
@@ -1067,8 +1150,8 @@ describe("duplicate item and creator name combination handling", () => {
 });
 
 describe.each([
-    ["a single item", [validItem]],
-    ["multiple items", validItems],
+    ["a single item with default tools", [validItem]],
+    ["multiple items with a mix of tools", validItems],
 ])("handles valid input with %s", (_: string, expected: Items) => {
     const input = JSON.stringify(expected);
 

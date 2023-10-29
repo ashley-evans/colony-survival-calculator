@@ -28,7 +28,7 @@ import { expectedItemDetailsQueryName } from "./utils";
 import {
     CreatorOverride,
     OutputUnit,
-    Tools,
+    AvailableTools,
 } from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
@@ -808,7 +808,7 @@ describe("given items w/ multiple creators returned", () => {
 
         test("returns to querying optimal recipe if applicable override is removed", async () => {
             const expectedItem = expectedSecondItemName;
-            const expectedTool = Tools.None;
+            const expectedTool = AvailableTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -859,7 +859,7 @@ describe("given items w/ multiple creators returned", () => {
                     creator: expectedCreator,
                 },
             ];
-            const expectedTool = Tools.None;
+            const expectedTool = AvailableTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -904,7 +904,7 @@ describe("given items w/ multiple creators returned", () => {
         test("returns to querying calculator output without creator overrides if removed", async () => {
             const expectedItem = expectedSecondItemName;
             const expectedWorkers = 5;
-            const expectedTool = Tools.None;
+            const expectedTool = AvailableTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -939,7 +939,7 @@ describe("given items w/ multiple creators returned", () => {
             const expectedItem = expectedSecondItemName;
             const expectedCreator = expectedSecondItemOverrides[1].creator;
             const expectedWorkers = 5;
-            const expectedTool = Tools.None;
+            const expectedTool = AvailableTools.None;
             const expectedOutputUnit = OutputUnit.Minutes;
             const expectedOverrides: CreatorOverride[] = [
                 {

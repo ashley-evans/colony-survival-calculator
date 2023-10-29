@@ -23,7 +23,10 @@ import {
 } from "../../../test/utils";
 import Calculator from "../Calculator";
 import { waitForRequest } from "../../../helpers/utils";
-import { OutputUnit, Tools } from "../../../graphql/__generated__/graphql";
+import {
+    OutputUnit,
+    AvailableTools,
+} from "../../../graphql/__generated__/graphql";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
@@ -91,7 +94,7 @@ test("updates the selected tool if selected is changed", async () => {
     const expected = "Iron";
 
     render(<Calculator />);
-    await selectTool(Tools.Iron);
+    await selectTool(AvailableTools.Iron);
     await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
@@ -106,7 +109,7 @@ test("updates the selected tool if selected is changed", async () => {
 });
 
 test("queries calculator with provided tool if non default selected", async () => {
-    const expectedTool = Tools.Steel;
+    const expectedTool = AvailableTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -132,7 +135,7 @@ test("queries calculator with provided tool if non default selected", async () =
 });
 
 test("queries optimal output again if tool is changed after first query", async () => {
-    const expectedTool = Tools.Copper;
+    const expectedTool = AvailableTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -148,7 +151,7 @@ test("queries optimal output again if tool is changed after first query", async 
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(Tools.Steel);
+    await selectTool(AvailableTools.Steel);
     await selectItemAndWorkers({
         itemName: item.name,
         workers: expectedWorkers,
@@ -159,7 +162,7 @@ test("queries optimal output again if tool is changed after first query", async 
 });
 
 test("queries requirements with provided tool if non default selected", async () => {
-    const expectedTool = Tools.Steel;
+    const expectedTool = AvailableTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -185,7 +188,7 @@ test("queries requirements with provided tool if non default selected", async ()
 });
 
 test("queries requirements again if tool is changed after first query", async () => {
-    const expectedTool = Tools.Copper;
+    const expectedTool = AvailableTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -201,7 +204,7 @@ test("queries requirements again if tool is changed after first query", async ()
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(Tools.Steel);
+    await selectTool(AvailableTools.Steel);
     await selectItemAndWorkers({
         itemName: item.name,
         workers: expectedWorkers,
@@ -212,7 +215,7 @@ test("queries requirements again if tool is changed after first query", async ()
 });
 
 test("queries item details with provided tool if non default selected", async () => {
-    const expectedTool = Tools.Steel;
+    const expectedTool = AvailableTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -238,7 +241,7 @@ test("queries item details with provided tool if non default selected", async ()
 });
 
 test("queries item details again if tool is changed after first query", async () => {
-    const expectedTool = Tools.Copper;
+    const expectedTool = AvailableTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -254,7 +257,7 @@ test("queries item details again if tool is changed after first query", async ()
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(Tools.Steel);
+    await selectTool(AvailableTools.Steel);
     await selectItemAndWorkers({
         itemName: item.name,
         workers: expectedWorkers,
@@ -268,7 +271,7 @@ test("does not reset the currently selected tool after changing tabs", async () 
     const expected = "Iron";
 
     render(<Calculator />);
-    await selectTool(Tools.Iron);
+    await selectTool(AvailableTools.Iron);
     await clickByName(expectedSettingsTab, "tab");
     await screen.findByRole("heading", {
         name: expectedSettingsTabHeader,
