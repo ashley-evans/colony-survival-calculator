@@ -7,7 +7,10 @@ import {
     expectedToolSelectLabel,
     expectedWorkerInputLabel,
 } from "./constants";
-import { OutputUnit, Tools } from "../../../../graphql/__generated__/graphql";
+import {
+    AvailableTools,
+    OutputUnit,
+} from "../../../../graphql/__generated__/graphql";
 import { OutputUnitSelectorMappings, ToolSelectorMappings } from "../../utils";
 import { selectOption } from "../../../../test";
 
@@ -48,7 +51,7 @@ async function selectOutputUnit(unit: OutputUnit) {
     });
 }
 
-async function selectTool(tool: Tools) {
+async function selectTool(tool: AvailableTools) {
     return selectOption({
         label: expectedToolSelectLabel,
         optionName: ToolSelectorMappings[tool],

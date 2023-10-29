@@ -1,18 +1,18 @@
 import React from "react";
 
-import { Tools } from "../../../../graphql/__generated__/graphql";
+import { AvailableTools } from "../../../../graphql/__generated__/graphql";
 import { ToolSelectorMappings } from "../../utils";
 import { Selector } from "../../../../common/components";
 
 type ToolSelectorProps = {
-    onToolChange: (unit: Tools) => void;
-    defaultTool?: Tools;
+    onToolChange: (unit: AvailableTools) => void;
+    defaultTool?: AvailableTools;
 };
 
-const tools = Object.values(Tools);
+const tools = Object.values(AvailableTools);
 
 function ToolSelector({ onToolChange, defaultTool }: ToolSelectorProps) {
-    const handleToolChange = (selectedTool?: Tools) => {
+    const handleToolChange = (selectedTool?: AvailableTools) => {
         if (selectedTool) onToolChange(selectedTool);
     };
 

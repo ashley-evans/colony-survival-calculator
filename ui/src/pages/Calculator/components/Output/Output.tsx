@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from "react";
 import {
     OutputUnit,
-    Tools,
+    AvailableTools,
     CreatorOverride,
 } from "../../../../graphql/__generated__/graphql";
 import { gql } from "../../../../graphql/__generated__";
@@ -16,7 +16,7 @@ type OptimalProps = {
     itemName: string;
     workers: number;
     outputUnit: OutputUnit;
-    maxAvailableTool?: Tools;
+    maxAvailableTool?: AvailableTools;
     creatorOverrides?: CreatorOverride[];
 };
 
@@ -25,7 +25,7 @@ type ErrorMessageProps = {
 };
 
 const GET_CALCULATOR_OUTPUT = gql(`
-    query GetCalculatorOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: Tools, $outputCreator: String, $creatorOverrides: [CreatorOverride!]) {
+    query GetCalculatorOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $outputCreator: String, $creatorOverrides: [CreatorOverride!]) {
         output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, creator: $outputCreator) {
             ... on OptimalOutput {
                 amount
