@@ -817,7 +817,10 @@ describe("given items w/ multiple creators returned", () => {
                 {
                     filters: {
                         name: expectedItem,
-                        optimal: { maxAvailableTool: expectedTool },
+                        optimal: {
+                            maxAvailableTool: expectedTool,
+                            hasMachineTools: false,
+                        },
                     },
                 }
             );
@@ -896,6 +899,7 @@ describe("given items w/ multiple creators returned", () => {
                 workers: expectedWorkers,
                 unit: OutputUnit.Minutes,
                 maxAvailableTool: expectedTool,
+                hasMachineTools: false,
                 outputCreator: expectedCreator,
                 creatorOverrides: expectedOverrides,
             });
@@ -915,6 +919,7 @@ describe("given items w/ multiple creators returned", () => {
                     workers: expectedWorkers,
                     unit: OutputUnit.Minutes,
                     maxAvailableTool: expectedTool,
+                    hasMachineTools: false,
                 }
             );
 
@@ -976,6 +981,7 @@ describe("given items w/ multiple creators returned", () => {
                 workers: expectedWorkers,
                 unit: expectedOutputUnit,
                 maxAvailableTool: expectedTool,
+                hasMachineTools: false,
                 outputCreator: expectedCreator,
                 creatorOverrides: expectedOverrides,
             });

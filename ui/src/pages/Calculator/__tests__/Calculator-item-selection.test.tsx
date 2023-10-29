@@ -310,7 +310,7 @@ test("requests item details for newly selected item if selection is changed", as
         {
             filters: {
                 name: expectedItemName,
-                optimal: { maxAvailableTool: "NONE" },
+                optimal: { maxAvailableTool: "NONE", hasMachineTools: false },
             },
         }
     );
@@ -320,14 +320,8 @@ test("requests item details for newly selected item if selection is changed", as
         label: expectedItemSelectLabel,
         optionName: expectedItemName,
     });
-    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(matchedRequestDetails.variables).toEqual({
-        filters: {
-            name: expectedItemName,
-            optimal: { maxAvailableTool: "NONE" },
-        },
-    });
+    await expect(expectedRequest).resolves.not.toThrow();
 });
 
 test("does not reset the currently selected item after changing tabs", async () => {

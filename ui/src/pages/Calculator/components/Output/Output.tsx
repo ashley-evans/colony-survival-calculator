@@ -17,6 +17,7 @@ type OptimalProps = {
     workers: number;
     outputUnit: OutputUnit;
     maxAvailableTool?: AvailableTools;
+    hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
 };
 
@@ -25,8 +26,8 @@ type ErrorMessageProps = {
 };
 
 const GET_CALCULATOR_OUTPUT = gql(`
-    query GetCalculatorOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $outputCreator: String, $creatorOverrides: [CreatorOverride!]) {
-        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, creator: $outputCreator) {
+    query GetCalculatorOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $outputCreator: String, $creatorOverrides: [CreatorOverride!]) {
+        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creator: $outputCreator) {
             ... on OptimalOutput {
                 amount
             }
@@ -34,7 +35,7 @@ const GET_CALCULATOR_OUTPUT = gql(`
                 message
             }
         }
-        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, creatorOverrides: $creatorOverrides, unit: $unit) {
+        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit) {
             ... on Requirements {
                 requirements {
                     name
@@ -67,6 +68,7 @@ function Output({
     workers,
     outputUnit,
     maxAvailableTool,
+    hasMachineTools,
     creatorOverrides,
 }: OptimalProps) {
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
@@ -90,6 +92,7 @@ function Output({
                 workers: debouncedWorkers,
                 unit: outputUnit,
                 maxAvailableTool,
+                hasMachineTools,
                 outputCreator: creator,
                 creatorOverrides: creatorOverridesFilter,
             },
@@ -99,6 +102,7 @@ function Output({
         debouncedWorkers,
         outputUnit,
         maxAvailableTool,
+        hasMachineTools,
         creatorOverrides,
     ]);
 

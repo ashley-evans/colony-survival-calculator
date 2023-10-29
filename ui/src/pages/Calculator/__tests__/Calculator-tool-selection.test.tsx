@@ -133,6 +133,7 @@ test("queries calculator with provided tool if non default selected", async () =
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
         maxAvailableTool: expectedTool,
+        hasMachineTools: false,
     });
 });
 
@@ -149,6 +150,7 @@ test("queries optimal output again if tool is changed after first query", async 
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
+            hasMachineTools: false,
         }
     );
 
@@ -185,6 +187,7 @@ test("queries requirements with provided tool if non default selected", async ()
         name: item.name,
         workers: expectedWorkers,
         maxAvailableTool: expectedTool,
+        hasMachineTools: false,
         unit: OutputUnit.Minutes,
     });
 });
@@ -202,6 +205,7 @@ test("queries requirements again if tool is changed after first query", async ()
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
+            hasMachineTools: false,
         }
     );
 
