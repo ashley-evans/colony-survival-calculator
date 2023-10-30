@@ -5,7 +5,14 @@ import ItemSelector from "./components/ItemSelector";
 import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
+import {
+    DefaultToolSelector,
+    MachineToolCheckbox,
+    PageContainer,
+    TabContainer,
+    TabHeader,
+    Tabs,
+} from "./styles";
 import {
     AvailableTools,
     CreatorOverride,
@@ -13,7 +20,6 @@ import {
     OutputUnit,
 } from "../../graphql/__generated__/graphql";
 import { gql } from "../../graphql/__generated__";
-import ToolSelector from "./components/ToolSelector";
 import CreatorOverrides from "./components/CreatorOverrides";
 import Output from "./components/Output";
 
@@ -40,6 +46,7 @@ type CalculatorTabProps = {
     itemState: StateProp<string | undefined>;
     workersState: StateProp<number | undefined>;
     toolState: StateProp<AvailableTools>;
+    machineToolState: StateProp<boolean>;
     outputUnitState: StateProp<OutputUnit>;
     selectedCreatorOverrides: CreatorOverride[];
 };
@@ -47,6 +54,7 @@ type CalculatorTabProps = {
 function getItemDetailsFilters(
     item?: string,
     tool?: AvailableTools,
+    hasMachineTools?: boolean,
     overrides?: CreatorOverride[]
 ): ItemsFilters {
     const creator = overrides
@@ -54,13 +62,14 @@ function getItemDetailsFilters(
         : undefined;
     return creator
         ? { name: item, creator }
-        : { name: item, optimal: { maxAvailableTool: tool } };
+        : { name: item, optimal: { maxAvailableTool: tool, hasMachineTools } };
 }
 
 function CalculatorTab({
     itemState: [selectedItem, setSelectedItem],
     workersState: [workers, setWorkers],
     toolState: [selectedTool, setSelectedTool],
+    machineToolState: [hasMachineTools, setHasMachineTools],
     outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
     selectedCreatorOverrides,
 }: CalculatorTabProps) {
@@ -76,6 +85,7 @@ function CalculatorTab({
                 filters: getItemDetailsFilters(
                     selectedItem,
                     selectedTool,
+                    hasMachineTools,
                     selectedCreatorOverrides
                 ),
             },
@@ -108,9 +118,14 @@ function CalculatorTab({
                         onWorkerChange={setWorkers}
                         defaultWorkers={workers}
                     />
-                    <ToolSelector
+                    <DefaultToolSelector
                         onToolChange={setSelectedTool}
                         defaultTool={selectedTool}
+                    />
+                    <MachineToolCheckbox
+                        onChange={setHasMachineTools}
+                        label="Machine tools available?"
+                        checked={hasMachineTools}
                     />
                     <OutputUnitSelector
                         onUnitChange={setSelectedOutputUnit}
@@ -133,6 +148,7 @@ function CalculatorTab({
                             workers={workers}
                             outputUnit={selectedOutputUnit}
                             maxAvailableTool={selectedTool}
+                            hasMachineTools={hasMachineTools}
                             creatorOverrides={selectedCreatorOverrides}
                         />
                     ) : null}
@@ -186,6 +202,7 @@ function Calculator() {
     const selectedItemState = useState<string>();
     const workersState = useState<number>();
     const selectedToolState = useState<AvailableTools>(AvailableTools.None);
+    const hasMachineToolState = useState<boolean>(false);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
     const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
 
@@ -215,6 +232,7 @@ function Calculator() {
                         itemState={selectedItemState}
                         workersState={workersState}
                         toolState={selectedToolState}
+                        machineToolState={hasMachineToolState}
                         outputUnitState={selectedOutputUnitState}
                         selectedCreatorOverrides={selectedCreatorOverrides[0]}
                     />

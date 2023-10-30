@@ -13,6 +13,7 @@ import {
     Input,
     InputIconContainer,
     Item,
+    Label,
     Menu,
     SelectorInputContainer,
     ToggleIndicatorIcon,
@@ -87,7 +88,7 @@ function AutoCompleteSelector<Item>({
 
     return (
         <Container palette={palette} className={className}>
-            <label {...getLabelProps()}>{labelText}</label>
+            <Label {...getLabelProps()}>{labelText}</Label>
             <SelectorInputContainer palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
                 <InputIconContainer>

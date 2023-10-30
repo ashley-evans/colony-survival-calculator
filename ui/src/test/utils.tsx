@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { render, within } from "@testing-library/react";
+import { ByRoleMatcher, render, within } from "@testing-library/react";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider } from "styled-components";
@@ -66,16 +66,18 @@ function renderWithTestProviders(
     };
 }
 
-async function clickButton({
+async function click({
     label,
+    role = "button",
     inside,
 }: {
     label: string;
+    role?: ByRoleMatcher;
     inside?: HTMLElement;
 }): Promise<void> {
     const user = userEvent.setup();
     const container = inside ? within(inside) : screen;
-    const button = await container.findByRole("button", { name: label });
+    const button = await container.findByRole(role, { name: label });
 
     await user.click(button);
 }
@@ -131,7 +133,7 @@ export {
     wrapWithTestProviders,
     renderWithRouterProvider,
     renderWithTestProviders,
-    clickButton,
+    click,
     typeValue,
     clearInput,
     openSelectMenu,

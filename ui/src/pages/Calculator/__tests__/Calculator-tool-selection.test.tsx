@@ -16,8 +16,10 @@ import {
     selectTool,
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
+    expectedMachineToolCheckboxLabel,
 } from "./utils";
 import {
+    click,
     openSelectMenu,
     renderWithTestProviders as render,
 } from "../../../test/utils";
@@ -131,6 +133,7 @@ test("queries calculator with provided tool if non default selected", async () =
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
         maxAvailableTool: expectedTool,
+        hasMachineTools: false,
     });
 });
 
@@ -147,6 +150,7 @@ test("queries optimal output again if tool is changed after first query", async 
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
+            hasMachineTools: false,
         }
     );
 
@@ -183,6 +187,7 @@ test("queries requirements with provided tool if non default selected", async ()
         name: item.name,
         workers: expectedWorkers,
         maxAvailableTool: expectedTool,
+        hasMachineTools: false,
         unit: OutputUnit.Minutes,
     });
 });
@@ -200,6 +205,7 @@ test("queries requirements again if tool is changed after first query", async ()
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
+            hasMachineTools: false,
         }
     );
 
@@ -225,7 +231,10 @@ test("queries item details with provided tool if non default selected", async ()
         {
             filters: {
                 name: item.name,
-                optimal: { maxAvailableTool: expectedTool },
+                optimal: {
+                    maxAvailableTool: expectedTool,
+                    hasMachineTools: false,
+                },
             },
         }
     );
@@ -251,7 +260,10 @@ test("queries item details again if tool is changed after first query", async ()
         {
             filters: {
                 name: item.name,
-                optimal: { maxAvailableTool: expectedTool },
+                optimal: {
+                    maxAvailableTool: expectedTool,
+                    hasMachineTools: false,
+                },
             },
         }
     );
@@ -282,6 +294,83 @@ test("does not reset the currently selected tool after changing tabs", async () 
     expect(
         await screen.findByRole("combobox", { name: expectedToolSelectLabel })
     ).toHaveTextContent(expected);
+});
+
+describe("machine tool selection", () => {
+    test("displays an unchecked checkbox to allow machine tool availability indication", async () => {
+        render(<Calculator />);
+
+        const checkbox = await screen.findByRole("checkbox", {
+            name: expectedMachineToolCheckboxLabel,
+        });
+        expect(checkbox).toBeVisible();
+        expect(checkbox).not.toBeChecked();
+    });
+
+    test("machine tool checkbox changes to checked when clicked", async () => {
+        render(<Calculator />);
+        await click({
+            label: expectedMachineToolCheckboxLabel,
+            role: "checkbox",
+        });
+
+        expect(
+            screen.getByRole("checkbox", {
+                name: expectedMachineToolCheckboxLabel,
+            })
+        ).toBeChecked();
+    });
+
+    test("does not reset the machine tool checkbox after changing tabs", async () => {
+        render(<Calculator />);
+        await click({
+            label: expectedMachineToolCheckboxLabel,
+            role: "checkbox",
+        });
+        await clickByName(expectedSettingsTab, "tab");
+        await screen.findByRole("heading", {
+            name: expectedSettingsTabHeader,
+            level: 2,
+        });
+        await clickByName(expectedCalculatorTab, "tab");
+
+        expect(
+            await screen.findByRole("checkbox", {
+                name: expectedMachineToolCheckboxLabel,
+            })
+        ).toBeChecked();
+    });
+
+    test("queries item details with machine tool availability once checked", async () => {
+        const expectedWorkers = 5;
+        const expectedRequest = waitForRequest(
+            server,
+            "POST",
+            expectedGraphQLAPIURL,
+            expectedItemDetailsQueryName,
+            {
+                filters: {
+                    name: item.name,
+                    optimal: {
+                        maxAvailableTool: AvailableTools.None,
+                        hasMachineTools: true,
+                    },
+                },
+            }
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndWorkers({
+            itemName: item.name,
+            workers: expectedWorkers,
+        });
+        await click({
+            label: expectedMachineToolCheckboxLabel,
+            role: "checkbox",
+        });
+
+        await expect(expectedRequest).resolves.not.toThrow();
+    });
 });
 
 afterAll(() => {

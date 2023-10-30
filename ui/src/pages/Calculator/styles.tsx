@@ -1,4 +1,6 @@
 import styled, { css } from "styled-components";
+import ToolSelector from "./components/ToolSelector";
+import Checkbox from "../../common/components/Checkbox";
 
 export const PageContainer = styled.div``;
 
@@ -48,3 +50,7 @@ export const TabHeader = styled.h2`
     margin-top: 0rem;
     margin-bottom: 0rem;
 `;
+
+export const DefaultToolSelector = styled(ToolSelector)``;
+
+export const MachineToolCheckbox = styled(Checkbox)``;

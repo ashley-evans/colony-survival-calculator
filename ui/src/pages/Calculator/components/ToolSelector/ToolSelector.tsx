@@ -7,11 +7,16 @@ import { Selector } from "../../../../common/components";
 type ToolSelectorProps = {
     onToolChange: (unit: AvailableTools) => void;
     defaultTool?: AvailableTools;
+    className?: string;
 };
 
 const tools = Object.values(AvailableTools);
 
-function ToolSelector({ onToolChange, defaultTool }: ToolSelectorProps) {
+function ToolSelector({
+    onToolChange,
+    defaultTool,
+    className,
+}: ToolSelectorProps) {
     const handleToolChange = (selectedTool?: AvailableTools) => {
         if (selectedTool) onToolChange(selectedTool);
     };
@@ -25,6 +30,7 @@ function ToolSelector({ onToolChange, defaultTool }: ToolSelectorProps) {
             defaultSelectedItem={defaultTool ?? tools[3]}
             onSelectedItemChange={handleToolChange}
             palette="secondary"
+            className={className}
         />
     );
 }

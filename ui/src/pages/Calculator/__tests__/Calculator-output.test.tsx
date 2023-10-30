@@ -5,6 +5,7 @@ import { act, screen, render as rtlRender } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
+    click,
     openSelectMenu,
     renderWithTestProviders as render,
     wrapWithTestProviders,
@@ -26,6 +27,7 @@ import {
     expectedCalculatorOutputQueryName,
     expectedLoadingOutputMessage,
     expectedRequirementsHeading,
+    expectedMachineToolCheckboxLabel,
 } from "./utils";
 import { OutputUnit } from "../../../graphql/__generated__/graphql";
 
@@ -153,6 +155,7 @@ test("queries calculator output if item and workers inputted with default unit s
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
+        hasMachineTools: false,
     });
 });
 
@@ -178,6 +181,7 @@ test("queries calculator output if item and workers inputted with non-default un
         workers: expectedWorkers,
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
+        hasMachineTools: false,
     });
 });
 
@@ -406,6 +410,35 @@ describe.each([
         });
     }
 );
+
+test("queries optimal output and requirements with machine tool availability once checked", async () => {
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedCalculatorOutputQueryName,
+        {
+            name: item.name,
+            workers: expectedWorkers,
+            unit: OutputUnit.Minutes,
+            maxAvailableTool: "NONE",
+            hasMachineTools: true,
+        }
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectItemAndWorkers({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+    await click({
+        label: expectedMachineToolCheckboxLabel,
+        role: "checkbox",
+    });
+
+    await expect(expectedRequest).resolves.not.toThrow();
+});
 
 describe("debounces output requests", () => {
     beforeAll(() => {

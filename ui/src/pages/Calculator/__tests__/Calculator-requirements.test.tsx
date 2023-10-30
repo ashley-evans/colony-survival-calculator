@@ -4,7 +4,7 @@ import { setupServer } from "msw/node";
 import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { clickButton, renderWithTestProviders as render } from "../../../test";
+import { click, renderWithTestProviders as render } from "../../../test";
 import { Requirement } from "../../../graphql/__generated__/graphql";
 import Calculator from "../Calculator";
 import {
@@ -677,7 +677,7 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithSingleCreatorAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: itemCell,
                 });
@@ -698,11 +698,11 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithSingleCreatorAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: itemCell,
                 });
-                await clickButton({
+                await click({
                     label: expectedCollapseDemandBreakdownLabel,
                     inside: itemCell,
                 });
@@ -732,7 +732,7 @@ describe("requirements rendering given requirements", () => {
                     name: requirementWithSingleCreatorAndDemands.name,
                 });
 
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: itemCell,
                 });
@@ -742,7 +742,7 @@ describe("requirements rendering given requirements", () => {
                         name: expectedCollapseDemandBreakdownLabel,
                     })
                 ).toBeVisible();
-                await clickButton({
+                await click({
                     label: expectedCollapseDemandBreakdownLabel,
                     inside: itemCell,
                 });
@@ -793,7 +793,7 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithSingleCreatorAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: itemCell,
                 });
@@ -913,7 +913,7 @@ describe("requirements rendering given requirements", () => {
             const itemCell = await screen.findByRole("cell", {
                 name: requirementWithMultipleCreators.name,
             });
-            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            await click({ label: expectedExpandCreatorBreakdownLabel });
 
             expect(
                 await within(itemCell).findByRole("button", {
@@ -931,8 +931,8 @@ describe("requirements rendering given requirements", () => {
             const itemCell = await screen.findByRole("cell", {
                 name: requirementWithMultipleCreators.name,
             });
-            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
-            await clickButton({ label: expectedCollapseCreatorBreakdownLabel });
+            await click({ label: expectedExpandCreatorBreakdownLabel });
+            await click({ label: expectedCollapseCreatorBreakdownLabel });
 
             expect(
                 await within(itemCell).findByRole("button", {
@@ -958,7 +958,7 @@ describe("requirements rendering given requirements", () => {
             const itemCell = await screen.findByRole("cell", {
                 name: requirementWithMultipleCreators.name,
             });
-            await clickButton({
+            await click({
                 label: expectedExpandCreatorBreakdownLabel,
                 inside: itemCell,
             });
@@ -968,7 +968,7 @@ describe("requirements rendering given requirements", () => {
                     name: expectedCollapseCreatorBreakdownLabel,
                 })
             ).toBeVisible();
-            await clickButton({
+            await click({
                 label: expectedCollapseCreatorBreakdownLabel,
                 inside: itemCell,
             });
@@ -1017,7 +1017,7 @@ describe("requirements rendering given requirements", () => {
                 workers: 5,
             });
             const requirementsTable = await screen.findByRole("table");
-            await clickButton({ label: expectedExpandCreatorBreakdownLabel });
+            await click({ label: expectedExpandCreatorBreakdownLabel });
             const rows = within(requirementsTable).getAllByRole("row");
 
             expect(rows).toHaveLength(
@@ -1068,7 +1068,7 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                     inside: itemCell,
                 });
@@ -1092,14 +1092,14 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                     inside: itemCell,
                 });
                 const creatorCell = await screen.findByRole("cell", {
                     name: expectedCreatorWithDemands,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: creatorCell,
                 });
@@ -1120,18 +1120,18 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                     inside: itemCell,
                 });
                 const creatorCell = await screen.findByRole("cell", {
                     name: expectedCreatorWithDemands,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: creatorCell,
                 });
-                await clickButton({
+                await click({
                     label: expectedCollapseDemandBreakdownLabel,
                     inside: creatorCell,
                 });
@@ -1160,18 +1160,18 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                     inside: itemCell,
                 });
                 const creatorCell = await screen.findByRole("cell", {
                     name: expectedCreatorWithDemands,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: creatorCell,
                 });
-                await clickButton({
+                await click({
                     label: expectedCollapseDemandBreakdownLabel,
                     inside: creatorCell,
                 });
@@ -1230,14 +1230,14 @@ describe("requirements rendering given requirements", () => {
                 const itemCell = await screen.findByRole("cell", {
                     name: requirementWithMultipleCreatorsAndDemands.name,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                     inside: itemCell,
                 });
                 const creatorCell = await screen.findByRole("cell", {
                     name: expectedCreatorWithDemands,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                     inside: creatorCell,
                 });
@@ -1710,10 +1710,10 @@ describe("requirements rendering given requirements", () => {
                         name: expectedWorkerColumnName,
                     }
                 );
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                 });
                 for (let i = 0; i < numberOfClicks; i++) {
@@ -2097,10 +2097,10 @@ describe("requirements rendering given requirements", () => {
                         name: expectedAmountColumnName,
                     }
                 );
-                await clickButton({
+                await click({
                     label: expectedExpandDemandBreakdownLabel,
                 });
-                await clickButton({
+                await click({
                     label: expectedExpandCreatorBreakdownLabel,
                 });
                 for (let i = 0; i < numberOfClicks; i++) {
