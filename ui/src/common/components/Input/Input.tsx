@@ -5,6 +5,7 @@ import {
     Container,
     IconContainer,
     InputContainer,
+    Label,
     Input as StyledInput,
 } from "./styles";
 import { ColorPalettes } from "../..";
@@ -57,7 +58,7 @@ function Input<Type>({
 
     return (
         <Container className={className}>
-            <label htmlFor={inputID}>{label}</label>
+            <Label htmlFor={inputID}>{label}</Label>
             <InputContainer palette={palette}>
                 <StyledInput
                     id={inputID}

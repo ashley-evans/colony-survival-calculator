@@ -117,3 +117,7 @@ export const ClearInputIcon = styled(FontAwesomeIcon)`
     margin-right: 0.5rem;
     cursor: pointer;
 `;
+
+export const Label = styled.label`
+    margin-bottom: 0.2rem;
+`;

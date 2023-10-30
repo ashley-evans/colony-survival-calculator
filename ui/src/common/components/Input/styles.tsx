@@ -65,3 +65,7 @@ export const IconContainer = styled.span`
     right: 0.7rem;
     cursor: pointer;
 `;
+
+export const Label = styled.label`
+    margin-bottom: 0.2rem;
+`;

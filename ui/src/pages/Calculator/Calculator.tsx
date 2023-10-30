@@ -5,7 +5,14 @@ import ItemSelector from "./components/ItemSelector";
 import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { PageContainer, TabContainer, TabHeader, Tabs } from "./styles";
+import {
+    DefaultToolSelector,
+    MachineToolCheckbox,
+    PageContainer,
+    TabContainer,
+    TabHeader,
+    Tabs,
+} from "./styles";
 import {
     AvailableTools,
     CreatorOverride,
@@ -13,10 +20,8 @@ import {
     OutputUnit,
 } from "../../graphql/__generated__/graphql";
 import { gql } from "../../graphql/__generated__";
-import ToolSelector from "./components/ToolSelector";
 import CreatorOverrides from "./components/CreatorOverrides";
 import Output from "./components/Output";
-import Checkbox from "../../common/components/Checkbox";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -113,18 +118,18 @@ function CalculatorTab({
                         onWorkerChange={setWorkers}
                         defaultWorkers={workers}
                     />
-                    <ToolSelector
+                    <DefaultToolSelector
                         onToolChange={setSelectedTool}
                         defaultTool={selectedTool}
+                    />
+                    <MachineToolCheckbox
+                        onChange={setHasMachineTools}
+                        label="Machine tools available?"
+                        checked={hasMachineTools}
                     />
                     <OutputUnitSelector
                         onUnitChange={setSelectedOutputUnit}
                         defaultUnit={selectedOutputUnit}
-                    />
-                    <Checkbox
-                        onChange={setHasMachineTools}
-                        label="Machine tools available?"
-                        checked={hasMachineTools}
                     />
                 </>
             ) : null}

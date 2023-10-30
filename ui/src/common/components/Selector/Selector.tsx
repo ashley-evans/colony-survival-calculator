@@ -5,6 +5,7 @@ import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import {
     Container,
     Item,
+    Label,
     Menu,
     SelectorInputContainer,
     ToggleIndicatorIcon,
@@ -57,7 +58,7 @@ function Selector<Item>({
 
     return (
         <Container palette={palette} className={className}>
-            <label {...getLabelProps()}>{labelText}</label>
+            <Label {...getLabelProps()}>{labelText}</Label>
             <SelectorInputContainer
                 {...getToggleButtonProps()}
                 palette={palette}
