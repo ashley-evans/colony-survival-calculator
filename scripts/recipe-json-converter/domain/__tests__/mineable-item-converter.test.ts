@@ -2,7 +2,7 @@ import path from "path";
 
 import { MineableItemConverterInputs } from "../../interfaces/mineable-item-converter";
 import { convertMineableItems as baseConvertMineableItems } from "../mineable-item-converter";
-import { APITools, Item, Items, MineableItems } from "../../types";
+import { DefaultToolset, Item, Items, MineableItems } from "../../types";
 
 const mockFindFiles = jest.fn();
 const mockReadMineableItemsFile = jest.fn();
@@ -101,8 +101,8 @@ test.each([
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             },
             creator: "Miner",
         };
@@ -132,8 +132,8 @@ test("ignores non-mineable items found in mineable items file", async () => {
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Miner",
     };
@@ -168,8 +168,8 @@ test("converts multiple items given multiple mineable items found in file", asyn
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             },
             creator: "Miner",
         },
@@ -180,8 +180,8 @@ test("converts multiple items given multiple mineable items found in file", asyn
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             },
             creator: "Miner",
         },

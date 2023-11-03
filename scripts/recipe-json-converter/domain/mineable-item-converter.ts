@@ -1,7 +1,7 @@
 import { FileFinder } from "../interfaces/file-finder";
 import { JSONFileReader } from "../interfaces/json-file-reader";
 import { MineableItemConverter } from "../interfaces/mineable-item-converter";
-import { APITools, Items, MineableItems } from "../types";
+import { DefaultToolset, Items, MineableItems } from "../types";
 import { JSON_FILE_EXTENSION } from "./constants";
 import { getUserFriendlyItemName } from "./recipe-dictionary";
 import { checkDuplication } from "./utils";
@@ -54,8 +54,8 @@ const convertToItems = (mineable: MineableItems): Items => {
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.steel,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.steel,
             },
             creator: "Miner",
         });

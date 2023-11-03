@@ -2,7 +2,7 @@ import path from "path";
 
 import { GrowableConverterInputs } from "../../interfaces/growable-converter";
 import { convertGrowables as baseConvertGrowables } from "../growable-converter";
-import { APITools, Growables, Item, Items } from "../../types";
+import { DefaultToolset, Growables, Item, Items } from "../../types";
 
 const mockFindFiles = jest.fn();
 const mockReadGrowablesFile = jest.fn();
@@ -34,8 +34,8 @@ const expectedStaticLogRecipe: Item = {
     optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
     toolset: {
         type: "default",
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        minimumTool: DefaultToolset.none,
+        maximumTool: DefaultToolset.none,
     },
     creator: "Forester",
     size: {
@@ -53,8 +53,8 @@ const expectedStaticLeavesRecipe: Item = {
     optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
     toolset: {
         type: "default",
-        minimumTool: APITools.none,
-        maximumTool: APITools.none,
+        minimumTool: DefaultToolset.none,
+        maximumTool: DefaultToolset.none,
     },
     creator: "Forester",
     size: {
@@ -161,8 +161,8 @@ test.each([
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             },
             creator: expectedCreator,
             ...(expectedSize ? { size: expectedSize } : {}),
@@ -187,8 +187,8 @@ test("returns converted recipe given single growable with more than 2 stages", a
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Wheat farmer",
         size: {
@@ -269,8 +269,8 @@ test("converts multiple items given multiple growables found in file", async () 
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             },
             creator: "Wheat farmer",
             size: {
@@ -285,8 +285,8 @@ test("converts multiple items given multiple growables found in file", async () 
             requires: [],
             toolset: {
                 type: "default",
-                minimumTool: APITools.none,
-                maximumTool: APITools.none,
+                minimumTool: DefaultToolset.none,
+                maximumTool: DefaultToolset.none,
             },
             creator: "Flax farmer",
             size: {

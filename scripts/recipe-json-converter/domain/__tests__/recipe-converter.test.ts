@@ -2,7 +2,7 @@ import path from "path";
 
 import { RecipeConverterInputs } from "../../interfaces/recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../recipe-converter";
-import { APITools, Item, Items } from "../../types";
+import { DefaultToolset, Item, Items, MachineToolset } from "../../types";
 
 const mockConvertCrafteableRecipes = jest.fn();
 const mockConvertMineableItems = jest.fn();
@@ -31,8 +31,8 @@ const expectedCraftableRecipes: Items = [
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Alchemist",
     },
@@ -43,10 +43,22 @@ const expectedCraftableRecipes: Items = [
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Alchemist",
+    },
+    {
+        name: "Brass parts",
+        createTime: 20,
+        output: 2,
+        requires: [],
+        toolset: {
+            type: "machine",
+            minimumTool: MachineToolset.machine,
+            maximumTool: MachineToolset.machine,
+        },
+        creator: "Metal lathe operator",
     },
 ];
 
@@ -58,8 +70,8 @@ const expectedMineableItems: Items = [
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Miner",
     },
@@ -73,8 +85,8 @@ const expectedGrowables: Items = [
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Wheat farmer",
     },
@@ -181,8 +193,8 @@ describe("handles directly non-creatable items", () => {
         output: 1,
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Test creator",
     };
@@ -220,8 +232,8 @@ describe("handles non-creatable items due to nested unknown item", () => {
         output: 1,
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Test creator",
     };
@@ -232,8 +244,8 @@ describe("handles non-creatable items due to nested unknown item", () => {
         output: 1,
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Test creator",
     };
@@ -279,8 +291,8 @@ test("filters out any item that depends on an item that cannot be created becaus
         output: 1,
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Test creator",
     };
@@ -291,8 +303,8 @@ test("filters out any item that depends on an item that cannot be created becaus
         output: 1,
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.steel,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.steel,
         },
         creator: "Test creator",
     };
