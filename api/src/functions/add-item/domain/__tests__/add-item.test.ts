@@ -1,6 +1,13 @@
-import { Items, Item, DefaultToolset, MachineToolset } from "../../../../types";
+import {
+    Items,
+    Item,
+    DefaultToolset,
+    MachineToolset,
+    GlassesToolset,
+} from "../../../../types";
 import {
     createItem,
+    createItemWithGlassesTools,
     createItemWithMachineTools,
     createOptionalOutput,
 } from "../../../../../test";
@@ -976,6 +983,40 @@ describe.each([
             },
         ]),
     ],
+    [
+        "an item with specified glasses tools but invalid minimum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "glasses",
+                    minimumTool: DefaultToolset.steel,
+                    maximumTool: GlassesToolset.glasses,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
+    [
+        "an item with specified machine tools but invalid maximum tool",
+        JSON.stringify([
+            {
+                name: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "glasses",
+                    minimumTool: GlassesToolset.glasses,
+                    maximumTool: DefaultToolset.steel,
+                },
+                creator: 1,
+            },
+        ]),
+    ],
 ])(
     "handles invalid input (schema validation) given %s",
     (_: string, input: string) => {
@@ -1020,7 +1061,7 @@ describe.each([
         "Missing optional output: test optional item in test item",
     ],
     [
-        "invalid min/max tool combination (none above stone)",
+        "invalid default min/max tool combination (none above stone)",
         createItem({
             name: "test item",
             createTime: 1,
@@ -1032,7 +1073,7 @@ describe.each([
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
-        "invalid min/max tool combination (stone above copper)",
+        "invalid default min/max tool combination (stone above copper)",
         createItem({
             name: "test item",
             createTime: 1,
@@ -1044,7 +1085,7 @@ describe.each([
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
-        "invalid min/max tool combination (copper above iron)",
+        "invalid default min/max tool combination (copper above iron)",
         createItem({
             name: "test item",
             createTime: 1,
@@ -1056,7 +1097,7 @@ describe.each([
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
-        "invalid min/max tool combination (iron above bronze)",
+        "invalid default min/max tool combination (iron above bronze)",
         createItem({
             name: "test item",
             createTime: 1,
@@ -1068,7 +1109,7 @@ describe.each([
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
     [
-        "invalid min/max tool combination (bronze above steel)",
+        "invalid default min/max tool combination (bronze above steel)",
         createItem({
             name: "test item",
             createTime: 1,
@@ -1076,6 +1117,18 @@ describe.each([
             requirements: [],
             minimumTool: DefaultToolset.steel,
             maximumTool: DefaultToolset.bronze,
+        }),
+        "Invalid item: test item, minimum tool is better than maximum tool",
+    ],
+    [
+        "invalid glasses min/max tool combination (none above glasses)",
+        createItemWithGlassesTools({
+            name: "test item",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            minimumTool: GlassesToolset.glasses,
+            maximumTool: GlassesToolset.no_glasses,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],

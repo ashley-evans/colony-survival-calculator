@@ -1,5 +1,6 @@
 import {
     DefaultToolset,
+    GlassesToolset,
     Item,
     MachineToolset,
     OptionalOutput,
@@ -96,9 +97,27 @@ function createItemWithMachineTools(
     });
 }
 
+function createItemWithGlassesTools(
+    input: Omit<ItemFactoryInputs, "toolset"> & {
+        minimumTool?: GlassesToolset;
+        maximumTool?: GlassesToolset;
+    }
+): Item {
+    const { minimumTool, maximumTool, ...rest } = input;
+    return baseCreateItem({
+        ...rest,
+        toolset: {
+            type: "glasses",
+            minimumTool: minimumTool ?? GlassesToolset.no_glasses,
+            maximumTool: maximumTool ?? GlassesToolset.no_glasses,
+        },
+    });
+}
+
 export {
     createItem,
     createItemWithMachineTools,
+    createItemWithGlassesTools,
     createRequirements,
     createOptionalOutput,
 };

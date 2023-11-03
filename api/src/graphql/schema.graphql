@@ -19,6 +19,8 @@ enum Tools {
     BRONZE
     STEEL
     MACHINE
+    NO_GLASSES
+    GLASSES
 }
 
 type Item {

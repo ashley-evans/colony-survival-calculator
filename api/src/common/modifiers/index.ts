@@ -2,7 +2,12 @@ import {
     AvailableTools,
     Tools as GraphQLSchemaTools,
 } from "../../graphql/schema";
-import { AllToolsets, DefaultToolset, MachineToolset } from "../../types";
+import {
+    AllToolsets,
+    DefaultToolset,
+    GlassesToolset,
+    MachineToolset,
+} from "../../types";
 
 const ToolModifierValues: Readonly<Record<AllToolsets, number>> = {
     [DefaultToolset.none]: 1,
@@ -12,6 +17,8 @@ const ToolModifierValues: Readonly<Record<AllToolsets, number>> = {
     [DefaultToolset.bronze]: 6.15,
     [DefaultToolset.steel]: 8,
     [MachineToolset.machine]: 1,
+    [GlassesToolset.no_glasses]: 1,
+    [GlassesToolset.glasses]: 1.2,
 };
 
 const AvailableToolsSchemaMap: Record<AvailableTools, DefaultToolset> = {
@@ -31,11 +38,13 @@ const GraphQLToolsSchemaMap: Record<AllToolsets, GraphQLSchemaTools> = {
     [DefaultToolset.bronze]: "BRONZE",
     [DefaultToolset.steel]: "STEEL",
     [MachineToolset.machine]: "MACHINE",
+    [GlassesToolset.no_glasses]: "NO_GLASSES",
+    [GlassesToolset.glasses]: "GLASSES",
 };
 
 function getMaxToolModifier(
-    maximum: DefaultToolset,
-    available: DefaultToolset
+    maximum: AllToolsets,
+    available: AllToolsets
 ): number {
     const maximumToolModifier = ToolModifierValues[maximum];
     const availableToolModifier = ToolModifierValues[available];

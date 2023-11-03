@@ -1,4 +1,8 @@
-import { DefaultToolset, MachineToolset } from "./generated/items";
+import {
+    DefaultToolset,
+    GlassesToolset,
+    MachineToolset,
+} from "./generated/items";
 
-export type AllToolsets = DefaultToolset | MachineToolset;
+export type AllToolsets = DefaultToolset | MachineToolset | GlassesToolset;
 export * from "./generated/items";
