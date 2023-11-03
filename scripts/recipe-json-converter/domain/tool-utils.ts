@@ -1,4 +1,11 @@
-import { APITools, Item, PiplizTools } from "../types";
+import {
+    Item,
+    PiplizTools,
+    DefaultToolset,
+    MachineToolset,
+    Recipe,
+} from "../types";
+import { splitPiplizName } from "./utils";
 
 const UNSUPPORTED_TOOL_ERROR = new Error("Toolset contains invalid tool");
 
@@ -20,13 +27,13 @@ const ToolModifierValues: Readonly<Record<SupportedPiplizTools, number>> = {
     [SupportedPiplizTools.steeltools]: 8,
 };
 
-const ToolMap: Readonly<Record<SupportedPiplizTools, APITools>> = {
-    [SupportedPiplizTools.notools]: APITools.none,
-    [SupportedPiplizTools.stonetools]: APITools.stone,
-    [SupportedPiplizTools.coppertools]: APITools.copper,
-    [SupportedPiplizTools.irontools]: APITools.iron,
-    [SupportedPiplizTools.bronzetools]: APITools.bronze,
-    [SupportedPiplizTools.steeltools]: APITools.steel,
+const ToolMap: Readonly<Record<SupportedPiplizTools, DefaultToolset>> = {
+    [SupportedPiplizTools.notools]: DefaultToolset.none,
+    [SupportedPiplizTools.stonetools]: DefaultToolset.stone,
+    [SupportedPiplizTools.coppertools]: DefaultToolset.copper,
+    [SupportedPiplizTools.irontools]: DefaultToolset.iron,
+    [SupportedPiplizTools.bronzetools]: DefaultToolset.bronze,
+    [SupportedPiplizTools.steeltools]: DefaultToolset.steel,
 };
 
 const mapPiplizTool = (tool: PiplizTools): SupportedPiplizTools | null => {
@@ -83,9 +90,30 @@ const getDefaultMinMaxTools = (creator: string): PiplizTools[] => {
     }
 };
 
-export {
-    getMinMaxTools,
-    getDefaultMinMaxTools,
-    SupportedPiplizTools,
-    UNSUPPORTED_TOOL_ERROR,
+const getToolset = (
+    recipe: Recipe,
+    npcToolsetMapping: Map<string, PiplizTools[]>
+): Item["toolset"] => {
+    const { itemName, creator } = splitPiplizName(recipe.name);
+    const tools = npcToolsetMapping.get(creator);
+    if (!tools) {
+        console.log(
+            `Defaulting to default toolset for recipe: ${itemName} from creator: ${creator}`
+        );
+
+        const defaultTools = getDefaultMinMaxTools(creator);
+        return getMinMaxTools(defaultTools);
+    }
+
+    if (tools.includes(PiplizTools.machinetools)) {
+        return {
+            type: "machine",
+            minimumTool: MachineToolset.machine,
+            maximumTool: MachineToolset.machine,
+        };
+    }
+
+    return getMinMaxTools(tools);
 };
+
+export { getToolset, SupportedPiplizTools, UNSUPPORTED_TOOL_ERROR };

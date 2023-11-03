@@ -90,6 +90,25 @@
         ]
     },
     {
+        "name": "Nitro",
+        "creator": "Alchemist",
+        "createTime": 20,
+        "requires": [
+            { "name": "Cotton fibre", "amount": 5 },
+            { "name": "Vial of nitric acid", "amount": 1 },
+            { "name": "Vial of sulphuric acid", "amount": 1 }
+        ],
+        "output": 50,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "iron",
+            "maximumTool": "steel"
+        },
+        "optionalOutputs": [
+            { "name": "Empty Vial", "likelihood": 0.95, "amount": 2 }
+        ]
+    },
+    {
         "name": "Door",
         "creator": "Artist",
         "createTime": 180,
@@ -310,6 +329,37 @@
     },
     {
         "name": "Iron bloom",
+        "creator": "Blast furnace operator",
+        "createTime": 15,
+        "requires": [
+            { "name": "Iron ore", "amount": 1 },
+            { "name": "Cokes", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
+        "name": "Steel ingot",
+        "creator": "Blast furnace operator",
+        "createTime": 15,
+        "requires": [
+            { "name": "Iron bloom", "amount": 1 },
+            { "name": "Silica sand", "amount": 1 },
+            { "name": "Cokes", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
+        "name": "Iron bloom",
         "creator": "Bloomery worker",
         "createTime": 120,
         "requires": [
@@ -378,6 +428,23 @@
             { "name": "Bronze ingot", "amount": 2 },
             { "name": "Iron wrought", "amount": 2 },
             { "name": "Chest", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Luxury chest",
+        "creator": "Chest maker",
+        "createTime": 720,
+        "requires": [
+            { "name": "Luxury garments", "amount": 1 },
+            { "name": "Golden shield", "amount": 3 },
+            { "name": "Monocular", "amount": 3 },
+            { "name": "Earthenware", "amount": 10 }
         ],
         "output": 1,
         "toolset": {
@@ -749,6 +816,37 @@
             "type": "default",
             "minimumTool": "stone",
             "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Cotton fibre",
+        "creator": "Cotton engine operator",
+        "createTime": 120,
+        "requires": [{ "name": "Cotton", "amount": 30 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
+        "name": "Luxury garments",
+        "creator": "Dyer",
+        "createTime": 300,
+        "requires": [
+            { "name": "Cotton fibre", "amount": 10 },
+            { "name": "Hemp fibre", "amount": 10 },
+            { "name": "Linen", "amount": 25 },
+            { "name": "Alkanet", "amount": 200 },
+            { "name": "Hollyhock", "amount": 200 },
+            { "name": "Wolfsbane", "amount": 200 }
+        ],
+        "output": 3,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "none"
         }
     },
     {
@@ -1169,7 +1267,7 @@
         }
     },
     {
-        "name": "Archimedean Screw",
+        "name": "Archimedean screw",
         "creator": "Engineer",
         "createTime": 480,
         "requires": [
@@ -1425,6 +1523,40 @@
         }
     },
     {
+        "name": "Gun trap",
+        "creator": "Gunsmith",
+        "createTime": 1000,
+        "requires": [
+            { "name": "Steel ingot", "amount": 10 },
+            { "name": "Steel parts", "amount": 25 },
+            { "name": "Brass parts", "amount": 25 },
+            { "name": "Vial of mineral oil", "amount": 5 },
+            { "name": "Nitro", "amount": 10 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Gun trap ammo",
+        "creator": "Gunsmith",
+        "createTime": 120,
+        "requires": [
+            { "name": "Brass parts", "amount": 3 },
+            { "name": "Lead ingot", "amount": 2 },
+            { "name": "Nitro", "amount": 15 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
         "name": "Musket",
         "creator": "Gunsmith",
         "createTime": 720,
@@ -1466,6 +1598,23 @@
             { "name": "Vial of mineral oil", "amount": 1 }
         ],
         "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Grenade launcher ammo",
+        "creator": "Gunsmith",
+        "createTime": 120,
+        "requires": [
+            { "name": "Lead ingot", "amount": 2 },
+            { "name": "Steel parts", "amount": 2 },
+            { "name": "Brass parts", "amount": 1 },
+            { "name": "Nitro", "amount": 15 }
+        ],
+        "output": 30,
         "toolset": {
             "type": "default",
             "minimumTool": "none",
@@ -1667,7 +1816,7 @@
         }
     },
     {
-        "name": "Artist's Workbench",
+        "name": "Artist's workbench",
         "creator": "Job block crafter",
         "createTime": 240,
         "requires": [
@@ -2265,6 +2414,42 @@
         }
     },
     {
+        "name": "Metal gear",
+        "creator": "Metal lathe operator",
+        "createTime": 15,
+        "requires": [{ "name": "Iron wrought", "amount": 2 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
+        "name": "Brass parts",
+        "creator": "Metal lathe operator",
+        "createTime": 25,
+        "requires": [{ "name": "Brass ingot", "amount": 2 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
+        "name": "Steel parts",
+        "creator": "Metal lathe operator",
+        "createTime": 25,
+        "requires": [{ "name": "Steel ingot", "amount": 1 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
+    },
+    {
         "name": "Paper",
         "creator": "Paper maker",
         "createTime": 318,
@@ -2368,6 +2553,18 @@
         "optionalOutputs": [
             { "name": "Empty pot", "likelihood": 0.95, "amount": 3 }
         ]
+    },
+    {
+        "name": "Movable type",
+        "creator": "Printing press operator",
+        "createTime": 45,
+        "requires": [{ "name": "Lead ingot", "amount": 1 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        }
     },
     {
         "name": "Rope",
@@ -2699,6 +2896,18 @@
             "type": "default",
             "minimumTool": "none",
             "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Empty punch card",
+        "creator": "Tabulating machine operator",
+        "createTime": 45,
+        "requires": [{ "name": "Paper", "amount": 10 }],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
         }
     },
     {

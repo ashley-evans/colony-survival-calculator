@@ -1,7 +1,7 @@
 import { FileFinder } from "../interfaces/file-finder";
 import { GrowableConverter } from "../interfaces/growable-converter";
 import { JSONFileReader } from "../interfaces/json-file-reader";
-import { APITools, Growables, Item, Items } from "../types";
+import { DefaultToolset, Growables, Item, Items } from "../types";
 import { JSON_FILE_EXTENSION } from "./constants";
 import {
     getUserFriendlyCreatorName,
@@ -21,8 +21,8 @@ const STATIC_RECIPES: Items = [
         optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Forester",
         size: {
@@ -38,8 +38,8 @@ const STATIC_RECIPES: Items = [
         optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator: "Forester",
         size: {
@@ -147,8 +147,8 @@ const mapToItem = (growable: Growables[number]): Item => {
         requires: [],
         toolset: {
             type: "default",
-            minimumTool: APITools.none,
-            maximumTool: APITools.none,
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
         },
         creator,
         ...(size ? { size } : {}),

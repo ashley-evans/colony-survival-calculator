@@ -12,15 +12,19 @@ import {
     Requirement,
     Requirements,
     OptionalOutput,
-    DefaultToolset as APITools,
+    DefaultToolset,
+    MachineToolset,
 } from "./generated/items";
+
+type APITools = DefaultToolset | MachineToolset;
 
 type NPCToolsetMapping = {
     npcType: string;
     toolset: string;
 };
 
-type RecipeResult = Recipes[number]["results"][number];
+type Recipe = Recipes[number];
+type RecipeResult = Recipe["results"][number];
 
 export {
     NPCToolsetMapping,
@@ -32,6 +36,9 @@ export {
     PiplizTools,
     PiplizToolsets,
     APITools,
+    DefaultToolset,
+    MachineToolset,
     Recipes,
+    Recipe,
     RecipeResult,
 };

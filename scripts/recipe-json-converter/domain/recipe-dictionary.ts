@@ -254,11 +254,14 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     streetlight: "Street light",
     railitem: "Rails",
     railgate: "Rail gate",
-    watersponge: "Archimedean Screw",
-    artisttable: "Artist's Workbench",
+    watersponge: "Archimedean screw",
+    artisttable: "Artist's workbench",
     rooftool: "Tiled roof",
     rooftoolblue: "Blue tiled roof",
     fence: "Fence",
+    movabletype: "Movable type",
+    manuscript: "Manuscript",
+    cardempty: "Empty punch card",
 };
 
 const getUserFriendlyItemName = (name: string): string | null => {
@@ -310,6 +313,11 @@ const creatorNameMap: Readonly<Record<string, string>> = {
     hemp: "Hemp farmer",
     wisteriaplant: "Wisteria flower farmer",
     artist: "Artist",
+    metallathe: "Metal lathe operator",
+    blastfurnace: "Blast furnace operator",
+    cottonengine: "Cotton engine operator",
+    printingpress: "Printing press operator",
+    tabulator: "Tabulating machine operator",
 };
 
 const getUserFriendlyCreatorName = (creator: string): string | null => {
