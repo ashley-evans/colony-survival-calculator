@@ -1295,11 +1295,13 @@ describe("recipe to item mapping", () => {
             ["streetlight", "Street light"],
             ["railitem", "Rails"],
             ["railgate", "Rail gate"],
-            ["watersponge", "Archimedean Screw"],
-            ["artisttable", "Artist's Workbench"],
+            ["watersponge", "Archimedean screw"],
+            ["artisttable", "Artist's workbench"],
             ["rooftool", "Tiled roof"],
             ["rooftoolblue", "Blue tiled roof"],
             ["fence", "Fence"],
+            ["manuscript", "Manuscript"],
+            ["cardempty", "Empty punch card"],
         ])(
             "can handle recipes for item: %s",
             async (itemName: string, expectedConvertedItemName: string) => {
@@ -1386,6 +1388,10 @@ describe("recipe to item mapping", () => {
             ["woodcutter", "Woodcutter"],
             ["artist", "Artist"],
             ["metallathe", "Metal lathe operator"],
+            ["blastfurnace", "Blast furnace operator"],
+            ["cottonengine", "Cotton engine operator"],
+            ["printingpress", "Printing press operator"],
+            ["tabulator", "Tabulating machine operator"],
         ])(
             "can handle recipes from creator: %s",
             async (creator: string, expectedConvertedCreator: string) => {
