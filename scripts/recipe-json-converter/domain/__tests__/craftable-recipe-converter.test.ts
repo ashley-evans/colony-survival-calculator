@@ -9,8 +9,8 @@ import {
     PiplizTools,
     PiplizToolsets,
     Item,
-    APITools,
     Items,
+    DefaultToolset,
 } from "../../types";
 
 const mockFindFiles = jest.fn();
@@ -327,8 +327,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
             };
@@ -406,8 +406,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.steel,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.steel,
                 },
                 creator: "Alchemist",
             };
@@ -457,8 +457,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: userFriendlyCreator,
             };
@@ -626,8 +626,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
                 optionalOutputs: [
@@ -699,8 +699,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
                 optionalOutputs: [
@@ -755,15 +755,64 @@ describe("recipe to item mapping", () => {
         );
     });
 
-    describe.each([PiplizTools.machinetools, PiplizTools.eyeglasses])(
-        "handles unknown toolset: %s",
-        (tools: PiplizTools) => {
-            const toolset: PiplizToolsets[number] = {
-                key: tools,
-                usable: [tools],
-            };
-            const creator = "alchemist";
-            const output = "poisondart";
+    describe("handles eyeglasses toolset", () => {
+        const tools = PiplizTools.eyeglasses;
+        const toolset: PiplizToolsets[number] = {
+            key: tools,
+            usable: [tools],
+        };
+        const creator = "alchemist";
+        const output = "poisondart";
+        const recipes: Recipes = [
+            {
+                cooldown: 20,
+                name: `pipliz.${creator}.${output}`,
+                requires: [],
+                results: [
+                    {
+                        type: output,
+                    },
+                ],
+            },
+        ];
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: tools,
+                        },
+                    ],
+                },
+            },
+        ];
+
+        beforeEach(() => {
+            mockReadToolFile.mockResolvedValue([toolset]);
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+        });
+
+        test("does not convert any item that has unknown toolset", async () => {
+            const actual = await convertRecipes(input);
+
+            expect(actual).toHaveLength(0);
+        });
+
+        test("logs skipped item to console", async () => {
+            await convertRecipes(input);
+
+            expect(consoleLogSpy).toHaveBeenCalledWith(
+                `Skipping recipe: ${output} from creator: ${creator} as requires unsupported toolset`
+            );
+        });
+    });
+
+    describe("handles machine tools", () => {
+        beforeEach(() => {
+            const creator = "metallathe";
+            const output = "brassparts";
             const recipes: Recipes = [
                 {
                     cooldown: 20,
@@ -782,34 +831,34 @@ describe("recipe to item mapping", () => {
                         attachBehaviour: [
                             {
                                 npcType: `pipliz.${creator}`,
-                                toolset: tools,
+                                toolset: PiplizTools.machinetools,
                             },
                         ],
                     },
                 },
             ];
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+        });
 
-            beforeEach(() => {
-                mockReadToolFile.mockResolvedValue([toolset]);
-                mockReadRecipeFile.mockResolvedValue(recipes);
-                mockReadBehaviourFile.mockResolvedValue(behaviours);
+        test("returns converted recipe for recipe that requires machine tools", async () => {
+            const actual = await convertRecipes(input);
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual({
+                name: "Brass parts",
+                creator: "Metal lathe operator",
+                output: 1,
+                createTime: 20,
+                requires: [],
+                toolset: {
+                    type: "machine",
+                    minimumTool: "machine",
+                    maximumTool: "machine",
+                },
             });
-
-            test("does not convert any item that has unknown toolset", async () => {
-                const actual = await convertRecipes(input);
-
-                expect(actual).toHaveLength(0);
-            });
-
-            test("logs skipped item to console", async () => {
-                await convertRecipes(input);
-
-                expect(consoleLogSpy).toHaveBeenCalledWith(
-                    `Skipping recipe: ${output} from creator: ${creator} as requires unsupported toolset`
-                );
-            });
-        }
-    );
+        });
+    });
 
     test("returns converted recipes given multiple valid recipes", async () => {
         const firstRecipeOutput = "poisondart";
@@ -859,8 +908,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
             },
@@ -871,8 +920,8 @@ describe("recipe to item mapping", () => {
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
             },
@@ -937,8 +986,8 @@ describe("recipe to item mapping", () => {
                 requires: [{ name: "Gunpowder", amount: expectedAmount }],
                 toolset: {
                     type: "default",
-                    minimumTool: APITools.none,
-                    maximumTool: APITools.none,
+                    minimumTool: DefaultToolset.none,
+                    maximumTool: DefaultToolset.none,
                 },
                 creator: "Alchemist",
             };
@@ -1288,8 +1337,8 @@ describe("recipe to item mapping", () => {
                     requires: [],
                     toolset: {
                         type: "default",
-                        minimumTool: APITools.none,
-                        maximumTool: APITools.none,
+                        minimumTool: DefaultToolset.none,
+                        maximumTool: DefaultToolset.none,
                     },
                     creator: "Alchemist",
                 };
@@ -1336,6 +1385,7 @@ describe("recipe to item mapping", () => {
             ["waterpump", "Water pump worker"],
             ["woodcutter", "Woodcutter"],
             ["artist", "Artist"],
+            ["metallathe", "Metal lathe operator"],
         ])(
             "can handle recipes from creator: %s",
             async (creator: string, expectedConvertedCreator: string) => {
@@ -1373,8 +1423,8 @@ describe("recipe to item mapping", () => {
                     requires: [],
                     toolset: {
                         type: "default",
-                        minimumTool: APITools.none,
-                        maximumTool: APITools.none,
+                        minimumTool: DefaultToolset.none,
+                        maximumTool: DefaultToolset.none,
                     },
                     creator: expectedConvertedCreator,
                 };

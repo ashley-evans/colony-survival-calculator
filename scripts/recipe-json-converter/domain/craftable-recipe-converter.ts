@@ -12,12 +12,9 @@ import {
     Items,
     OptionalOutput,
     Requirements,
+    Recipe,
 } from "../types";
-import {
-    UNSUPPORTED_TOOL_ERROR,
-    getDefaultMinMaxTools,
-    getMinMaxTools,
-} from "./tool-utils";
+import { UNSUPPORTED_TOOL_ERROR, getToolset } from "./tool-utils";
 import {
     getUserFriendlyCreatorName,
     getUserFriendlyItemName,
@@ -36,7 +33,6 @@ const RECIPE_PREFIX = "recipes_";
 const RECIPE_EXCLUSION_SET = new Set<string>(["recipes_merchant.json"]);
 
 type PiplizToolset = PiplizToolsets[number];
-type Recipe = Recipes[number];
 
 const getKnownToolsets = async (
     inputDirectoryPath: string,
@@ -211,14 +207,7 @@ const mapRecipeToItem = (
     npcToolsetMapping: Map<string, PiplizTools[]>
 ): Item => {
     const { itemName, creator } = splitPiplizName(recipe.name);
-    const tools = npcToolsetMapping.get(creator);
-    if (!tools) {
-        console.log(
-            `Defaulting to default toolset for recipe: ${itemName} from creator: ${creator}`
-        );
-    }
-
-    const toolset = getMinMaxTools(tools ?? getDefaultMinMaxTools(creator));
+    const toolset = getToolset(recipe, npcToolsetMapping);
     const { matching, nonMatching } = filterByCondition(
         recipe.results,
         (result) => result.type === itemName
