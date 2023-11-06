@@ -115,13 +115,7 @@ const getToolset = (
         };
     }
 
-    const test = getMinMaxTools(tools);
-    if (creator === "fisherman") {
-        console.dir(tools);
-        console.dir(test);
-    }
-
-    return test;
+    return getMinMaxTools(tools);
 };
 
 export { getToolset, SupportedPiplizTools, UNSUPPORTED_TOOL_ERROR };
