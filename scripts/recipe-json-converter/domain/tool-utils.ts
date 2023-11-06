@@ -67,7 +67,9 @@ const getMinMaxTools = (tools: PiplizTools[]): Item["toolset"] => {
         const value = ToolModifierValues[supportedTool];
         if (ToolModifierValues[minimumTool] > value) {
             minimumTool = supportedTool;
-        } else if (ToolModifierValues[maximumTool] < value) {
+        }
+
+        if (ToolModifierValues[maximumTool] < value) {
             maximumTool = supportedTool;
         }
     }
@@ -113,7 +115,13 @@ const getToolset = (
         };
     }
 
-    return getMinMaxTools(tools);
+    const test = getMinMaxTools(tools);
+    if (creator === "fisherman") {
+        console.dir(tools);
+        console.dir(test);
+    }
+
+    return test;
 };
 
 export { getToolset, SupportedPiplizTools, UNSUPPORTED_TOOL_ERROR };
