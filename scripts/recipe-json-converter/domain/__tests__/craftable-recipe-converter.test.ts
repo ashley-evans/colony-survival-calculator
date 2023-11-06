@@ -860,6 +860,83 @@ describe("recipe to item mapping", () => {
         });
     });
 
+    test.each([
+        [
+            "min",
+            PiplizTools.stonetools,
+            PiplizTools.steeltools,
+            DefaultToolset.stone,
+            DefaultToolset.steel,
+        ],
+        [
+            "max",
+            PiplizTools.notools,
+            PiplizTools.coppertools,
+            DefaultToolset.none,
+            DefaultToolset.copper,
+        ],
+    ])(
+        "handles default toolset with non-default %s",
+        async (
+            _: string,
+            min: PiplizTools,
+            max: PiplizTools,
+            expectedMin: DefaultToolset,
+            expectedMax: DefaultToolset
+        ) => {
+            const toolsKey = "test tools";
+            const toolset: PiplizToolsets[number] = {
+                key: toolsKey,
+                usable: [max, min],
+            };
+            const creator = "alchemist";
+            const output = "poisondart";
+            const recipes: Recipes = [
+                {
+                    cooldown: 20,
+                    name: `pipliz.${creator}.${output}`,
+                    requires: [],
+                    results: [
+                        {
+                            type: output,
+                        },
+                    ],
+                },
+            ];
+            const behaviours: BlockBehaviours = [
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${creator}`,
+                                toolset: toolsKey,
+                            },
+                        ],
+                    },
+                },
+            ];
+            mockReadToolFile.mockResolvedValue([toolset]);
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+
+            const actual = await convertRecipes(input);
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual({
+                name: "Poison dart",
+                creator: "Alchemist",
+                output: 1,
+                createTime: 20,
+                requires: [],
+                toolset: {
+                    type: "default",
+                    minimumTool: expectedMin,
+                    maximumTool: expectedMax,
+                },
+            });
+        }
+    );
+
     test("returns converted recipes given multiple valid recipes", async () => {
         const firstRecipeOutput = "poisondart";
         const secondRecipeOutput = "gunpowder";
