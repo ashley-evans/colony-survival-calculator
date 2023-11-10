@@ -5,7 +5,10 @@ import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { click, renderWithTestProviders as render } from "../../../test";
-import { Requirement } from "../../../graphql/__generated__/graphql";
+import {
+    AvailableTools,
+    Requirement,
+} from "../../../graphql/__generated__/graphql";
 import Calculator from "../Calculator";
 import {
     selectItemAndWorkers,
@@ -18,6 +21,7 @@ import {
     createCreatorDemands,
     createRequirement,
     createRequirementCreator,
+    selectTool,
 } from "./utils";
 import { SingleCreatorRequirementsTableRow } from "../components/Output/components/Requirements";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
@@ -584,6 +588,54 @@ describe("requirements rendering given requirements", () => {
                 }
             }
         );
+
+        test("re-renders the requirements table if the tools change back to an already selected", async () => {
+            const expected = requirementsWithSingleCreator[1];
+            server.use(
+                createCalculatorOutputResponseHandler(
+                    createRequirements([expected]),
+                    expectedOutput
+                )
+            );
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndWorkers({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            await screen.findByText(expected.creators[0].creator);
+
+            server.use(
+                createCalculatorOutputResponseHandler(
+                    createRequirements([requirementsWithSingleCreator[0]]),
+                    expectedOutput
+                )
+            );
+
+            await selectTool(AvailableTools.Steel);
+            await selectTool(AvailableTools.None);
+            await screen.findByText(expected.creators[0].creator);
+
+            const requirementsTable = await screen.findByRole("table");
+            const rows = within(requirementsTable).getAllByRole("row");
+            expect(rows).toHaveLength(3);
+            const requirementRow = rows[2];
+            const cells = within(requirementRow).getAllByRole("cell");
+            expect(cells[Columns.CREATOR]).toHaveAccessibleName(
+                expected.creators[0].creator
+            );
+            expect(cells[Columns.CREATOR]).toBeVisible();
+            expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName("");
+            expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
+            expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
+                expected.amount.toString()
+            );
+            expect(cells[Columns.AMOUNT]).toBeVisible();
+            expect(cells[Columns.WORKERS]).toHaveAccessibleName(
+                expected.creators[0].workers.toString()
+            );
+            expect(cells[Columns.WORKERS]).toBeVisible();
+        });
 
         test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);

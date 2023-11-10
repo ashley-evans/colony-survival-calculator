@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     IconDefinition,
@@ -40,9 +40,7 @@ function Requirements({ requirements }: RequirementsProps) {
         useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
         useState<ValidSortDirections>("none");
-    const [rows, setRows] = useState<RequirementsTableRow[]>(
-        mapRequirementsToRows(requirements)
-    );
+    const [rows, setRows] = useState<RequirementsTableRow[]>([]);
 
     const changeAmountSortDirection: MouseEventHandler = (event) => {
         event.stopPropagation();
@@ -60,6 +58,11 @@ function Requirements({ requirements }: RequirementsProps) {
         const updated = toggleBreakdown(key, rows);
         setRows([...updated]);
     };
+
+    useEffect(() => {
+        const updated = mapRequirementsToRows(requirements);
+        setRows(updated);
+    }, [requirements]);
 
     if (rows.length <= 1) {
         return <></>;
@@ -117,7 +120,7 @@ function Requirements({ requirements }: RequirementsProps) {
                     <tbody>
                         {sortedRows.map((requirement) => (
                             <RequirementRow
-                                key={requirement.name}
+                                key={requirement.key}
                                 row={requirement}
                                 toggleBreakdown={toggleRowExpansion}
                             />
