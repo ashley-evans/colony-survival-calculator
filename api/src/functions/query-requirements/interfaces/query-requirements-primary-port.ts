@@ -25,6 +25,11 @@ type Requirement = {
     creators: RequirementRecipe[];
 };
 
+type RequirementResult = {
+    requirements: Requirement[];
+    totalWorkers: number;
+};
+
 interface QueryRequirementsPrimaryPort {
     (input: {
         name: string;
@@ -33,7 +38,7 @@ interface QueryRequirementsPrimaryPort {
         maxAvailableTool?: DefaultToolset;
         hasMachineTools?: boolean;
         creatorOverrides?: CreatorOverride[];
-    }): Promise<Requirement[]>;
+    }): Promise<RequirementResult>;
 }
 
 export type {
@@ -41,5 +46,6 @@ export type {
     Requirement,
     RequirementRecipe,
     Demand,
+    RequirementResult,
     QueryRequirementsPrimaryPort,
 };

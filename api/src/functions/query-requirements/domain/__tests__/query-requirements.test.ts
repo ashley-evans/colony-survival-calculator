@@ -108,21 +108,24 @@ test("returns only output details fo provided item given provided item has no re
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: "test item name creator",
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: "test item name creator",
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 5,
+    });
 });
 
 test("throws an error if provided item requires an item that does not exist in database", async () => {
@@ -161,34 +164,37 @@ test("returns requirements given item with a single requirement and no nested re
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: item.creator,
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [{ name: requiredItem.name, amount: 10 }],
-                },
-            ],
-        },
-        {
-            name: requiredItem.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem.name,
-                    creator: requiredItem.creator,
-                    amount: 10,
-                    workers: 7.5,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: item.creator,
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [{ name: requiredItem.name, amount: 10 }],
+                    },
+                ],
+            },
+            {
+                name: requiredItem.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem.name,
+                        creator: requiredItem.creator,
+                        amount: 10,
+                        workers: 7.5,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 12.5,
+    });
 });
 
 test("returns requirements given item with multiple requirements and no nested requirements", async () => {
@@ -224,50 +230,53 @@ test("returns requirements given item with multiple requirements and no nested r
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: item.creator,
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [
-                        { name: requiredItem1.name, amount: 10 },
-                        { name: requiredItem2.name, amount: 15 },
-                    ],
-                },
-            ],
-        },
-        {
-            name: requiredItem1.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem1.name,
-                    creator: requiredItem1.creator,
-                    amount: 10,
-                    workers: 7.5,
-                    demands: [],
-                },
-            ],
-        },
-        {
-            name: requiredItem2.name,
-            amount: 15,
-            creators: [
-                {
-                    name: requiredItem2.name,
-                    creator: requiredItem2.creator,
-                    amount: 15,
-                    workers: 30,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: item.creator,
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [
+                            { name: requiredItem1.name, amount: 10 },
+                            { name: requiredItem2.name, amount: 15 },
+                        ],
+                    },
+                ],
+            },
+            {
+                name: requiredItem1.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem1.name,
+                        creator: requiredItem1.creator,
+                        amount: 10,
+                        workers: 7.5,
+                        demands: [],
+                    },
+                ],
+            },
+            {
+                name: requiredItem2.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: requiredItem2.name,
+                        creator: requiredItem2.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 42.5,
+    });
 });
 
 test("returns requirements given item with single nested requirement", async () => {
@@ -300,47 +309,50 @@ test("returns requirements given item with single nested requirement", async () 
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: item.creator,
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [{ name: requiredItem1.name, amount: 10 }],
-                },
-            ],
-        },
-        {
-            name: requiredItem1.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem1.name,
-                    creator: requiredItem1.creator,
-                    amount: 10,
-                    workers: 7.5,
-                    demands: [{ name: requiredItem2.name, amount: 15 }],
-                },
-            ],
-        },
-        {
-            name: requiredItem2.name,
-            amount: 15,
-            creators: [
-                {
-                    name: requiredItem2.name,
-                    creator: requiredItem2.creator,
-                    amount: 15,
-                    workers: 30,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: item.creator,
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [{ name: requiredItem1.name, amount: 10 }],
+                    },
+                ],
+            },
+            {
+                name: requiredItem1.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem1.name,
+                        creator: requiredItem1.creator,
+                        amount: 10,
+                        workers: 7.5,
+                        demands: [{ name: requiredItem2.name, amount: 15 }],
+                    },
+                ],
+            },
+            {
+                name: requiredItem2.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: requiredItem2.name,
+                        creator: requiredItem2.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 42.5,
+    });
 });
 
 test("returns requirements given item with multiple different nested requirements", async () => {
@@ -383,63 +395,66 @@ test("returns requirements given item with multiple different nested requirement
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: item.creator,
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [{ name: requiredItem1.name, amount: 10 }],
-                },
-            ],
-        },
-        {
-            name: requiredItem1.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem1.name,
-                    creator: requiredItem1.creator,
-                    amount: 10,
-                    workers: 7.5,
-                    demands: [
-                        { name: requiredItem2.name, amount: 15 },
-                        { name: requiredItem3.name, amount: 10 },
-                    ],
-                },
-            ],
-        },
-        {
-            name: requiredItem2.name,
-            amount: 15,
-            creators: [
-                {
-                    name: requiredItem2.name,
-                    creator: requiredItem2.creator,
-                    amount: 15,
-                    workers: 30,
-                    demands: [],
-                },
-            ],
-        },
-        {
-            name: requiredItem3.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem3.name,
-                    creator: requiredItem3.creator,
-                    amount: 10,
-                    workers: 20,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: item.creator,
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [{ name: requiredItem1.name, amount: 10 }],
+                    },
+                ],
+            },
+            {
+                name: requiredItem1.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem1.name,
+                        creator: requiredItem1.creator,
+                        amount: 10,
+                        workers: 7.5,
+                        demands: [
+                            { name: requiredItem2.name, amount: 15 },
+                            { name: requiredItem3.name, amount: 10 },
+                        ],
+                    },
+                ],
+            },
+            {
+                name: requiredItem2.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: requiredItem2.name,
+                        creator: requiredItem2.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+            {
+                name: requiredItem3.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem3.name,
+                        creator: requiredItem3.creator,
+                        amount: 10,
+                        workers: 20,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 62.5,
+    });
 });
 
 test("returns combined requirements given item with multiple nested requirements with common requirement", async () => {
@@ -485,66 +500,69 @@ test("returns combined requirements given item with multiple nested requirements
         workers: validWorkers,
     });
 
-    expect(actual).toEqual([
-        {
-            name: item.name,
-            amount: 7.5,
-            creators: [
-                {
-                    name: item.name,
-                    creator: item.creator,
-                    amount: 7.5,
-                    workers: 5,
-                    demands: [
-                        { name: requiredItem1.name, amount: 10 },
-                        { name: requiredItem3.name, amount: 5 },
-                    ],
-                },
-            ],
-        },
-        {
-            name: requiredItem1.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem1.name,
-                    creator: requiredItem1.creator,
-                    amount: 10,
-                    workers: 7.5,
-                    demands: [
-                        { name: requiredItem2.name, amount: 15 },
-                        { name: requiredItem3.name, amount: 10 },
-                    ],
-                },
-            ],
-        },
-        {
-            name: requiredItem3.name,
-            amount: 15,
-            creators: [
-                {
-                    name: requiredItem3.name,
-                    creator: requiredItem3.creator,
-                    amount: 15,
-                    workers: 30,
-                    demands: [],
-                },
-            ],
-        },
-        {
-            name: requiredItem2.name,
-            amount: 15,
-            creators: [
-                {
-                    name: requiredItem2.name,
-                    creator: requiredItem2.creator,
-                    amount: 15,
-                    workers: 30,
-                    demands: [],
-                },
-            ],
-        },
-    ]);
+    expect(actual).toEqual({
+        requirements: [
+            {
+                name: item.name,
+                amount: 7.5,
+                creators: [
+                    {
+                        name: item.name,
+                        creator: item.creator,
+                        amount: 7.5,
+                        workers: 5,
+                        demands: [
+                            { name: requiredItem1.name, amount: 10 },
+                            { name: requiredItem3.name, amount: 5 },
+                        ],
+                    },
+                ],
+            },
+            {
+                name: requiredItem1.name,
+                amount: 10,
+                creators: [
+                    {
+                        name: requiredItem1.name,
+                        creator: requiredItem1.creator,
+                        amount: 10,
+                        workers: 7.5,
+                        demands: [
+                            { name: requiredItem2.name, amount: 15 },
+                            { name: requiredItem3.name, amount: 10 },
+                        ],
+                    },
+                ],
+            },
+            {
+                name: requiredItem3.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: requiredItem3.name,
+                        creator: requiredItem3.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+            {
+                name: requiredItem2.name,
+                amount: 15,
+                creators: [
+                    {
+                        name: requiredItem2.name,
+                        creator: requiredItem2.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+        ],
+        totalWorkers: 72.5,
+    });
 });
 
 test("throws an error if an unhandled exception occurs while fetching item requirements", async () => {
@@ -741,7 +759,7 @@ describe("handles tool modifiers", () => {
             });
 
             const requirement = findRequirement(
-                actual,
+                actual.requirements,
                 requiredItemName
             ) as Requirement;
 
@@ -779,7 +797,7 @@ describe("handles tool modifiers", () => {
             maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
-            actual,
+            actual.requirements,
             requiredItemName
         ) as Requirement;
 
@@ -814,7 +832,7 @@ describe("handles tool modifiers", () => {
             maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
-            actual,
+            actual.requirements,
             requiredItemName
         ) as Requirement;
 
@@ -847,7 +865,7 @@ describe("handles tool modifiers", () => {
             maxAvailableTool: DefaultToolset.steel,
         });
         const requirement = findRequirement(
-            actual,
+            actual.requirements,
             requiredItemName
         ) as Requirement;
 
@@ -879,41 +897,44 @@ describe("optional output requirement impact", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: item.name,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 5 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 5,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: 1.25,
-                        workers: 5,
-                        demands: [],
-                    },
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 3.75,
-                        workers: 2.8125,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: item.name,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 5 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 1.25,
+                            workers: 5,
+                            demands: [],
+                        },
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 3.75,
+                            workers: 2.8125,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 12.8125,
+        });
     });
 
     test("factors optional output given item with nested requirement that is top level optional output", async () => {
@@ -949,54 +970,57 @@ describe("optional output requirement impact", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: item.name,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [{ name: requiredItem1.name, amount: 10 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem1.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: requiredItem1.name,
-                        creator: requiredItem1.creator,
-                        amount: 10,
-                        workers: 7.5,
-                        demands: [{ name: requiredItem2.name, amount: 15 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem2.name,
-                amount: 15,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: 2.5,
-                        workers: 5,
-                        demands: [],
-                    },
-                    {
-                        name: requiredItem2.name,
-                        creator: requiredItem2.creator,
-                        amount: 12.5,
-                        workers: 25,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: item.name,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [{ name: requiredItem1.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [{ name: requiredItem2.name, amount: 15 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 2.5,
+                            workers: 5,
+                            demands: [],
+                        },
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 12.5,
+                            workers: 25,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 42.5,
+        });
     });
 
     test("uses recipe with high optional output over lower base output", async () => {
@@ -1036,34 +1060,37 @@ describe("optional output requirement impact", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: item.name,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [{ name: requirementName, amount: 5 }],
-                    },
-                ],
-            },
-            {
-                name: requirementName,
-                amount: 5,
-                creators: [
-                    {
-                        name: requirementName,
-                        creator: higherOptionalOutputRecipe.creator,
-                        amount: 5,
-                        workers: 3,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: item.name,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [{ name: requirementName, amount: 5 }],
+                        },
+                    ],
+                },
+                {
+                    name: requirementName,
+                    amount: 5,
+                    creators: [
+                        {
+                            name: requirementName,
+                            creator: higherOptionalOutputRecipe.creator,
+                            amount: 5,
+                            workers: 3,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 8,
+        });
     });
 });
 
@@ -1100,34 +1127,37 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 15,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: moreOptimalItemRecipe.creator,
-                        amount: 15,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 20,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 20,
-                        workers: 15,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: moreOptimalItemRecipe.creator,
+                            amount: 15,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 20 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 20,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 20,
+                            workers: 15,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 20,
+        });
     });
 
     test("factors max available tool into most output calculation when given item w/ lower base output but higher modified", async () => {
@@ -1165,34 +1195,37 @@ describe("multiple recipe handling", () => {
             maxAvailableTool: DefaultToolset.steel,
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 60,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: moreOptimalItemRecipe.creator,
-                        amount: 60,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 80 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 80,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 80,
-                        workers: 60,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 60,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: moreOptimalItemRecipe.creator,
+                            amount: 60,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 80 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 80,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 80,
+                            workers: 60,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 65,
+        });
     });
 
     test("ignores more optimal recipe if cannot be created by provided max tool", async () => {
@@ -1230,34 +1263,37 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: lessOptimalItemRecipe.creator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 10 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 10,
-                        workers: 7.5,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: lessOptimalItemRecipe.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 12.5,
+        });
     });
 
     test("does not return any required items if the required item was related to a sub optimal recipe", async () => {
@@ -1299,36 +1335,42 @@ describe("multiple recipe handling", () => {
             workers: validWorkers,
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 30,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: moreOptimalItemRecipe.creator,
-                        amount: 30,
-                        workers: 5,
-                        demands: [
-                            { name: moreOptimalRequiredItem.name, amount: 20 },
-                        ],
-                    },
-                ],
-            },
-            {
-                name: moreOptimalRequiredItem.name,
-                amount: 20,
-                creators: [
-                    {
-                        name: moreOptimalRequiredItem.name,
-                        creator: moreOptimalRequiredItem.creator,
-                        amount: 20,
-                        workers: 15,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 30,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: moreOptimalItemRecipe.creator,
+                            amount: 30,
+                            workers: 5,
+                            demands: [
+                                {
+                                    name: moreOptimalRequiredItem.name,
+                                    amount: 20,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: moreOptimalRequiredItem.name,
+                    amount: 20,
+                    creators: [
+                        {
+                            name: moreOptimalRequiredItem.name,
+                            creator: moreOptimalRequiredItem.creator,
+                            amount: 20,
+                            workers: 15,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 20,
+        });
     });
 
     test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
@@ -1407,34 +1449,37 @@ describe("creator override handling", () => {
             ],
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: overrideCreator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 10 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 10,
-                        workers: 7.5,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: overrideCreator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 12.5,
+        });
     });
 
     test("favours less optimal requirement recipe given applicable requirement override", async () => {
@@ -1473,34 +1518,37 @@ describe("creator override handling", () => {
             ],
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 15,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: recipe.creator,
-                        amount: 15,
-                        workers: 5,
-                        demands: [{ name: requiredItemName, amount: 20 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItemName,
-                amount: 20,
-                creators: [
-                    {
-                        name: requiredItemName,
-                        creator: overrideCreator,
-                        amount: 20,
-                        workers: 15,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: recipe.creator,
+                            amount: 15,
+                            workers: 5,
+                            demands: [{ name: requiredItemName, amount: 20 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItemName,
+                    amount: 20,
+                    creators: [
+                        {
+                            name: requiredItemName,
+                            creator: overrideCreator,
+                            amount: 20,
+                            workers: 15,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 20,
+        });
     });
 
     test("throws an error if provided more than one override for a single item", async () => {
@@ -1570,34 +1618,37 @@ describe("creator override handling", () => {
             ],
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 15,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: moreOptimalItemRecipe.creator,
-                        amount: 15,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 20,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 20,
-                        workers: 15,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: moreOptimalItemRecipe.creator,
+                            amount: 15,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 20 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 20,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 20,
+                            workers: 15,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 20,
+        });
     });
 
     test("does not return any requirement that relates to a recipe that was removed by an override", async () => {
@@ -1640,34 +1691,37 @@ describe("creator override handling", () => {
             creatorOverrides: [{ itemName: validItemName, creator: override }],
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 15,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: override,
-                        amount: 15,
-                        workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem.name,
-                amount: 20,
-                creators: [
-                    {
-                        name: requiredItem.name,
-                        creator: requiredItem.creator,
-                        amount: 20,
-                        workers: 15,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: override,
+                            amount: 15,
+                            workers: 5,
+                            demands: [{ name: requiredItem.name, amount: 20 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem.name,
+                    amount: 20,
+                    creators: [
+                        {
+                            name: requiredItem.name,
+                            creator: requiredItem.creator,
+                            amount: 20,
+                            workers: 15,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 20,
+        });
     });
 
     test("throws an error if the provided override would result in no recipe being known for a given item (root override)", async () => {
@@ -1781,39 +1835,42 @@ describe("creator override handling", () => {
             ],
         });
 
-        expect(actual).toEqual([
-            {
-                name: validItemName,
-                amount: 7.5,
-                creators: [
-                    {
-                        name: validItemName,
-                        creator: lessOptimalRecipe.creator,
-                        amount: 7.5,
-                        workers: 5,
-                        demands: [
-                            {
-                                name: lessOptimalRecipeRequirement.name,
-                                amount: 10,
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                name: lessOptimalRecipeRequirement.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: lessOptimalRecipeRequirement.name,
-                        creator: lessOptimalRecipeRequirement.creator,
-                        amount: 10,
-                        workers: 7.5,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: validItemName,
+                    amount: 7.5,
+                    creators: [
+                        {
+                            name: validItemName,
+                            creator: lessOptimalRecipe.creator,
+                            amount: 7.5,
+                            workers: 5,
+                            demands: [
+                                {
+                                    name: lessOptimalRecipeRequirement.name,
+                                    amount: 10,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: lessOptimalRecipeRequirement.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: lessOptimalRecipeRequirement.name,
+                            creator: lessOptimalRecipeRequirement.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 12.5,
+        });
     });
 });
 
@@ -1999,7 +2056,7 @@ describe("handles multiple output units", () => {
                 unit,
             });
 
-            expect(actual).toEqual(expected);
+            expect(actual.requirements).toEqual(expected);
         }
     );
 });
@@ -2095,35 +2152,38 @@ describe("handles machine tools", () => {
             hasMachineTools: true,
         });
 
-        expect(actual).toEqual([
-            {
-                name: baseItem.name,
-                amount: 15,
-                creators: [
-                    {
-                        name: baseItem.name,
-                        creator: baseItem.creator,
-                        amount: 15,
-                        workers: 5,
-                        demands: [
-                            { name: machineToolsItem.name, amount: 12.5 },
-                        ],
-                    },
-                ],
-            },
-            {
-                name: machineToolsItem.name,
-                amount: 12.5,
-                creators: [
-                    {
-                        name: machineToolsItem.name,
-                        creator: machineToolsItem.creator,
-                        amount: 12.5,
-                        workers: 25,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
+        expect(actual).toEqual({
+            requirements: [
+                {
+                    name: baseItem.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: baseItem.name,
+                            creator: baseItem.creator,
+                            amount: 15,
+                            workers: 5,
+                            demands: [
+                                { name: machineToolsItem.name, amount: 12.5 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: machineToolsItem.name,
+                    amount: 12.5,
+                    creators: [
+                        {
+                            name: machineToolsItem.name,
+                            creator: machineToolsItem.creator,
+                            amount: 12.5,
+                            workers: 25,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 30,
+        });
     });
 });

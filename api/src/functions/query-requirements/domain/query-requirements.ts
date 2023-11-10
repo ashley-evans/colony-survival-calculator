@@ -230,6 +230,17 @@ function applyOutputUnit(
     });
 }
 
+function calculateTotalWorkers(requirement: Requirement[]): number {
+    return requirement.reduce((overallAcc, requirement) => {
+        const creatorTotal = requirement.creators.reduce(
+            (creatorAcc, creator) => creatorAcc + creator.workers,
+            0
+        );
+
+        return overallAcc + creatorTotal;
+    }, 0);
+}
+
 const queryRequirements: QueryRequirementsPrimaryPort = async ({
     name,
     workers,
@@ -286,7 +297,12 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
     );
 
     const mapped = mapResults(result);
-    return unit !== OutputUnit.SECONDS ? applyOutputUnit(mapped, unit) : mapped;
+    const output =
+        unit !== OutputUnit.SECONDS ? applyOutputUnit(mapped, unit) : mapped;
+    return {
+        requirements: output,
+        totalWorkers: calculateTotalWorkers(output),
+    };
 };
 
 export { queryRequirements };
