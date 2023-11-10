@@ -61,7 +61,7 @@ const handler: GraphQLEventHandler<
     }
 
     try {
-        const requirements = await queryRequirements({
+        const { requirements, totalWorkers } = await queryRequirements({
             name,
             workers,
             ...(unit ? { unit: OutputUnit[unit] } : {}),
@@ -80,6 +80,7 @@ const handler: GraphQLEventHandler<
         return {
             __typename: "Requirements",
             requirements,
+            totalWorkers,
         };
     } catch (ex) {
         if (ex instanceof Error && isUserError(ex)) {

@@ -10,7 +10,7 @@ import type {
     UserError,
     AvailableTools,
 } from "../../../graphql/schema";
-import type { Requirement } from "../interfaces/query-requirements-primary-port";
+import type { RequirementResult as DomainResult } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 import { DefaultToolset as SchemaTools } from "../../../types";
@@ -62,8 +62,11 @@ function createMockEvent({
     return mockEvent;
 }
 
+const expectedEmptyResult: DomainResult = { requirements: [], totalWorkers: 0 };
+
 beforeEach(() => {
     mockQueryRequirements.mockReset();
+    mockQueryRequirements.mockResolvedValue(expectedEmptyResult);
 });
 
 test("calls the domain to fetch requirements for provided event w/o tool modifier", async () => {
@@ -204,9 +207,40 @@ test.each([
 );
 
 test.each([
-    ["no requirements received", [], []],
+    ["no requirements received", expectedEmptyResult, [], 0],
     [
         "multiple requirements received",
+        {
+            requirements: [
+                {
+                    name: "test item 1",
+                    amount: 60,
+                    creators: [
+                        {
+                            name: "test item 1",
+                            creator: "test item 1 creator",
+                            amount: 60,
+                            workers: 5,
+                            demands: [{ name: "required item 1", amount: 80 }],
+                        },
+                    ],
+                },
+                {
+                    name: "required item 1",
+                    amount: 80,
+                    creators: [
+                        {
+                            name: "required item 1",
+                            creator: "required item 1 creator",
+                            amount: 80,
+                            workers: 60,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+            totalWorkers: 65,
+        },
         [
             {
                 name: "test item 1",
@@ -235,41 +269,15 @@ test.each([
                 ],
             },
         ],
-        [
-            {
-                name: "test item 1",
-                amount: 60,
-                creators: [
-                    {
-                        name: "test item 1",
-                        creator: "test item 1 creator",
-                        amount: 60,
-                        workers: 5,
-                        demands: [{ name: "required item 1", amount: 80 }],
-                    },
-                ],
-            },
-            {
-                name: "required item 1",
-                amount: 80,
-                creators: [
-                    {
-                        name: "required item 1",
-                        creator: "required item 1 creator",
-                        amount: 80,
-                        workers: 60,
-                        demands: [],
-                    },
-                ],
-            },
-        ],
+        65,
     ],
 ])(
     "returns all items received from domain given %s",
     async (
         _: string,
-        returned: Requirement[],
-        expected: GraphQLRequirement[]
+        returned: DomainResult,
+        expectedRequirements: GraphQLRequirement[],
+        expectedWorkers: number
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);
         const event = createMockEvent({ name: "test", workers: 1 });
@@ -280,8 +288,11 @@ test.each([
         }
 
         expect(actual.__typename).toEqual("Requirements");
-        expect(actual.requirements).toHaveLength(expected.length);
-        expect(actual.requirements).toEqual(expect.arrayContaining(expected));
+        expect(actual.requirements).toHaveLength(expectedRequirements.length);
+        expect(actual.requirements).toEqual(
+            expect.arrayContaining(expectedRequirements)
+        );
+        expect(actual.totalWorkers).toEqual(expectedWorkers);
     }
 );
 
