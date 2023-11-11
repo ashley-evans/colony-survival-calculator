@@ -21,13 +21,19 @@ jest.mock("../domain/query-item", () => ({
 
 const mockQueryItem = queryItem as jest.Mock;
 
-function createOptimalFilter(
-    maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean
-): OptimalFilter {
+function createOptimalFilter({
+    maxAvailableTool,
+    hasMachineTools,
+    hasEyeglasses,
+}: {
+    maxAvailableTool?: AvailableTools;
+    hasMachineTools?: boolean;
+    hasEyeglasses?: boolean;
+}): OptimalFilter {
     return {
         maxAvailableTool: maxAvailableTool ?? null,
         hasMachineTools: hasMachineTools ?? null,
+        hasEyeglasses: hasEyeglasses ?? null,
     };
 }
 
@@ -77,12 +83,12 @@ const mockEventWithCreator = createMockEvent(
 );
 const mockEventWithOptimalFilter = createMockEvent(
     createFilters({
-        optimal: createOptimalFilter(),
+        optimal: createOptimalFilter({}),
     })
 );
 const mockEventWithOptimalFilterAndMaxTool = createMockEvent(
     createFilters({
-        optimal: createOptimalFilter("COPPER"),
+        optimal: createOptimalFilter({ maxAvailableTool: "COPPER" }),
     })
 );
 const mockEventWithAllFilters = createMockEvent(
@@ -90,7 +96,7 @@ const mockEventWithAllFilters = createMockEvent(
         itemName: expectedItemName,
         minimumCreators: expectedMinimumCreators,
         creator: expectedCreator,
-        optimal: createOptimalFilter("STEEL"),
+        optimal: createOptimalFilter({ maxAvailableTool: "STEEL" }),
     })
 );
 
@@ -144,7 +150,7 @@ test.each([
         "an optimal filter specified w/ machine tool indication (true)",
         createMockEvent(
             createFilters({
-                optimal: createOptimalFilter(undefined, true),
+                optimal: createOptimalFilter({ hasMachineTools: true }),
             })
         ),
         {
@@ -155,11 +161,33 @@ test.each([
         "an optimal filter specified w/ machine tool indication (false)",
         createMockEvent(
             createFilters({
-                optimal: createOptimalFilter(undefined, false),
+                optimal: createOptimalFilter({ hasMachineTools: false }),
             })
         ),
         {
             optimal: { hasMachineTools: false },
+        },
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses tool indication (true)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter({ hasEyeglasses: true }),
+            })
+        ),
+        {
+            optimal: { hasEyeglasses: true },
+        },
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses tool indication (false)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter({ hasEyeglasses: false }),
+            })
+        ),
+        {
+            optimal: { hasEyeglasses: false },
         },
     ],
 ])(

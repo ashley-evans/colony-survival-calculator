@@ -20,6 +20,11 @@ function mapOptimalFilter(
                   input.hasMachineTools !== undefined
                       ? input.hasMachineTools
                       : undefined,
+              hasEyeglasses:
+                  input.hasEyeglasses !== null &&
+                  input.hasEyeglasses !== undefined
+                      ? input.hasEyeglasses
+                      : undefined,
           }
         : undefined;
 }

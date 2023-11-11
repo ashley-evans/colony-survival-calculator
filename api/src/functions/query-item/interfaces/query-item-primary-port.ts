@@ -3,6 +3,7 @@ import type { Items, DefaultToolset } from "../../../types";
 type OptimalFilter = {
     maxAvailableTool?: DefaultToolset | undefined;
     hasMachineTools?: boolean | undefined;
+    hasEyeglasses?: boolean | undefined;
 };
 
 type QueryFilters = {
