@@ -17,10 +17,16 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
     const itemMap = new Map<string, Item>();
     const maxAvailableTool = filters.maxAvailableTool ?? DefaultToolset.steel;
     const hasMachineTools = filters.hasMachineTools ?? true;
+    const hasEyeglasses = filters.hasEyeglasses ?? true;
 
     for (const item of items) {
         if (
-            !isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+            !isAvailableToolSufficient(
+                maxAvailableTool,
+                hasMachineTools,
+                hasEyeglasses,
+                item
+            )
         ) {
             continue;
         }

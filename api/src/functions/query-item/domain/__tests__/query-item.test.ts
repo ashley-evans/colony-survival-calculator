@@ -3,8 +3,12 @@ import {
     queryItemByCreatorCount,
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
-import { DefaultToolset, type Items } from "../../../../types";
-import { createItem, createItemWithMachineTools } from "../../../../../test";
+import { DefaultToolset, GlassesToolset, type Items } from "../../../../types";
+import {
+    createItem,
+    createItemWithGlassesTools,
+    createItemWithMachineTools,
+} from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
 jest.mock("../../adapters/mongodb-query-item", () => ({
@@ -387,6 +391,99 @@ describe("field queries", () => {
             });
 
             expect(actual).toHaveLength(0);
+        });
+
+        describe("eye glasses indication", () => {
+            test.each([
+                ["default indication", undefined],
+                ["specified", true],
+            ])(
+                "returns the recipe that uses eye glasses if more optimal with them (%s)",
+                async (_: string, hasEyeglasses: boolean | undefined) => {
+                    const itemName = "item 1";
+                    const expected = createItemWithGlassesTools({
+                        name: itemName,
+                        createTime: 1,
+                        output: 2,
+                        requirements: [],
+                        maximumTool: GlassesToolset.glasses,
+                    });
+                    const received = [
+                        expected,
+                        createItemWithGlassesTools({
+                            name: itemName,
+                            createTime: 1,
+                            output: 2.2,
+                            requirements: [],
+                        }),
+                    ];
+                    mockQueryItemByField.mockResolvedValue(received);
+
+                    const actual = await queryItem({
+                        optimal: { hasEyeglasses },
+                    });
+
+                    expect(actual).toHaveLength(1);
+                    expect(actual[0]).toEqual(expected);
+                }
+            );
+
+            test("ignores eye glasses availability if the more optimal recipe does not require them", async () => {
+                const itemName = "item 1";
+                const expected = createItemWithGlassesTools({
+                    name: itemName,
+                    createTime: 1,
+                    output: 10,
+                    requirements: [],
+                });
+                const received = [
+                    expected,
+                    createItemWithGlassesTools({
+                        name: itemName,
+                        createTime: 5,
+                        output: 10,
+                        requirements: [],
+                        maximumTool: GlassesToolset.glasses,
+                    }),
+                ];
+                mockQueryItemByField.mockResolvedValue(received);
+
+                const actual = await queryItem({
+                    optimal: { hasEyeglasses: true },
+                });
+
+                expect(actual).toHaveLength(1);
+                expect(actual[0]).toEqual(expected);
+            });
+
+            test("does not return more optimal recipe if eye glasses are required but are not available", async () => {
+                const itemName = "item 1";
+                const expected = createItemWithGlassesTools({
+                    name: itemName,
+                    createTime: 5,
+                    output: 1,
+                    requirements: [],
+                });
+                const received = [
+                    expected,
+                    createItemWithGlassesTools({
+                        name: itemName,
+                        createTime: 1,
+                        output: 10,
+                        requirements: [],
+                        minimumTool: GlassesToolset.glasses,
+                        maximumTool: GlassesToolset.glasses,
+                    }),
+                ];
+                mockQueryItemByField.mockResolvedValue(received);
+
+                const actual = await queryItem({
+                    optimal: { hasEyeglasses: false },
+                });
+
+                expect(actual).toHaveLength(1);
+                expect(actual[0]).toEqual(expected);
+            });
         });
     });
 
