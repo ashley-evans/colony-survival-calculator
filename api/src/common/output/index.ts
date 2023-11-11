@@ -15,13 +15,27 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
 
 function calculateOutput(
     item: Pick<Item, "toolset" | "createTime" | "output">,
-    maxAvailableTool: DefaultToolset | GlassesToolset
+    maxAvailableDefaultTool: DefaultToolset,
+    maxAvailableEyeglasses: GlassesToolset
 ): number {
-    const modifier =
-        item.toolset.type === "machine"
-            ? ToolModifierValues["machine"]
-            : getMaxToolModifier(item.toolset.maximumTool, maxAvailableTool);
+    const getModifier = ({ toolset }: Pick<Item, "toolset">) => {
+        switch (toolset.type) {
+            case "machine":
+                return ToolModifierValues["machine"];
+            case "glasses":
+                return getMaxToolModifier(
+                    toolset.maximumTool,
+                    maxAvailableEyeglasses
+                );
+            case "default":
+                return getMaxToolModifier(
+                    toolset.maximumTool,
+                    maxAvailableDefaultTool
+                );
+        }
+    };
 
+    const modifier = getModifier(item);
     return item.output / (item.createTime / modifier);
 }
 

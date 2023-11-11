@@ -4,8 +4,9 @@ import {
     OutputUnitSecondMappings,
     calculateOutput as calculateItemOutput,
     getMinimumToolRequired,
+    MinimumTools,
 } from "../../../common";
-import { DefaultToolset } from "../../../types";
+import { DefaultToolset, GlassesToolset } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
@@ -34,10 +35,16 @@ async function getItemOutputDetails(
 function filterCreatableItems(
     items: ItemOutputDetails[],
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
+    hasEyeglasses: boolean
 ): ItemOutputDetails[] {
     return items.filter((item) =>
-        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+        isAvailableToolSufficient(
+            maxAvailableTool,
+            hasMachineTools,
+            hasEyeglasses,
+            item
+        )
     );
 }
 
@@ -45,11 +52,17 @@ function getMaxOutput(
     items: ItemOutputDetails[],
     workers: number,
     unit: OutputUnit,
-    maxAvailableTool: DefaultToolset
+    maxAvailableDefaultTool: DefaultToolset,
+    maxAvailableEyeglasses: GlassesToolset
 ): number {
     let maximumOutputPerSecond = 0;
     for (const item of items) {
-        const outputPerSecond = calculateItemOutput(item, maxAvailableTool);
+        const outputPerSecond = calculateItemOutput(
+            item,
+            maxAvailableDefaultTool,
+            maxAvailableEyeglasses
+        );
+
         if (maximumOutputPerSecond < outputPerSecond) {
             maximumOutputPerSecond = outputPerSecond;
         }
@@ -60,12 +73,28 @@ function getMaxOutput(
     return outputPerWorker * workers;
 }
 
+function getMinimumToolError({
+    needsMachineTools,
+    minimumDefault,
+}: MinimumTools): string {
+    if (minimumDefault !== DefaultToolset.none) {
+        return `${TOOL_LEVEL_ERROR_PREFIX} minimum tool is: ${minimumDefault}`;
+    }
+
+    if (needsMachineTools) {
+        return `${TOOL_LEVEL_ERROR_PREFIX} requires machine tools`;
+    }
+
+    return `${TOOL_LEVEL_ERROR_PREFIX} requires eyeglasses`;
+}
+
 const calculateOutput: QueryOutputPrimaryPort = async ({
     name,
     workers,
     unit,
     maxAvailableTool = DefaultToolset.none,
     hasMachineTools = false,
+    hasEyeglasses = false,
     creator,
 }) => {
     if (name === "") {
@@ -84,21 +113,28 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     const creatableRecipes = filterCreatableItems(
         outputDetails,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
+        hasEyeglasses
     );
     if (creatableRecipes.length === 0) {
-        const { needsMachineTools, minimumDefault } = getMinimumToolRequired(
+        const minimumTool = getMinimumToolRequired(
             outputDetails.map((details) => ({ ...details, name }))
         );
-
-        const errorSuffix = needsMachineTools
-            ? "requires machine tools"
-            : `minimum tool is: ${minimumDefault}`;
-
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
+        const error = getMinimumToolError(minimumTool);
+        throw new Error(error);
     }
 
-    return getMaxOutput(creatableRecipes, workers, unit, maxAvailableTool);
+    const maxAvailableEyeglasses = hasEyeglasses
+        ? GlassesToolset.glasses
+        : GlassesToolset.no_glasses;
+
+    return getMaxOutput(
+        creatableRecipes,
+        workers,
+        unit,
+        maxAvailableTool,
+        maxAvailableEyeglasses
+    );
 };
 
 export { calculateOutput };

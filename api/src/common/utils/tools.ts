@@ -45,55 +45,42 @@ function getLowestToolWithRangeTool(
     return ToolModifierValues[a] < ToolModifierValues[b] ? a : b;
 }
 
-function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
-    if (group.length === 1) {
-        const item = group[0] as RequiredToolFields;
-
-        switch (item.toolset.type) {
-            case "machine":
-                return {
-                    needsMachineTools: true,
-                    minimumDefault: DefaultToolset.none,
-                    minimumEyeglasses: GlassesToolset.no_glasses,
-                };
-            case "glasses":
-                return {
-                    needsMachineTools: false,
-                    minimumDefault: DefaultToolset.none,
-                    minimumEyeglasses: item.toolset.minimumTool,
-                };
-            case "default":
-                return {
-                    needsMachineTools: false,
-                    minimumDefault: item.toolset.minimumTool,
-                    minimumEyeglasses: GlassesToolset.no_glasses,
-                };
-        }
+function getMinimumDefaultTool(items: RequiredToolFields[]): DefaultToolset {
+    if (items.every(({ toolset }) => toolset.type !== "default")) {
+        return DefaultToolset.none;
     }
 
-    let minimumDefault = DefaultToolset.steel;
-    let minimumEyeglasses = GlassesToolset.glasses;
-    let needsMachineTools = false;
-    for (const { toolset } of group) {
-        switch (toolset.type) {
-            case "machine":
-                needsMachineTools = true;
-                break;
-            case "glasses":
-                minimumEyeglasses = getLowestToolWithRangeTool(
-                    minimumEyeglasses,
-                    toolset.minimumTool
-                );
-                break;
-            case "default":
-                minimumDefault = getLowestToolWithRangeTool(
-                    minimumDefault,
-                    toolset.minimumTool
-                );
+    return items.reduce((acc, current) => {
+        if (current.toolset.type === "default") {
+            acc = getLowestToolWithRangeTool(acc, current.toolset.minimumTool);
         }
+        return acc;
+    }, DefaultToolset.steel as DefaultToolset);
+}
+
+function getMinimumEyeglassesTool(items: RequiredToolFields[]): GlassesToolset {
+    if (items.every(({ toolset }) => toolset.type !== "glasses")) {
+        return GlassesToolset.no_glasses;
     }
 
-    return { minimumDefault, minimumEyeglasses, needsMachineTools };
+    return items.reduce((acc, current) => {
+        if (current.toolset.type === "glasses") {
+            acc = getLowestToolWithRangeTool(acc, current.toolset.minimumTool);
+        }
+        return acc;
+    }, GlassesToolset.glasses as GlassesToolset);
+}
+
+function getMachineToolsRequired(items: RequiredToolFields[]): boolean {
+    return items.some(({ toolset }) => toolset.type === "machine");
+}
+
+function getMinimumToolWithinGroup(items: RequiredToolFields[]): MinimumTools {
+    return {
+        minimumDefault: getMinimumDefaultTool(items),
+        minimumEyeglasses: getMinimumEyeglassesTool(items),
+        needsMachineTools: getMachineToolsRequired(items),
+    };
 }
 
 function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
@@ -177,4 +164,5 @@ export {
     isAvailableToolWithRangeSufficient,
     isAvailableToolSufficient,
     hasMinimumRequiredTools,
+    MinimumTools,
 };

@@ -1,7 +1,12 @@
 import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
-import { DefaultToolset, MachineToolset, Toolset } from "../../../../types";
+import {
+    DefaultToolset,
+    GlassesToolset,
+    MachineToolset,
+    Toolset,
+} from "../../../../types";
 import { OutputUnit } from "../../../../common";
 
 jest.mock("../../adapters/mongodb-output-adapter", () => ({
@@ -278,7 +283,7 @@ describe("handles machine tool recipes", () => {
         ["default", undefined],
         ["specified", false],
     ])(
-        "throws an error if the item can only be produced by machine tools are not available (%s)",
+        "throws an error if the item can only be produced by machine tools and they are not available (%s)",
         async (_: string, hasMachineTools: boolean | undefined) => {
             expect.assertions(1);
             await expect(
@@ -343,6 +348,108 @@ describe("handles machine tool recipes", () => {
             unit: OutputUnit.MINUTES,
             hasMachineTools: true,
             maxAvailableTool: DefaultToolset.steel,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+});
+
+describe("handles eyeglasses recipes", () => {
+    test.each([
+        ["default", undefined],
+        ["specified", false],
+    ])(
+        "throws an error if the item can only be produced by eye glasses and they are not available (%s)",
+        async (_: string, hasEyeglasses: boolean | undefined) => {
+            const expectedRequiredToolsError = new Error(
+                "Unable to create item with available tools, requires eyeglasses"
+            );
+            const eyeglassesItemDetails = createItemOutputDetails(5, 10, {
+                type: "glasses",
+                minimumTool: GlassesToolset.glasses,
+                maximumTool: GlassesToolset.glasses,
+            });
+            mockQueryOutputDetails.mockResolvedValue([eyeglassesItemDetails]);
+
+            expect.assertions(1);
+            await expect(
+                calculateOutput({
+                    name: validItemName,
+                    workers: validWorkers,
+                    unit: OutputUnit.MINUTES,
+                    ...(hasEyeglasses !== undefined ? { hasEyeglasses } : {}),
+                })
+            ).rejects.toThrow(expectedRequiredToolsError);
+        }
+    );
+
+    test("returns expected output if multiple recipes and more optimal uses eye glasses and they are available", async () => {
+        const suboptimal = createItemOutputDetails(1, 2, {
+            type: "glasses",
+            minimumTool: GlassesToolset.no_glasses,
+            maximumTool: GlassesToolset.no_glasses,
+        });
+        const optimal = createItemOutputDetails(1, 2, {
+            type: "glasses",
+            minimumTool: GlassesToolset.glasses,
+            maximumTool: GlassesToolset.glasses,
+        });
+        const expected = 720;
+        mockQueryOutputDetails.mockResolvedValue([suboptimal, optimal]);
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasEyeglasses: true,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("ignores any more optimal recipe that uses eye glasses if they are not available", async () => {
+        const suboptimal = createItemOutputDetails(1, 2, {
+            type: "glasses",
+            minimumTool: GlassesToolset.no_glasses,
+            maximumTool: GlassesToolset.no_glasses,
+        });
+        const optimal = createItemOutputDetails(1, 1.8, {
+            type: "glasses",
+            minimumTool: GlassesToolset.glasses,
+            maximumTool: GlassesToolset.glasses,
+        });
+        const expected = 600;
+        mockQueryOutputDetails.mockResolvedValue([suboptimal, optimal]);
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasEyeglasses: false,
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("does not prefer eye glasses recipes if another recipe is more optimal and uses another toolset", async () => {
+        const suboptimal = createItemOutputDetails(1, 2, {
+            type: "glasses",
+            minimumTool: GlassesToolset.glasses,
+            maximumTool: GlassesToolset.glasses,
+        });
+        const optimal = createItemOutputDetails(1, 5, {
+            type: "default",
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
+        });
+        const expected = 1500;
+        mockQueryOutputDetails.mockResolvedValue([suboptimal, optimal]);
+
+        const actual = await calculateOutput({
+            name: validItemName,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            hasEyeglasses: true,
         });
 
         expect(actual).toBeCloseTo(expected);

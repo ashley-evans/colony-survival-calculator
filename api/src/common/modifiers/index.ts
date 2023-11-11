@@ -43,8 +43,16 @@ const GraphQLToolsSchemaMap: Record<AllToolsets, GraphQLSchemaTools> = {
 };
 
 function getMaxToolModifier(
-    maximum: AllToolsets,
-    available: AllToolsets
+    maximum: DefaultToolset,
+    available: DefaultToolset
+): number;
+function getMaxToolModifier(
+    maximum: GlassesToolset,
+    available: GlassesToolset
+): number;
+function getMaxToolModifier(
+    maximum: DefaultToolset | GlassesToolset,
+    available: DefaultToolset | GlassesToolset
 ): number {
     const maximumToolModifier = ToolModifierValues[maximum];
     const availableToolModifier = ToolModifierValues[available];
