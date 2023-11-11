@@ -16,14 +16,23 @@ jest.mock("../domain/output-calculator", () => ({
 
 const mockCalculateOutput = calculateOutput as jest.Mock;
 
-function createMockEvent(
-    name: string,
-    workers: number,
-    unit: OutputUnit,
-    maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean,
-    creator?: string
-): AppSyncResolverEvent<QueryOutputArgs> {
+function createMockEvent({
+    name,
+    workers,
+    unit,
+    maxAvailableTool,
+    hasMachineTools,
+    hasEyeglasses,
+    creator,
+}: {
+    name: string;
+    workers: number;
+    unit: OutputUnit;
+    maxAvailableTool?: AvailableTools;
+    hasMachineTools?: boolean;
+    hasEyeglasses?: boolean;
+    creator?: string;
+}): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
         name,
@@ -31,6 +40,7 @@ function createMockEvent(
         unit,
         maxAvailableTool: maxAvailableTool ?? null,
         hasMachineTools: hasMachineTools ?? null,
+        hasEyeglasses: hasEyeglasses ?? null,
         creator: creator ?? null,
     };
 
@@ -41,11 +51,11 @@ const expectedItemName = "test item name";
 const expectedWorkers = 5;
 const expectedUnit = "GAME_DAYS";
 
-const validEvent = createMockEvent(
-    expectedItemName,
-    expectedWorkers,
-    expectedUnit
-);
+const validEvent = createMockEvent({
+    name: expectedItemName,
+    workers: expectedWorkers,
+    unit: expectedUnit,
+});
 
 beforeEach(() => {
     mockCalculateOutput.mockReset();
@@ -75,12 +85,12 @@ test.each<[AvailableTools, SchemaTools]>([
         const expectedItemName = "another test item";
         const expectedWorkers = 2;
         const expectedUnit = "MINUTES";
-        const event = createMockEvent(
-            expectedItemName,
-            expectedWorkers,
-            expectedUnit,
-            provided
-        );
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            maxAvailableTool: provided,
+        });
 
         await handler(event);
 
@@ -96,14 +106,12 @@ test.each<[AvailableTools, SchemaTools]>([
 
 test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
     const expectedCreator = "test item creator";
-    const event = createMockEvent(
-        expectedItemName,
-        expectedWorkers,
-        expectedUnit,
-        undefined,
-        undefined,
-        expectedCreator
-    );
+    const event = createMockEvent({
+        name: expectedItemName,
+        workers: expectedWorkers,
+        unit: expectedUnit,
+        creator: expectedCreator,
+    });
 
     await handler(event);
 
@@ -122,15 +130,12 @@ test.each([
 ])(
     "calls the domain to calculate output given machine tool %s",
     async (_: string, hasMachineTools: boolean) => {
-        const expectedCreator = "test item creator";
-        const event = createMockEvent(
-            expectedItemName,
-            expectedWorkers,
-            expectedUnit,
-            undefined,
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
             hasMachineTools,
-            expectedCreator
-        );
+        });
 
         await handler(event);
 
@@ -139,8 +144,32 @@ test.each([
             name: expectedItemName,
             workers: expectedWorkers,
             unit: expectedUnit,
-            creator: expectedCreator,
             hasMachineTools,
+        });
+    }
+);
+
+test.each([
+    ["available", true],
+    ["unavailable", false],
+])(
+    "calls the domain to calculate output given eyeglasses %s",
+    async (_: string, hasEyeglasses: boolean) => {
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            hasEyeglasses,
+        });
+
+        await handler(event);
+
+        expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
+        expect(mockCalculateOutput).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            hasEyeglasses,
         });
     }
 );

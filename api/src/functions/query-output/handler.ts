@@ -25,8 +25,15 @@ const isUserError = ({ message }: Error): boolean => {
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
     event
 ) => {
-    const { name, workers, unit, maxAvailableTool, creator, hasMachineTools } =
-        event.arguments;
+    const {
+        name,
+        workers,
+        unit,
+        maxAvailableTool,
+        creator,
+        hasMachineTools,
+        hasEyeglasses,
+    } = event.arguments;
 
     try {
         const output = await calculateOutput({
@@ -41,6 +48,9 @@ const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
                 : {}),
             ...(hasMachineTools !== undefined && hasMachineTools !== null
                 ? { hasMachineTools }
+                : {}),
+            ...(hasEyeglasses !== undefined && hasEyeglasses !== null
+                ? { hasEyeglasses }
                 : {}),
             ...(creator ? { creator } : {}),
         });

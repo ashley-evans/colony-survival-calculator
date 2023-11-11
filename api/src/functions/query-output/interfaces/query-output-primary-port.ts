@@ -8,6 +8,7 @@ interface QueryOutputPrimaryPort {
         unit: OutputUnit;
         maxAvailableTool?: DefaultToolset;
         hasMachineTools?: boolean;
+        hasEyeglasses?: boolean;
         creator?: string;
     }): Promise<number>;
 }

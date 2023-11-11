@@ -114,6 +114,7 @@ type Query {
         unit: OutputUnit!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
+        hasEyeglasses: Boolean
         creator: String
     ): OutputResult!
 }
