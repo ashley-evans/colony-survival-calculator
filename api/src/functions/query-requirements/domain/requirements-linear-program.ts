@@ -1,6 +1,6 @@
 import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 
-import { Item, Items, DefaultToolset } from "../../../types";
+import { Item, Items, DefaultToolset, GlassesToolset } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime, groupItemsByName } from "./item-utils";
 import { isAvailableToolSufficient } from "../../../common";
@@ -44,10 +44,16 @@ function createVariableName({
 function filterCreatable(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
+    hasEyeglasses: boolean
 ): Items {
     return items.filter((item) =>
-        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+        isAvailableToolSufficient(
+            maxAvailableTool,
+            hasMachineTools,
+            hasEyeglasses,
+            item
+        )
     );
 }
 
@@ -79,6 +85,7 @@ function createRecipeOutputVariableName(
 function createDemandVariables(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
+    maxAvailableEyeglasses: GlassesToolset,
     inputItemName: string
 ): Variables {
     const recipeMap = groupItemsByName(items);
@@ -104,7 +111,11 @@ function createDemandVariables(
             );
 
             // Set recipe output properties
-            const createTime = calculateCreateTime(recipe, maxAvailableTool);
+            const createTime = calculateCreateTime(
+                recipe,
+                maxAvailableTool,
+                maxAvailableEyeglasses
+            );
             recipeVariable[baseRecipeOutputPropertyName] =
                 recipe.output / createTime;
 
@@ -264,7 +275,8 @@ function computeRequirementVertices(
     workers: number,
     requirements: Items,
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
+    hasEyeglasses: boolean
 ): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);
@@ -275,11 +287,13 @@ function computeRequirementVertices(
     const createAbleItems = filterCreatable(
         requirements,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
+        hasEyeglasses
     );
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,
+        hasEyeglasses ? GlassesToolset.glasses : GlassesToolset.no_glasses,
         inputItemName
     );
 

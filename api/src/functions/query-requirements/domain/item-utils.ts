@@ -1,26 +1,23 @@
 import { Graph } from "graph-data-structure";
 
-import { DefaultToolset, Item, Items } from "../../../types";
+import { DefaultToolset, GlassesToolset, Item, Items } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
 import { INTERNAL_SERVER_ERROR } from "./errors";
-import {
-    ToolModifierValues,
-    getMaxToolModifier,
-    groupItemsByName,
-} from "../../../common";
+import { getModifier, groupItemsByName } from "../../../common";
 
 const ROOT_GRAPH_KEY = "root";
 
 function calculateCreateTime(
-    { toolset, createTime }: Pick<Item, "toolset" | "createTime">,
-    availableTool: DefaultToolset
+    item: Pick<Item, "toolset" | "createTime">,
+    maxAvailableDefaultTool: DefaultToolset,
+    maxAvailableEyeglasses: GlassesToolset
 ) {
-    if (toolset.type === "machine") {
-        return createTime / ToolModifierValues["machine"];
-    }
-
-    const toolModifier = getMaxToolModifier(toolset.maximumTool, availableTool);
-    return createTime / toolModifier;
+    const toolModifier = getModifier(
+        item,
+        maxAvailableDefaultTool,
+        maxAvailableEyeglasses
+    );
+    return item.createTime / toolModifier;
 }
 
 function getUniqueItemKey(item: Pick<Item, "name" | "creator">): string {

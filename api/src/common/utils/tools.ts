@@ -110,6 +110,14 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
 }
 
 function isAvailableToolWithRangeSufficient(
+    minimum: DefaultToolset,
+    available: DefaultToolset
+): boolean;
+function isAvailableToolWithRangeSufficient(
+    minimum: GlassesToolset,
+    available: GlassesToolset
+): boolean;
+function isAvailableToolWithRangeSufficient(
     minimum: DefaultToolset | GlassesToolset,
     available: DefaultToolset | GlassesToolset
 ): boolean {
@@ -145,15 +153,26 @@ function isAvailableToolSufficient(
 function hasMinimumRequiredTools(
     items: RequiredToolFields[],
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
+    hasEyeglasses: boolean
 ): { hasRequired: true } | { hasRequired: false; requiredTool: AllToolsets } {
-    const { minimumDefault, needsMachineTools } = getMinimumToolRequired(items);
+    const { minimumDefault, needsMachineTools, minimumEyeglasses } =
+        getMinimumToolRequired(items);
+    if (!isAvailableToolWithRangeSufficient(minimumDefault, maxAvailableTool)) {
+        return { hasRequired: false, requiredTool: minimumDefault };
+    }
+
     if (needsMachineTools && !hasMachineTools) {
         return { hasRequired: false, requiredTool: MachineToolset.machine };
-    } else if (
-        !isAvailableToolWithRangeSufficient(minimumDefault, maxAvailableTool)
+    }
+
+    if (
+        !isAvailableToolWithRangeSufficient(
+            minimumEyeglasses,
+            hasEyeglasses ? GlassesToolset.glasses : GlassesToolset.no_glasses
+        )
     ) {
-        return { hasRequired: false, requiredTool: minimumDefault };
+        return { hasRequired: false, requiredTool: minimumEyeglasses };
     }
 
     return { hasRequired: true };

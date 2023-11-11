@@ -235,6 +235,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
     workers,
     maxAvailableTool = DefaultToolset.none,
     hasMachineTools = false,
+    hasEyeglasses = false,
     unit = OutputUnit.SECONDS,
     creatorOverrides,
 }) => {
@@ -267,14 +268,23 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
     const required = hasMinimumRequiredTools(
         overriddenRequirements,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
+        hasEyeglasses
     );
     if (!required.hasRequired) {
-        const errorSuffix =
-            required.requiredTool === "machine"
-                ? "requires machine tools"
-                : `minimum tool is: ${required.requiredTool}`;
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
+        if (required.requiredTool === "machine") {
+            throw new Error(
+                `${TOOL_LEVEL_ERROR_PREFIX} requires machine tools`
+            );
+        }
+
+        if (required.requiredTool === "glasses") {
+            throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} requires eyeglasses`);
+        }
+
+        throw new Error(
+            `${TOOL_LEVEL_ERROR_PREFIX} minimum tool is: ${required.requiredTool}`
+        );
     }
 
     const result = computeRequirementVertices(
@@ -282,7 +292,8 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         workers,
         overriddenRequirements,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
+        hasEyeglasses
     );
 
     const mapped = mapResults(result);

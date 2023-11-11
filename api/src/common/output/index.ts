@@ -13,30 +13,38 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.GAME_DAYS]: 435,
 };
 
+function getModifier(
+    { toolset }: Pick<Item, "toolset">,
+    maxAvailableDefaultTool: DefaultToolset,
+    maxAvailableEyeglasses: GlassesToolset
+): number {
+    switch (toolset.type) {
+        case "machine":
+            return ToolModifierValues["machine"];
+        case "glasses":
+            return getMaxToolModifier(
+                toolset.maximumTool,
+                maxAvailableEyeglasses
+            );
+        case "default":
+            return getMaxToolModifier(
+                toolset.maximumTool,
+                maxAvailableDefaultTool
+            );
+    }
+}
+
 function calculateOutput(
     item: Pick<Item, "toolset" | "createTime" | "output">,
     maxAvailableDefaultTool: DefaultToolset,
     maxAvailableEyeglasses: GlassesToolset
 ): number {
-    const getModifier = ({ toolset }: Pick<Item, "toolset">) => {
-        switch (toolset.type) {
-            case "machine":
-                return ToolModifierValues["machine"];
-            case "glasses":
-                return getMaxToolModifier(
-                    toolset.maximumTool,
-                    maxAvailableEyeglasses
-                );
-            case "default":
-                return getMaxToolModifier(
-                    toolset.maximumTool,
-                    maxAvailableDefaultTool
-                );
-        }
-    };
-
-    const modifier = getModifier(item);
+    const modifier = getModifier(
+        item,
+        maxAvailableDefaultTool,
+        maxAvailableEyeglasses
+    );
     return item.output / (item.createTime / modifier);
 }
 
-export { OutputUnit, OutputUnitSecondMappings, calculateOutput };
+export { OutputUnit, OutputUnitSecondMappings, getModifier, calculateOutput };
