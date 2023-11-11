@@ -36,6 +36,7 @@ function createMockEvent({
     workers,
     maxAvailableTool,
     hasMachineTools,
+    hasEyeglasses,
     creatorOverrides,
     unit,
     selectionSetList = ["name"],
@@ -44,6 +45,7 @@ function createMockEvent({
     workers: number;
     maxAvailableTool?: AvailableTools;
     hasMachineTools?: boolean;
+    hasEyeglasses?: boolean;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
     selectionSetList?: string[];
@@ -56,6 +58,7 @@ function createMockEvent({
         maxAvailableTool: maxAvailableTool ?? null,
         creatorOverrides: creatorOverrides ?? null,
         hasMachineTools: hasMachineTools ?? null,
+        hasEyeglasses: hasEyeglasses ?? null,
         unit: unit ?? null,
     };
 
@@ -127,6 +130,29 @@ test.each([
             name: expectedItemName,
             workers: expectedAmount,
             hasMachineTools,
+        });
+    }
+);
+
+test.each([
+    ["available", true],
+    ["unavailable", false],
+])(
+    "calls the domain to fetch requirements given eye glasses %s",
+    async (_: string, hasEyeglasses: boolean) => {
+        const event = createMockEvent({
+            name: expectedItemName,
+            workers: expectedAmount,
+            hasEyeglasses,
+        });
+
+        await handler(event);
+
+        expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+        expect(mockQueryRequirements).toHaveBeenCalledWith({
+            name: expectedItemName,
+            workers: expectedAmount,
+            hasEyeglasses,
         });
     }
 );

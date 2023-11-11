@@ -105,6 +105,7 @@ type Query {
         workers: Int!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
+        hasEyeglasses: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
     ): RequirementResult!

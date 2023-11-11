@@ -49,6 +49,7 @@ const handler: GraphQLEventHandler<
         maxAvailableTool,
         creatorOverrides,
         hasMachineTools,
+        hasEyeglasses,
     } = event.arguments;
     const { selectionSetList } = event.info;
 
@@ -73,6 +74,9 @@ const handler: GraphQLEventHandler<
                 : {}),
             ...(hasMachineTools !== null && hasMachineTools !== undefined
                 ? { hasMachineTools }
+                : {}),
+            ...(hasEyeglasses !== null && hasEyeglasses !== undefined
+                ? { hasEyeglasses }
                 : {}),
             ...(creatorOverrides ? { creatorOverrides } : {}),
         });

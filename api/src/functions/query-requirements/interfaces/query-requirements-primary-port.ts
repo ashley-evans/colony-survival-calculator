@@ -32,6 +32,7 @@ interface QueryRequirementsPrimaryPort {
         unit?: OutputUnit;
         maxAvailableTool?: DefaultToolset;
         hasMachineTools?: boolean;
+        hasEyeglasses?: boolean;
         creatorOverrides?: CreatorOverride[];
     }): Promise<Requirement[]>;
 }
