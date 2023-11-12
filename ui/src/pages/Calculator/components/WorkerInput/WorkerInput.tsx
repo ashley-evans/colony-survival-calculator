@@ -19,7 +19,7 @@ function WorkerInput({ onWorkerChange, defaultWorkers }: ItemSelectorProps) {
 
     return (
         <Input
-            label="Workers:"
+            label="Output item workers:"
             parseValue={parseValue}
             onChange={onWorkerChange}
             errorMessage="Invalid input, must be a positive non-zero whole number"
