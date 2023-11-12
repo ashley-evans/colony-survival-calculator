@@ -5,7 +5,7 @@ export const expectedCreatorOverrideQueryName = "GetMultipleCreatorDetails";
 
 export const expectedCalculatorTabHeader = "Desired output:";
 export const expectedItemSelectLabel = "Item:";
-export const expectedWorkerInputLabel = "Workers:";
+export const expectedWorkerInputLabel = "Output item workers:";
 export const expectedOutputUnitLabel = "Desired output units:";
 export const expectedToolSelectLabel = "Tools:";
 export const expectedMachineToolCheckboxLabel = "Machine tools available?";

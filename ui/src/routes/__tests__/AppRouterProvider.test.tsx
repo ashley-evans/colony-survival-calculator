@@ -12,7 +12,7 @@ import {
 
 const EXPECTED_CALCULATOR_HEADER = "Desired output:";
 const EXPECTED_CALCULATOR_ITEM_LABEL = "Item:";
-const EXPECTED_CALCULATOR_WORKER_LABEL = "Workers:";
+const EXPECTED_CALCULATOR_WORKER_LABEL = "Output item workers:";
 const EXPECTED_LOADING_MESSAGE = "Loading...";
 const EXPECTED_APPLICATION_TITLE = "Colony Survival Calculator";
 const EXPECTED_REPOSITORY_URL =
