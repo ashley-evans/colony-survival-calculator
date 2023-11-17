@@ -82,4 +82,4 @@ exports[`handles invalid input (schema validation) given an item with specified 
 
 exports[`handles invalid input (schema validation) given an item with specified machine tools but invalid minimum tool throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/toolset/type","schemaPath":"#/oneOf/0/properties/type/const","keyword":"const","params":{"allowedValue":"default"},"message":"must be equal to constant"},{"instancePath":"/0/toolset/minimumTool","schemaPath":"#/definitions/machineToolset/enum","keyword":"enum","params":{"allowedValues":["machine"]},"message":"must be equal to one of the allowed values"},{"instancePath":"/0/toolset","schemaPath":"#/oneOf","keyword":"oneOf","params":{"passingSchemas":null},"message":"must match exactly one schema in oneOf"}]"`;
 
-exports[`handles invalid input (schema validation) given invalid JSON throws a validation error 1`] = `"Validation Error: Unexpected token i in JSON at position 2"`;
+exports[`handles invalid input (schema validation) given invalid JSON throws a validation error 1`] = `"Validation Error: Expected property name or '}' in JSON at position 2"`;
