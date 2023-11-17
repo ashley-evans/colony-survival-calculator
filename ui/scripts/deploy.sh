@@ -73,7 +73,7 @@ else
     bucket=$(terraform -chdir="$infra_dir" output -raw static_file_bucket_name)
     
     echo "Deploying built files to S3 bucket: $bucket..."
-    aws s3 cp $dist_dir "s3://$bucket" --recursive
+    aws s3 sync $dist_dir "s3://$bucket" --delete
 
     cloudfront_dist_id=$(terraform -chdir="$infra_dir" output -raw static_file_distribution_id)
 
