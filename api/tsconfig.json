@@ -1,9 +1,11 @@
 {
-    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node18/tsconfig"],
+    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node20/tsconfig"],
     "compilerOptions": {
         "outDir": "dist",
         "resolveJsonModule": true,
-        "verbatimModuleSyntax": false
+        "verbatimModuleSyntax": false,
+        "moduleResolution": "bundler",
+        "module": "es6"
     },
     "include": ["./src/**/*"],
     "exclude": ["./dist/**/*"]

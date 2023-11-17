@@ -39,7 +39,7 @@ if [ -z $environment ]; then
 fi
 
 if [ -z $runtime ]; then
-    runtime="node18"
+    runtime="node20"
 fi
 
 current_dir=$(pwd)
