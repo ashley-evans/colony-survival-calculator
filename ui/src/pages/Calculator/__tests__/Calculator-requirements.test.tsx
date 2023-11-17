@@ -1,5 +1,5 @@
 import React from "react";
-import { graphql } from "msw";
+import { HttpResponse, delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -160,24 +160,26 @@ const expectedOutput = 150;
 const expectedOutputText = `Optimal output: ${expectedOutput} per minute`;
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({ distinctItemNames: items.map((item) => item.name) })
-        );
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: items.map((item) => item.name),
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                item: [],
+            },
+        });
     }),
     createCalculatorOutputResponseHandler(
         createRequirements([requirementsWithSingleCreator[0]]),
         expectedOutput
     ),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
-                item: [],
-            })
-        );
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({ data: { item: [] } });
     })
 );
 
@@ -230,8 +232,9 @@ describe("item w/o requirements handling", async () => {
 describe("response delay handling", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
-                return res.once(ctx.delay("infinite"));
+            graphql.query(expectedCalculatorOutputQueryName, async () => {
+                await delay("infinite");
+                return HttpResponse.json({});
             })
         );
     });

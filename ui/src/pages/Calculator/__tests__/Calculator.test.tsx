@@ -1,6 +1,6 @@
 import React from "react";
 import { screen, within } from "@testing-library/react";
-import { graphql } from "msw";
+import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import Calculator from "../Calculator";
@@ -31,27 +31,27 @@ const expectedFarmSizeDetails = {
 const items = [itemWithFarmSize, itemWithoutFarmSize];
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({ distinctItemNames: items.map((item) => item.name) })
-        );
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: items.map((item) => item.name),
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
-        const { filters } = req.variables;
+    graphql.query(expectedItemDetailsQueryName, ({ variables }) => {
+        const { filters } = variables;
         const { name } = filters;
         if (name === itemWithFarmSize.name) {
-            return res(ctx.data({ item: [expectedFarmSizeDetails] }));
+            return HttpResponse.json({
+                data: { item: [expectedFarmSizeDetails] },
+            });
         }
 
-        return res(ctx.data({ item: [] }));
+        return HttpResponse.json({ data: { item: [] } });
     }),
     createCalculatorOutputResponseHandler([], 5.2),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
-                item: [],
-            })
-        );
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({ data: { item: [] } });
     })
 );
 
@@ -329,9 +329,15 @@ describe("optimal farm size note rendering", () => {
 
     test("does not render optimal farm size message if item details could not fetched", async () => {
         server.use(
-            graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-                return res.once(ctx.errors([{ message: "Error Message" }]));
-            })
+            graphql.query(
+                expectedItemDetailsQueryName,
+                () => {
+                    return HttpResponse.json({
+                        errors: [{ message: "Error Message" }],
+                    });
+                },
+                { once: true }
+            )
         );
 
         render(<Calculator />);

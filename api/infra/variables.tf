@@ -14,7 +14,7 @@ variable "src_folder" {
 
 variable "runtime" {
   type    = string
-  default = "nodejs18.x"
+  default = "nodejs20.x"
 }
 
 variable "mongodb_public_key" {

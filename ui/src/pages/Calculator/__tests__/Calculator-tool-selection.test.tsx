@@ -1,5 +1,5 @@
 import React from "react";
-import { graphql } from "msw";
+import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen } from "@testing-library/react";
 
@@ -17,6 +17,7 @@ import {
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
     expectedMachineToolCheckboxLabel,
+    expectedOutputPrefix,
 } from "./utils";
 import {
     click,
@@ -33,21 +34,26 @@ import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
+const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ distinctItemNames: [item.name] }));
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: [item.name],
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                item: [],
+            },
+        });
     }),
     createCalculatorOutputResponseHandler([], 5.2),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
-                item: [],
-            })
-        );
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({ data: { item: [] } });
     })
 );
 
@@ -126,6 +132,7 @@ test("queries calculator with provided tool if non default selected", async () =
         itemName: item.name,
         workers: expectedWorkers,
     });
+    await screen.findByText(expectedOutputMessage);
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -161,6 +168,7 @@ test("queries optimal output again if tool is changed after first query", async 
         workers: expectedWorkers,
     });
     await selectTool(expectedTool);
+    await screen.findByText(expectedOutputMessage);
 
     await expect(expectedRequest).resolves.not.toThrow();
 });
@@ -181,6 +189,7 @@ test("queries requirements with provided tool if non default selected", async ()
         itemName: item.name,
         workers: expectedWorkers,
     });
+    await screen.findByText(expectedOutputMessage);
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -216,6 +225,7 @@ test("queries requirements again if tool is changed after first query", async ()
         workers: expectedWorkers,
     });
     await selectTool(expectedTool);
+    await screen.findByText(expectedOutputMessage);
 
     await expect(expectedRequest).resolves.not.toThrow();
 });

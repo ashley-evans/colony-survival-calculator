@@ -1,5 +1,5 @@
 import React from "react";
-import { graphql } from "msw";
+import { HttpResponse, delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { act, screen, render as rtlRender } from "@testing-library/react";
 import { vi } from "vitest";
@@ -41,21 +41,26 @@ import Output from "../components/Output";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
+const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ distinctItemNames: [item.name] }));
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: [item.name],
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                item: [],
+            },
+        });
     }),
     createCalculatorOutputResponseHandler([], 5.2),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
-                item: [],
-            })
-        );
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({ data: { item: [] } });
     })
 );
 
@@ -148,6 +153,7 @@ test("queries calculator output if item and workers inputted with default unit s
         itemName: item.name,
         workers: expectedWorkers,
     });
+    await screen.findByText(expectedOutputMessage);
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -174,6 +180,7 @@ test("queries calculator output if item and workers inputted with non-default un
         itemName: item.name,
         workers: expectedWorkers,
     });
+    await screen.findByText(`${expectedOutputPrefix} 5.2 per game day`);
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -198,8 +205,9 @@ test("renders the clear input button if workers inputted", async () => {
 
 test("does not render the optimal output message if output has not been received yet", async () => {
     server.use(
-        graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
-            return res(ctx.delay("infinite"));
+        graphql.query(expectedCalculatorOutputQueryName, async () => {
+            await delay("infinite");
+            return HttpResponse.json({});
         })
     );
 
@@ -436,6 +444,7 @@ test("queries optimal output and requirements with machine tool availability onc
         label: expectedMachineToolCheckboxLabel,
         role: "checkbox",
     });
+    await screen.findByText(expectedOutputMessage);
 
     await expect(expectedRequest).resolves.not.toThrow();
 });

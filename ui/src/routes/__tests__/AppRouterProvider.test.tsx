@@ -1,5 +1,5 @@
 import { screen, within } from "@testing-library/react";
-import { graphql } from "msw";
+import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
@@ -23,11 +23,11 @@ const EXPECTED_LIGHT_THEME_BUTTON_LABEL = "Change to light theme";
 const item: ItemName = { name: "Item 1" };
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(ctx.data({ distinctItemNames: [item.name] }));
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({ data: { distinctItemNames: [item.name] } });
     }),
-    graphql.query(expectedItemDetailsQueryName, (req, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({ data: { item: [] } });
     })
 );
 
