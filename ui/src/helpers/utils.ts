@@ -1,25 +1,26 @@
-import { DefaultBodyType, matchRequestUrl, MockedRequest } from "msw";
+import { DefaultBodyType, StrictRequest } from "msw";
 import { SetupServer } from "msw/lib/node";
 
-type GraphQLOperationBody<Arguments> = {
+type GraphQLOperationBody<Arguments extends DefaultBodyType> = {
     operationName: string;
     variables: Arguments;
 };
 
-type RequestListenerResponse = {
-    matchedRequest: MockedRequest;
+type RequestListenerResponse<T extends DefaultBodyType> = {
+    matchedRequest: StrictRequest<T>;
 };
 
-type RequestListenerResponseWithDetails<Arguments> = RequestListenerResponse & {
-    matchedRequestDetails: GraphQLOperationBody<Arguments>;
-    detailsUpToMatch: GraphQLOperationBody<Arguments>[];
-};
+type RequestListenerResponseWithDetails<Arguments extends DefaultBodyType> =
+    RequestListenerResponse<Arguments> & {
+        matchedRequestDetails: GraphQLOperationBody<Arguments>;
+        detailsUpToMatch: GraphQLOperationBody<Arguments>[];
+    };
 
-async function getQueryDetails<Arguments>(
-    req: MockedRequest<DefaultBodyType>
-): Promise<GraphQLOperationBody<Arguments> | undefined> {
+async function getQueryDetails<Arguments extends DefaultBodyType>(
+    req: StrictRequest<GraphQLOperationBody<Arguments>>
+): Promise<GraphQLOperationBody<Arguments> | undefined | null> {
     try {
-        return await req.json();
+        return req.clone().json();
     } catch {
         return undefined;
     }
@@ -29,91 +30,102 @@ function waitForRequest(
     server: SetupServer,
     method: string,
     url: string
-): Promise<RequestListenerResponse>;
-function waitForRequest<Arguments>(
+): Promise<RequestListenerResponse<DefaultBodyType>>;
+function waitForRequest<Arguments extends DefaultBodyType>(
     server: SetupServer,
     method: string,
     url: string,
     operationName?: string,
     requiredArguments?: Arguments
 ): Promise<RequestListenerResponseWithDetails<Arguments>>;
-function waitForRequest<Arguments>(
+function waitForRequest<Arguments extends DefaultBodyType>(
     server: SetupServer,
     method: string,
     url: string,
     operationName?: string,
     requiredArguments?: Arguments
 ): Promise<
-    RequestListenerResponse | RequestListenerResponseWithDetails<Arguments>
+    | RequestListenerResponse<DefaultBodyType>
+    | RequestListenerResponseWithDetails<Arguments>
 > {
     const matchingRequestDetails: GraphQLOperationBody<Arguments>[] = [];
     let requestId = "";
-    let requestDetails: GraphQLOperationBody<Arguments> | undefined;
+    let requestDetails: GraphQLOperationBody<Arguments> | undefined | null;
 
     return new Promise((resolve, reject) => {
-        server.events.on("request:start", async (req) => {
-            const matchesMethod =
-                req.method.toLowerCase() === method.toLowerCase();
+        server.events.on(
+            "request:start",
+            async ({ request, requestId: currentRequestId }) => {
+                const matchesMethod =
+                    request.method.toLowerCase() === method.toLowerCase();
+                const matchesUrl = request.url == url;
 
-            const matchesUrl = matchRequestUrl(req.url, url).matches;
+                let matchesOperationName = true;
+                let matchesArguments = true;
+                let details: GraphQLOperationBody<Arguments> | undefined | null;
+                if (operationName) {
+                    details = await getQueryDetails<Arguments>(request);
+                    matchesOperationName =
+                        operationName === details?.operationName;
 
-            let matchesOperationName = true;
-            let matchesArguments = true;
-            let details: GraphQLOperationBody<Arguments> | undefined;
-            if (operationName) {
-                details = await getQueryDetails<Arguments>(req);
-                matchesOperationName = operationName === details?.operationName;
+                    if (requiredArguments && details) {
+                        matchesArguments =
+                            JSON.stringify(requiredArguments) ==
+                            JSON.stringify(details.variables);
 
-                if (requiredArguments && details) {
-                    matchesArguments =
-                        JSON.stringify(requiredArguments) ==
-                        JSON.stringify(details.variables);
-
-                    matchingRequestDetails.push(details);
-                }
-            }
-
-            if (
-                matchesMethod &&
-                matchesUrl &&
-                matchesOperationName &&
-                matchesArguments
-            ) {
-                requestId = req.id;
-                requestDetails = details;
-            }
-        });
-
-        server.events.on("request:match", (req) => {
-            if (req.id === requestId) {
-                const result: RequestListenerResponse = {
-                    matchedRequest: req,
-                };
-
-                if (requestDetails) {
-                    resolve({
-                        ...result,
-                        matchedRequestDetails: requestDetails,
-                        detailsUpToMatch: matchingRequestDetails.slice(
-                            0,
-                            matchingRequestDetails.length - 1
-                        ),
-                    });
+                        matchingRequestDetails.push(details);
+                    }
                 }
 
-                resolve(result);
+                if (
+                    matchesMethod &&
+                    matchesUrl &&
+                    matchesOperationName &&
+                    matchesArguments
+                ) {
+                    requestId = currentRequestId;
+                    requestDetails = details;
+                }
             }
-        });
+        );
 
-        server.events.on("request:unhandled", (req) => {
-            if (req.id === requestId) {
-                reject(
-                    new Error(
-                        `The ${req.method} ${req.url.href} request was unhandled.`
-                    )
-                );
+        server.events.on(
+            "request:match",
+            ({ request, requestId: currentRequestId }) => {
+                if (currentRequestId === requestId) {
+                    if (requestDetails) {
+                        const result: RequestListenerResponse<Arguments> = {
+                            matchedRequest: request,
+                        };
+
+                        resolve({
+                            ...result,
+                            matchedRequestDetails: requestDetails,
+                            detailsUpToMatch: matchingRequestDetails.slice(
+                                0,
+                                matchingRequestDetails.length - 1
+                            ),
+                        });
+                    }
+
+                    resolve({ matchedRequest: request });
+                }
             }
-        });
+        );
+
+        server.events.on(
+            "request:unhandled",
+            ({ requestId: currentRequestId, request }) => {
+                if (currentRequestId === requestId) {
+                    const url = new URL(request.url);
+                    reject(
+                        new Error(
+                            `The ${request.method} ${url.href} request was unhandled.`
+                        )
+                    );
+                }
+            }
+        );
     });
 }
 

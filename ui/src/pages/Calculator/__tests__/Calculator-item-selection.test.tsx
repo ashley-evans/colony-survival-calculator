@@ -1,6 +1,6 @@
 import React from "react";
 import { screen } from "@testing-library/react";
-import { graphql } from "msw";
+import { HttpResponse, delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../../helpers/utils";
@@ -35,21 +35,27 @@ const expectedNetworkExceptionError =
 const items: ItemName[] = [{ name: "Item 1" }, { name: "Item 2" }];
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({ distinctItemNames: items.map((item) => item.name) })
-        );
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: items.map((item) => item.name),
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                item: [],
+            },
+        });
     }),
     createCalculatorOutputResponseHandler([], 5.2),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({
+            data: {
                 item: [],
-            })
-        );
+            },
+        });
     })
 );
 
@@ -61,10 +67,12 @@ beforeEach(() => {
     server.resetHandlers();
     server.events.removeAllListeners();
     server.use(
-        graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-            return res(
-                ctx.data({ distinctItemNames: items.map((item) => item.name) })
-            );
+        graphql.query(expectedItemNameQueryName, () => {
+            return HttpResponse.json({
+                data: {
+                    distinctItemNames: items.map((item) => item.name),
+                },
+            });
         })
     );
 });
@@ -98,8 +106,9 @@ describe("handles item loading", () => {
 
     beforeEach(() => {
         server.use(
-            graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                return res(ctx.delay("infinite"));
+            graphql.query(expectedItemNameQueryName, async () => {
+                await delay("infinite");
+                return HttpResponse.json({});
             })
         );
     });
@@ -155,8 +164,12 @@ describe("handles item loading", () => {
 describe("given no item names returned", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                return res(ctx.data({ distinctItemNames: [] }));
+            graphql.query(expectedItemNameQueryName, () => {
+                return HttpResponse.json({
+                    data: {
+                        distinctItemNames: [],
+                    },
+                });
             })
         );
     });
@@ -347,9 +360,15 @@ test("does not reset the currently selected item after changing tabs", async () 
 describe("item name request error handling", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-                return res.once(ctx.errors([{ message: "Error Message" }]));
-            })
+            graphql.query(
+                expectedItemNameQueryName,
+                () => {
+                    return HttpResponse.json({
+                        errors: [{ message: "Error Message" }],
+                    });
+                },
+                { once: true }
+            )
         );
     });
 
@@ -394,9 +413,15 @@ describe("item name request error handling", () => {
 
 test("renders an unhandled error message if an exception occurs fetching item details", async () => {
     server.use(
-        graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-            return res.once(ctx.errors([{ message: "Error Message" }]));
-        })
+        graphql.query(
+            expectedItemDetailsQueryName,
+            () => {
+                return HttpResponse.json({
+                    errors: [{ message: "Error Message" }],
+                });
+            },
+            { once: true }
+        )
     );
 
     render(<Calculator />);

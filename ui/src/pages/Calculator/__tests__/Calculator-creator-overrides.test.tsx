@@ -1,6 +1,6 @@
 import React from "react";
 import { screen, waitFor } from "@testing-library/react";
-import { graphql } from "msw";
+import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import { waitForRequest } from "../../../helpers/utils";
@@ -23,6 +23,7 @@ import {
     expectedCalculatorTabHeader,
     selectItemAndWorkers,
     expectedCalculatorOutputQueryName,
+    expectedOutputPrefix,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import {
@@ -61,6 +62,7 @@ const expectedCreatorOverrides: CreatorOverride[] = [
     ...expectedFirstItemOverrides,
     ...expectedSecondItemOverrides,
 ];
+const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
 
 function generateItemCreatorOverrides(
     name: string,
@@ -79,24 +81,30 @@ function generateItemCreatorOverrides(
 }
 
 const server = setupServer(
-    graphql.query(expectedItemNameQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({ distinctItemNames: items.map((item) => item.name) })
-        );
+    graphql.query(expectedItemNameQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                distinctItemNames: items.map((item) => item.name),
+            },
+        });
     }),
-    graphql.query(expectedItemDetailsQueryName, (_, res, ctx) => {
-        return res(ctx.data({ item: [] }));
+    graphql.query(expectedItemDetailsQueryName, () => {
+        return HttpResponse.json({
+            data: {
+                item: [],
+            },
+        });
     }),
     createCalculatorOutputResponseHandler([], 5.2),
-    graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-        return res(
-            ctx.data({
+    graphql.query(expectedCreatorOverrideQueryName, () => {
+        return HttpResponse.json({
+            data: {
                 item: expectedCreatorOverrides.map(({ itemName, creator }) => ({
                     name: itemName,
                     creator,
                 })),
-            })
-        );
+            },
+        });
     })
 );
 
@@ -143,8 +151,9 @@ test("displays optimal default calculation explanation", async () => {
 describe("handles creator override list loading", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-                return res(ctx.delay("infinite"));
+            graphql.query(expectedCreatorOverrideQueryName, async () => {
+                await delay("infinite");
+                return HttpResponse.json({});
             })
         );
     });
@@ -175,12 +184,12 @@ describe("handles creator override list loading", () => {
 describe("given no creator overrides returned", () => {
     beforeEach(() => {
         server.use(
-            graphql.query(expectedCreatorOverrideQueryName, (_, res, ctx) => {
-                return res(
-                    ctx.data({
+            graphql.query(expectedCreatorOverrideQueryName, () => {
+                return HttpResponse.json({
+                    data: {
                         item: [],
-                    })
-                );
+                    },
+                });
             })
         );
     });
@@ -249,21 +258,18 @@ describe("given items w/ multiple creators returned", () => {
 
         beforeEach(() => {
             server.use(
-                graphql.query(
-                    expectedCreatorOverrideQueryName,
-                    (_, res, ctx) => {
-                        return res(
-                            ctx.data({
-                                item: expectedOverrides.map(
-                                    ({ itemName, creator }) => ({
-                                        name: itemName,
-                                        creator,
-                                    })
-                                ),
-                            })
-                        );
-                    }
-                )
+                graphql.query(expectedCreatorOverrideQueryName, () => {
+                    return HttpResponse.json({
+                        data: {
+                            item: expectedOverrides.map(
+                                ({ itemName, creator }) => ({
+                                    name: itemName,
+                                    creator,
+                                })
+                            ),
+                        },
+                    });
+                })
             );
         });
 
@@ -892,6 +898,7 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
+            await screen.findByText(expectedOutputMessage);
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({
@@ -974,6 +981,7 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
+            await screen.findByText(expectedOutputMessage);
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({

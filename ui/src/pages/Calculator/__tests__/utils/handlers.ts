@@ -1,4 +1,4 @@
-import { graphql } from "msw";
+import { HttpResponse, graphql } from "msw";
 import {
     GetCalculatorOutputQuery,
     Requirement,
@@ -11,13 +11,13 @@ const createCalculatorOutputResponseHandler = (
 ) =>
     graphql.query<GetCalculatorOutputQuery>(
         expectedCalculatorOutputQueryName,
-        (_, res, ctx) =>
-            res(
-                ctx.data({
+        () =>
+            HttpResponse.json({
+                data: {
                     output: { __typename: "OptimalOutput", amount },
                     requirement: { __typename: "Requirements", requirements },
-                })
-            )
+                },
+            })
     );
 
 const createCalculatorOutputUserErrorHandler = (
@@ -29,9 +29,9 @@ const createCalculatorOutputUserErrorHandler = (
     if ("amount" in input) {
         return graphql.query<GetCalculatorOutputQuery>(
             expectedCalculatorOutputQueryName,
-            (_, res, ctx) =>
-                res(
-                    ctx.data({
+            () =>
+                HttpResponse.json({
+                    data: {
                         output: {
                             __typename: "OptimalOutput",
                             amount: input.amount,
@@ -40,15 +40,15 @@ const createCalculatorOutputUserErrorHandler = (
                             __typename: "UserError",
                             message: input.requirementsUserError,
                         },
-                    })
-                )
+                    },
+                })
         );
     } else if ("requirements" in input) {
         return graphql.query<GetCalculatorOutputQuery>(
             expectedCalculatorOutputQueryName,
-            (_, res, ctx) =>
-                res(
-                    ctx.data({
+            () =>
+                HttpResponse.json({
+                    data: {
                         output: {
                             __typename: "UserError",
                             message: input.amountUserError,
@@ -57,16 +57,16 @@ const createCalculatorOutputUserErrorHandler = (
                             __typename: "Requirements",
                             requirements: input.requirements,
                         },
-                    })
-                )
+                    },
+                })
         );
     }
 
     return graphql.query<GetCalculatorOutputQuery>(
         expectedCalculatorOutputQueryName,
-        (_, res, ctx) =>
-            res(
-                ctx.data({
+        () =>
+            HttpResponse.json({
+                data: {
                     output: {
                         __typename: "UserError",
                         message: input.amountUserError,
@@ -75,14 +75,14 @@ const createCalculatorOutputUserErrorHandler = (
                         __typename: "UserError",
                         message: input.requirementsUserError,
                     },
-                })
-            )
+                },
+            })
     );
 };
 
 const createCalculatorOutputErrorHandler = (message: string) =>
-    graphql.query(expectedCalculatorOutputQueryName, (_, res, ctx) => {
-        return res(ctx.errors([{ message: message }]));
+    graphql.query(expectedCalculatorOutputQueryName, () => {
+        return HttpResponse.json({ errors: [{ message }] });
     });
 
 export {
