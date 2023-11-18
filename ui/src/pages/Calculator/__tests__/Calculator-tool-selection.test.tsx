@@ -84,6 +84,20 @@ test.each(["None", "Stone", "Copper", "Iron", "Bronze", "Steel"])(
     }
 );
 
+test("renders the tool options in order of unlock", async () => {
+    render(<Calculator />);
+    await openSelectMenu({ label: expectedToolSelectLabel });
+
+    const toolOptions = await screen.findAllByRole("option");
+    expect(toolOptions).toHaveLength(6);
+    expect(toolOptions[0]).toHaveAccessibleName("None");
+    expect(toolOptions[1]).toHaveAccessibleName("Stone");
+    expect(toolOptions[2]).toHaveAccessibleName("Copper");
+    expect(toolOptions[3]).toHaveAccessibleName("Iron");
+    expect(toolOptions[4]).toHaveAccessibleName("Bronze");
+    expect(toolOptions[5]).toHaveAccessibleName("Steel");
+});
+
 test("renders none as the selected tool by default", async () => {
     const expected = "None";
 
