@@ -10,7 +10,16 @@ type ToolSelectorProps = {
     className?: string;
 };
 
-const tools = Object.values(AvailableTools);
+const orderedTools: Record<AvailableTools, number> = {
+    [AvailableTools.None]: 0,
+    [AvailableTools.Stone]: 1,
+    [AvailableTools.Copper]: 2,
+    [AvailableTools.Iron]: 3,
+    [AvailableTools.Bronze]: 4,
+    [AvailableTools.Steel]: 5,
+};
+
+const tools = Object.keys(orderedTools) as AvailableTools[];
 
 function ToolSelector({
     onToolChange,
@@ -27,7 +36,7 @@ function ToolSelector({
             itemToKey={(tool) => tool}
             itemToDisplayText={(tool) => ToolSelectorMappings[tool]}
             labelText="Tools:"
-            defaultSelectedItem={defaultTool ?? tools[3]}
+            defaultSelectedItem={defaultTool ?? tools[0]}
             onSelectedItemChange={handleToolChange}
             palette="secondary"
             className={className}
