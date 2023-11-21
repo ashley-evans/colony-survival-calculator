@@ -14,6 +14,14 @@ type Constraints = IModelBase["constraints"];
 type Variables = IModelBase["variables"];
 type VariableProperties = NonNullable<Variables[number]>;
 
+type ProgramInput = {
+    inputItemName: string;
+    target: { workers: number } | { amount: number };
+    requirements: Items;
+    maxAvailableTool: DefaultToolset;
+    hasMachineTools: boolean;
+};
+
 export type VertexOutput = {
     [key: string]: number;
 } & {
@@ -259,13 +267,27 @@ function getVertexWithHighestOutputAndLowestWorkers(
     return currentBest;
 }
 
-function computeRequirementVertices(
+function createTargetConstraint(
     inputItemName: string,
-    workers: number,
-    requirements: Items,
-    maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
-): VertexOutput | undefined {
+    target: ProgramInput["target"]
+): Readonly<Constraints> {
+    if ("workers" in target) {
+        const inputWorkersConstraintName =
+            createInputWorkersPropertyName(inputItemName);
+
+        return { [inputWorkersConstraintName]: { equal: target.workers } };
+    }
+
+    return { [inputItemName]: { equal: target.amount } };
+}
+
+function computeRequirementVertices({
+    inputItemName,
+    requirements,
+    maxAvailableTool,
+    hasMachineTools,
+    target,
+}: ProgramInput): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);
     if (!input) {
@@ -285,8 +307,7 @@ function computeRequirementVertices(
 
     const demandConstraints = createMinimumConstraints(variables);
     const outputConstraints = createOutputConstraints(variables);
-    const inputWorkersConstraintName =
-        createInputWorkersPropertyName(inputItemName);
+    const targetConstraint = createTargetConstraint(inputItemName, target);
 
     const model: IMultiObjectiveModel = {
         optimize: {
@@ -296,7 +317,7 @@ function computeRequirementVertices(
         constraints: {
             ...demandConstraints,
             ...outputConstraints,
-            [inputWorkersConstraintName]: { equal: workers },
+            ...targetConstraint,
         },
         variables: variables,
     };
