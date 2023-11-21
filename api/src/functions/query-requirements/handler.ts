@@ -11,6 +11,7 @@ import {
     TOOL_LEVEL_ERROR_PREFIX,
     MULTIPLE_OVERRIDE_ERROR_PREFIX,
     INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
+    INVALID_TARGET_ERROR,
 } from "./domain/errors";
 import { queryRequirements } from "./domain/query-requirements";
 
@@ -26,6 +27,7 @@ const amountFields = new Set([
 const exactUserErrors = new Set([
     INVALID_ITEM_NAME_ERROR,
     INVALID_WORKERS_ERROR,
+    INVALID_TARGET_ERROR,
     UNKNOWN_ITEM_ERROR,
     INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
 ]);
