@@ -29,34 +29,36 @@ const isUserError = (
 };
 
 const expectedItemName = "test name";
-const expectedAmount = 4;
+const expectedWorkers = 10;
 
-function createMockEvent({
-    name,
-    workers,
-    maxAvailableTool,
-    hasMachineTools,
-    creatorOverrides,
-    unit,
-    selectionSetList = ["name"],
-}: {
+type GraphQLEventBaseInput = {
     name: string;
-    workers: number;
     maxAvailableTool?: AvailableTools;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
     selectionSetList?: string[];
-}): AppSyncResolverEvent<QueryRequirementArgs> {
+};
+
+type GraphQLEventWorkerInput = GraphQLEventBaseInput & { workers: number };
+type GraphQLEventAmountInput = GraphQLEventBaseInput & { amount: number };
+
+function createMockEvent(
+    input: GraphQLEventWorkerInput | GraphQLEventAmountInput
+): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
-    mockEvent.info.selectionSetList = selectionSetList;
+    mockEvent.info.selectionSetList = input.selectionSetList ?? ["name"];
     mockEvent.arguments = {
-        name,
-        workers,
-        maxAvailableTool: maxAvailableTool ?? null,
-        creatorOverrides: creatorOverrides ?? null,
-        hasMachineTools: hasMachineTools ?? null,
-        unit: unit ?? null,
+        name: input.name,
+        target: {
+            ...("workers" in input
+                ? { workers: input.workers }
+                : { amount: input.amount }),
+        },
+        maxAvailableTool: input.maxAvailableTool ?? null,
+        creatorOverrides: input.creatorOverrides ?? null,
+        hasMachineTools: input.hasMachineTools ?? null,
+        unit: input.unit ?? null,
     };
 
     return mockEvent;
@@ -69,7 +71,7 @@ beforeEach(() => {
 test("calls the domain to fetch requirements for provided event w/o tool modifier", async () => {
     const event = createMockEvent({
         name: expectedItemName,
-        workers: expectedAmount,
+        workers: expectedWorkers,
     });
 
     await handler(event);
@@ -77,7 +79,23 @@ test("calls the domain to fetch requirements for provided event w/o tool modifie
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith({
         name: expectedItemName,
-        workers: expectedAmount,
+        workers: expectedWorkers,
+    });
+});
+
+test("calls the domain to fetch requirements to satisfy target output given event with target amount", async () => {
+    const expectedAmount = 5;
+    const event = createMockEvent({
+        name: expectedItemName,
+        amount: expectedAmount,
+    });
+
+    await handler(event);
+
+    expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+    expect(mockQueryRequirements).toHaveBeenCalledWith({
+        name: expectedItemName,
+        amount: expectedAmount,
     });
 });
 
@@ -93,7 +111,7 @@ test.each<[AvailableTools, SchemaTools]>([
     async (provided: AvailableTools, expectedTool: SchemaTools) => {
         const event = createMockEvent({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             maxAvailableTool: provided,
         });
 
@@ -102,7 +120,7 @@ test.each<[AvailableTools, SchemaTools]>([
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             maxAvailableTool: expectedTool,
         });
     }
@@ -116,7 +134,7 @@ test.each([
     async (_: string, hasMachineTools: boolean) => {
         const event = createMockEvent({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             hasMachineTools,
         });
 
@@ -125,7 +143,7 @@ test.each([
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             hasMachineTools,
         });
     }
@@ -144,7 +162,7 @@ test("provides specified creator overrides to domain if provided", async () => {
     ];
     const event = createMockEvent({
         name: expectedItemName,
-        workers: expectedAmount,
+        workers: expectedWorkers,
         creatorOverrides: overrides,
     });
 
@@ -153,7 +171,7 @@ test("provides specified creator overrides to domain if provided", async () => {
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith({
         name: expectedItemName,
-        workers: expectedAmount,
+        workers: expectedWorkers,
         creatorOverrides: overrides,
     });
 });
@@ -167,7 +185,7 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
     async (provided: GraphQLOutputUnit, expected: OutputUnit) => {
         const event = createMockEvent({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             unit: provided,
         });
 
@@ -176,7 +194,7 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             unit: expected,
         });
     }
@@ -194,7 +212,7 @@ test.each([
         );
         const event = createMockEvent({
             name: expectedItemName,
-            workers: expectedAmount,
+            workers: expectedWorkers,
             selectionSetList,
         });
 

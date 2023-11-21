@@ -25,15 +25,28 @@ type Requirement = {
     creators: RequirementRecipe[];
 };
 
+type QueryRequirementsBaseParams = {
+    name: string;
+    unit?: OutputUnit;
+    maxAvailableTool?: DefaultToolset;
+    hasMachineTools?: boolean;
+    creatorOverrides?: CreatorOverride[];
+};
+
+type QueryRequirementsTargetWorkers = QueryRequirementsBaseParams & {
+    workers: number;
+};
+
+type QueryRequirementsTargetAmount = QueryRequirementsBaseParams & {
+    amount: number;
+};
+
+type QueryRequirementsParams =
+    | QueryRequirementsTargetWorkers
+    | QueryRequirementsTargetAmount;
+
 interface QueryRequirementsPrimaryPort {
-    (input: {
-        name: string;
-        workers: number;
-        unit?: OutputUnit;
-        maxAvailableTool?: DefaultToolset;
-        hasMachineTools?: boolean;
-        creatorOverrides?: CreatorOverride[];
-    }): Promise<Requirement[]>;
+    (input: QueryRequirementsParams): Promise<Requirement[]>;
 }
 
 export type {
@@ -42,4 +55,7 @@ export type {
     RequirementRecipe,
     Demand,
     QueryRequirementsPrimaryPort,
+    QueryRequirementsTargetWorkers,
+    QueryRequirementsTargetAmount,
+    QueryRequirementsParams,
 };

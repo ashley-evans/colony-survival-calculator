@@ -44,7 +44,7 @@ const handler: GraphQLEventHandler<
 > = async (event) => {
     const {
         name,
-        workers,
+        target,
         unit,
         maxAvailableTool,
         creatorOverrides,
@@ -63,7 +63,9 @@ const handler: GraphQLEventHandler<
     try {
         const requirements = await queryRequirements({
             name,
-            workers,
+            ...("amount" in target
+                ? { amount: target.amount }
+                : { workers: target.workers }),
             ...(unit ? { unit: OutputUnit[unit] } : {}),
             ...(maxAvailableTool
                 ? {
