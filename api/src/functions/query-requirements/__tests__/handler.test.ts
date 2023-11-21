@@ -31,30 +31,26 @@ const isUserError = (
 const expectedItemName = "test name";
 const expectedWorkers = 10;
 
-type GraphQLEventBaseInput = {
+type GraphQLEventInput = {
     name: string;
     maxAvailableTool?: AvailableTools;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
     selectionSetList?: string[];
+    workers?: number;
+    amount?: number;
 };
 
-type GraphQLEventWorkerInput = GraphQLEventBaseInput & { workers: number };
-type GraphQLEventAmountInput = GraphQLEventBaseInput & { amount: number };
-
 function createMockEvent(
-    input: GraphQLEventWorkerInput | GraphQLEventAmountInput
+    input: GraphQLEventInput
 ): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.info.selectionSetList = input.selectionSetList ?? ["name"];
     mockEvent.arguments = {
         name: input.name,
-        target: {
-            ...("workers" in input
-                ? { workers: input.workers }
-                : { amount: input.amount }),
-        },
+        workers: input.workers ?? null,
+        amount: input.amount ?? null,
         maxAvailableTool: input.maxAvailableTool ?? null,
         creatorOverrides: input.creatorOverrides ?? null,
         hasMachineTools: input.hasMachineTools ?? null,
@@ -214,6 +210,26 @@ test.each([
             name: expectedItemName,
             workers: expectedWorkers,
             selectionSetList,
+        });
+
+        expect.assertions(1);
+        await expect(handler(event)).rejects.toThrow(expectedError);
+    }
+);
+
+test.each([
+    ["neither amount or workers parameters are provided", undefined, undefined],
+    ["both amount and workers parameters are provided", 1, 1],
+])(
+    "throws an invalid argument exception if %s",
+    async (_: string, amount?: number, workers?: number) => {
+        const expectedError = new Error(
+            "Invalid arguments: Must provide either amount or workers when querying requirements (not both)"
+        );
+        const event = createMockEvent({
+            name: expectedItemName,
+            ...(amount ? { amount } : {}),
+            ...(workers ? { workers } : {}),
         });
 
         expect.assertions(1);

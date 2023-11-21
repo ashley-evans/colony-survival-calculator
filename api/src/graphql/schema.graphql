@@ -61,16 +61,6 @@ type Requirements {
 
 union RequirementResult = Requirements | UserError
 
-type RequirementTargetWorkers {
-    workers: Int!
-}
-
-type RequirementTargetAmount {
-    amount: Float!
-}
-
-union RequirementTarget = RequirementTargetWorkers | RequirementTargetAmount
-
 type OptimalOutput {
     amount: Float!
 }
@@ -109,11 +99,12 @@ type Query {
     item(filters: ItemsFilters): [Item!]!
     requirement(
         name: ID!
-        target: RequirementTarget!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
+        workers: Int
+        amount: Float
     ): RequirementResult!
     output(
         name: ID!
