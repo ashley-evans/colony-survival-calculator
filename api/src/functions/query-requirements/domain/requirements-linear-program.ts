@@ -3,7 +3,11 @@ import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 import { Item, Items, DefaultToolset } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime, groupItemsByName } from "./item-utils";
-import { isAvailableToolSufficient } from "../../../common";
+import {
+    OutputUnit,
+    OutputUnitSecondMappings,
+    isAvailableToolSufficient,
+} from "../../../common";
 
 export const WORKERS_PROPERTY = "workers";
 export const REQUIREMENT_PREFIX = "requirement-";
@@ -14,12 +18,15 @@ type Constraints = IModelBase["constraints"];
 type Variables = IModelBase["variables"];
 type VariableProperties = NonNullable<Variables[number]>;
 
+export type ProgramTarget = { workers: number } | { amount: number };
+
 type ProgramInput = {
     inputItemName: string;
-    target: { workers: number } | { amount: number };
+    target: ProgramTarget;
     requirements: Items;
     maxAvailableTool: DefaultToolset;
     hasMachineTools: boolean;
+    unit: OutputUnit;
 };
 
 export type VertexOutput = {
@@ -87,7 +94,8 @@ function createRecipeOutputVariableName(
 function createDemandVariables(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
-    inputItemName: string
+    inputItemName: string,
+    unit: OutputUnit
 ): Variables {
     const recipeMap = groupItemsByName(items);
 
@@ -114,7 +122,7 @@ function createDemandVariables(
             // Set recipe output properties
             const createTime = calculateCreateTime(recipe, maxAvailableTool);
             recipeVariable[baseRecipeOutputPropertyName] =
-                recipe.output / createTime;
+                (recipe.output / createTime) * OutputUnitSecondMappings[unit];
 
             // Create base output to recipe output mapping
             const recipeOutputVariable: VariableProperties = {};
@@ -144,7 +152,9 @@ function createDemandVariables(
                     requirement.name
                 );
                 recipeVariable[recipeDemandVariableName] =
-                    (requirement.amount / createTime) * -1;
+                    (requirement.amount / createTime) *
+                    OutputUnitSecondMappings[unit] *
+                    -1;
 
                 // Add linking properties
                 specificRecipeRequirementVariable[requirement.name] = -1;
@@ -162,7 +172,9 @@ function createDemandVariables(
                 // If optional output is same as base recipe, update base recipe output
                 // rather than adding separate output
                 const optionalOutput =
-                    (optional.amount / createTime) * optional.likelihood;
+                    (optional.amount / createTime) *
+                    optional.likelihood *
+                    OutputUnitSecondMappings[unit];
                 if (optional.name === recipe.name) {
                     const newOutput =
                         (recipeVariable[baseRecipeOutputPropertyName] ?? 0) +
@@ -287,6 +299,7 @@ function computeRequirementVertices({
     maxAvailableTool,
     hasMachineTools,
     target,
+    unit,
 }: ProgramInput): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);
@@ -302,7 +315,8 @@ function computeRequirementVertices({
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,
-        inputItemName
+        inputItemName,
+        unit
     );
 
     const demandConstraints = createMinimumConstraints(variables);

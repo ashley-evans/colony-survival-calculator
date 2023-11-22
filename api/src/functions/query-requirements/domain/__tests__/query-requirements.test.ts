@@ -2129,6 +2129,7 @@ describe("handles machine tools", () => {
 });
 
 describe("handles calculating requirements for target output", () => {
+    const targetAmount = 7.5;
     const requiredItem3 = createItem({
         name: "required item 3",
         createTime: 4,
@@ -2166,73 +2167,6 @@ describe("handles calculating requirements for target output", () => {
         ]);
     });
 
-    test("returns expected requirements", async () => {
-        const targetAmount = 7.5;
-
-        const actual = await queryRequirements({
-            name: validItemName,
-            amount: targetAmount,
-        });
-
-        expect(actual).toEqual([
-            {
-                name: item.name,
-                amount: targetAmount,
-                creators: [
-                    {
-                        name: item.name,
-                        creator: item.creator,
-                        amount: targetAmount,
-                        workers: 5,
-                        demands: [{ name: requiredItem1.name, amount: 10 }],
-                    },
-                ],
-            },
-            {
-                name: requiredItem1.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: requiredItem1.name,
-                        creator: requiredItem1.creator,
-                        amount: 10,
-                        workers: 7.5,
-                        demands: [
-                            { name: requiredItem2.name, amount: 15 },
-                            { name: requiredItem3.name, amount: 10 },
-                        ],
-                    },
-                ],
-            },
-            {
-                name: requiredItem2.name,
-                amount: 15,
-                creators: [
-                    {
-                        name: requiredItem2.name,
-                        creator: requiredItem2.creator,
-                        amount: 15,
-                        workers: 30,
-                        demands: [],
-                    },
-                ],
-            },
-            {
-                name: requiredItem3.name,
-                amount: 10,
-                creators: [
-                    {
-                        name: requiredItem3.name,
-                        creator: requiredItem3.creator,
-                        amount: 10,
-                        workers: 20,
-                        demands: [],
-                    },
-                ],
-            },
-        ]);
-    });
-
     test.each([
         ["equal to zero", 0],
         ["less than zero", -1],
@@ -2247,6 +2181,200 @@ describe("handles calculating requirements for target output", () => {
             await expect(
                 queryRequirements({ name: validItemName, amount })
             ).rejects.toThrow(expectedError);
+        }
+    );
+
+    test.each([
+        [
+            OutputUnit.SECONDS,
+            [
+                {
+                    name: item.name,
+                    amount: targetAmount,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: targetAmount,
+                            workers: 5,
+                            demands: [{ name: requiredItem1.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [
+                                { name: requiredItem2.name, amount: 15 },
+                                { name: requiredItem3.name, amount: 10 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 15,
+                            workers: 30,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem3.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem3.name,
+                            creator: requiredItem3.creator,
+                            amount: 10,
+                            workers: 20,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+        [
+            OutputUnit.MINUTES,
+            [
+                {
+                    name: item.name,
+                    amount: targetAmount,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: targetAmount,
+                            workers: 0.08333333,
+                            demands: [{ name: requiredItem1.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 0.125,
+                            demands: [
+                                { name: requiredItem2.name, amount: 15 },
+                                { name: requiredItem3.name, amount: 10 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 15,
+                            workers: 0.5,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem3.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem3.name,
+                            creator: requiredItem3.creator,
+                            amount: 10,
+                            workers: 0.33333333,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+        [
+            OutputUnit.GAME_DAYS,
+            [
+                {
+                    name: item.name,
+                    amount: targetAmount,
+                    creators: [
+                        {
+                            name: item.name,
+                            creator: item.creator,
+                            amount: targetAmount,
+                            workers: 0.01149425,
+                            demands: [{ name: requiredItem1.name, amount: 10 }],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem1.name,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 0.01724138,
+                            demands: [
+                                { name: requiredItem2.name, amount: 15 },
+                                { name: requiredItem3.name, amount: 10 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem2.name,
+                    amount: 15,
+                    creators: [
+                        {
+                            name: requiredItem2.name,
+                            creator: requiredItem2.creator,
+                            amount: 15,
+                            workers: 0.06896552,
+                            demands: [],
+                        },
+                    ],
+                },
+                {
+                    name: requiredItem3.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            name: requiredItem3.name,
+                            creator: requiredItem3.creator,
+                            amount: 10,
+                            workers: 0.04597701,
+                            demands: [],
+                        },
+                    ],
+                },
+            ],
+        ],
+    ])(
+        "factors output unit into target amount when given non default %s",
+        async (unit: OutputUnit, expected: Requirement[]) => {
+            const actual = await queryRequirements({
+                name: validItemName,
+                amount: targetAmount,
+                unit,
+            });
+
+            expect(actual).toEqual(expected);
         }
     );
 });
