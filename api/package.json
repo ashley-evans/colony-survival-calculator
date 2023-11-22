@@ -38,5 +38,10 @@
         "mongodb-memory-server": "^9.1.1",
         "ts-jest": "^29.1.0",
         "typescript": "^5.0.3"
+    },
+    "config": {
+        "mongodbMemoryServer": {
+            "version": "6.0.4"
+        }
     }
 }
