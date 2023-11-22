@@ -3,7 +3,11 @@ import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 import { Item, Items, DefaultToolset } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime, groupItemsByName } from "./item-utils";
-import { isAvailableToolSufficient } from "../../../common";
+import {
+    OutputUnit,
+    OutputUnitSecondMappings,
+    isAvailableToolSufficient,
+} from "../../../common";
 
 export const WORKERS_PROPERTY = "workers";
 export const REQUIREMENT_PREFIX = "requirement-";
@@ -13,6 +17,17 @@ export const OUTPUT_PREFIX = "output-";
 type Constraints = IModelBase["constraints"];
 type Variables = IModelBase["variables"];
 type VariableProperties = NonNullable<Variables[number]>;
+
+export type ProgramTarget = { workers: number } | { amount: number };
+
+type ProgramInput = {
+    inputItemName: string;
+    target: ProgramTarget;
+    requirements: Items;
+    maxAvailableTool: DefaultToolset;
+    hasMachineTools: boolean;
+    unit: OutputUnit;
+};
 
 export type VertexOutput = {
     [key: string]: number;
@@ -79,7 +94,8 @@ function createRecipeOutputVariableName(
 function createDemandVariables(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
-    inputItemName: string
+    inputItemName: string,
+    unit: OutputUnit
 ): Variables {
     const recipeMap = groupItemsByName(items);
 
@@ -106,7 +122,7 @@ function createDemandVariables(
             // Set recipe output properties
             const createTime = calculateCreateTime(recipe, maxAvailableTool);
             recipeVariable[baseRecipeOutputPropertyName] =
-                recipe.output / createTime;
+                (recipe.output / createTime) * OutputUnitSecondMappings[unit];
 
             // Create base output to recipe output mapping
             const recipeOutputVariable: VariableProperties = {};
@@ -136,7 +152,9 @@ function createDemandVariables(
                     requirement.name
                 );
                 recipeVariable[recipeDemandVariableName] =
-                    (requirement.amount / createTime) * -1;
+                    (requirement.amount / createTime) *
+                    OutputUnitSecondMappings[unit] *
+                    -1;
 
                 // Add linking properties
                 specificRecipeRequirementVariable[requirement.name] = -1;
@@ -154,7 +172,9 @@ function createDemandVariables(
                 // If optional output is same as base recipe, update base recipe output
                 // rather than adding separate output
                 const optionalOutput =
-                    (optional.amount / createTime) * optional.likelihood;
+                    (optional.amount / createTime) *
+                    optional.likelihood *
+                    OutputUnitSecondMappings[unit];
                 if (optional.name === recipe.name) {
                     const newOutput =
                         (recipeVariable[baseRecipeOutputPropertyName] ?? 0) +
@@ -259,13 +279,28 @@ function getVertexWithHighestOutputAndLowestWorkers(
     return currentBest;
 }
 
-function computeRequirementVertices(
+function createTargetConstraint(
     inputItemName: string,
-    workers: number,
-    requirements: Items,
-    maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
-): VertexOutput | undefined {
+    target: ProgramInput["target"]
+): Readonly<Constraints> {
+    if ("workers" in target) {
+        const inputWorkersConstraintName =
+            createInputWorkersPropertyName(inputItemName);
+
+        return { [inputWorkersConstraintName]: { equal: target.workers } };
+    }
+
+    return { [inputItemName]: { equal: target.amount } };
+}
+
+function computeRequirementVertices({
+    inputItemName,
+    requirements,
+    maxAvailableTool,
+    hasMachineTools,
+    target,
+    unit,
+}: ProgramInput): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemName);
     if (!input) {
@@ -280,13 +315,13 @@ function computeRequirementVertices(
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,
-        inputItemName
+        inputItemName,
+        unit
     );
 
     const demandConstraints = createMinimumConstraints(variables);
     const outputConstraints = createOutputConstraints(variables);
-    const inputWorkersConstraintName =
-        createInputWorkersPropertyName(inputItemName);
+    const targetConstraint = createTargetConstraint(inputItemName, target);
 
     const model: IMultiObjectiveModel = {
         optimize: {
@@ -296,7 +331,7 @@ function computeRequirementVertices(
         constraints: {
             ...demandConstraints,
             ...outputConstraints,
-            [inputWorkersConstraintName]: { equal: workers },
+            ...targetConstraint,
         },
         variables: variables,
     };

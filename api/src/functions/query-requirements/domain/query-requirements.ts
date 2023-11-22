@@ -1,16 +1,13 @@
 import type {
     CreatorOverride,
     Demand,
+    QueryRequirementsParams,
     QueryRequirementsPrimaryPort,
     RequirementRecipe,
 } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
 import { Items, DefaultToolset } from "../../../types";
-import {
-    hasMinimumRequiredTools,
-    OutputUnit,
-    OutputUnitSecondMappings,
-} from "../../../common";
+import { hasMinimumRequiredTools, OutputUnit } from "../../../common";
 import { Requirement } from "../interfaces/query-requirements-primary-port";
 import {
     VertexOutput,
@@ -24,6 +21,7 @@ import {
     INTERNAL_SERVER_ERROR,
     INVALID_ITEM_NAME_ERROR,
     INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
+    INVALID_TARGET_ERROR,
     INVALID_WORKERS_ERROR,
     MULTIPLE_OVERRIDE_ERROR_PREFIX,
     TOOL_LEVEL_ERROR_PREFIX,
@@ -149,7 +147,10 @@ function createRecipeMap(
     return [itemRecipeMap, recipeMap];
 }
 
-function mapResults(results?: VertexOutput): Requirement[] {
+function mapResults(
+    inputItemName: string,
+    results?: VertexOutput
+): Requirement[] {
     if (!results) {
         return [];
     }
@@ -188,63 +189,48 @@ function mapResults(results?: VertexOutput): Requirement[] {
             return { ...recipe, demands: demands ?? [] };
         });
 
-        result.push({
+        const mapped = {
             name: totalKey,
             amount,
             creators: creatorsWithDemands.filter(
                 (creator) => creator.workers > 0
             ),
-        });
+        };
+        totalKey === inputItemName
+            ? result.unshift(mapped)
+            : result.push(mapped);
     }
 
     return result;
 }
 
-function applyOutputUnit(
-    requirements: Requirement[],
-    unit: OutputUnit
-): Requirement[] {
-    const factor = OutputUnitSecondMappings[unit];
-
-    return requirements.map((requirement) => {
-        const creators = requirement.creators.map((creator) => {
-            const demands = creator.demands.map((demand) => {
-                return {
-                    ...demand,
-                    amount: factor * demand.amount,
-                };
-            });
-
-            return {
-                ...creator,
-                demands,
-                amount: factor * creator.amount,
-            };
-        });
-
-        return {
-            ...requirement,
-            creators,
-            amount: factor * requirement.amount,
-        };
-    });
-}
-
-const queryRequirements: QueryRequirementsPrimaryPort = async ({
-    name,
-    workers,
-    maxAvailableTool = DefaultToolset.none,
-    hasMachineTools = false,
-    unit = OutputUnit.SECONDS,
-    creatorOverrides,
-}) => {
-    if (name === "") {
+function validateInput(
+    input: QueryRequirementsParams
+): QueryRequirementsParams {
+    if (input.name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
     }
 
-    if (workers <= 0) {
+    if ("workers" in input && input.workers <= 0) {
         throw new Error(INVALID_WORKERS_ERROR);
     }
+
+    if ("amount" in input && input.amount <= 0) {
+        throw new Error(INVALID_TARGET_ERROR);
+    }
+
+    return input;
+}
+
+const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
+    const {
+        name,
+        maxAvailableTool = DefaultToolset.none,
+        hasMachineTools = false,
+        unit = OutputUnit.SECONDS,
+        creatorOverrides,
+        ...target
+    } = validateInput(input);
 
     const multipleOverride = findMultipleOverrides(creatorOverrides);
     if (multipleOverride) {
@@ -277,16 +263,16 @@ const queryRequirements: QueryRequirementsPrimaryPort = async ({
         throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
     }
 
-    const result = computeRequirementVertices(
-        name,
-        workers,
-        overriddenRequirements,
+    const result = computeRequirementVertices({
+        inputItemName: name,
+        target,
+        requirements: overriddenRequirements,
         maxAvailableTool,
-        hasMachineTools
-    );
+        hasMachineTools,
+        unit,
+    });
 
-    const mapped = mapResults(result);
-    return unit !== OutputUnit.SECONDS ? applyOutputUnit(mapped, unit) : mapped;
+    return mapResults(name, result);
 };
 
 export { queryRequirements };
