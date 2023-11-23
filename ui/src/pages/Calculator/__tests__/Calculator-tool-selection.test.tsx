@@ -12,7 +12,7 @@ import {
     expectedSettingsTabHeader,
     expectedToolSelectLabel,
     clickByName,
-    selectItemAndWorkers,
+    selectItemAndTarget,
     selectTool,
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
@@ -142,7 +142,7 @@ test("queries calculator with provided tool if non default selected", async () =
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(expectedTool);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -177,7 +177,7 @@ test("queries optimal output again if tool is changed after first query", async 
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(AvailableTools.Steel);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -199,7 +199,7 @@ test("queries requirements with provided tool if non default selected", async ()
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(expectedTool);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -234,7 +234,7 @@ test("queries requirements again if tool is changed after first query", async ()
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(AvailableTools.Steel);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -265,7 +265,7 @@ test("queries item details with provided tool if non default selected", async ()
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(expectedTool);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -294,7 +294,7 @@ test("queries item details again if tool is changed after first query", async ()
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectTool(AvailableTools.Steel);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -384,7 +384,7 @@ describe("machine tool selection", () => {
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: item.name,
             workers: expectedWorkers,
         });

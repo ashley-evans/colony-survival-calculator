@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 
 import ItemSelector from "./components/ItemSelector";
-import WorkerInput from "./components/WorkerInput";
 import OutputUnitSelector from "./components/OutputUnitSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
@@ -22,6 +21,7 @@ import {
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
 import Output from "./components/Output";
+import TargetInput from "./components/TargetInput";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -45,6 +45,7 @@ type StateProp<S> = [S, (value: S) => void];
 type CalculatorTabProps = {
     itemState: StateProp<string | undefined>;
     workersState: StateProp<number | undefined>;
+    targetAmountState: StateProp<number | undefined>;
     toolState: StateProp<AvailableTools>;
     machineToolState: StateProp<boolean>;
     outputUnitState: StateProp<OutputUnit>;
@@ -68,6 +69,7 @@ function getItemDetailsFilters(
 function CalculatorTab({
     itemState: [selectedItem, setSelectedItem],
     workersState: [workers, setWorkers],
+    targetAmountState: [targetAmount, setTargetAmount],
     toolState: [selectedTool, setSelectedTool],
     machineToolState: [hasMachineTools, setHasMachineTools],
     outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
@@ -114,9 +116,11 @@ function CalculatorTab({
                         onItemChange={setSelectedItem}
                         defaultSelectedItem={selectedItem}
                     />
-                    <WorkerInput
+                    <TargetInput
                         onWorkerChange={setWorkers}
                         defaultWorkers={workers}
+                        onAmountChange={setTargetAmount}
+                        defaultAmount={targetAmount}
                     />
                     <DefaultToolSelector
                         onToolChange={setSelectedTool}
@@ -201,6 +205,7 @@ function Calculator() {
 
     const selectedItemState = useState<string>();
     const workersState = useState<number>();
+    const targetAmountState = useState<number>();
     const selectedToolState = useState<AvailableTools>(AvailableTools.None);
     const hasMachineToolState = useState<boolean>(false);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
@@ -231,6 +236,7 @@ function Calculator() {
                     <CalculatorTab
                         itemState={selectedItemState}
                         workersState={workersState}
+                        targetAmountState={targetAmountState}
                         toolState={selectedToolState}
                         machineToolState={hasMachineToolState}
                         outputUnitState={selectedOutputUnitState}

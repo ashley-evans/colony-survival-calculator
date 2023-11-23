@@ -21,7 +21,7 @@ import {
     expectedRemoveCreatorOverrideButtonText,
     expectedCalculatorTab,
     expectedCalculatorTabHeader,
-    selectItemAndWorkers,
+    selectItemAndTarget,
     expectedCalculatorOutputQueryName,
     expectedOutputPrefix,
 } from "./utils";
@@ -807,7 +807,7 @@ describe("given items w/ multiple creators returned", () => {
                 optionName: expectedCreator,
             });
             await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({ itemName: expectedItem });
+            await selectItemAndTarget({ itemName: expectedItem });
 
             await expect(expectedRequest).resolves.not.toThrow();
         });
@@ -842,7 +842,7 @@ describe("given items w/ multiple creators returned", () => {
                 optionName: expectedSecondItemOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({ itemName: expectedItem });
+            await selectItemAndTarget({ itemName: expectedItem });
             await clickByName(expectedSettingsTab, "tab");
             await clickByName(
                 expectedRemoveCreatorOverrideButtonText,
@@ -894,7 +894,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await user.click(secondItemCreatorOption);
             await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
@@ -933,7 +933,7 @@ describe("given items w/ multiple creators returned", () => {
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
@@ -977,7 +977,7 @@ describe("given items w/ multiple creators returned", () => {
                 optionName: expectedCreator,
             });
             await clickByName(expectedCalculatorTab, "tab");
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });

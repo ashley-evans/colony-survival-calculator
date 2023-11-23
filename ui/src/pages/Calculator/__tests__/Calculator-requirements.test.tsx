@@ -11,7 +11,7 @@ import {
 } from "../../../graphql/__generated__/graphql";
 import Calculator from "../Calculator";
 import {
-    selectItemAndWorkers,
+    selectItemAndTarget,
     expectedItemNameQueryName,
     expectedItemDetailsQueryName,
     expectedCreatorOverrideQueryName,
@@ -204,7 +204,7 @@ describe("item w/o requirements handling", async () => {
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -219,7 +219,7 @@ describe("item w/o requirements handling", async () => {
 
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -241,7 +241,7 @@ describe("response delay handling", () => {
 
     test("does not render the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -258,7 +258,7 @@ describe("response delay handling", () => {
 
     test("does not render the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -273,7 +273,7 @@ describe("response delay handling", () => {
 describe("requirements rendering given requirements", () => {
     test("renders the requirements section header", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -287,7 +287,7 @@ describe("requirements rendering given requirements", () => {
 
     test("renders the requirements table", async () => {
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -326,7 +326,7 @@ describe("requirements rendering given requirements", () => {
             (columnName: string) => {
                 test("renders the column sort button", async () => {
                     render(<Calculator />, expectedGraphQLAPIURL);
-                    await selectItemAndWorkers({
+                    await selectItemAndTarget({
                         itemName: selectedItemName,
                         workers: 5,
                     });
@@ -341,7 +341,7 @@ describe("requirements rendering given requirements", () => {
 
                 test("sets the column as unsorted (default sort) by default", async () => {
                     render(<Calculator />, expectedGraphQLAPIURL);
-                    await selectItemAndWorkers({
+                    await selectItemAndTarget({
                         itemName: selectedItemName,
                         workers: 5,
                     });
@@ -370,7 +370,7 @@ describe("requirements rendering given requirements", () => {
                         const user = userEvent.setup();
 
                         render(<Calculator />, expectedGraphQLAPIURL);
-                        await selectItemAndWorkers({
+                        await selectItemAndTarget({
                             itemName: selectedItemName,
                             workers: 5,
                         });
@@ -401,7 +401,7 @@ describe("requirements rendering given requirements", () => {
             const user = userEvent.setup();
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -441,7 +441,7 @@ describe("requirements rendering given requirements", () => {
             const user = userEvent.setup();
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -552,7 +552,7 @@ describe("requirements rendering given requirements", () => {
                 );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -602,7 +602,7 @@ describe("requirements rendering given requirements", () => {
             );
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -642,7 +642,7 @@ describe("requirements rendering given requirements", () => {
 
         test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -659,7 +659,7 @@ describe("requirements rendering given requirements", () => {
 
         test("does not render a expand button to view creator breakdown if item is only created by 1 creator", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -676,7 +676,7 @@ describe("requirements rendering given requirements", () => {
 
         test("does not render a expand button to view demand breakdown if item has no demands", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -708,7 +708,7 @@ describe("requirements rendering given requirements", () => {
 
             test("renders an expand button to view demand breakdown if item has demands", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -725,7 +725,7 @@ describe("requirements rendering given requirements", () => {
 
             test("pressing the expand button toggles the button to a collapse button", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -746,7 +746,7 @@ describe("requirements rendering given requirements", () => {
 
             test("pressing the collapse button toggles the button back to expand", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -773,7 +773,7 @@ describe("requirements rendering given requirements", () => {
                 const user = userEvent.setup();
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -813,7 +813,7 @@ describe("requirements rendering given requirements", () => {
                     requirementWithSingleCreatorAndDemands.creators[0].demands;
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -840,7 +840,7 @@ describe("requirements rendering given requirements", () => {
                     requirementWithSingleCreatorAndDemands.creators[0].demands;
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -895,7 +895,7 @@ describe("requirements rendering given requirements", () => {
             const expectedTotal = "14";
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -924,7 +924,7 @@ describe("requirements rendering given requirements", () => {
                 );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -944,7 +944,7 @@ describe("requirements rendering given requirements", () => {
 
         test("renders a expand button to view creator breakdown", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -961,7 +961,7 @@ describe("requirements rendering given requirements", () => {
 
         test("pressing the expand button toggles the button to a collapse button", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -979,7 +979,7 @@ describe("requirements rendering given requirements", () => {
 
         test("pressing the collapse button toggles the button back to expand", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -1000,7 +1000,7 @@ describe("requirements rendering given requirements", () => {
             const user = userEvent.setup();
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -1036,7 +1036,7 @@ describe("requirements rendering given requirements", () => {
 
         test("does not show creator breakdown by default", async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -1067,7 +1067,7 @@ describe("requirements rendering given requirements", () => {
             const expectedCreators = requirementWithMultipleCreators.creators;
 
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: selectedItemName,
                 workers: 5,
             });
@@ -1116,7 +1116,7 @@ describe("requirements rendering given requirements", () => {
 
             test("renders an expand button to view demand breakdown if creator has demands", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1140,7 +1140,7 @@ describe("requirements rendering given requirements", () => {
 
             test("pressing the expand button toggles the button to a collapse button", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1168,7 +1168,7 @@ describe("requirements rendering given requirements", () => {
 
             test("pressing the collapse button toggles the button back to expand", async () => {
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1202,7 +1202,7 @@ describe("requirements rendering given requirements", () => {
                 const user = userEvent.setup();
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1245,7 +1245,7 @@ describe("requirements rendering given requirements", () => {
                     );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1277,7 +1277,7 @@ describe("requirements rendering given requirements", () => {
                     1;
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -1367,7 +1367,7 @@ describe("requirements rendering given requirements", () => {
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -1403,7 +1403,7 @@ describe("requirements rendering given requirements", () => {
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: selectedItemName,
             workers: 5,
         });
@@ -1754,7 +1754,7 @@ describe("requirements rendering given requirements", () => {
                 const user = userEvent.setup();
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });
@@ -2141,7 +2141,7 @@ describe("requirements rendering given requirements", () => {
                 const user = userEvent.setup();
 
                 render(<Calculator />, expectedGraphQLAPIURL);
-                await selectItemAndWorkers({
+                await selectItemAndTarget({
                     itemName: selectedItemName,
                     workers: 5,
                 });

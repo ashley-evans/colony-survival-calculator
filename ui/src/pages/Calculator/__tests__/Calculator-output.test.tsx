@@ -21,7 +21,7 @@ import {
     expectedSettingsTab,
     expectedSettingsTabHeader,
     clickByName,
-    selectItemAndWorkers,
+    selectItemAndTarget,
     selectOutputUnit,
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
@@ -149,7 +149,7 @@ test("queries calculator output if item and workers inputted with default unit s
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -176,7 +176,7 @@ test("queries calculator output if item and workers inputted with non-default un
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOutputUnit(OutputUnit.GameDays);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -196,7 +196,7 @@ test("renders the clear input button if workers inputted", async () => {
     const expectedClearLabel = "Clear worker input";
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({ workers: 5 });
+    await selectItemAndTarget({ workers: 5 });
 
     expect(
         await screen.findByRole("button", { name: expectedClearLabel })
@@ -213,7 +213,7 @@ test("does not render the optimal output message if output has not been received
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOutputUnit(OutputUnit.GameDays);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: 5,
     });
@@ -241,7 +241,7 @@ test.each([
 
         render(<Calculator />, expectedGraphQLAPIURL);
         await selectOutputUnit(selectedUnit);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: item.name,
             workers: 5,
         });
@@ -281,7 +281,7 @@ test.each([
     server.use(createCalculatorOutputResponseHandler([], actual));
 
     render(<Calculator />);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: 5,
     });
@@ -295,12 +295,12 @@ test("clears the optimal output message if the workers is changed to an invalid 
     server.use(createCalculatorOutputResponseHandler([], output));
 
     render(<Calculator />);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: 5,
     });
     await screen.findByText(expectedOutput);
-    await selectItemAndWorkers({ workers: "wibble", clear: true });
+    await selectItemAndTarget({ workers: "wibble", clear: true });
 
     expect(
         screen.queryByText(expectedOutputPrefix, { exact: false })
@@ -368,7 +368,7 @@ describe.each([
 
         test(`renders the ${expectedErrorTestText} if an error occurs while fetching optimal output`, async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -380,7 +380,7 @@ describe.each([
 
         test("does not render the optimal output message", async () => {
             render(<Calculator />);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -393,7 +393,7 @@ describe.each([
 
         test("does not render the requirements section header", async () => {
             render(<Calculator />);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -408,7 +408,7 @@ describe.each([
 
         test("does not render the requirements table", async () => {
             render(<Calculator />);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -436,7 +436,7 @@ test("queries optimal output and requirements with machine tool availability onc
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });

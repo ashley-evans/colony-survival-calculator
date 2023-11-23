@@ -1,12 +1,15 @@
 import { DefaultTheme } from "styled-components";
 import "@fontsource/roboto-mono";
 
-const common: Pick<DefaultTheme, "container" | "typography"> = {
+const common: Pick<DefaultTheme, "container" | "typography" | "breakpoints"> = {
     container: {
         padding: "1rem",
     },
     typography: {
         family: "Roboto Mono",
+    },
+    breakpoints: {
+        mobile: "40rem",
     },
 };
 

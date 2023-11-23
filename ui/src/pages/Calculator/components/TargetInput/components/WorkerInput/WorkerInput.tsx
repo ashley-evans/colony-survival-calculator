@@ -1,13 +1,13 @@
 import React from "react";
 
-import { Input } from "../../../../common/components";
+import { Input } from "../../../../../../common/components";
 
-type ItemSelectorProps = {
+export type WorkerInputProps = {
     onWorkerChange: (workers?: number) => void;
     defaultWorkers?: number;
 };
 
-function WorkerInput({ onWorkerChange, defaultWorkers }: ItemSelectorProps) {
+function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
     const parseValue = (value: unknown): number => {
         const input = Number(value);
         if (!isNaN(input) && input > 0 && input % 1 === 0) {
@@ -22,9 +22,9 @@ function WorkerInput({ onWorkerChange, defaultWorkers }: ItemSelectorProps) {
             label="Output item workers:"
             parseValue={parseValue}
             onChange={onWorkerChange}
-            errorMessage="Invalid input, must be a positive non-zero whole number"
+            errorMessage="Invalid output item workers, must be a positive non-zero whole number"
             inputMode="numeric"
-            clearIconLabel="Clear worker input"
+            clearIconLabel="Clear output item workers"
             defaultValue={defaultWorkers?.toString()}
         />
     );
