@@ -168,6 +168,7 @@ test("queries calculator with provided tool if non default selected", async () =
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
+        amount: null,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
         maxAvailableTool: expectedTool,
@@ -185,6 +186,7 @@ test("queries optimal output again if tool is changed after first query", async 
         expectedCalculatorOutputQueryName,
         {
             name: item.name,
+            amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
@@ -229,6 +231,7 @@ test("queries requirements with provided tool if non default selected", async ()
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
+        amount: null,
         workers: expectedWorkers,
         maxAvailableTool: expectedTool,
         hasMachineTools: false,
@@ -246,6 +249,7 @@ test("queries requirements again if tool is changed after first query", async ()
         expectedCalculatorOutputQueryName,
         {
             name: item.name,
+            amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,

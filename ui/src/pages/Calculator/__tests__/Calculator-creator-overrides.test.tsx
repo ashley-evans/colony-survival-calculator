@@ -920,6 +920,7 @@ describe("given items w/ multiple creators returned", () => {
 
             expect(matchedRequestDetails.variables).toEqual({
                 name: expectedItem,
+                amount: null,
                 workers: expectedWorkers,
                 unit: OutputUnit.Minutes,
                 maxAvailableTool: expectedTool,
@@ -939,6 +940,7 @@ describe("given items w/ multiple creators returned", () => {
                 expectedCalculatorOutputQueryName,
                 {
                     name: expectedItem,
+                    amount: null,
                     workers: expectedWorkers,
                     unit: OutputUnit.Minutes,
                     maxAvailableTool: expectedTool,
@@ -1005,6 +1007,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(matchedRequestDetails.variables).toEqual({
                 name: expectedItem,
                 workers: expectedWorkers,
+                amount: null,
                 unit: expectedOutputUnit,
                 maxAvailableTool: expectedTool,
                 hasMachineTools: false,

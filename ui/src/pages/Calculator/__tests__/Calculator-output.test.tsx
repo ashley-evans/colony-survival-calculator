@@ -178,6 +178,7 @@ test("queries calculator output if item and workers inputted with default unit s
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
+        amount: null,
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
@@ -205,6 +206,7 @@ test("queries calculator output if item and workers inputted with non-default un
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
+        amount: null,
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
@@ -231,6 +233,7 @@ test("queries calculator output if item and target amount inputted with default 
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
+        workers: null,
         amount: expectedAmount,
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
@@ -257,6 +260,7 @@ test("queries calculator output if item and target amount inputted with non-defa
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
+        workers: null,
         amount: expectedAmount,
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
@@ -341,6 +345,7 @@ test("queries optimal output and requirements with machine tool availability onc
         expectedCalculatorOutputQueryName,
         {
             name: item.name,
+            amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: "NONE",
@@ -362,7 +367,7 @@ test("queries optimal output and requirements with machine tool availability onc
     await expect(expectedRequest).resolves.not.toThrow();
 });
 
-test.only.each([
+test.each([
     ["item with single creator", [item], 20],
     [
         "item with multiple creators",
@@ -462,7 +467,12 @@ describe("debounces output requests", () => {
             "POST",
             expectedGraphQLAPIURL,
             expectedCalculatorOutputQueryName,
-            { name: expectedItemName, workers: 3, unit: expectedOutputUnit }
+            {
+                name: expectedItemName,
+                amount: null,
+                workers: 3,
+                unit: expectedOutputUnit,
+            }
         );
 
         const { rerender } = rtlRender(
@@ -522,7 +532,12 @@ describe("debounces output requests", () => {
             "POST",
             expectedGraphQLAPIURL,
             expectedCalculatorOutputQueryName,
-            { name: expectedItemName, amount: 3, unit: expectedOutputUnit }
+            {
+                name: expectedItemName,
+                amount: 3,
+                workers: null,
+                unit: expectedOutputUnit,
+            }
         );
 
         const { rerender } = rtlRender(

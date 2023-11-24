@@ -89,7 +89,12 @@ function Output({
         getCalculatorOutput({
             variables: {
                 name: itemName,
-                ...debouncedTarget,
+                amount:
+                    "amount" in debouncedTarget ? debouncedTarget.amount : null,
+                workers:
+                    "workers" in debouncedTarget
+                        ? debouncedTarget.workers
+                        : null,
                 unit: outputUnit,
                 maxAvailableTool,
                 hasMachineTools,
