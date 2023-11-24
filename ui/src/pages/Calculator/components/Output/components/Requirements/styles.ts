@@ -104,3 +104,8 @@ export const CreatorBreakdownRow = styled.tr`
 export const BreakdownRow = styled(Row)`
     background-color: ${(props) => props.theme.color.tertiary.on_main};
 `;
+
+export const TotalRow = styled(Row)`
+    font-weight: bold;
+    border-top: 1px solid ${(props) => props.theme.color.tertiary.on_container};
+`;

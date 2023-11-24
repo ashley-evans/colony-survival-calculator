@@ -13,6 +13,7 @@ import {
     Header,
     SortableHeader,
     TableContainer,
+    TotalRow,
 } from "./styles";
 import { RequirementRow } from "./RequirementRow";
 import {
@@ -64,7 +65,7 @@ function Requirements({ requirements }: RequirementsProps) {
         setRows(updated);
     }, [requirements]);
 
-    if (requirements.length === 0) {
+    if (rows.length === 0) {
         return <></>;
     }
 
@@ -72,6 +73,10 @@ function Requirements({ requirements }: RequirementsProps) {
         workerSortDirection !== "none"
             ? sortBy(rows, workerSortDirection, "workers")
             : sortBy(rows, amountSortDirection, "amount");
+
+    const totalWorkers = rows.reduce((acc, { workers }) => {
+        return acc + Math.ceil(workers);
+    }, 0);
 
     return (
         <>
@@ -126,6 +131,13 @@ function Requirements({ requirements }: RequirementsProps) {
                             />
                         ))}
                     </tbody>
+                    {rows.length > 1 && totalWorkers ? (
+                        <tfoot>
+                            <TotalRow
+                                row={{ name: "Total:", workers: totalWorkers }}
+                            />
+                        </tfoot>
+                    ) : null}
                 </RequirementsTable>
             </TableContainer>
         </>
