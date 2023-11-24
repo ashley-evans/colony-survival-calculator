@@ -1,4 +1,10 @@
-import React, { FormEvent, HTMLAttributes, useId, useState } from "react";
+import React, {
+    FormEvent,
+    HTMLAttributes,
+    useEffect,
+    useId,
+    useState,
+} from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -55,6 +61,10 @@ function Input<Type>({
         setValue("");
         onChange(undefined);
     };
+
+    useEffect(() => {
+        setValue(defaultValue ?? "");
+    }, [defaultValue]);
 
     return (
         <Container className={className}>

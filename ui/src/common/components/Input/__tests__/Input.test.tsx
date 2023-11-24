@@ -7,6 +7,7 @@ import {
     renderWithTestProviders as render,
     typeValue,
     clearInput,
+    wrapWithTestProviders,
 } from "../../../../test";
 import Input from "..";
 
@@ -284,6 +285,35 @@ test("sets the provided value as default if specified", async () => {
             onChange={mockOnChangeHandler}
             defaultValue={expectedDefault}
         />
+    );
+
+    expect(
+        await screen.findByLabelText(expectedLabelText, {
+            selector: "input",
+        })
+    ).toHaveValue(expectedDefault);
+});
+
+test("changes the displayed value when the default value is changed after initial render", async () => {
+    const expectedDefault = "2";
+    const { rerender } = render(
+        <Input
+            label={expectedLabelText}
+            parseValue={parseValue}
+            onChange={mockOnChangeHandler}
+            defaultValue={"1"}
+        />
+    );
+
+    rerender(
+        wrapWithTestProviders(
+            <Input
+                label={expectedLabelText}
+                parseValue={parseValue}
+                onChange={mockOnChangeHandler}
+                defaultValue={expectedDefault}
+            />
+        )
     );
 
     expect(
