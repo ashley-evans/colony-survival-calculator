@@ -8,9 +8,8 @@ import { gql } from "../../../../graphql/__generated__";
 import { useLazyQuery } from "@apollo/client";
 import { useDebounce } from "use-debounce";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
-import { Requirements } from "./components";
+import { Requirements, RequirementsSankey } from "./components";
 import { LoadingMessage } from "./styles";
-import RequirementsSankey from "./components/RequirementsSankey";
 import { Target } from "../TargetInput";
 
 type OutputProps = {
