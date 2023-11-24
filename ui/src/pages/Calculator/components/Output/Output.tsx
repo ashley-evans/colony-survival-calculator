@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import {
     OutputUnit,
     AvailableTools,
@@ -8,14 +8,15 @@ import { gql } from "../../../../graphql/__generated__";
 import { useLazyQuery } from "@apollo/client";
 import { useDebounce } from "use-debounce";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
-import { OptimalOutput, Requirements } from "./components";
+import { Requirements, RequirementsSankey } from "./components";
 import { LoadingMessage } from "./styles";
-import RequirementsSankey from "./components/RequirementsSankey";
+import { Target } from "../TargetInput";
 
-type OptimalProps = {
+type OutputProps = {
     itemName: string;
-    workers: number;
+    target: Target;
     outputUnit: OutputUnit;
+    onSelectedItemTotalChange: (target: Target) => void;
     maxAvailableTool?: AvailableTools;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
@@ -26,16 +27,8 @@ type ErrorMessageProps = {
 };
 
 const GET_CALCULATOR_OUTPUT = gql(`
-    query GetCalculatorOutput($name: ID!, $workers: Int!, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $outputCreator: String, $creatorOverrides: [CreatorOverride!]) {
-        output(name: $name, workers: $workers, unit: $unit, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creator: $outputCreator) {
-            ... on OptimalOutput {
-                amount
-            }
-            ... on UserError {
-                message
-            }
-        }
-        requirement(name: $name, workers: $workers, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit) {
+    query GetCalculatorOutput($name: ID!, $workers: Int, $amount: Float, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $creatorOverrides: [CreatorOverride!]) {
+        requirement(name: $name, workers: $workers, amount: $amount, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit) {
             ... on Requirements {
                 requirements {
                     name
@@ -63,24 +56,31 @@ function ErrorMessage({ children }: ErrorMessageProps) {
     return <span role="alert">{children}</span>;
 }
 
+function UnhandledErrorMessage() {
+    return (
+        <ErrorMessage>
+            An error occurred while calculating output, please change inputs and
+            try again.
+        </ErrorMessage>
+    );
+}
+
 function Output({
     itemName,
-    workers,
+    target,
     outputUnit,
     maxAvailableTool,
     hasMachineTools,
     creatorOverrides,
-}: OptimalProps) {
+    onSelectedItemTotalChange,
+}: OutputProps) {
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
         GET_CALCULATOR_OUTPUT
     );
-    const [debouncedWorkers] = useDebounce(workers, DEFAULT_DEBOUNCE);
+    const [debouncedTarget] = useDebounce(target, DEFAULT_DEBOUNCE);
+    const [hasInvalidResponse, setHasInvalidResponse] = useState<boolean>();
 
     useEffect(() => {
-        const creator = creatorOverrides
-            ? creatorOverrides.find(({ itemName: item }) => item === itemName)
-                  ?.creator
-            : undefined;
         const creatorOverridesFilter =
             creatorOverrides && creatorOverrides.length > 0
                 ? creatorOverrides
@@ -89,48 +89,71 @@ function Output({
         getCalculatorOutput({
             variables: {
                 name: itemName,
-                workers: debouncedWorkers,
+                amount:
+                    "amount" in debouncedTarget ? debouncedTarget.amount : null,
+                workers:
+                    "workers" in debouncedTarget
+                        ? debouncedTarget.workers
+                        : null,
                 unit: outputUnit,
                 maxAvailableTool,
                 hasMachineTools,
-                outputCreator: creator,
                 creatorOverrides: creatorOverridesFilter,
             },
         });
     }, [
         itemName,
-        debouncedWorkers,
+        debouncedTarget,
         outputUnit,
         maxAvailableTool,
         hasMachineTools,
         creatorOverrides,
     ]);
 
-    if (error) {
-        return (
-            <ErrorMessage>
-                An error occurred while calculating output, please change
-                item/workers/output unit and try again.
-            </ErrorMessage>
+    useEffect(() => {
+        if (!data?.requirement || isUserError(data.requirement)) {
+            return;
+        }
+
+        const selectedItemRequirements = data.requirement.requirements.find(
+            ({ name }) => name === itemName
         );
+
+        if (!selectedItemRequirements) {
+            setHasInvalidResponse(true);
+            return;
+        }
+
+        setHasInvalidResponse(false);
+        if ("amount" in target) {
+            const totalWorkers = selectedItemRequirements.creators.reduce(
+                (acc, { workers }) => {
+                    return acc + workers;
+                },
+                0
+            );
+            onSelectedItemTotalChange({ workers: totalWorkers });
+        } else {
+            onSelectedItemTotalChange({
+                amount: selectedItemRequirements.amount,
+            });
+        }
+    }, [data?.requirement]);
+
+    if (hasInvalidResponse || error) {
+        return <UnhandledErrorMessage />;
     }
 
-    if (loading || !data?.output || !data.requirement) {
+    if (loading || !data?.requirement) {
         return <LoadingMessage>Calculating output...</LoadingMessage>;
     }
 
-    if (
-        (isUserError(data.output) && isUserError(data.requirement)) ||
-        isUserError(data.requirement)
-    ) {
+    if (isUserError(data.requirement)) {
         return <ErrorMessage>{data.requirement.message}</ErrorMessage>;
-    } else if (isUserError(data.output)) {
-        return <ErrorMessage>{data.output.message}</ErrorMessage>;
     }
 
     return (
         <>
-            <OptimalOutput amount={data.output.amount} unit={outputUnit} />
             <Requirements requirements={data.requirement.requirements} />
             <RequirementsSankey
                 requirements={data.requirement.requirements}

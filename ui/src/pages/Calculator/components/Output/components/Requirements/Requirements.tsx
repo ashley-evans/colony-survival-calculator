@@ -64,10 +64,6 @@ function Requirements({ requirements }: RequirementsProps) {
         setRows(updated);
     }, [requirements]);
 
-    if (rows.length <= 1) {
-        return <></>;
-    }
-
     const sortedRows =
         workerSortDirection !== "none"
             ? sortBy(rows, workerSortDirection, "workers")

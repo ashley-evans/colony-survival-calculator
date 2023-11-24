@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import {
     expectedItemSelectLabel,
     expectedOutputUnitLabel,
+    expectedTargetAmountInputLabel,
     expectedToolSelectLabel,
     expectedWorkerInputLabel,
 } from "./constants";
@@ -14,32 +15,44 @@ import {
 import { OutputUnitSelectorMappings, ToolSelectorMappings } from "../../utils";
 import { selectOption } from "../../../../test";
 
-async function selectItemAndWorkers({
-    itemName,
-    workers,
-    clear = false,
-}: {
+type SelectItemAndTargetBaseParams = {
     itemName?: string;
-    workers?: number | string;
     clear?: boolean;
-}) {
+};
+
+type SelectItemAndTargetParams =
+    | (SelectItemAndTargetBaseParams & { workers?: number | string })
+    | (SelectItemAndTargetBaseParams & { amount?: number | string });
+
+async function selectItemAndTarget(input: SelectItemAndTargetParams) {
     const user = userEvent.setup();
     const workerInput = await screen.findByLabelText(expectedWorkerInputLabel, {
         selector: "input",
     });
+    const amountInput = await screen.findByLabelText(
+        expectedTargetAmountInputLabel,
+        {
+            selector: "input",
+        }
+    );
 
-    if (clear) {
+    if (input.clear) {
         await user.clear(workerInput);
+        await user.clear(amountInput);
     }
 
-    if (workers) {
-        await user.type(workerInput, workers.toString());
+    if ("workers" in input && input.workers) {
+        await user.type(workerInput, input.workers.toString());
     }
 
-    if (itemName) {
+    if ("amount" in input && input.amount) {
+        await user.type(amountInput, input.amount.toString());
+    }
+
+    if (input.itemName) {
         await selectOption({
             label: expectedItemSelectLabel,
-            optionName: itemName,
+            optionName: input.itemName,
         });
     }
 }
@@ -65,4 +78,4 @@ async function clickByName(name: string, matcher: ByRoleMatcher) {
     await user.click(tab);
 }
 
-export { clickByName, selectItemAndWorkers, selectOutputUnit, selectTool };
+export { clickByName, selectItemAndTarget, selectOutputUnit, selectTool };

@@ -1,7 +1,12 @@
 import React from "react";
-import { HttpResponse, delay, graphql } from "msw";
+import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
-import { act, screen, render as rtlRender } from "@testing-library/react";
+import {
+    act,
+    screen,
+    render as rtlRender,
+    waitFor,
+} from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
@@ -12,24 +17,29 @@ import {
 } from "../../../test/utils";
 import { waitForRequest } from "../../../helpers/utils";
 import {
-    ItemName,
     expectedCalculatorTab,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
-    expectedOutputPrefix,
     expectedOutputUnitLabel,
     expectedSettingsTab,
     expectedSettingsTabHeader,
     clickByName,
-    selectItemAndWorkers,
+    selectItemAndTarget,
     selectOutputUnit,
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
-    expectedLoadingOutputMessage,
     expectedRequirementsHeading,
     expectedMachineToolCheckboxLabel,
+    createRequirement,
+    createRequirementCreator,
+    expectedWorkerInputLabel,
+    expectedTargetAmountInputLabel,
+    expectedRequirementsUnhandledErrorText,
 } from "./utils";
-import { OutputUnit } from "../../../graphql/__generated__/graphql";
+import {
+    OutputUnit,
+    Requirement,
+} from "../../../graphql/__generated__/graphql";
 
 import Calculator from "../Calculator";
 import {
@@ -40,8 +50,17 @@ import {
 import Output from "../components/Output";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const item: ItemName = { name: "Item 1" };
-const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
+const item = createRequirement({
+    name: "Required Item 1",
+    amount: 30,
+    creators: [
+        createRequirementCreator({
+            recipeName: "Required Item 1",
+            amount: 30,
+            workers: 20,
+        }),
+    ],
+});
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
@@ -58,7 +77,7 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([item]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     })
@@ -149,16 +168,17 @@ test("queries calculator output if item and workers inputted with default unit s
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
+        amount: null,
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
@@ -176,180 +196,90 @@ test("queries calculator output if item and workers inputted with non-default un
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOutputUnit(OutputUnit.GameDays);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
-    await screen.findByText(`${expectedOutputPrefix} 5.2 per game day`);
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
         name: item.name,
         workers: expectedWorkers,
+        amount: null,
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
     });
 });
 
-test("renders the clear input button if workers inputted", async () => {
-    const expectedClearLabel = "Clear worker input";
-
-    render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({ workers: 5 });
-
-    expect(
-        await screen.findByRole("button", { name: expectedClearLabel })
-    ).toBeVisible();
-});
-
-test("does not render the optimal output message if output has not been received yet", async () => {
-    server.use(
-        graphql.query(expectedCalculatorOutputQueryName, async () => {
-            await delay("infinite");
-            return HttpResponse.json({});
-        })
+test("queries calculator output if item and target amount inputted with default unit selected", async () => {
+    const expectedAmount = 5.2;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedCalculatorOutputQueryName
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOutputUnit(OutputUnit.GameDays);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
-        workers: 5,
+        amount: expectedAmount,
     });
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(await screen.findByText(expectedLoadingOutputMessage)).toBeVisible();
-    expect(
-        screen.queryByText(expectedOutputPrefix, { exact: false })
-    ).not.toBeInTheDocument();
+    expect(matchedRequestDetails.variables).toEqual({
+        name: item.name,
+        workers: null,
+        amount: expectedAmount,
+        unit: OutputUnit.GameDays,
+        maxAvailableTool: "NONE",
+        hasMachineTools: false,
+    });
 });
 
-test.each([
-    ["seconds", OutputUnit.Seconds, 0.1, "second"],
-    ["minutes", OutputUnit.Minutes, 5, "minute"],
-    ["game days", OutputUnit.GameDays, 60, "game day"],
-])(
-    "renders the optimal output in %s if selected",
-    async (
-        _: string,
-        selectedUnit: OutputUnit,
-        expected: number,
-        expectedUnit: string
-    ) => {
-        const expectedOutput = `${expectedOutputPrefix} ${expected} per ${expectedUnit}`;
-        server.use(createCalculatorOutputResponseHandler([], expected));
+test("queries calculator output if item and target amount inputted with non-default unit selected", async () => {
+    const expectedAmount = 5.2;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedCalculatorOutputQueryName
+    );
 
-        render(<Calculator />, expectedGraphQLAPIURL);
-        await selectOutputUnit(selectedUnit);
-        await selectItemAndWorkers({
-            itemName: item.name,
-            workers: 5,
-        });
-
-        expect(await screen.findByText(expectedOutput)).toBeVisible();
-    }
-);
-
-test.each([
-    [
-        "rounds optimal output to 1 decimals if more than 1 decimal places",
-        28.23,
-        "≈28.2",
-    ],
-    [
-        "does not show approx symbol if optimal output is only accurate to 1 decimal place",
-        28.1,
-        "28.1",
-    ],
-    [
-        "rounds optimal output to more precision if rounding would output zero",
-        0.0012,
-        "≈0.001",
-    ],
-    [
-        "does not show approx symbol if optimal output has no additional precision (below 0.1)",
-        0.001,
-        "0.001",
-    ],
-    [
-        "rounds optimal output to 1 decimal place (recurring close to ceil)",
-        0.8999999999999999,
-        "≈0.9",
-    ],
-])("%s", async (_: string, actual: number, expected: string) => {
-    const expectedOutput = `${expectedOutputPrefix} ${expected} per minute`;
-    server.use(createCalculatorOutputResponseHandler([], actual));
-
-    render(<Calculator />);
-    await selectItemAndWorkers({
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectItemAndTarget({
         itemName: item.name,
-        workers: 5,
+        amount: expectedAmount,
     });
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
+    const { matchedRequestDetails } = await expectedRequest;
 
-    expect(await screen.findByText(expectedOutput)).toBeVisible();
-});
-
-test("clears the optimal output message if the workers is changed to an invalid value", async () => {
-    const output = 28.1;
-    const expectedOutput = `${expectedOutputPrefix} ${output} per minute`;
-    server.use(createCalculatorOutputResponseHandler([], output));
-
-    render(<Calculator />);
-    await selectItemAndWorkers({
-        itemName: item.name,
-        workers: 5,
+    expect(matchedRequestDetails.variables).toEqual({
+        name: item.name,
+        workers: null,
+        amount: expectedAmount,
+        unit: OutputUnit.Minutes,
+        maxAvailableTool: "NONE",
+        hasMachineTools: false,
     });
-    await screen.findByText(expectedOutput);
-    await selectItemAndWorkers({ workers: "wibble", clear: true });
-
-    expect(
-        screen.queryByText(expectedOutputPrefix, { exact: false })
-    ).not.toBeInTheDocument();
 });
 
 describe.each([
     [
         "unexpected",
         () => createCalculatorOutputErrorHandler("Unexpected"),
-        "An error occurred while calculating output, please change item/workers/output unit and try again.",
+        expectedRequirementsUnhandledErrorText,
         "error message",
     ],
     [
-        "combined consistent user",
-        () =>
-            createCalculatorOutputUserErrorHandler({
-                requirementsUserError: "Consistent user error",
-                amountUserError: "Consistent user error",
-            }),
-        "Consistent user error",
-        "one error message",
-    ],
-    [
-        "inconsistent user error",
+        "requirements query user errors",
         () =>
             createCalculatorOutputUserErrorHandler({
                 requirementsUserError: "Requirements user error",
-                amountUserError: "Amount user error",
-            }),
-        "Requirements user error",
-        "the error message from requirements query",
-    ],
-    [
-        "only amount query user errors",
-        () =>
-            createCalculatorOutputUserErrorHandler({
-                requirements: [],
-                amountUserError: "Amount user error",
-            }),
-        "Amount user error",
-        "the error message from amount query",
-    ],
-    [
-        "only requirements query user errors",
-        () =>
-            createCalculatorOutputUserErrorHandler({
-                requirementsUserError: "Requirements user error",
-                amount: 5.2,
             }),
         "Requirements user error",
         "the error message from requirements query",
@@ -368,7 +298,7 @@ describe.each([
 
         test(`renders the ${expectedErrorTestText} if an error occurs while fetching optimal output`, async () => {
             render(<Calculator />, expectedGraphQLAPIURL);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -378,22 +308,9 @@ describe.each([
             );
         });
 
-        test("does not render the optimal output message", async () => {
-            render(<Calculator />);
-            await selectItemAndWorkers({
-                itemName: item.name,
-                workers: 5,
-            });
-            await screen.findByRole("alert");
-
-            expect(
-                screen.queryByText(expectedOutputPrefix, { exact: false })
-            ).not.toBeInTheDocument();
-        });
-
         test("does not render the requirements section header", async () => {
             render(<Calculator />);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -408,7 +325,7 @@ describe.each([
 
         test("does not render the requirements table", async () => {
             render(<Calculator />);
-            await selectItemAndWorkers({
+            await selectItemAndTarget({
                 itemName: item.name,
                 workers: 5,
             });
@@ -428,6 +345,7 @@ test("queries optimal output and requirements with machine tool availability onc
         expectedCalculatorOutputQueryName,
         {
             name: item.name,
+            amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
             maxAvailableTool: "NONE",
@@ -436,7 +354,7 @@ test("queries optimal output and requirements with machine tool availability onc
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectItemAndWorkers({
+    await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
     });
@@ -444,9 +362,96 @@ test("queries optimal output and requirements with machine tool availability onc
         label: expectedMachineToolCheckboxLabel,
         role: "checkbox",
     });
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
 
     await expect(expectedRequest).resolves.not.toThrow();
+});
+
+test.each([
+    ["item with single creator", [item], 20],
+    [
+        "item with multiple creators",
+        [
+            createRequirement({
+                name: item.name,
+                amount: 50,
+                creators: [
+                    createRequirementCreator({
+                        recipeName: item.name,
+                        creator: "Creator 1",
+                        amount: 45,
+                        workers: 12,
+                    }),
+                    createRequirementCreator({
+                        recipeName: item.name,
+                        creator: "Creator 2",
+                        amount: 5,
+                        workers: 2,
+                    }),
+                ],
+            }),
+        ],
+        14,
+    ],
+    [
+        "item with single creator with floating point worker count",
+        [
+            createRequirement({
+                name: item.name,
+                amount: 50,
+                creators: [
+                    createRequirementCreator({
+                        recipeName: item.name,
+                        creator: "Creator 1",
+                        amount: 45,
+                        workers: 12.5,
+                    }),
+                ],
+            }),
+        ],
+        13,
+    ],
+])(
+    "sets output workers input to total output workers required if target amount entered given %s",
+    async (_: string, requirements: Requirement[], expected: number) => {
+        server.use(createCalculatorOutputResponseHandler(requirements));
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndTarget({
+            itemName: item.name,
+            amount: 10,
+        });
+        await screen.findByRole("heading", {
+            name: expectedRequirementsHeading,
+        });
+
+        await waitFor(() =>
+            expect(
+                screen.getByLabelText(expectedWorkerInputLabel, {
+                    selector: "input",
+                })
+            ).toHaveValue(expected.toString())
+        );
+    }
+);
+
+test("sets output target amount to total output amount if workers entered", async () => {
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectItemAndTarget({
+        itemName: item.name,
+        workers: 10,
+    });
+    await screen.findByRole("heading", {
+        name: expectedRequirementsHeading,
+    });
+
+    await waitFor(() =>
+        expect(
+            screen.getByLabelText(expectedTargetAmountInputLabel, {
+                selector: "input",
+            })
+        ).toHaveValue(item.amount.toString())
+    );
 });
 
 describe("debounces output requests", () => {
@@ -462,15 +467,23 @@ describe("debounces output requests", () => {
             "POST",
             expectedGraphQLAPIURL,
             expectedCalculatorOutputQueryName,
-            { name: expectedItemName, workers: 3, unit: expectedOutputUnit }
+            {
+                name: expectedItemName,
+                amount: null,
+                workers: 3,
+                unit: expectedOutputUnit,
+            }
         );
 
         const { rerender } = rtlRender(
             wrapWithTestProviders(
                 <Output
                     itemName={expectedItemName}
-                    workers={1}
+                    target={{ workers: 1 }}
                     outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
                 />,
                 expectedGraphQLAPIURL
             )
@@ -479,8 +492,11 @@ describe("debounces output requests", () => {
             wrapWithTestProviders(
                 <Output
                     itemName={expectedItemName}
-                    workers={2}
+                    target={{ workers: 2 }}
                     outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
                 />,
                 expectedGraphQLAPIURL
             )
@@ -489,8 +505,11 @@ describe("debounces output requests", () => {
             wrapWithTestProviders(
                 <Output
                     itemName={expectedItemName}
-                    workers={3}
+                    target={{ workers: 3 }}
                     outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
                 />,
                 expectedGraphQLAPIURL
             )
@@ -502,6 +521,71 @@ describe("debounces output requests", () => {
 
         expect(detailsUpToMatch).not.toContainEqual(
             expect.objectContaining({ workers: 2 })
+        );
+    });
+
+    test("only requests optimal output every 500ms on target amount change", async () => {
+        const expectedItemName = "test item";
+        const expectedOutputUnit = OutputUnit.GameDays;
+        const expectedLastRequest = waitForRequest(
+            server,
+            "POST",
+            expectedGraphQLAPIURL,
+            expectedCalculatorOutputQueryName,
+            {
+                name: expectedItemName,
+                amount: 3,
+                workers: null,
+                unit: expectedOutputUnit,
+            }
+        );
+
+        const { rerender } = rtlRender(
+            wrapWithTestProviders(
+                <Output
+                    itemName={expectedItemName}
+                    target={{ amount: 1 }}
+                    outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <Output
+                    itemName={expectedItemName}
+                    target={{ amount: 2 }}
+                    outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        rerender(
+            wrapWithTestProviders(
+                <Output
+                    itemName={expectedItemName}
+                    target={{ amount: 3 }}
+                    outputUnit={expectedOutputUnit}
+                    onSelectedItemTotalChange={() => {
+                        return;
+                    }}
+                />,
+                expectedGraphQLAPIURL
+            )
+        );
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
+        const { detailsUpToMatch } = await expectedLastRequest;
+
+        expect(detailsUpToMatch).not.toContainEqual(
+            expect.objectContaining({ amount: 2 })
         );
     });
 

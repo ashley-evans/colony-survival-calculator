@@ -7,10 +7,8 @@ import Calculator from "../Calculator";
 import { renderWithTestProviders as render } from "../../../test/utils";
 import {
     expectedItemNameQueryName,
-    selectItemAndWorkers,
+    selectItemAndTarget,
     expectedItemSelectLabel,
-    expectedWorkerInputLabel,
-    expectedOutputPrefix,
     expectedFarmSizeNotePrefix,
     ItemName,
     expectedCalculatorTab,
@@ -49,7 +47,7 @@ const server = setupServer(
 
         return HttpResponse.json({ data: { item: [] } });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     })
@@ -214,112 +212,19 @@ describe("tab rendering", async () => {
     });
 });
 
-describe("worker input rendering", () => {
-    const expectedErrorMessage =
-        "Invalid input, must be a positive non-zero whole number";
-
-    test("renders an input to enter the number of workers", async () => {
-        render(<Calculator />);
-
-        expect(
-            await screen.findByLabelText(expectedWorkerInputLabel, {
-                selector: "input",
-            })
-        ).toBeVisible();
-    });
-
-    test("does not render an error message by default", async () => {
-        render(<Calculator />);
-        await screen.findByLabelText(expectedWorkerInputLabel, {
-            selector: "input",
-        });
-
-        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    });
-
-    describe.each([
-        ["negative", "-1"],
-        ["zero", "0"],
-        ["float", "1.1"],
-        ["not a number", "test"],
-        ["number with invalid character suffix", "3-test"],
-    ])(
-        "renders invalid workers message if workers is %s",
-        (_: string, input: string) => {
-            test("renders invalid workers message", async () => {
-                render(<Calculator />);
-                await selectItemAndWorkers({
-                    itemName: items[0].name,
-                    workers: input,
-                });
-
-                expect(await screen.findByRole("alert")).toHaveTextContent(
-                    expectedErrorMessage
-                );
-            });
-
-            test("does not render optimal output message", async () => {
-                render(<Calculator />);
-                await selectItemAndWorkers({
-                    itemName: items[0].name,
-                    workers: input,
-                });
-
-                expect(
-                    screen.queryByText(expectedOutputPrefix, { exact: false })
-                ).not.toBeInTheDocument();
-            });
-        }
-    );
-
-    test("clears error message after changing input to a valid input", async () => {
-        const invalidInput = "Invalid";
-        const validInput = "1";
-
-        render(<Calculator />);
-        await selectItemAndWorkers({
-            itemName: items[0].name,
-            workers: invalidInput,
-        });
-        await screen.findByRole("alert");
-        await selectItemAndWorkers({ workers: validInput, clear: true });
-
-        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    });
-
-    test("does not reset worker input after tab is changed", async () => {
-        const expectedWorkerValue = "24";
-
-        render(<Calculator />);
-        await selectItemAndWorkers({ workers: expectedWorkerValue });
-        await clickByName(expectedSettingsTab, "tab");
-        await screen.findByRole("heading", {
-            name: expectedSettingsTabHeader,
-            level: 2,
-        });
-        await clickByName(expectedCalculatorTab, "tab");
-
-        expect(
-            await screen.findByLabelText(expectedWorkerInputLabel, {
-                selector: "input",
-            })
-        ).toHaveValue(expectedWorkerValue);
-    });
-});
-
 describe("optimal farm size note rendering", () => {
     test("renders the optimal height and width of the farm if provided", async () => {
         const expectedMessage = `${expectedFarmSizeNotePrefix} ${expectedFarmSizeDetails.size.width} x ${expectedFarmSizeDetails.size.height}`;
 
         render(<Calculator />);
-        await selectItemAndWorkers({ itemName: itemWithFarmSize.name });
+        await selectItemAndTarget({ itemName: itemWithFarmSize.name });
 
         expect(await screen.findByText(expectedMessage)).toBeVisible();
     });
 
     test("does not render optimal farm size message if no size provided", async () => {
         render(<Calculator />);
-        await selectItemAndWorkers({ itemName: itemWithoutFarmSize.name });
+        await selectItemAndTarget({ itemName: itemWithoutFarmSize.name });
         await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         expect(
@@ -341,7 +246,7 @@ describe("optimal farm size note rendering", () => {
         );
 
         render(<Calculator />);
-        await selectItemAndWorkers({
+        await selectItemAndTarget({
             itemName: items[0].name,
         });
         await screen.findByRole("alert");

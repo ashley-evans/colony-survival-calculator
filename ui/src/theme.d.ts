@@ -31,6 +31,9 @@ declare module "styled-components" {
         typography: {
             family: string;
         };
+        breakpoints: {
+            mobile: string;
+        };
     }
 }
 

@@ -49,7 +49,7 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({
             data: {
