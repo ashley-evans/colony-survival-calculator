@@ -98,11 +98,24 @@ const server = setupServer(
     }),
     createCalculatorOutputResponseHandler([
         createRequirement({
-            name: items[0].name,
+            name: expectedFirstItemName,
             amount: 1,
             creators: [
                 createRequirementCreator({
-                    recipeName: items[0].name,
+                    recipeName: expectedFirstItemName,
+                    workers: 1,
+                    amount: 1,
+                    creator: "Creator",
+                    demands: [],
+                }),
+            ],
+        }),
+        createRequirement({
+            name: expectedSecondItemName,
+            amount: 1,
+            creators: [
+                createRequirementCreator({
+                    recipeName: expectedSecondItemName,
                     workers: 1,
                     amount: 1,
                     creator: "Creator",

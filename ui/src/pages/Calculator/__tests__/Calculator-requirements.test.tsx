@@ -514,7 +514,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const rows = within(requirementsTable).getAllByRole("row");
 
-                expect(rows).toHaveLength(expected.length + 1);
+                expect(rows).toHaveLength(expected.length + 2);
                 for (const requirement of expected) {
                     const requirementCell = within(requirementsTable).getByRole(
                         "cell",
@@ -574,7 +574,7 @@ describe("requirements rendering given requirements", () => {
 
             const requirementsTable = await screen.findByRole("table");
             const rows = within(requirementsTable).getAllByRole("row");
-            expect(rows).toHaveLength(3);
+            expect(rows).toHaveLength(4);
             const requirementRow = rows[2];
             const cells = within(requirementRow).getAllByRole("cell");
             expect(cells[Columns.CREATOR]).toHaveAccessibleName(
@@ -767,7 +767,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const rows = within(requirementsTable).getAllByRole("row");
 
-                expect(rows).toHaveLength(requirements.length + 1);
+                expect(rows).toHaveLength(requirements.length + 2);
                 for (const demand of demands) {
                     expect(
                         within(requirementsTable).queryByRole("cell", {
@@ -802,7 +802,7 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 expect(rows).toHaveLength(
-                    demands.length + requirements.length + 1
+                    demands.length + requirements.length + 2
                 );
                 for (let i = 2; i < demands.length; i++) {
                     const cells = within(rows[i + demands.length]).getAllByRole(
@@ -983,7 +983,7 @@ describe("requirements rendering given requirements", () => {
             const requirementsTable = await screen.findByRole("table");
             const rows = within(requirementsTable).getAllByRole("row");
 
-            expect(rows).toHaveLength(requirements.length + 1);
+            expect(rows).toHaveLength(requirements.length + 2);
             for (const creator of requirementWithMultipleCreators.creators) {
                 expect(
                     within(requirementsTable).queryByRole("cell", {
@@ -1018,7 +1018,7 @@ describe("requirements rendering given requirements", () => {
             const rows = within(requirementsTable).getAllByRole("row");
 
             expect(rows).toHaveLength(
-                expectedCreators.length + requirements.length + 1
+                expectedCreators.length + requirements.length + 2
             );
 
             for (let i = 2; i < expectedCreators.length; i++) {
@@ -1193,7 +1193,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const rows = within(requirementsTable).getAllByRole("row");
 
-                expect(rows).toHaveLength(requirements.length + 2);
+                expect(rows).toHaveLength(requirements.length + 3);
                 for (const demand of demands) {
                     expect(
                         within(requirementsTable).queryByRole("cell", {
@@ -1240,7 +1240,7 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 expect(rows).toHaveLength(
-                    expectedOffset + requirements.length + 1
+                    expectedOffset + requirements.length + 2
                 );
                 for (let i = 0; i < demands.length; i++) {
                     const cells = within(
@@ -2215,6 +2215,88 @@ test("clears error message if the target output item is found on subsequent requ
     await screen.findByRole("heading", { name: expectedRequirementsHeading });
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
+
+describe("total row rendering", () => {
+    const expectedTotalRowName = "Total:";
+
+    test("does not render a total row if the item has no requirements", async () => {
+        server.use(
+            createCalculatorOutputResponseHandler(createRequirements([]))
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndTarget({
+            itemName: selectedItemName,
+            workers: 5,
+        });
+        const requirementsTable = await screen.findByRole("table");
+
+        expect(
+            within(requirementsTable).queryByText(expectedTotalRowName)
+        ).not.toBeInTheDocument();
+    });
+
+    test.each([
+        [
+            "single requirement w/ single creator",
+            createRequirements([requirementsWithSingleCreator[0]]),
+            40,
+        ],
+        [
+            "single requirement w/ multiple creators",
+            createRequirements([requirementWithMultipleCreators]),
+            34,
+        ],
+        [
+            "multiple requirements",
+            createRequirements(requirementsWithSingleCreator),
+            80,
+        ],
+        [
+            "single requirement w/ creator that has floating point workers",
+            createRequirements([
+                createRequirement({
+                    name: "Test item",
+                    amount: 50,
+                    creators: [
+                        createRequirementCreator({
+                            recipeName: "Test item",
+                            creator: "Creator 1",
+                            amount: 45,
+                            workers: 12.5,
+                        }),
+                    ],
+                }),
+            ]),
+            33,
+        ],
+    ])(
+        "renders a total row given item with %s",
+        async (
+            _: string,
+            requirements: Requirement[],
+            expectedTotalWorkers: number
+        ) => {
+            server.use(createCalculatorOutputResponseHandler(requirements));
+
+            render(<Calculator />, expectedGraphQLAPIURL);
+            await selectItemAndTarget({
+                itemName: selectedItemName,
+                workers: 5,
+            });
+            const requirementsTable = await screen.findByRole("table");
+
+            const totalCell =
+                within(requirementsTable).getByText(expectedTotalRowName);
+            expect(totalCell).toBeVisible();
+            const totalRow = totalCell.parentElement as HTMLElement;
+            const totalRowCells = within(totalRow).getAllByRole("cell");
+            expect(totalRowCells[Columns.WORKERS]).toHaveAccessibleName(
+                expectedTotalWorkers.toString()
+            );
+        }
+    );
 });
 
 afterAll(() => {
