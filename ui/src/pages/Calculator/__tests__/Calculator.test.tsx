@@ -47,7 +47,7 @@ const server = setupServer(
 
         return HttpResponse.json({ data: { item: [] } });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     })

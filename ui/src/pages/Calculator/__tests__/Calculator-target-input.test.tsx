@@ -8,7 +8,6 @@ import { renderWithTestProviders as render } from "../../../test/utils";
 import {
     selectItemAndTarget,
     expectedWorkerInputLabel,
-    expectedOutputPrefix,
     expectedCalculatorTab,
     expectedSettingsTab,
     clickByName,
@@ -18,6 +17,7 @@ import {
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedTargetAmountInputLabel,
+    expectedRequirementsHeading,
 } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
@@ -38,7 +38,7 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     })
@@ -60,11 +60,11 @@ describe("worker input rendering", () => {
     test("renders an input to enter the number of workers", async () => {
         render(<Calculator />);
 
-        expect(
-            await screen.findByLabelText(expectedWorkerInputLabel, {
-                selector: "input",
-            })
-        ).toBeVisible();
+        const input = await screen.findByLabelText(expectedWorkerInputLabel, {
+            selector: "input",
+        });
+        expect(input).toBeVisible();
+        expect(input).toHaveValue("");
     });
 
     test("does not render an error message by default", async () => {
@@ -97,15 +97,18 @@ describe("worker input rendering", () => {
                 );
             });
 
-            test("does not render optimal output message", async () => {
+            test("does not render requirements section", async () => {
                 render(<Calculator />);
                 await selectItemAndTarget({
                     itemName: item.name,
                     workers: input,
                 });
+                await screen.findByRole("alert");
 
                 expect(
-                    screen.queryByText(expectedOutputPrefix, { exact: false })
+                    screen.queryByRole("heading", {
+                        name: expectedRequirementsHeading,
+                    })
                 ).not.toBeInTheDocument();
             });
         }
@@ -171,11 +174,14 @@ describe("target amount input rendering", () => {
     test("renders an input to enter the target amount", async () => {
         render(<Calculator />);
 
-        expect(
-            await screen.findByLabelText(expectedTargetAmountInputLabel, {
+        const input = await screen.findByLabelText(
+            expectedTargetAmountInputLabel,
+            {
                 selector: "input",
-            })
-        ).toBeVisible();
+            }
+        );
+        expect(input).toBeVisible();
+        expect(input).toHaveValue("");
     });
 
     test("does not render an error message by default", async () => {
@@ -207,15 +213,18 @@ describe("target amount input rendering", () => {
                 );
             });
 
-            test("does not render optimal output message", async () => {
+            test("does not render the requirements section", async () => {
                 render(<Calculator />);
                 await selectItemAndTarget({
                     itemName: item.name,
                     workers: input,
                 });
+                await screen.findByRole("alert");
 
                 expect(
-                    screen.queryByText(expectedOutputPrefix, { exact: false })
+                    screen.queryByRole("heading", {
+                        name: expectedRequirementsHeading,
+                    })
                 ).not.toBeInTheDocument();
             });
         }

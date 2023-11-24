@@ -9,17 +9,49 @@ import {
 } from "./components";
 import { ExchangeIcon, InputWrapper, TargetInputContainer } from "./styles";
 
-type TargetInputProps = WorkerInputProps & AmountInputProps;
+export type Target =
+    | {
+          workers: number;
+      }
+    | { amount: number };
 
-function TargetInput(props: TargetInputProps) {
+type TargetInputProps = { onTargetChange: (target: Target) => void } & Pick<
+    AmountInputProps,
+    "defaultAmount"
+> &
+    Pick<WorkerInputProps, "defaultWorkers">;
+
+function TargetInput({
+    onTargetChange,
+    defaultAmount,
+    defaultWorkers,
+}: TargetInputProps) {
+    const handleWorkerChange = (workers?: number) => {
+        if (workers) {
+            onTargetChange({ workers });
+        }
+    };
+
+    const handleAmountChange = (amount?: number) => {
+        if (amount) {
+            onTargetChange({ amount });
+        }
+    };
+
     return (
         <TargetInputContainer>
             <InputWrapper>
-                <WorkerInput {...props} />
+                <WorkerInput
+                    defaultWorkers={defaultWorkers}
+                    onWorkerChange={handleWorkerChange}
+                />
             </InputWrapper>
             <ExchangeIcon icon={faArrowRightArrowLeft} />
             <InputWrapper>
-                <AmountInput {...props} />
+                <AmountInput
+                    defaultAmount={defaultAmount}
+                    onAmountChange={handleAmountChange}
+                />
             </InputWrapper>
         </TargetInputContainer>
     );

@@ -21,7 +21,7 @@ import {
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
 import Output from "./components/Output";
-import TargetInput from "./components/TargetInput";
+import TargetInput, { Target } from "./components/TargetInput";
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -44,8 +44,7 @@ type StateProp<S> = [S, (value: S) => void];
 
 type CalculatorTabProps = {
     itemState: StateProp<string | undefined>;
-    workersState: StateProp<number | undefined>;
-    targetAmountState: StateProp<number | undefined>;
+    currentTarget: StateProp<Target | undefined>;
     toolState: StateProp<AvailableTools>;
     machineToolState: StateProp<boolean>;
     outputUnitState: StateProp<OutputUnit>;
@@ -68,8 +67,7 @@ function getItemDetailsFilters(
 
 function CalculatorTab({
     itemState: [selectedItem, setSelectedItem],
-    workersState: [workers, setWorkers],
-    targetAmountState: [targetAmount, setTargetAmount],
+    currentTarget: [target, setTarget],
     toolState: [selectedTool, setSelectedTool],
     machineToolState: [hasMachineTools, setHasMachineTools],
     outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
@@ -95,6 +93,21 @@ function CalculatorTab({
         }
     );
 
+    const handleSelectedItemTotalChange = (total: Target) => {
+        if ("amount" in total) {
+            setTargetAmount(total.amount);
+        } else {
+            setWorkers(total.workers);
+        }
+    };
+
+    const [workers, setWorkers] = useState<number | undefined>(
+        target && "workers" in target ? target.workers : undefined
+    );
+    const [targetAmount, setTargetAmount] = useState<number | undefined>(
+        target && "amount" in target ? target.amount : undefined
+    );
+
     if (itemNamesLoading) {
         return (
             <PageContainer>
@@ -117,9 +130,8 @@ function CalculatorTab({
                         defaultSelectedItem={selectedItem}
                     />
                     <TargetInput
-                        onWorkerChange={setWorkers}
+                        onTargetChange={setTarget}
                         defaultWorkers={workers}
-                        onAmountChange={setTargetAmount}
                         defaultAmount={targetAmount}
                     />
                     <DefaultToolSelector
@@ -146,14 +158,17 @@ function CalculatorTab({
                             {itemDetailsData?.item[0].size.height}
                         </span>
                     ) : null}
-                    {workers && selectedItem ? (
+                    {target && selectedItem ? (
                         <Output
                             itemName={selectedItem}
-                            workers={workers}
+                            target={target}
                             outputUnit={selectedOutputUnit}
                             maxAvailableTool={selectedTool}
                             hasMachineTools={hasMachineTools}
                             creatorOverrides={selectedCreatorOverrides}
+                            onSelectedItemTotalChange={
+                                handleSelectedItemTotalChange
+                            }
                         />
                     ) : null}
                 </>
@@ -204,8 +219,7 @@ function Calculator() {
     );
 
     const selectedItemState = useState<string>();
-    const workersState = useState<number>();
-    const targetAmountState = useState<number>();
+    const targetState = useState<Target>();
     const selectedToolState = useState<AvailableTools>(AvailableTools.None);
     const hasMachineToolState = useState<boolean>(false);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
@@ -235,8 +249,7 @@ function Calculator() {
                 {selectedTab === PageTabs.CALCULATOR ? (
                     <CalculatorTab
                         itemState={selectedItemState}
-                        workersState={workersState}
-                        targetAmountState={targetAmountState}
+                        currentTarget={targetState}
                         toolState={selectedToolState}
                         machineToolState={hasMachineToolState}
                         outputUnitState={selectedOutputUnitState}

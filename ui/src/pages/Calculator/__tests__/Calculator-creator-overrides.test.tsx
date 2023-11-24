@@ -23,7 +23,9 @@ import {
     expectedCalculatorTabHeader,
     selectItemAndTarget,
     expectedCalculatorOutputQueryName,
-    expectedOutputPrefix,
+    createRequirement,
+    createRequirementCreator,
+    expectedRequirementsHeading,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import {
@@ -62,7 +64,6 @@ const expectedCreatorOverrides: CreatorOverride[] = [
     ...expectedFirstItemOverrides,
     ...expectedSecondItemOverrides,
 ];
-const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
 
 function generateItemCreatorOverrides(
     name: string,
@@ -95,7 +96,21 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([
+        createRequirement({
+            name: items[0].name,
+            amount: 1,
+            creators: [
+                createRequirementCreator({
+                    recipeName: items[0].name,
+                    workers: 1,
+                    amount: 1,
+                    creator: "Creator",
+                    demands: [],
+                }),
+            ],
+        }),
+    ]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({
             data: {
@@ -898,7 +913,9 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
-            await screen.findByText(expectedOutputMessage);
+            await screen.findByRole("heading", {
+                name: expectedRequirementsHeading,
+            });
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({
@@ -907,7 +924,6 @@ describe("given items w/ multiple creators returned", () => {
                 unit: OutputUnit.Minutes,
                 maxAvailableTool: expectedTool,
                 hasMachineTools: false,
-                outputCreator: expectedCreator,
                 creatorOverrides: expectedOverrides,
             });
         });
@@ -981,7 +997,9 @@ describe("given items w/ multiple creators returned", () => {
                 itemName: expectedItem,
                 workers: expectedWorkers,
             });
-            await screen.findByText(expectedOutputMessage);
+            await screen.findByRole("heading", {
+                name: expectedRequirementsHeading,
+            });
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({
@@ -990,7 +1008,6 @@ describe("given items w/ multiple creators returned", () => {
                 unit: expectedOutputUnit,
                 maxAvailableTool: expectedTool,
                 hasMachineTools: false,
-                outputCreator: expectedCreator,
                 creatorOverrides: expectedOverrides,
             });
         });

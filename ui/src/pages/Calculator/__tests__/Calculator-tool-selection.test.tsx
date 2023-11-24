@@ -17,7 +17,9 @@ import {
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
     expectedMachineToolCheckboxLabel,
-    expectedOutputPrefix,
+    createRequirement,
+    createRequirementCreator,
+    expectedRequirementsHeading,
 } from "./utils";
 import {
     click,
@@ -34,7 +36,6 @@ import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
 const item: ItemName = { name: "Item 1" };
-const expectedOutputMessage = `${expectedOutputPrefix} 5.2 per minute`;
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
@@ -51,7 +52,21 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([], 5.2),
+    createCalculatorOutputResponseHandler([
+        createRequirement({
+            name: item.name,
+            amount: 1,
+            creators: [
+                createRequirementCreator({
+                    recipeName: item.name,
+                    workers: 1,
+                    amount: 1,
+                    creator: "Creator",
+                    demands: [],
+                }),
+            ],
+        }),
+    ]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     })
@@ -146,7 +161,9 @@ test("queries calculator with provided tool if non default selected", async () =
         itemName: item.name,
         workers: expectedWorkers,
     });
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", {
+        name: expectedRequirementsHeading,
+    });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -182,7 +199,9 @@ test("queries optimal output again if tool is changed after first query", async 
         workers: expectedWorkers,
     });
     await selectTool(expectedTool);
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", {
+        name: expectedRequirementsHeading,
+    });
 
     await expect(expectedRequest).resolves.not.toThrow();
 });
@@ -203,7 +222,9 @@ test("queries requirements with provided tool if non default selected", async ()
         itemName: item.name,
         workers: expectedWorkers,
     });
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", {
+        name: expectedRequirementsHeading,
+    });
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
@@ -239,7 +260,9 @@ test("queries requirements again if tool is changed after first query", async ()
         workers: expectedWorkers,
     });
     await selectTool(expectedTool);
-    await screen.findByText(expectedOutputMessage);
+    await screen.findByRole("heading", {
+        name: expectedRequirementsHeading,
+    });
 
     await expect(expectedRequest).resolves.not.toThrow();
 });

@@ -25,7 +25,11 @@ function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
             errorMessage="Invalid output item workers, must be a positive non-zero whole number"
             inputMode="numeric"
             clearIconLabel="Clear output item workers"
-            defaultValue={defaultWorkers?.toString()}
+            defaultValue={
+                defaultWorkers
+                    ? Math.ceil(defaultWorkers).toString()
+                    : undefined
+            }
         />
     );
 }

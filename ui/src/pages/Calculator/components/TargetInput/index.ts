@@ -1,3 +1,4 @@
-import { TargetInput } from "./TargetInput";
+import { TargetInput, Target } from "./TargetInput";
 
+export type { Target };
 export default TargetInput;
