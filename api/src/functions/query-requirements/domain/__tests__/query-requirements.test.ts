@@ -2,7 +2,10 @@ import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem, createItemWithMachineTools } from "../../../../../test";
 import { DefaultToolset } from "../../../../types";
-import { Requirement } from "../../interfaces/query-requirements-primary-port";
+import {
+    QueryRequirementsParams,
+    Requirement,
+} from "../../interfaces/query-requirements-primary-port";
 import { OutputUnit } from "../../../../common";
 
 jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
@@ -10,6 +13,9 @@ jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
 }));
 
 const mockMongoDBQueryRequirements = mongoDBQueryRequirements as jest.Mock;
+const consoleLogSpy = jest
+    .spyOn(console, "log")
+    .mockImplementation(() => undefined);
 
 const validItemName = "test item name";
 const validWorkers = 5;
@@ -23,6 +29,7 @@ function findRequirement(
 
 beforeEach(() => {
     mockMongoDBQueryRequirements.mockReset();
+    consoleLogSpy.mockClear();
 });
 
 test("throws an error given an empty string as an item name", async () => {
@@ -2377,4 +2384,33 @@ describe("handles calculating requirements for target output", () => {
             expect(actual).toEqual(expected);
         }
     );
+});
+
+test("logs out requirements query to console", async () => {
+    const expectedParams: QueryRequirementsParams = {
+        name: validItemName,
+        maxAvailableTool: DefaultToolset.copper,
+        hasMachineTools: true,
+        unit: OutputUnit.GAME_DAYS,
+        creatorOverrides: [
+            { itemName: "Override 1", creator: "Override 1 Creator" },
+        ],
+        amount: 2,
+    };
+    mockMongoDBQueryRequirements.mockResolvedValue([
+        createItem({
+            name: validItemName,
+            createTime: 1,
+            output: 1,
+            requirements: [],
+        }),
+    ]);
+
+    await queryRequirements(expectedParams);
+
+    expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+    expect(consoleLogSpy).toHaveBeenCalledWith({
+        key: "Requirements Input",
+        parameters: JSON.stringify(expectedParams),
+    });
 });

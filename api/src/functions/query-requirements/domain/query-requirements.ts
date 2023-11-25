@@ -231,6 +231,10 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         creatorOverrides,
         ...target
     } = validateInput(input);
+    console.log({
+        key: "Requirements Input",
+        parameters: JSON.stringify(input),
+    });
 
     const multipleOverride = findMultipleOverrides(creatorOverrides);
     if (multipleOverride) {
