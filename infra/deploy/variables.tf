@@ -18,6 +18,10 @@ variable "remote_state_table_arn" {
   type = string
 }
 
+variable "remote_state_read_write_policy_arn" {
+  type = string
+}
+
 variable "region" {
   type = string
 }
