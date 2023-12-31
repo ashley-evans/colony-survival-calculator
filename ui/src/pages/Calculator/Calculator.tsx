@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense, lazy } from "react";
 import { useQuery } from "@apollo/client";
 
 import ItemSelector from "./components/ItemSelector";
@@ -20,8 +20,9 @@ import {
 } from "../../graphql/__generated__/graphql";
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
-import Output from "./components/Output";
 import TargetInput, { Target } from "./components/TargetInput";
+
+const Output = lazy(() => import("./components/Output"));
 
 const GET_ITEM_NAMES_QUERY = gql(`
     query GetItemNames {
@@ -159,17 +160,19 @@ function CalculatorTab({
                         </span>
                     ) : null}
                     {target && selectedItem ? (
-                        <Output
-                            itemName={selectedItem}
-                            target={target}
-                            outputUnit={selectedOutputUnit}
-                            maxAvailableTool={selectedTool}
-                            hasMachineTools={hasMachineTools}
-                            creatorOverrides={selectedCreatorOverrides}
-                            onSelectedItemTotalChange={
-                                handleSelectedItemTotalChange
-                            }
-                        />
+                        <Suspense fallback={<span>Loading...</span>}>
+                            <Output
+                                itemName={selectedItem}
+                                target={target}
+                                outputUnit={selectedOutputUnit}
+                                maxAvailableTool={selectedTool}
+                                hasMachineTools={hasMachineTools}
+                                creatorOverrides={selectedCreatorOverrides}
+                                onSelectedItemTotalChange={
+                                    handleSelectedItemTotalChange
+                                }
+                            />
+                        </Suspense>
                     ) : null}
                 </>
             </ErrorBoundary>

@@ -13,5 +13,3 @@ export default defineConfig({
         pool: "forks",
     },
 });
-
-// Decreased initial index bundle size from 775.91kB to 605.94 kB
