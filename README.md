@@ -36,16 +36,30 @@ yarn ci
 
 ### Deploying infrastructure
 
-Run the following command to setup the UI infrastructure for development:
+#### Deploying
+
+Run the following command to setup the infrastructure for development:
 
 ```sh
 yarn lerna run deploy -- -e dev
 ```
 
-### Tearing down infrastructure
+#### Tearing down
 
-Run the following command to remove any deployed UI infrastructure for development:
+Run the following command to remove any deployed infrastructure for development:
 
 ```sh
 yarn lerna run deploy -- -e dev -t
 ```
+
+#### CI Setup
+
+To enable the Github actions to deploy the infrastructure for production/testing, you must first create the deployment role in AWS by running the following command:
+
+> Note: This requires the ARNs of a S3 Bucket, DynamoDB table, Read/write policy to access the bucket and table, and an OpenID Connect Provider that is configured to work with Github Actions
+
+```sh
+terraform apply -chdir=./infra/deploy
+```
+
+Once applied, the `deploy_role_arn` needs to be set as a repository secret under the name `DEPLOY_ROLE_ARN` in Github
