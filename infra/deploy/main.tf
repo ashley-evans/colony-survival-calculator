@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    key                  = "deploy/terraform.tfstate"
+    key                  = "deployment/colony-survival-calculator/terraform.tfstate"
     workspace_key_prefix = ""
   }
 
@@ -37,34 +37,6 @@ data "aws_iam_policy_document" "deploy_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "remote_state_read_write_policy" {
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action   = "s3:ListBucket"
-        Effect   = "Allow"
-        Resource = var.remote_state_bucket_arn
-      },
-      {
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
-        Effect   = "Allow"
-        Resource = "${var.remote_state_bucket_arn}/*"
-      },
-      {
-        Action = [
-          "dynamodb:DescribeTable",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
-        ],
-        Effect   = "Allow"
-        Resource = var.remote_state_table_arn
-      }
-    ]
-  })
-}
-
 resource "aws_iam_policy" "ui_deploy_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
@@ -94,7 +66,7 @@ resource "aws_iam_policy" "api_deploy_policy" {
 resource "aws_iam_role" "deploy_role" {
   assume_role_policy = data.aws_iam_policy_document.deploy_policy_document.json
   managed_policy_arns = [
-    aws_iam_policy.remote_state_read_write_policy.arn,
+    var.remote_state_read_write_policy_arn,
     aws_iam_policy.ui_deploy_policy.arn,
     aws_iam_policy.api_deploy_policy.arn,
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",

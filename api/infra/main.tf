@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    key                  = "api/terraform.tfstate"
+    key                  = "colony-survival-calculator/api/terraform.tfstate"
     workspace_key_prefix = ""
   }
 
