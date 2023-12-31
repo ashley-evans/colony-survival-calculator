@@ -1,16 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "normalize.css";
-import { Auth } from "@aws-amplify/auth";
+import { Amplify } from "aws-amplify";
 import { ApolloProvider } from "@apollo/client";
 
 import RouterProvider from "./routes/AppRouterProvider";
 
 const region = import.meta.env.VITE_AWS_REGION;
 
-Auth.configure({
-    region,
-    identityPoolId: import.meta.env.VITE_IDENTITY_POOL_ID,
+Amplify.configure({
+    Auth: {
+        Cognito: {
+            identityPoolId: import.meta.env.VITE_IDENTITY_POOL_ID,
+            allowGuestAccess: true,
+        },
+    },
 });
 
 import { createClient } from "./clients/aws-appsync-client-factory";

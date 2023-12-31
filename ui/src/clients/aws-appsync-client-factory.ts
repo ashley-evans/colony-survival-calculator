@@ -5,7 +5,7 @@ import {
     InMemoryCache,
     NormalizedCacheObject,
 } from "@apollo/client";
-import { Auth } from "@aws-amplify/auth";
+import { fetchAuthSession } from "aws-amplify/auth";
 import { createAuthLink, AuthOptions } from "aws-appsync-auth-link";
 
 function createClient(
@@ -14,7 +14,10 @@ function createClient(
 ): ApolloClient<NormalizedCacheObject> {
     const authConfiguration: AuthOptions = {
         type: "AWS_IAM",
-        credentials: () => Auth.currentCredentials(),
+        credentials: async () => {
+            const { credentials } = await fetchAuthSession();
+            return credentials ?? null;
+        },
     };
 
     const httpLink = new HttpLink({ uri: url });
