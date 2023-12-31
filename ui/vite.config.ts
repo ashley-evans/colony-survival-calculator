@@ -12,11 +12,4 @@ export default defineConfig({
         setupFiles: "./src/test/setup.tsx",
         pool: "forks",
     },
-    // Required as part of workaround detailed here:
-    // https://github.com/aws-amplify/amplify-js/issues/9639#issuecomment-1271955246
-    resolve: {
-        alias: {
-            "./runtimeConfig": "./runtimeConfig.browser",
-        },
-    },
 });
