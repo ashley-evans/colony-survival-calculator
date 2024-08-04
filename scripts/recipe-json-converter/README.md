@@ -22,10 +22,6 @@ Artist's recipe's needs to be updated to:
 -   Align result type and names for sign recipe:
     -   Update `signitem` to `sign`
 
-Artist sign recipe needs to be manually updated to align result type and name:
-
--   Update `signitem` to `sign`
-
 Berry farmer recipe needs to be manually updated as does not follow same naming convention as other recipes
 
 -   Update: `gather` to `berry`

@@ -17,6 +17,11 @@ import {
     clickByName,
     expectedSettingsTabHeader,
     expectedCreatorOverrideQueryName,
+    expectedAboutTab,
+    expectedAboutVersionExplanation,
+    expectedGameDataReferenceRepositoryLink,
+    expectedGameDataReferenceRepositoryLinkText,
+    expectedGameDataReferenceRepositoryExplanation,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
@@ -69,7 +74,7 @@ describe("tab rendering", async () => {
         expect(await screen.findByRole("tablist")).toBeVisible();
     });
 
-    test.each([expectedCalculatorTab, expectedSettingsTab])(
+    test.each([expectedCalculatorTab, expectedSettingsTab, expectedAboutTab])(
         "renders the %s tab inside the tab list",
         async (expected: string) => {
             render(<Calculator />);
@@ -105,6 +110,18 @@ describe("tab rendering", async () => {
         expect(settingsTab).toHaveAttribute("tabindex", "-1");
     });
 
+    test("renders the about tab as not selected by default", async () => {
+        render(<Calculator />);
+        const tablist = await screen.findByRole("tablist");
+
+        const settingsTab = within(tablist).getByRole("tab", {
+            name: expectedAboutTab,
+            selected: false,
+        });
+        expect(settingsTab).toBeVisible();
+        expect(settingsTab).toHaveAttribute("tabindex", "-1");
+    });
+
     test("renders the calculator tab content inside a tab panel by default", async () => {
         render(<Calculator />);
         const panel = await screen.findByRole("tabpanel");
@@ -127,6 +144,18 @@ describe("tab rendering", async () => {
         });
         expect(settingsTab).toBeVisible();
         expect(settingsTab).toHaveAttribute("tabindex", "0");
+    });
+
+    test("sets the about tab to selected if clicked", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+
+        const aboutTab = await screen.findByRole("tab", {
+            name: expectedAboutTab,
+            selected: true,
+        });
+        expect(aboutTab).toBeVisible();
+        expect(aboutTab).toHaveAttribute("tabindex", "0");
     });
 
     test("sets the calculator tab back to selected if re-opened", async () => {
@@ -160,6 +189,16 @@ describe("tab rendering", async () => {
         ).toBeVisible();
     });
 
+    test("renders the about tab content inside a tab panel if about tab is selected", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+        const panel = await screen.findByRole("tabpanel");
+
+        expect(
+            await within(panel).findByText(expectedAboutVersionExplanation)
+        ).toBeVisible();
+    });
+
     test("does not render the settings tab if the calculator tab is selected (default)", async () => {
         render(<Calculator />);
         const panel = await screen.findByRole("tabpanel");
@@ -173,6 +212,19 @@ describe("tab rendering", async () => {
                 level: 2,
                 name: expectedSettingsTabHeader,
             })
+        ).not.toBeInTheDocument();
+    });
+
+    test("does not render the about tab if the calculator tab is selected (default)", async () => {
+        render(<Calculator />);
+        const panel = await screen.findByRole("tabpanel");
+        await within(panel).findByRole("heading", {
+            level: 2,
+            name: expectedCalculatorTabHeader,
+        });
+
+        expect(
+            within(panel).queryByText(expectedAboutVersionExplanation)
         ).not.toBeInTheDocument();
     });
 
@@ -191,6 +243,18 @@ describe("tab rendering", async () => {
                 level: 2,
                 name: expectedSettingsTabHeader,
             })
+        ).not.toBeInTheDocument();
+    });
+
+    test("hides the about tab if the calculator tab is re-opened", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+        const panel = await screen.findByRole("tabpanel");
+        await within(panel).findByText(expectedAboutVersionExplanation);
+        await clickByName(expectedCalculatorTab, "tab");
+
+        expect(
+            within(panel).queryByText(expectedAboutVersionExplanation)
         ).not.toBeInTheDocument();
     });
 
@@ -254,6 +318,25 @@ describe("optimal farm size note rendering", () => {
         expect(
             screen.queryByText(expectedFarmSizeNotePrefix, { exact: false })
         ).not.toBeInTheDocument();
+    });
+});
+
+describe("about tab rendering", () => {
+    test("renders a link to reference game data Github repository", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+        const panel = await screen.findByRole("tabpanel");
+
+        const link = await within(panel).findByRole("link", {
+            name: expectedGameDataReferenceRepositoryLinkText,
+        });
+        expect(link).toHaveAttribute(
+            "href",
+            expectedGameDataReferenceRepositoryLink
+        );
+        expect(link.parentElement).toHaveTextContent(
+            expectedGameDataReferenceRepositoryExplanation
+        );
     });
 });
 

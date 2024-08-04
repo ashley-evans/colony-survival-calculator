@@ -211,9 +211,27 @@ function SettingsTab({
     );
 }
 
+function AboutTab() {
+    return (
+        <>
+            <span>
+                Calculations are correct for version: 0.11.0.8 (2024-06-10)
+            </span>
+            <span>
+                Calculations use public game data files from the{" "}
+                <a href="https://github.com/pipliz/ColonySurvival">
+                    Colony Survival repository
+                </a>
+                .
+            </span>
+        </>
+    );
+}
+
 enum PageTabs {
     CALCULATOR = "calculator",
     SETTINGS = "settings",
+    ABOUT = "about",
 }
 
 function Calculator() {
@@ -247,6 +265,14 @@ function Calculator() {
                 >
                     Settings
                 </button>
+                <button
+                    role="tab"
+                    aria-selected={selectedTab === PageTabs.ABOUT}
+                    tabIndex={selectedTab === PageTabs.ABOUT ? 0 : -1}
+                    onClick={() => setSelectedTab(PageTabs.ABOUT)}
+                >
+                    About
+                </button>
             </Tabs>
             <TabContainer role="tabpanel">
                 {selectedTab === PageTabs.CALCULATOR ? (
@@ -264,6 +290,7 @@ function Calculator() {
                         selectedCreatorOverrides={selectedCreatorOverrides}
                     />
                 ) : null}
+                {selectedTab === PageTabs.ABOUT ? <AboutTab /> : null}
             </TabContainer>
         </PageContainer>
     );

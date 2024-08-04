@@ -10,14 +10,6 @@ variable "repository_name" {
   type = string
 }
 
-variable "remote_state_bucket_arn" {
-  type = string
-}
-
-variable "remote_state_table_arn" {
-  type = string
-}
-
 variable "remote_state_read_write_policy_arn" {
   type = string
 }
