@@ -618,7 +618,7 @@
         "creator": "Cook",
         "createTime": 40,
         "requires": [
-            { "name": "Raw fish", "amount": 1 },
+            { "name": "Raw fish", "amount": 4 },
             { "name": "Firewood", "amount": 1 }
         ],
         "output": 1,
@@ -1318,7 +1318,7 @@
     {
         "name": "Raw fish",
         "creator": "Fisherman",
-        "createTime": 125,
+        "createTime": 30,
         "requires": [],
         "output": 1,
         "toolset": {
