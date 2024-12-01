@@ -68,6 +68,9 @@ Tinkerer's recipe's needs to be updated to:
     -   Update: `slingday` to: `guardslingerdayjob`
     -   Update: `slingnight` to: `guardslingernightjob`
 -   Only include one splitting stump recipe, remove entry for: `splittingstumptaiga`
+-   Only include one straw roof entry
+    -   Remove duplicate entry that outputs 4 roof straw.
+    -   Update remaining entry to have craft time of 40 seconds.
 
 Woodcutters' recipe's needs to be updated to:
 

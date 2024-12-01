@@ -1379,6 +1379,10 @@ describe("recipe to item mapping", () => {
             ["fence", "Fence"],
             ["manuscript", "Manuscript"],
             ["cardempty", "Empty punch card"],
+            ["quarterblockdynamicitem", "Dynamic Quarter Block"],
+            ["rooftoolplanks", "Wooden Roof"],
+            ["rooftoolstraw", "Straw Roof"],
+            ["plankscoated", "Coated planks"],
         ])(
             "can handle recipes for item: %s",
             async (itemName: string, expectedConvertedItemName: string) => {
