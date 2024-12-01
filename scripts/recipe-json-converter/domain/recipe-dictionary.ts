@@ -262,6 +262,10 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     movabletype: "Movable type",
     manuscript: "Manuscript",
     cardempty: "Empty punch card",
+    quarterblockdynamicitem: "Dynamic Quarter Block",
+    rooftoolplanks: "Wooden Roof",
+    rooftoolstraw: "Straw Roof",
+    plankscoated: "Coated planks",
 };
 
 const getUserFriendlyItemName = (name: string): string | null => {
