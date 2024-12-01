@@ -215,7 +215,7 @@ function AboutTab() {
     return (
         <>
             <span>
-                Calculations are correct for version: 0.11.0.8 (2024-06-10)
+                Calculations are correct for version: 0.12.0.1 (2024-11-29)
             </span>
             <span>
                 Calculations use public game data files from the{" "}
