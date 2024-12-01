@@ -148,6 +148,21 @@
         }
     },
     {
+        "name": "Dynamic Quarter Block",
+        "creator": "Artist",
+        "createTime": 80,
+        "requires": [
+            { "name": "Planks", "amount": 2 },
+            { "name": "Stone rubble", "amount": 2 }
+        ],
+        "output": 4,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
         "name": "Wooden stairs",
         "creator": "Artist",
         "createTime": 120,
@@ -3110,6 +3125,30 @@
         }
     },
     {
+        "name": "Wooden Roof",
+        "creator": "Tinkerer",
+        "createTime": 40,
+        "requires": [{ "name": "Planks", "amount": 4 }],
+        "output": 4,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "stone"
+        }
+    },
+    {
+        "name": "Coated planks",
+        "creator": "Tinkerer",
+        "createTime": 40,
+        "requires": [{ "name": "Planks", "amount": 4 }],
+        "output": 4,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "stone"
+        }
+    },
+    {
         "name": "Furnace",
         "creator": "Tinkerer",
         "createTime": 50,
@@ -3196,6 +3235,21 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "stone"
+        }
+    },
+    {
+        "name": "Straw Roof",
+        "creator": "Tinkerer",
+        "createTime": 40,
+        "requires": [
+            { "name": "Planks", "amount": 1 },
+            { "name": "Straw", "amount": 1 }
+        ],
+        "output": 2,
         "toolset": {
             "type": "default",
             "minimumTool": "none",
