@@ -68,13 +68,23 @@ resource "mongodbatlas_project" "main" {
   org_id = data.mongodbatlas_roles_org_id.main.org_id
 }
 
-resource "mongodbatlas_serverless_instance" "main" {
-  project_id = mongodbatlas_project.main.id
-  name       = "${local.resource_prefix}db-instance"
+resource "mongodbatlas_advanced_cluster" "main" {
+  project_id   = mongodbatlas_project.main.id
+  name         = "${local.resource_prefix}cluster"
+  cluster_type = "REPLICASET"
 
-  provider_settings_backing_provider_name = "AWS"
-  provider_settings_provider_name         = "SERVERLESS"
-  provider_settings_region_name           = replace(upper(var.region), "-", "_")
+  replication_specs {
+    region_configs {
+      region_name           = replace(upper(var.region), "-", "_")
+      provider_name         = "TENANT"
+      backing_provider_name = "AWS"
+      priority              = 7
+
+      electable_specs {
+        instance_size = "M0"
+      }
+    }
+  }
 }
 
 resource "mongodbatlas_project_ip_access_list" "main" {
@@ -173,7 +183,7 @@ resource "aws_lambda_function" "add_item_lambda" {
       ITEM_SEED_KEY        = "${local.seed_file_key_prefix}items.json"
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
     }
   }
 
@@ -255,7 +265,7 @@ resource "aws_lambda_function" "query_item_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
     }
   }
 }
@@ -353,7 +363,7 @@ resource "aws_lambda_function" "query_requirements_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
     }
   }
 }
@@ -450,7 +460,7 @@ resource "aws_lambda_function" "query_output_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
     }
   }
 }
@@ -547,7 +557,7 @@ resource "aws_lambda_function" "query_distinct_item_names_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_serverless_instance.main.connection_strings_standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
     }
   }
 }
