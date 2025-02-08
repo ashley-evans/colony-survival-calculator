@@ -14,7 +14,7 @@
         "postinstall": "yarn generate"
     },
     "devDependencies": {
-        "@tsconfig/node20": "^20.1.2",
+        "@tsconfig/node22": "^22.0.0",
         "@tsconfig/strictest": "^2.0.1",
         "@types/jest": "^29.5.4",
         "@types/jest-when": "^3.5.2",
