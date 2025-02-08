@@ -14,9 +14,9 @@ The currently deployed version of the application can be found at the following 
 
 ## Requirements
 
-| Name      | Version  | Instructions                                        |
-| --------- | -------- | --------------------------------------------------- |
-| Terraform | >= 1.3.7 | https://developer.hashicorp.com/terraform/downloads |
+| Name      | Version   | Instructions                                        |
+| --------- | --------- | --------------------------------------------------- |
+| Terraform | >= 1.10.5 | https://developer.hashicorp.com/terraform/downloads |
 
 ## Setup
 
