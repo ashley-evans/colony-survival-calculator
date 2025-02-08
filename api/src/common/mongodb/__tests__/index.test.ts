@@ -8,7 +8,7 @@ let mongoDBMemoryServer: MongoMemoryServer;
 beforeAll(async () => {
     mongoDBMemoryServer = await MongoMemoryServer.create({
         binary: {
-            version: "6.0.4",
+            version: "8.0.4",
         },
         instance: {
             dbName: databaseName,
