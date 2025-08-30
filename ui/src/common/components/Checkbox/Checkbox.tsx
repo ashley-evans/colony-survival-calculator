@@ -1,4 +1,4 @@
-import React, { FormEvent, useId } from "react";
+import { FormEvent, useId } from "react";
 import { Container, StyledCheckbox } from "./styles";
 import { ColorPalettes } from "../..";
 
@@ -33,7 +33,7 @@ function Checkbox({
                 type="checkbox"
                 defaultChecked={checked}
                 onChange={handleCheckboxChange}
-                palette={palette}
+                $palette={palette}
             />
         </Container>
     );

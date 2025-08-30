@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     UseComboboxProps,
     UseComboboxStateChange,
@@ -87,9 +87,9 @@ function AutoCompleteSelector<Item>({
     }, [defaultSelectedItem]);
 
     return (
-        <Container palette={palette} className={className}>
+        <Container $palette={palette} className={className}>
             <Label {...getLabelProps()}>{labelText}</Label>
-            <SelectorInputContainer palette={palette}>
+            <SelectorInputContainer $palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
                 <InputIconContainer>
                     {inputValue && clearIconLabelText ? (
@@ -115,8 +115,8 @@ function AutoCompleteSelector<Item>({
             </SelectorInputContainer>
             <Menu
                 {...getMenuProps()}
-                isOpen={isOpen && filtered.length > 0}
-                palette={palette}
+                $isOpen={isOpen && filtered.length > 0}
+                $palette={palette}
             >
                 {isOpen ? (
                     <>
@@ -124,7 +124,7 @@ function AutoCompleteSelector<Item>({
                             <Item
                                 key={itemToKey(item, index)}
                                 {...getItemProps({ item, index })}
-                                palette={palette}
+                                $palette={palette}
                             >
                                 {itemToDisplayText(item)}
                             </Item>

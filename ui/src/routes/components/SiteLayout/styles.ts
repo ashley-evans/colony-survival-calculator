@@ -19,7 +19,7 @@ export const SiteHeader = styled.h1`
 export const SiteTheme = styled.div`
     ${(props) => css`
         color: ${props.theme.color.background.on_main};
-        font-family ${props.theme.typography.family};
+        font-family: ${props.theme.typography.family};
     `}
 `;
 

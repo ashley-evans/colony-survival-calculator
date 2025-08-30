@@ -1,4 +1,3 @@
-import React from "react";
 import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within } from "@testing-library/react";

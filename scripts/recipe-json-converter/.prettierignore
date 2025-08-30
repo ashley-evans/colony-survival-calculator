@@ -4,4 +4,4 @@ node_modules
 
 # Generated files
 
-**/generated/*.*
+**/__generated__/*.*

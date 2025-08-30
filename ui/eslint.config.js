@@ -10,6 +10,8 @@ module.exports = defineConfig([
     reactPlugin.configs.flat["jsx-runtime"],
     reactRefresh.configs.vite,
     {
+        files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
+        ...reactPlugin.configs.flat.recommended,
         languageOptions: {
             ...reactPlugin.configs.flat.recommended.languageOptions,
             parserOptions: {
@@ -22,6 +24,9 @@ module.exports = defineConfig([
         },
         settings: {
             react: { version: "detect" },
+        },
+        rules: {
+            "react/jsx-uses-react": "error",
         },
     },
 ]);

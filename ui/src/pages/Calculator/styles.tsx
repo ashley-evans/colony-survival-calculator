@@ -12,11 +12,11 @@ export const Tabs = styled.div`
         padding: 0.5rem;
         cursor: pointer;
 
-        :first-child {
+        &:first-child {
             border-top-left-radius: 0.4rem;
         }
 
-        :last-child {
+        &:last-child {
             border-width: 0.1rem 0.1rem 0 0;
             border-top-right-radius: 0.4rem;
         }

@@ -1,4 +1,3 @@
-import React from "react";
 import { HttpResponse, delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within, waitFor } from "@testing-library/react";

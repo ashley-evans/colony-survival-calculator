@@ -1,5 +1,5 @@
-import React, { useState, Suspense, lazy } from "react";
-import { useQuery } from "@apollo/client";
+import { useState, Suspense, lazy } from "react";
+import { useQuery } from "@apollo/client/react";
 
 import ItemSelector from "./components/ItemSelector";
 import OutputUnitSelector from "./components/OutputUnitSelector";

@@ -1,5 +1,5 @@
 import { DefaultBodyType, StrictRequest } from "msw";
-import { SetupServer } from "msw/lib/node";
+import { SetupServer } from "msw/node";
 
 type GraphQLOperationBody<Arguments extends DefaultBodyType> = {
     operationName: string;

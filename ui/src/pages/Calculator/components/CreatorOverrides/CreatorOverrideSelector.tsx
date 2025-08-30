@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { faRemove } from "@fortawesome/free-solid-svg-icons";
 
 import { Selector } from "../../../../common";

@@ -1,37 +1,15 @@
-import {
-    ApolloClient,
-    ApolloLink,
-    HttpLink,
-    InMemoryCache,
-    NormalizedCacheObject,
-} from "@apollo/client";
-import { fetchAuthSession } from "aws-amplify/auth";
-import { createAuthLink, AuthOptions } from "aws-appsync-auth-link";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { createSignedFetch } from "./aws-signed-fetch";
 
-function createClient(
-    url: string,
-    region: string,
-): ApolloClient<NormalizedCacheObject> {
-    const authConfiguration: AuthOptions = {
-        type: "AWS_IAM",
-        credentials: async () => {
-            const { credentials } = await fetchAuthSession();
-            return credentials ?? null;
-        },
-    };
-
-    const httpLink = new HttpLink({ uri: url });
-    const link = ApolloLink.from([
-        createAuthLink({
-            url: url,
-            region: region,
-            auth: authConfiguration,
-        }),
-        httpLink,
-    ]);
+function createClient(url: string, region: string): ApolloClient {
+    const signedFetch = createSignedFetch(region);
+    const httpLink = new HttpLink({
+        uri: url,
+        fetch: signedFetch,
+    });
 
     return new ApolloClient({
-        link,
+        link: httpLink,
         cache: new InMemoryCache(),
     });
 }

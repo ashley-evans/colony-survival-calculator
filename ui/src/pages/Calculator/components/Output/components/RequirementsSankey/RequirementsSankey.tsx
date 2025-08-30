@@ -1,4 +1,3 @@
-import React from "react";
 import { ResponsiveSankey, DefaultLink, DefaultNode } from "@nivo/sankey";
 
 import { SankeyContainer } from "./styles";

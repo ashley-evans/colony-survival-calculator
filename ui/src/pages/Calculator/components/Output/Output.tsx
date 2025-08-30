@@ -1,11 +1,11 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import {
     OutputUnit,
     AvailableTools,
     CreatorOverride,
 } from "../../../../graphql/__generated__/graphql";
 import { gql } from "../../../../graphql/__generated__";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import { useDebounce } from "use-debounce";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { Requirements, RequirementsSankey } from "./components";

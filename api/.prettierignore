@@ -5,7 +5,7 @@ node_modules
 # Generated files
 
 schema.d.ts
-**/generated/*.d.ts
+**/__generated__/*.d.ts
 
 # Built files
 

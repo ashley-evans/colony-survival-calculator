@@ -8,12 +8,12 @@ export const Container = styled.div`
 `;
 
 type InputContainerProps = {
-    palette: ColorPalettes;
+    $palette: ColorPalettes;
 };
 
 export const InputContainer = styled.div<InputContainerProps>`
-    ${({ theme, palette }) => css`
-        color: ${theme.color[palette].on_container};
+    ${({ theme, $palette }) => css`
+        color: ${theme.color[$palette].on_container};
     `}
 
     display: flex;
@@ -23,26 +23,26 @@ export const InputContainer = styled.div<InputContainerProps>`
 `;
 
 type InputProps = {
-    palette: ColorPalettes;
+    $palette: ColorPalettes;
 };
 
 export const Input = styled.input<InputProps>`
-    ${({ theme, palette, "aria-invalid": invalid }) => css`
-        color: ${theme.color[palette].on_container};
-        background-color: ${theme.color[palette].container};
-        border: 1px solid ${theme.color[palette].container};
+    ${({ theme, $palette, "aria-invalid": invalid }) => css`
+        color: ${theme.color[$palette].on_container};
+        background-color: ${theme.color[$palette].container};
+        border: 1px solid ${theme.color[$palette].container};
 
-        :hover,
-        :focus {
-            border-color: ${theme.color[palette].on_container};
+        &:hover,
+        &:focus {
+            border-color: ${theme.color[$palette].on_container};
         }
 
         ${invalid &&
         css`
             border-color: ${theme.color.error.main};
 
-            :hover,
-            :focus {
+            &:hover,
+            &:focus {
                 border-color: ${theme.color.error.main};
             }
         `}
@@ -55,8 +55,8 @@ export const Input = styled.input<InputProps>`
 
 export const IconContainer = styled.span`
     ${({ theme }) => css`
-        :hover,
-        :focus {
+        &:hover,
+        &:focus {
             color: ${theme.color.error.main};
         }
     `}

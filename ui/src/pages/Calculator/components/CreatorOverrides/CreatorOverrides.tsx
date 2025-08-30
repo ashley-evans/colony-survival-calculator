@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client/react";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 
 import { gql } from "../../../../graphql/__generated__";

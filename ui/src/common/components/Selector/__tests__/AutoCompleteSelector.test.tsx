@@ -1,4 +1,3 @@
-import React from "react";
 import { screen, waitFor } from "@testing-library/react";
 
 import { Item, createItem, itemToKey, itemToDisplayText } from "./utils";

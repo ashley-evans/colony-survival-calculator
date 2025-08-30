@@ -1,5 +1,3 @@
-import React from "react";
-
 import { AutoCompleteSelector } from "../../../../common/components";
 
 type ItemSelectorProps = {
