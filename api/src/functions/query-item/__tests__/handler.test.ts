@@ -23,7 +23,7 @@ const mockQueryItem = queryItem as jest.Mock;
 
 function createOptimalFilter(
     maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean
+    hasMachineTools?: boolean,
 ): OptimalFilter {
     return {
         maxAvailableTool: maxAvailableTool ?? null,
@@ -51,7 +51,7 @@ function createFilters({
 }
 
 function createMockEvent(
-    filters?: ItemsFilters
+    filters?: ItemsFilters,
 ): AppSyncResolverEvent<QueryItemArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryItemArgs>>();
     mockEvent.arguments = {
@@ -67,23 +67,23 @@ const expectedCreator = "test item creator";
 const mockEventWithoutFilters = createMockEvent();
 const mockEventWithEmptyFilters = createMockEvent(createFilters({}));
 const mockEventWithItemName = createMockEvent(
-    createFilters({ itemName: expectedItemName })
+    createFilters({ itemName: expectedItemName }),
 );
 const mockEventWithMinimumCreators = createMockEvent(
-    createFilters({ minimumCreators: expectedMinimumCreators })
+    createFilters({ minimumCreators: expectedMinimumCreators }),
 );
 const mockEventWithCreator = createMockEvent(
-    createFilters({ creator: expectedCreator })
+    createFilters({ creator: expectedCreator }),
 );
 const mockEventWithOptimalFilter = createMockEvent(
     createFilters({
         optimal: createOptimalFilter(),
-    })
+    }),
 );
 const mockEventWithOptimalFilterAndMaxTool = createMockEvent(
     createFilters({
         optimal: createOptimalFilter("COPPER"),
-    })
+    }),
 );
 const mockEventWithAllFilters = createMockEvent(
     createFilters({
@@ -91,7 +91,7 @@ const mockEventWithAllFilters = createMockEvent(
         minimumCreators: expectedMinimumCreators,
         creator: expectedCreator,
         optimal: createOptimalFilter("STEEL"),
-    })
+    }),
 );
 
 beforeEach(() => {
@@ -145,7 +145,7 @@ test.each([
         createMockEvent(
             createFilters({
                 optimal: createOptimalFilter(undefined, true),
-            })
+            }),
         ),
         {
             optimal: { hasMachineTools: true },
@@ -156,7 +156,7 @@ test.each([
         createMockEvent(
             createFilters({
                 optimal: createOptimalFilter(undefined, false),
-            })
+            }),
         ),
         {
             optimal: { hasMachineTools: false },
@@ -167,7 +167,7 @@ test.each([
     async (
         _: string,
         event: AppSyncResolverEvent<QueryItemArgs>,
-        expected: QueryFilters | undefined
+        expected: QueryFilters | undefined,
     ) => {
         mockQueryItem.mockResolvedValue([]);
 
@@ -175,7 +175,7 @@ test.each([
 
         expect(mockQueryItem).toHaveBeenCalledTimes(1);
         expect(mockQueryItem).toHaveBeenCalledWith(expected);
-    }
+    },
 );
 
 test.each([
@@ -329,17 +329,17 @@ test.each([
 
         expect(actual).toHaveLength(received.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("throws a user friendly error if an exception occurs while fetching item details", async () => {
     const expectedError = new Error(
-        "An error occurred while fetching item details, please try again."
+        "An error occurred while fetching item details, please try again.",
     );
     mockQueryItem.mockRejectedValue(new Error("unhandled"));
 
     expect.assertions(1);
     await expect(handler(mockEventWithoutFilters)).rejects.toThrow(
-        expectedError
+        expectedError,
     );
 });

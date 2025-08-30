@@ -28,7 +28,7 @@ async function clearItemsCollection() {
     const existingCollections = await db.listCollections().toArray();
     const collectionExists =
         existingCollections.find(
-            (collection) => collection.name == itemCollectionName
+            (collection) => collection.name == itemCollectionName,
         ) !== undefined;
     if (collectionExists) {
         const itemsCollection = db.collection(itemCollectionName);
@@ -38,7 +38,7 @@ async function clearItemsCollection() {
 
 function createItemWithNumberOfRecipes(
     itemName: string,
-    amount: number
+    amount: number,
 ): Items {
     const items: Items = [];
     for (let i = 0; i < amount; i++) {
@@ -49,7 +49,7 @@ function createItemWithNumberOfRecipes(
                 output: 1,
                 requirements: [],
                 creator: `${itemName}-creator-${i + 1}`,
-            })
+            }),
         );
     }
 
@@ -83,7 +83,7 @@ test.each([
         await expect(async () => {
             await import("../mongodb-query-item");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 describe("field queries", () => {
@@ -134,7 +134,7 @@ describe("field queries", () => {
 
             expect(actual).toHaveLength(expected.length);
             expect(actual).toEqual(expect.arrayContaining(expected));
-        }
+        },
     );
 
     test("returns only the specified item given an item name provided and multiple items in collection", async () => {
@@ -264,7 +264,7 @@ describe("creator count queries", () => {
     test("returns only items with more than two creators if minimum of two specified", async () => {
         const expected = createItemWithNumberOfRecipes(
             "expected item w/ two recipes",
-            2
+            2,
         );
         const stored = [
             createItem({
@@ -289,7 +289,7 @@ describe("creator count queries", () => {
     test("returns only items with more than three creators if minimum of three specified", async () => {
         const expected = createItemWithNumberOfRecipes(
             "expected item w/ 3 recipes",
-            3
+            3,
         );
         const stored = [
             ...createItemWithNumberOfRecipes("item w/ 2 recipes", 2),

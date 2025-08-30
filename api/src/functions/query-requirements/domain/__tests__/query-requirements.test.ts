@@ -22,7 +22,7 @@ const validWorkers = 5;
 
 function findRequirement(
     requirements: Requirement[],
-    itemName: string
+    itemName: string,
 ): Requirement | undefined {
     return requirements.find((workers) => workers.name === itemName);
 }
@@ -34,12 +34,12 @@ beforeEach(() => {
 
 test("throws an error given an empty string as an item name", async () => {
     const expectedError = new Error(
-        "Invalid item name provided, must be a non-empty string"
+        "Invalid item name provided, must be a non-empty string",
     );
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: "", workers: validWorkers })
+        queryRequirements({ name: "", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -50,14 +50,14 @@ test.each([
     "throws an error given number of workers that is %s",
     async (_: string, workers: number) => {
         const expectedError = new Error(
-            "Invalid number of workers provided, must be a positive number"
+            "Invalid number of workers provided, must be a positive number",
         );
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers })
+            queryRequirements({ name: validItemName, workers }),
         ).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("calls the database adapter to get the requirements given valid input", async () => {
@@ -81,7 +81,7 @@ test("throws an error if no requirements are returned at all (item does not exis
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -97,7 +97,7 @@ test("throws an error if the provided item details are not returned from DB", as
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -144,7 +144,7 @@ test("throws an error if provided item requires an item that does not exist in d
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -560,7 +560,7 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -592,7 +592,7 @@ describe("handles tool modifiers", () => {
         async (
             _: string,
             minimum: DefaultToolset,
-            provided: DefaultToolset
+            provided: DefaultToolset,
         ) => {
             const item = createItem({
                 name: validItemName,
@@ -611,9 +611,9 @@ describe("handles tool modifiers", () => {
                     name: validItemName,
                     workers: validWorkers,
                     maxAvailableTool: provided,
-                })
+                }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test.each([
@@ -643,7 +643,7 @@ describe("handles tool modifiers", () => {
         async (
             _: string,
             minimum: DefaultToolset,
-            provided: DefaultToolset
+            provided: DefaultToolset,
         ) => {
             const requiredItem = createItem({
                 name: "another item",
@@ -673,9 +673,9 @@ describe("handles tool modifiers", () => {
                     name: validItemName,
                     workers: validWorkers,
                     maxAvailableTool: provided,
-                })
+                }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test("throws an error with lowest required tool in message given multiple items w/ unmet tool requirements", async () => {
@@ -701,7 +701,7 @@ describe("handles tool modifiers", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers })
+            queryRequirements({ name: validItemName, workers: validWorkers }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -717,7 +717,7 @@ describe("handles tool modifiers", () => {
         async (
             provided: DefaultToolset,
             expectedOutput: number,
-            expectedWorkers: number
+            expectedWorkers: number,
         ) => {
             const requiredItemName = "another item";
             const requiredItem = createItem({
@@ -749,15 +749,15 @@ describe("handles tool modifiers", () => {
 
             const requirement = findRequirement(
                 actual,
-                requiredItemName
+                requiredItemName,
             ) as Requirement;
 
             expect(requirement.amount).toBeCloseTo(expectedOutput);
             expect(requirement.creators[0]?.amount).toBeCloseTo(expectedOutput);
             expect(requirement.creators[0]?.workers).toBeCloseTo(
-                expectedWorkers
+                expectedWorkers,
             );
-        }
+        },
     );
 
     test("returns required output/workers to satisfy input item given tool better than applicable to input item", async () => {
@@ -787,7 +787,7 @@ describe("handles tool modifiers", () => {
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.amount).toBeCloseTo(30);
@@ -822,7 +822,7 @@ describe("handles tool modifiers", () => {
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.creators[0]?.workers).toBeCloseTo(0.625);
@@ -855,7 +855,7 @@ describe("handles tool modifiers", () => {
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.creators[0]?.workers).toBeCloseTo(1.25);
@@ -1372,7 +1372,7 @@ describe("multiple recipe handling", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers })
+            queryRequirements({ name: validItemName, workers: validWorkers }),
         ).rejects.toThrow(expectedError);
     });
 });
@@ -1537,7 +1537,7 @@ describe("creator override handling", () => {
                     { itemName: validItemName, creator: overrideCreator },
                     { itemName: validItemName, creator: "another creator" },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -1704,7 +1704,7 @@ describe("creator override handling", () => {
                 creatorOverrides: [
                     { itemName: validItemName, creator: override },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -1735,7 +1735,7 @@ describe("creator override handling", () => {
                 creatorOverrides: [
                     { itemName: requiredItem.name, creator: override },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -2007,7 +2007,7 @@ describe("handles multiple output units", () => {
             });
 
             expect(actual).toEqual(expected);
-        }
+        },
     );
 });
 
@@ -2025,7 +2025,7 @@ describe("handles machine tools", () => {
         requirements: [{ name: machineToolsItem.name, amount: 5 }],
     });
     const expectedRequiredToolsError = new Error(
-        "Unable to create item with available tools, requires machine tools"
+        "Unable to create item with available tools, requires machine tools",
     );
 
     beforeEach(() => {
@@ -2052,7 +2052,7 @@ describe("handles machine tools", () => {
                         name: machineToolsItem.name,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
-                    })
+                    }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
 
@@ -2063,10 +2063,10 @@ describe("handles machine tools", () => {
                         name: baseItem.name,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
-                    })
+                    }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
-        }
+        },
     );
 
     test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
@@ -2091,7 +2091,7 @@ describe("handles machine tools", () => {
                 workers: validWorkers,
                 hasMachineTools: true,
                 maxAvailableTool: DefaultToolset.iron,
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -2181,14 +2181,14 @@ describe("handles calculating requirements for target output", () => {
         "throws an error given target amount that is %s",
         async (_: string, amount: number) => {
             const expectedError = new Error(
-                "Invalid target output provided, must be a positive number"
+                "Invalid target output provided, must be a positive number",
             );
 
             expect.assertions(1);
             await expect(
-                queryRequirements({ name: validItemName, amount })
+                queryRequirements({ name: validItemName, amount }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test.each([
@@ -2382,7 +2382,7 @@ describe("handles calculating requirements for target output", () => {
             });
 
             expect(actual).toEqual(expected);
-        }
+        },
     );
 });
 

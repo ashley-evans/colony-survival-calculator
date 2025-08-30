@@ -14,13 +14,13 @@ import {
 
 type RecipeConverterDependencies = {
     convertCraftableRecipes: (
-        input: CraftableRecipeConverterInputs
+        input: CraftableRecipeConverterInputs,
     ) => ReturnType<CraftableRecipeConverter>;
     convertMineableItems: (
-        input: MineableItemConverterInputs
+        input: MineableItemConverterInputs,
     ) => ReturnType<MineableItemConverter>;
     convertGrowables: (
-        input: GrowableConverterInputs
+        input: GrowableConverterInputs,
     ) => ReturnType<GrowableConverter>;
     writeJSON: JSONWriter;
 };

@@ -59,10 +59,10 @@ function createVariableName({
 function filterCreatable(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
 ): Items {
     return items.filter((item) =>
-        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item),
     );
 }
 
@@ -72,21 +72,21 @@ function createBaseOutputPropertyName(itemName: string) {
 
 function createRecipeDemandVariableName(
     recipe: Pick<Item, "name" | "creator">,
-    demand: string
+    demand: string,
 ) {
     return `${REQUIREMENT_PREFIX}${createVariableName(recipe)}-${demand}`;
 }
 
 function createRecipeProductionVariableName(
     recipe: Pick<Item, "name" | "creator">,
-    product: string
+    product: string,
 ): string {
     return `${PRODUCTION_PREFIX}${createVariableName(recipe)}-${product}`;
 }
 
 function createRecipeOutputVariableName(
     recipe: Pick<Item, "name" | "creator">,
-    output: string
+    output: string,
 ): string {
     return `${OUTPUT_PREFIX}${createVariableName(recipe)}-${output}`;
 }
@@ -95,7 +95,7 @@ function createDemandVariables(
     items: Readonly<Items>,
     maxAvailableTool: DefaultToolset,
     inputItemName: string,
-    unit: OutputUnit
+    unit: OutputUnit,
 ): Variables {
     const recipeMap = groupItemsByName(items);
 
@@ -116,7 +116,7 @@ function createDemandVariables(
             const recipeVariable: VariableProperties = {};
             const baseRecipeOutputPropertyName = createRecipeOutputVariableName(
                 recipe,
-                recipe.name
+                recipe.name,
             );
 
             // Set recipe output properties
@@ -149,7 +149,7 @@ function createDemandVariables(
                 // Create specific recipe output properties
                 const recipeDemandVariableName = createRecipeDemandVariableName(
                     recipe,
-                    requirement.name
+                    requirement.name,
                 );
                 recipeVariable[recipeDemandVariableName] =
                     (requirement.amount / createTime) *
@@ -223,7 +223,7 @@ function createDemandVariables(
 }
 
 function createMinimumConstraints(
-    variables: Readonly<Variables>
+    variables: Readonly<Variables>,
 ): Readonly<Constraints> {
     const uniqueConstraints: Constraints = {};
     for (const properties of Object.values(variables)) {
@@ -236,7 +236,7 @@ function createMinimumConstraints(
 }
 
 function createOutputConstraints(
-    variables: Readonly<Variables>
+    variables: Readonly<Variables>,
 ): Readonly<Constraints> {
     const outputConstraints: Constraints = {};
     for (const [key, properties] of Object.entries(variables)) {
@@ -254,7 +254,7 @@ function createOutputConstraints(
 
 function getVertexWithHighestOutputAndLowestWorkers(
     inputItemName: string,
-    vertices: VertexOutput[] | undefined
+    vertices: VertexOutput[] | undefined,
 ): VertexOutput | undefined {
     if (!vertices || vertices.length === 0) {
         return undefined;
@@ -281,7 +281,7 @@ function getVertexWithHighestOutputAndLowestWorkers(
 
 function createTargetConstraint(
     inputItemName: string,
-    target: ProgramInput["target"]
+    target: ProgramInput["target"],
 ): Readonly<Constraints> {
     if ("workers" in target) {
         const inputWorkersConstraintName =
@@ -310,13 +310,13 @@ function computeRequirementVertices({
     const createAbleItems = filterCreatable(
         requirements,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
     );
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,
         inputItemName,
-        unit
+        unit,
     );
 
     const demandConstraints = createMinimumConstraints(variables);
@@ -339,7 +339,7 @@ function computeRequirementVertices({
     const result = solver.MultiObjective(model) as LinearProgramOutput;
     return getVertexWithHighestOutputAndLowestWorkers(
         inputItemName,
-        result.vertices
+        result.vertices,
     );
 }
 

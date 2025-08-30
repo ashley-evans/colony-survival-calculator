@@ -2,7 +2,7 @@ import type { S3Event, S3EventRecord } from "aws-lambda";
 import { mock } from "jest-mock-extended";
 
 export function createS3EventBucketDetails(
-    name?: string
+    name?: string,
 ): S3EventRecord["s3"]["bucket"] {
     const bucketDetails = mock<S3EventRecord["s3"]["bucket"]>();
     if (name) {
@@ -13,7 +13,7 @@ export function createS3EventBucketDetails(
 }
 
 export function createS3EventBucketObjectDetails(
-    key?: string
+    key?: string,
 ): S3EventRecord["s3"]["object"] {
     const objectDetails = mock<S3EventRecord["s3"]["object"]>();
     if (key) {
@@ -25,7 +25,7 @@ export function createS3EventBucketObjectDetails(
 
 export function createS3EventNotificationDetails(
     bucketDetails?: S3EventRecord["s3"]["bucket"],
-    objectDetails?: S3EventRecord["s3"]["object"]
+    objectDetails?: S3EventRecord["s3"]["object"],
 ): S3EventRecord["s3"] {
     const notificationDetails = mock<S3EventRecord["s3"]>();
     if (bucketDetails) {
@@ -40,7 +40,7 @@ export function createS3EventNotificationDetails(
 }
 
 export function createS3EventRecord(
-    details?: S3EventRecord["s3"]
+    details?: S3EventRecord["s3"],
 ): S3EventRecord {
     const record = mock<S3EventRecord>();
     if (details) {

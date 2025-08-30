@@ -19,7 +19,7 @@ import AppRouterProvider, {
 const defaultGraphQLURL = "https://localhost:3000/graphql";
 
 function createApolloClient(
-    apiURL: string
+    apiURL: string,
 ): ApolloClient<NormalizedCacheObject> {
     const httpLink = new HttpLink({ uri: apiURL });
     return new ApolloClient({
@@ -30,7 +30,7 @@ function createApolloClient(
 
 function wrapWithTestProviders(
     children: ReactElement,
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     const client = createApolloClient(apiURL);
 
@@ -43,7 +43,7 @@ function wrapWithTestProviders(
 
 function renderWithRouterProvider(
     routerProps: AppRouterProviderProps = {},
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     const client = createApolloClient(apiURL);
 
@@ -52,14 +52,14 @@ function renderWithRouterProvider(
         ...render(
             <ApolloProvider client={client}>
                 <AppRouterProvider {...routerProps} />
-            </ApolloProvider>
+            </ApolloProvider>,
         ),
     };
 }
 
 function renderWithTestProviders(
     children: ReactElement,
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     return {
         ...render(wrapWithTestProviders(children, apiURL)),

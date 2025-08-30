@@ -92,7 +92,7 @@ interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
 }
 
 export const ToggleIndicatorIcon = styled(
-    FontAwesomeIcon
+    FontAwesomeIcon,
 )<ToggleIndicatorIconProps>`
     ${({ selected }) => {
         if (selected) {

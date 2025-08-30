@@ -11,7 +11,7 @@ const FILE_NAME = "types";
 const getMineableItems = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readMineableItemsFile: JSONFileReader<MineableItems>
+    readMineableItemsFile: JSONFileReader<MineableItems>,
 ) => {
     const mineableItemsFiles = await findFiles({
         root: inputDirectoryPath,
@@ -21,11 +21,11 @@ const getMineableItems = async (
 
     if (mineableItemsFiles.length === 0) {
         throw new Error(
-            `No ${FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`
+            `No ${FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`,
         );
     } else if (mineableItemsFiles.length > 1) {
         throw new Error(
-            `Multiple ${FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`
+            `Multiple ${FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`,
         );
     }
 
@@ -39,11 +39,11 @@ const convertToItems = (mineable: MineableItems): Items => {
         }
 
         const userFriendlyItemName = getUserFriendlyItemName(
-            current.onRemoveType
+            current.onRemoveType,
         );
         if (!userFriendlyItemName) {
             throw new Error(
-                `User friendly name unavailable for item: ${current.onRemoveType}`
+                `User friendly name unavailable for item: ${current.onRemoveType}`,
             );
         }
 
@@ -72,14 +72,14 @@ const convertMineableItems: MineableItemConverter = async ({
     const mineable = await getMineableItems(
         inputDirectoryPath,
         findFiles,
-        readMineableItemsFile
+        readMineableItemsFile,
     );
 
     const converted = convertToItems(mineable);
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(
-            `Multiple mineable recipes for item: ${containsDuplicate.name}, please remove one`
+            `Multiple mineable recipes for item: ${containsDuplicate.name}, please remove one`,
         );
     }
 

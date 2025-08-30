@@ -55,7 +55,7 @@ function AutoCompleteSelector<Item>({
         setFiltered(
             getItemFilter && inputValue
                 ? items.filter(getItemFilter(inputValue))
-                : items
+                : items,
         );
     };
 

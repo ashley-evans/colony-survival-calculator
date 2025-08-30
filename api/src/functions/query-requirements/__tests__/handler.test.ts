@@ -23,7 +23,7 @@ jest.mock("../domain/query-requirements", () => ({
 const mockQueryRequirements = queryRequirements as jest.Mock;
 
 const isUserError = (
-    requirementResult: RequirementResult
+    requirementResult: RequirementResult,
 ): requirementResult is UserError => {
     return "message" in requirementResult;
 };
@@ -43,7 +43,7 @@ type GraphQLEventInput = {
 };
 
 function createMockEvent(
-    input: GraphQLEventInput
+    input: GraphQLEventInput,
 ): AppSyncResolverEvent<QueryRequirementArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.info.selectionSetList = input.selectionSetList ?? ["name"];
@@ -119,7 +119,7 @@ test.each<[AvailableTools, SchemaTools]>([
             workers: expectedWorkers,
             maxAvailableTool: expectedTool,
         });
-    }
+    },
 );
 
 test.each([
@@ -142,7 +142,7 @@ test.each([
             workers: expectedWorkers,
             hasMachineTools,
         });
-    }
+    },
 );
 
 test("provides specified creator overrides to domain if provided", async () => {
@@ -193,7 +193,7 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
             workers: expectedWorkers,
             unit: expected,
         });
-    }
+    },
 );
 
 test.each([
@@ -204,7 +204,7 @@ test.each([
     "throws invalid arguments exception if %s is queried without providing output unit",
     async (_: string, selectionSetList: string[]) => {
         const expectedError = new Error(
-            "Invalid arguments: Must provide output unit when querying amounts"
+            "Invalid arguments: Must provide output unit when querying amounts",
         );
         const event = createMockEvent({
             name: expectedItemName,
@@ -214,7 +214,7 @@ test.each([
 
         expect.assertions(1);
         await expect(handler(event)).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test.each([
@@ -224,7 +224,7 @@ test.each([
     "throws an invalid argument exception if %s",
     async (_: string, amount?: number, workers?: number) => {
         const expectedError = new Error(
-            "Invalid arguments: Must provide either amount or workers when querying requirements (not both)"
+            "Invalid arguments: Must provide either amount or workers when querying requirements (not both)",
         );
         const event = createMockEvent({
             name: expectedItemName,
@@ -234,7 +234,7 @@ test.each([
 
         expect.assertions(1);
         await expect(handler(event)).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test.each([
@@ -303,7 +303,7 @@ test.each([
     async (
         _: string,
         returned: Requirement[],
-        expected: GraphQLRequirement[]
+        expected: GraphQLRequirement[],
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);
         const event = createMockEvent({ name: "test", workers: 1 });
@@ -316,7 +316,7 @@ test.each([
         expect(actual.__typename).toEqual("Requirements");
         expect(actual.requirements).toHaveLength(expected.length);
         expect(actual.requirements).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test.each([
@@ -354,7 +354,7 @@ test.each([
         }
 
         expect(actual).toEqual({ __typename: "UserError", message: error });
-    }
+    },
 );
 
 test("throws the exception if an unknown exception occurs while fetching item requirements", async () => {

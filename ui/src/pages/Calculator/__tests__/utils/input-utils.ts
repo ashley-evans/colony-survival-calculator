@@ -33,7 +33,7 @@ async function selectItemAndTarget(input: SelectItemAndTargetParams) {
         expectedTargetAmountInputLabel,
         {
             selector: "input",
-        }
+        },
     );
 
     if (input.clear) {

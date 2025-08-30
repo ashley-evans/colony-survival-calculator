@@ -139,7 +139,7 @@ test("only writes returned craftable recipes to provided JSON output path if onl
     expect(mockWriteJSON).toHaveBeenCalledTimes(1);
     expect(mockWriteJSON).toHaveBeenCalledWith(
         input.outputFilePath,
-        expectedCraftableRecipes
+        expectedCraftableRecipes,
     );
 });
 
@@ -152,7 +152,7 @@ test("only writes returned mineable items to provided JSON output path if only m
     expect(mockWriteJSON).toHaveBeenCalledTimes(1);
     expect(mockWriteJSON).toHaveBeenCalledWith(
         input.outputFilePath,
-        expectedMineableItems
+        expectedMineableItems,
     );
 });
 
@@ -165,7 +165,7 @@ test("only writes returned growable items to provided JSON output path if only g
     expect(mockWriteJSON).toHaveBeenCalledTimes(1);
     expect(mockWriteJSON).toHaveBeenCalledWith(
         input.outputFilePath,
-        expectedGrowables
+        expectedGrowables,
     );
 });
 
@@ -181,7 +181,7 @@ test("writes combined recipes to provided JSON output path if both returned", as
     expect(mockWriteJSON).toHaveBeenCalledTimes(1);
     expect(mockWriteJSON).toHaveBeenCalledWith(
         input.outputFilePath,
-        expect.arrayContaining(expected)
+        expect.arrayContaining(expected),
     );
 });
 
@@ -210,7 +210,7 @@ describe("handles directly non-creatable items", () => {
 
         expect(mockWriteJSON).not.toHaveBeenCalledWith(
             input.outputFilePath,
-            expect.arrayContaining([itemWithUnknownRequirement])
+            expect.arrayContaining([itemWithUnknownRequirement]),
         );
     });
 
@@ -219,7 +219,7 @@ describe("handles directly non-creatable items", () => {
 
         expect(consoleLogSpy).toHaveBeenCalledTimes(1);
         expect(consoleLogSpy).toHaveBeenCalledWith(
-            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`
+            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`,
         );
     });
 });
@@ -262,11 +262,11 @@ describe("handles non-creatable items due to nested unknown item", () => {
 
         expect(mockWriteJSON).not.toHaveBeenCalledWith(
             input.outputFilePath,
-            expect.arrayContaining([itemWithNestedUnknownRequirement])
+            expect.arrayContaining([itemWithNestedUnknownRequirement]),
         );
         expect(mockWriteJSON).not.toHaveBeenCalledWith(
             input.outputFilePath,
-            expect.arrayContaining([itemWithUnknownRequirement])
+            expect.arrayContaining([itemWithUnknownRequirement]),
         );
     });
 
@@ -275,10 +275,10 @@ describe("handles non-creatable items due to nested unknown item", () => {
 
         expect(consoleLogSpy).toHaveBeenCalledTimes(2);
         expect(consoleLogSpy).toHaveBeenCalledWith(
-            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`
+            `Removed recipe: ${itemWithUnknownRequirement.name} from ${itemWithUnknownRequirement.creator} as depends on item that cannot be created`,
         );
         expect(consoleLogSpy).toHaveBeenCalledWith(
-            `Removed recipe: ${itemWithNestedUnknownRequirement.name} from ${itemWithNestedUnknownRequirement.creator} as depends on item that cannot be created`
+            `Removed recipe: ${itemWithNestedUnknownRequirement.name} from ${itemWithNestedUnknownRequirement.creator} as depends on item that cannot be created`,
         );
     });
 });
@@ -317,11 +317,11 @@ test("filters out any item that depends on an item that cannot be created becaus
 
     expect(mockWriteJSON).not.toHaveBeenCalledWith(
         input.outputFilePath,
-        expect.arrayContaining([itemWithNestedUnknownRequirement])
+        expect.arrayContaining([itemWithNestedUnknownRequirement]),
     );
     expect(mockWriteJSON).not.toHaveBeenCalledWith(
         input.outputFilePath,
-        expect.arrayContaining([itemWithUnknownRequirement])
+        expect.arrayContaining([itemWithUnknownRequirement]),
     );
 });
 

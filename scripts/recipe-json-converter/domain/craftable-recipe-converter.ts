@@ -37,7 +37,7 @@ type PiplizToolset = PiplizToolsets[number];
 const getKnownToolsets = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readToolsFile: JSONFileReader<PiplizToolsets>
+    readToolsFile: JSONFileReader<PiplizToolsets>,
 ): Promise<PiplizToolsets> => {
     const toolsetFiles = await findFiles({
         root: inputDirectoryPath,
@@ -47,11 +47,11 @@ const getKnownToolsets = async (
 
     if (toolsetFiles.length === 0) {
         throw new Error(
-            `No ${TOOLSETS_FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`
+            `No ${TOOLSETS_FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`,
         );
     } else if (toolsetFiles.length > 1) {
         throw new Error(
-            `Multiple ${TOOLSETS_FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`
+            `Multiple ${TOOLSETS_FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`,
         );
     }
 
@@ -61,7 +61,7 @@ const getKnownToolsets = async (
 const getBlockBehaviours = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readBehavioursFile: JSONFileReader<BlockBehaviours>
+    readBehavioursFile: JSONFileReader<BlockBehaviours>,
 ): Promise<BlockBehaviours> => {
     const blockBehavioursFiles = await findFiles({
         root: inputDirectoryPath,
@@ -71,12 +71,12 @@ const getBlockBehaviours = async (
 
     if (blockBehavioursFiles.length === 0) {
         throw new Error(
-            `No ${BLOCK_BEHAVIOURS_PREFIX}*${JSON_FILE_EXTENSION} file(s) found in provided directory`
+            `No ${BLOCK_BEHAVIOURS_PREFIX}*${JSON_FILE_EXTENSION} file(s) found in provided directory`,
         );
     }
 
     const behaviours = await Promise.all(
-        blockBehavioursFiles.map((path) => readBehavioursFile(path))
+        blockBehavioursFiles.map((path) => readBehavioursFile(path)),
     );
 
     return behaviours.flat();
@@ -85,7 +85,7 @@ const getBlockBehaviours = async (
 const getKnownRecipes = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readRecipeFile: JSONFileReader<Recipes>
+    readRecipeFile: JSONFileReader<Recipes>,
 ): Promise<Recipes> => {
     const recipePaths = await findFiles({
         root: inputDirectoryPath,
@@ -100,75 +100,78 @@ const getKnownRecipes = async (
     });
 
     const recipes = await Promise.all(
-        filtered.map((path) => readRecipeFile(path))
+        filtered.map((path) => readRecipeFile(path)),
     );
 
     return recipes.flat();
 };
 
 const createToolsetMap = (
-    toolsets: PiplizToolsets
+    toolsets: PiplizToolsets,
 ): Map<string, PiplizToolset> =>
     new Map(toolsets.map((toolset) => [toolset.key, toolset]));
 
 const createNPCToolsetMapping = (
     blockBehaviours: BlockBehaviours,
-    toolsets: PiplizToolsets
+    toolsets: PiplizToolsets,
 ): Map<string, PiplizTools[]> => {
     const toolsetMap = createToolsetMap(toolsets);
-    const mappings = blockBehaviours.reduce((acc, current) => {
-        if (!current.baseType?.attachBehaviour) {
-            return acc;
-        }
-
-        const attachBehaviours = current.baseType.attachBehaviour.reduce(
-            (acc, current) => {
-                if (typeof current === "string") {
-                    return acc;
-                }
-
-                if (current.npcType && current.toolset) {
-                    acc.push({
-                        npcType: current.npcType,
-                        toolset: current.toolset,
-                    });
-                }
-
+    const mappings = blockBehaviours.reduce(
+        (acc, current) => {
+            if (!current.baseType?.attachBehaviour) {
                 return acc;
-            },
-            [] as NPCToolsetMapping[]
-        );
-
-        if (attachBehaviours[0]) {
-            const { toolset: required, npcType } = attachBehaviours[0];
-            const creator = splitPiplizCreator(npcType);
-            const toolset = toolsetMap.get(required);
-            if (!toolset) {
-                throw new Error(
-                    `Unknown toolset: ${required} required by ${creator}`
-                );
             }
 
-            acc.push([creator, toolset.usable]);
-        }
+            const attachBehaviours = current.baseType.attachBehaviour.reduce(
+                (acc, current) => {
+                    if (typeof current === "string") {
+                        return acc;
+                    }
 
-        return acc;
-    }, [] as [string, PiplizTools[]][]);
+                    if (current.npcType && current.toolset) {
+                        acc.push({
+                            npcType: current.npcType,
+                            toolset: current.toolset,
+                        });
+                    }
+
+                    return acc;
+                },
+                [] as NPCToolsetMapping[],
+            );
+
+            if (attachBehaviours[0]) {
+                const { toolset: required, npcType } = attachBehaviours[0];
+                const creator = splitPiplizCreator(npcType);
+                const toolset = toolsetMap.get(required);
+                if (!toolset) {
+                    throw new Error(
+                        `Unknown toolset: ${required} required by ${creator}`,
+                    );
+                }
+
+                acc.push([creator, toolset.usable]);
+            }
+
+            return acc;
+        },
+        [] as [string, PiplizTools[]][],
+    );
 
     return new Map(mappings);
 };
 
 const mapPiplizRequirementsToAPIRequirements = (
-    requirements: Recipe["requires"]
+    requirements: Recipe["requires"],
 ): Requirements =>
     requirements.map((requirement) => {
         const convertedRequirementName = getUserFriendlyItemName(
-            requirement.type
+            requirement.type,
         );
 
         if (!convertedRequirementName) {
             throw new Error(
-                `User friendly name unavailable for item: ${requirement.type}`
+                `User friendly name unavailable for item: ${requirement.type}`,
             );
         }
 
@@ -180,16 +183,16 @@ const mapPiplizRequirementsToAPIRequirements = (
     });
 
 const mapPiplizOptionalOutputsToAPIRequirements = (
-    outputs: Recipe["results"]
+    outputs: Recipe["results"],
 ): OptionalOutput[] =>
     outputs.map((result) => {
         const convertedOptionalOutputName = getUserFriendlyItemName(
-            result.type
+            result.type,
         );
 
         if (!convertedOptionalOutputName) {
             throw new Error(
-                `User friendly name unavailable for item: ${result.type}`
+                `User friendly name unavailable for item: ${result.type}`,
             );
         }
 
@@ -204,21 +207,21 @@ const mapPiplizOptionalOutputsToAPIRequirements = (
 
 const mapRecipeToItem = (
     recipe: Recipe,
-    npcToolsetMapping: Map<string, PiplizTools[]>
+    npcToolsetMapping: Map<string, PiplizTools[]>,
 ): Item => {
     const { itemName, creator } = splitPiplizName(recipe.name);
     const toolset = getToolset(recipe, npcToolsetMapping);
     const { matching, nonMatching } = filterByCondition(
         recipe.results,
-        (result) => result.type === itemName
+        (result) => result.type === itemName,
     );
     if (matching.length === 0) {
         throw new Error(
-            `Unable to find primary output for recipe: ${itemName} from creator: ${creator}`
+            `Unable to find primary output for recipe: ${itemName} from creator: ${creator}`,
         );
     } else if (matching.length > 1) {
         throw new Error(
-            `Multiple primary outputs specified for: ${itemName} from creator: ${creator}`
+            `Multiple primary outputs specified for: ${itemName} from creator: ${creator}`,
         );
     }
 
@@ -232,12 +235,12 @@ const mapRecipeToItem = (
     const convertedCreator = getUserFriendlyCreatorName(creator);
     if (!convertedCreator) {
         throw new Error(
-            `User friendly name unavailable for creator: ${creator}`
+            `User friendly name unavailable for creator: ${creator}`,
         );
     }
 
     const requirements = mapPiplizRequirementsToAPIRequirements(
-        recipe.requires
+        recipe.requires,
     );
     const optionalOutputs =
         mapPiplizOptionalOutputsToAPIRequirements(nonMatching);
@@ -263,18 +266,18 @@ const convertRecipes: CraftableRecipeConverter = async ({
     const toolsets = await getKnownToolsets(
         inputDirectoryPath,
         findFiles,
-        readToolsFile
+        readToolsFile,
     );
     const blockBehaviours = await getBlockBehaviours(
         inputDirectoryPath,
         findFiles,
-        readBehavioursFile
+        readBehavioursFile,
     );
     const npcToolsetMap = createNPCToolsetMapping(blockBehaviours, toolsets);
     const recipes = await getKnownRecipes(
         inputDirectoryPath,
         findFiles,
-        readRecipeFile
+        readRecipeFile,
     );
 
     const converted = recipes.reduce((acc, current) => {
@@ -287,7 +290,7 @@ const convertRecipes: CraftableRecipeConverter = async ({
 
             const { itemName, creator } = splitPiplizName(current.name);
             console.log(
-                `Skipping recipe: ${itemName} from creator: ${creator} as requires unsupported toolset`
+                `Skipping recipe: ${itemName} from creator: ${creator} as requires unsupported toolset`,
             );
         }
 
@@ -297,7 +300,7 @@ const convertRecipes: CraftableRecipeConverter = async ({
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(
-            `Multiple recipes for item: ${containsDuplicate.name} from creator: ${containsDuplicate.creator}, please remove one`
+            `Multiple recipes for item: ${containsDuplicate.name} from creator: ${containsDuplicate.creator}, please remove one`,
         );
     }
 

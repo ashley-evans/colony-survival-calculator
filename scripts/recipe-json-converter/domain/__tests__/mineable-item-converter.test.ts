@@ -36,7 +36,7 @@ test("finds the mineable items file in the provided input directory", async () =
 
     expect(mockFindFiles).toHaveBeenCalledTimes(1);
     expect(mockFindFiles).toHaveBeenCalledWith(
-        expectedMineableItemsFileFindInput
+        expectedMineableItemsFileFindInput,
     );
 });
 
@@ -58,9 +58,9 @@ test.each([
 
         expect.assertions(1);
         await expect(convertMineableItems(input)).rejects.toThrowError(
-            expectedError
+            expectedError,
         );
-    }
+    },
 );
 
 test("parses the JSON found in the mineable items file", async () => {
@@ -111,7 +111,7 @@ test.each([
 
         expect(actual).toHaveLength(1);
         expect(actual[0]).toEqual(expected);
-    }
+    },
 );
 
 test("ignores non-mineable items found in mineable items file", async () => {
@@ -208,7 +208,7 @@ test("throws an error if a mineable item is found with an unknown name", async (
 
     expect.assertions(1);
     await expect(convertMineableItems(input)).rejects.toThrowError(
-        expectedError
+        expectedError,
     );
 });
 
@@ -233,6 +233,6 @@ test("throws an error if more than one recipe for same mineable item", async () 
 
     expect.assertions(1);
     await expect(convertMineableItems(input)).rejects.toThrowError(
-        expectedError
+        expectedError,
     );
 });

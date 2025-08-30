@@ -993,7 +993,7 @@ describe.each([
             expect.assertions(1);
             await expect(addItem(input)).rejects.toMatchSnapshot();
         });
-    }
+    },
 );
 
 describe.each([

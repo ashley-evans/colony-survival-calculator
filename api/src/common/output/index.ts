@@ -15,7 +15,7 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
 
 function calculateOutput(
     item: Pick<Item, "toolset" | "createTime" | "output">,
-    maxAvailableTool: DefaultToolset
+    maxAvailableTool: DefaultToolset,
 ): number {
     const modifier =
         item.toolset.type === "machine"

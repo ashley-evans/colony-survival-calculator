@@ -22,7 +22,7 @@ function createMockEvent(
     unit: OutputUnit,
     maxAvailableTool?: AvailableTools,
     hasMachineTools?: boolean,
-    creator?: string
+    creator?: string,
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
@@ -44,7 +44,7 @@ const expectedUnit = "GAME_DAYS";
 const validEvent = createMockEvent(
     expectedItemName,
     expectedWorkers,
-    expectedUnit
+    expectedUnit,
 );
 
 beforeEach(() => {
@@ -79,7 +79,7 @@ test.each<[AvailableTools, SchemaTools]>([
             expectedItemName,
             expectedWorkers,
             expectedUnit,
-            provided
+            provided,
         );
 
         await handler(event);
@@ -91,7 +91,7 @@ test.each<[AvailableTools, SchemaTools]>([
             unit: expectedUnit,
             maxAvailableTool: expectedTool,
         });
-    }
+    },
 );
 
 test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
@@ -102,7 +102,7 @@ test("calls the domain to calculate output given a valid event w/ specific creat
         expectedUnit,
         undefined,
         undefined,
-        expectedCreator
+        expectedCreator,
     );
 
     await handler(event);
@@ -129,7 +129,7 @@ test.each([
             expectedUnit,
             undefined,
             hasMachineTools,
-            expectedCreator
+            expectedCreator,
         );
 
         await handler(event);
@@ -142,7 +142,7 @@ test.each([
             creator: expectedCreator,
             hasMachineTools,
         });
-    }
+    },
 );
 
 test("returns the calculated output", async () => {
@@ -173,7 +173,7 @@ test.each([
         const actual = await handler(validEvent);
 
         expect(actual).toEqual({ __typename: "UserError", message: error });
-    }
+    },
 );
 
 test("throws an error if any unhandled exceptions occur while calculating output", async () => {

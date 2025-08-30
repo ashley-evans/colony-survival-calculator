@@ -84,7 +84,7 @@ const handler: GraphQLEventHandler<
     const { selectionSetList } = event.info;
 
     const selectedAmountFields = selectionSetList.filter((value) =>
-        amountFields.has(value)
+        amountFields.has(value),
     );
 
     if (selectedAmountFields.length > 0 && !unit) {

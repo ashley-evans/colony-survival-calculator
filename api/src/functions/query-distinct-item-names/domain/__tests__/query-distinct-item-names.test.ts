@@ -28,7 +28,7 @@ test.each([
         const actual = await domain();
 
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("throws an error if any unhandled exceptions occur while querying distinct item names from database", async () => {

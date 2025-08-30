@@ -10,14 +10,14 @@ type MinimumTools = {
 
 function getHighestDefaultTool(
     a: DefaultToolset,
-    b: DefaultToolset
+    b: DefaultToolset,
 ): DefaultToolset {
     return ToolModifierValues[a] > ToolModifierValues[b] ? a : b;
 }
 
 function getLowestDefaultTool(
     a: DefaultToolset,
-    b: DefaultToolset
+    b: DefaultToolset,
 ): DefaultToolset {
     return ToolModifierValues[a] < ToolModifierValues[b] ? a : b;
 }
@@ -43,7 +43,7 @@ function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
 
         minimumDefault = getLowestDefaultTool(
             minimumDefault,
-            toolset.minimumTool
+            toolset.minimumTool,
         );
     }
 
@@ -63,7 +63,7 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
 
         minimumDefault = getHighestDefaultTool(
             minimumDefault,
-            groupMin.minimumDefault
+            groupMin.minimumDefault,
         );
     }
 
@@ -72,7 +72,7 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
 
 function isAvailableDefaultToolSufficient(
     minimum: DefaultToolset,
-    available: DefaultToolset
+    available: DefaultToolset,
 ): boolean {
     const minimumToolModifier = ToolModifierValues[minimum];
     const availableToolModifier = ToolModifierValues[available];
@@ -82,7 +82,7 @@ function isAvailableDefaultToolSufficient(
 function isAvailableToolSufficient(
     available: DefaultToolset,
     hasMachineTools: boolean,
-    item: Pick<Item, "toolset">
+    item: Pick<Item, "toolset">,
 ) {
     if (item.toolset.type === "machine") {
         return hasMachineTools;
@@ -90,14 +90,14 @@ function isAvailableToolSufficient(
 
     return isAvailableDefaultToolSufficient(
         item.toolset.minimumTool,
-        available
+        available,
     );
 }
 
 function hasMinimumRequiredTools(
     items: RequiredToolFields[],
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
 ): { hasRequired: true } | { hasRequired: false; requiredTool: AllToolsets } {
     const { minimumDefault, needsMachineTools } = getMinimumToolRequired(items);
     if (needsMachineTools && !hasMachineTools) {

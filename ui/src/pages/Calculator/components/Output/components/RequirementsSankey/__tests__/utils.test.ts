@@ -22,7 +22,7 @@ describe("requirements tree creation", () => {
     test("returns root node with no children", () => {
         const actual = createTree(
             [requirementWithSingleCreatorNoDemands],
-            requirementWithSingleCreatorNoDemands.name
+            requirementWithSingleCreatorNoDemands.name,
         );
 
         expect(actual).toEqual({
@@ -61,7 +61,7 @@ describe("requirements tree creation", () => {
         ];
         const actual = createTree(
             requirementsSingleDemand,
-            requirementsSingleDemand[0].name
+            requirementsSingleDemand[0].name,
         );
 
         expect(actual).toEqual({
@@ -81,7 +81,7 @@ describe("requirements tree creation", () => {
 
     test("throws an error if provided a root item name that does not exist", () => {
         expect(() =>
-            createTree([requirementWithSingleCreatorNoDemands], "unknown item")
+            createTree([requirementWithSingleCreatorNoDemands], "unknown item"),
         ).toThrowError("Unknown item required with name: unknown item");
     });
 
@@ -121,7 +121,7 @@ describe("requirements tree creation", () => {
         ];
         const actual = createTree(
             requirementsSingleDemand,
-            requirementsSingleDemand[0].name
+            requirementsSingleDemand[0].name,
         );
 
         expect(actual).toEqual({
@@ -179,7 +179,7 @@ describe("requirements tree creation", () => {
         ];
         const actual = createTree(
             requirementsNestedDemand,
-            requirementsNestedDemand[0].name
+            requirementsNestedDemand[0].name,
         );
 
         expect(actual).toEqual({
@@ -235,8 +235,8 @@ describe("requirements tree creation", () => {
         expect(() =>
             createTree(
                 requirementsNestedDemand,
-                requirementsNestedDemand[0].name
-            )
+                requirementsNestedDemand[0].name,
+            ),
         ).toThrowError("Unknown item required with name: Item 3");
     });
 
@@ -287,7 +287,7 @@ describe("requirements tree creation", () => {
 
         const actual = createTree(
             requirementsNestedSplitDemand,
-            requirementsNestedSplitDemand[0].name
+            requirementsNestedSplitDemand[0].name,
         );
 
         expect(actual).toEqual({

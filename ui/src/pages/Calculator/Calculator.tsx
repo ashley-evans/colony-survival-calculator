@@ -56,7 +56,7 @@ function getItemDetailsFilters(
     item?: string,
     tool?: AvailableTools,
     hasMachineTools?: boolean,
-    overrides?: CreatorOverride[]
+    overrides?: CreatorOverride[],
 ): ItemsFilters {
     const creator = overrides
         ? overrides.find(({ itemName }) => item == itemName)?.creator
@@ -87,11 +87,11 @@ function CalculatorTab({
                     selectedItem,
                     selectedTool,
                     hasMachineTools,
-                    selectedCreatorOverrides
+                    selectedCreatorOverrides,
                 ),
             },
             skip: !selectedItem,
-        }
+        },
     );
 
     const handleSelectedItemTotalChange = (total: Target) => {
@@ -103,10 +103,10 @@ function CalculatorTab({
     };
 
     const [workers, setWorkers] = useState<number | undefined>(
-        target && "workers" in target ? target.workers : undefined
+        target && "workers" in target ? target.workers : undefined,
     );
     const [targetAmount, setTargetAmount] = useState<number | undefined>(
-        target && "amount" in target ? target.amount : undefined
+        target && "amount" in target ? target.amount : undefined,
     );
 
     if (itemNamesLoading) {
@@ -236,7 +236,7 @@ enum PageTabs {
 
 function Calculator() {
     const [selectedTab, setSelectedTab] = useState<PageTabs>(
-        PageTabs.CALCULATOR
+        PageTabs.CALCULATOR,
     );
 
     const selectedItemState = useState<string>();

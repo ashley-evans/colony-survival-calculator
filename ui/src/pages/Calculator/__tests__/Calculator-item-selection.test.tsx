@@ -56,7 +56,7 @@ const server = setupServer(
                 item: [],
             },
         });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -73,7 +73,7 @@ beforeEach(() => {
                     distinctItemNames: items.map((item) => item.name),
                 },
             });
-        })
+        }),
     );
 });
 
@@ -82,7 +82,7 @@ test("queries all known item names", async () => {
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedItemNameQueryName
+        expectedItemNameQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -97,7 +97,7 @@ test("renders desired output header", async () => {
     expect(
         await screen.findByRole("heading", {
             name: expectedCalculatorTabHeader,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -109,7 +109,7 @@ describe("handles item loading", () => {
             graphql.query(expectedItemNameQueryName, async () => {
                 await delay("infinite");
                 return HttpResponse.json({});
-            })
+            }),
         );
     });
 
@@ -126,7 +126,7 @@ describe("handles item loading", () => {
         expect(
             screen.queryByRole("heading", {
                 name: expectedCalculatorTabHeader,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -136,7 +136,7 @@ describe("handles item loading", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedItemSelectLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -146,7 +146,7 @@ describe("handles item loading", () => {
         expect(
             screen.queryByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -156,7 +156,7 @@ describe("handles item loading", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedOutputUnitLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -170,7 +170,7 @@ describe("given no item names returned", () => {
                         distinctItemNames: [],
                     },
                 });
-            })
+            }),
         );
     });
 
@@ -178,7 +178,7 @@ describe("given no item names returned", () => {
         render(<Calculator />);
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedMissingItemsError
+            expectedMissingItemsError,
         );
     });
 
@@ -189,7 +189,7 @@ describe("given no item names returned", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedItemSelectLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -200,7 +200,7 @@ describe("given no item names returned", () => {
         expect(
             screen.queryByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -211,7 +211,7 @@ describe("given no item names returned", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedToolSelectLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -222,7 +222,7 @@ describe("given no item names returned", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedOutputUnitLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -232,7 +232,7 @@ test("does not render a missing known items if item names are returned", async (
     await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
     expect(
-        screen.queryByText(expectedMissingItemsError)
+        screen.queryByText(expectedMissingItemsError),
     ).not.toBeInTheDocument();
 });
 
@@ -242,7 +242,7 @@ test("renders a select for the items if item names are returned", async () => {
     expect(
         await screen.findByRole("combobox", {
             name: expectedItemSelectLabel,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -252,7 +252,7 @@ test("renders a placeholder message for the item selector", async () => {
     expect(
         await screen.findByRole("combobox", {
             name: expectedItemSelectLabel,
-        })
+        }),
     ).toHaveAttribute("placeholder", "Select an item to use in calculations");
 });
 
@@ -262,7 +262,7 @@ test("renders each item name returned as an option in the item selector", async 
 
     for (const expected of items) {
         expect(
-            screen.getByRole("option", { name: expected.name })
+            screen.getByRole("option", { name: expected.name }),
         ).toBeVisible();
     }
 });
@@ -272,7 +272,7 @@ test("renders the item selector with no assigned value by default", async () => 
     await openSelectMenu({ label: expectedItemSelectLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel }),
     ).toHaveValue("");
 });
 
@@ -287,13 +287,13 @@ test("updates the selected option if selected is changed", async () => {
     await openSelectMenu({ label: expectedItemSelectLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel }),
     ).toHaveValue(expected);
     expect(
         screen.getByRole("option", {
             name: expected,
             selected: true,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -309,7 +309,7 @@ test("renders a clear button if an item is selected", async () => {
     expect(
         await screen.findByRole("button", {
             name: expectedClearButtonLabelText,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -325,7 +325,7 @@ test("requests item details for newly selected item if selection is changed", as
                 name: expectedItemName,
                 optimal: { maxAvailableTool: "NONE", hasMachineTools: false },
             },
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -353,7 +353,7 @@ test("does not reset the currently selected item after changing tabs", async () 
     await clickByName(expectedCalculatorTab, "tab");
 
     expect(
-        await screen.findByRole("combobox", { name: expectedItemSelectLabel })
+        await screen.findByRole("combobox", { name: expectedItemSelectLabel }),
     ).toHaveValue(expected);
 });
 
@@ -367,8 +367,8 @@ describe("item name request error handling", () => {
                         errors: [{ message: "Error Message" }],
                     });
                 },
-                { once: true }
-            )
+                { once: true },
+            ),
         );
     });
 
@@ -376,7 +376,7 @@ describe("item name request error handling", () => {
         render(<Calculator />);
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedNetworkExceptionError
+            expectedNetworkExceptionError,
         );
     });
 
@@ -386,7 +386,7 @@ describe("item name request error handling", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedItemSelectLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -396,7 +396,7 @@ describe("item name request error handling", () => {
         expect(
             screen.queryByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -406,7 +406,7 @@ describe("item name request error handling", () => {
         expect(
             screen.queryByRole("combobox", {
                 name: expectedOutputUnitLabel,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -420,8 +420,8 @@ test("renders an unhandled error message if an exception occurs fetching item de
                     errors: [{ message: "Error Message" }],
                 });
             },
-            { once: true }
-        )
+            { once: true },
+        ),
     );
 
     render(<Calculator />);
@@ -431,7 +431,7 @@ test("renders an unhandled error message if an exception occurs fetching item de
     });
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-        expectedNetworkExceptionError
+        expectedNetworkExceptionError,
     );
 });
 

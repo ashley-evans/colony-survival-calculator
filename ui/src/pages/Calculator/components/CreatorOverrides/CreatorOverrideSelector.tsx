@@ -28,7 +28,7 @@ function CreatorOverrideSelector({
     onRemove,
 }: CreatorOverrideSelectorProps) {
     const [selectedItem, setSelectedItem] = useState<string>(
-        defaultOverride.itemName
+        defaultOverride.itemName,
     );
 
     const handleSelectedItemChange = (value?: string) => {

@@ -32,7 +32,7 @@ async function clearItemsCollection() {
     const existingCollections = await db.listCollections().toArray();
     const collectionExists =
         existingCollections.find(
-            (collection) => collection.name == itemCollectionName
+            (collection) => collection.name == itemCollectionName,
         ) !== undefined;
     if (collectionExists) {
         const itemsCollection = db.collection(itemCollectionName);
@@ -67,7 +67,7 @@ test.each([
         await expect(async () => {
             await import("../mongodb-output-adapter");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
@@ -162,7 +162,7 @@ test.each([
         _: string,
         __: string,
         stored: Items,
-        expected: ItemOutputDetails[]
+        expected: ItemOutputDetails[],
     ) => {
         await storeItems(stored);
         const { queryOutputDetails } = await import(
@@ -173,7 +173,7 @@ test.each([
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("only returns output details related to provided creator if item is created by more than one creator", async () => {

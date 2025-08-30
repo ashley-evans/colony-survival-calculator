@@ -99,9 +99,9 @@ test.each([
 
         expect.assertions(1);
         await expect(convertGrowables(input)).rejects.toThrowError(
-            expectedError
+            expectedError,
         );
-    }
+    },
 );
 
 test("parses the JSON found in the growables file", async () => {
@@ -148,7 +148,7 @@ test.each([
         expectedName: string,
         expectedCreator: string,
         expectedOutput: number,
-        expectedSize: { height: number; width: number } | null
+        expectedSize: { height: number; width: number } | null,
     ) => {
         const growables: Growables = [
             { identifier: piplizName, stages: [{}, {}] },
@@ -172,7 +172,7 @@ test.each([
 
         expect(actual).toHaveLength(1 + expectedStaticRecipes.length);
         expect(actual).toContainEqual(expected);
-    }
+    },
 );
 
 test("returns converted recipe given single growable with more than 2 stages", async () => {
@@ -212,7 +212,7 @@ test("throws an error if provided growable with unknown user friendly name", asy
 
     expect.assertions(1);
     await expect(convertGrowables(input)).rejects.toThrowError(
-        `User friendly name unavailable for growable: ${unknownName}`
+        `User friendly name unavailable for growable: ${unknownName}`,
     );
 });
 
@@ -225,7 +225,7 @@ test("throws an error if provided growable with unknown user friendly creator na
 
     expect.assertions(1);
     await expect(convertGrowables(input)).rejects.toThrowError(
-        `User friendly creator name unavailable for growable: ${unknownCreator}`
+        `User friendly creator name unavailable for growable: ${unknownCreator}`,
     );
 });
 
@@ -238,7 +238,7 @@ test("throws an error if provided growable has unknown expected output", async (
 
     expect.assertions(1);
     await expect(convertGrowables(input)).rejects.toThrowError(
-        `Expected output for growable: ${unknownOutput} not known`
+        `Expected output for growable: ${unknownOutput} not known`,
     );
 });
 
@@ -251,7 +251,7 @@ test("throws an error if provided growable has less than one growth day", async 
 
     expect.assertions(1);
     await expect(convertGrowables(input)).rejects.toThrowError(
-        `Provided growable: ${lessThanMinGrowth} grows in less than one day`
+        `Provided growable: ${lessThanMinGrowth} grows in less than one day`,
     );
 });
 

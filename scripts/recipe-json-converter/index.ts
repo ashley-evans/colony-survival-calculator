@@ -70,7 +70,7 @@ const createRecipesFileReader = (): JSONFileReader<Recipes> => {
 };
 
 const createCraftableRecipeConverter = (): ((
-    input: CraftableRecipeConverterInputs
+    input: CraftableRecipeConverterInputs,
 ) => ReturnType<CraftableRecipeConverter>) => {
     const toolsReader = createToolsFileReader();
     const behavioursReader = createBehavioursFileReader();
@@ -91,7 +91,7 @@ const createMineableItemsFileReader = (): JSONFileReader<MineableItems> => {
 };
 
 const createMineableItemsConverter = (): ((
-    input: MineableItemConverterInputs
+    input: MineableItemConverterInputs,
 ) => ReturnType<MineableItemConverter>) => {
     const mineableItemsReader = createMineableItemsFileReader();
 
@@ -108,7 +108,7 @@ const createGrowableItemsFileReader = (): JSONFileReader<Growables> => {
 };
 
 const createGrowablesConverter = (): ((
-    input: GrowableConverterInputs
+    input: GrowableConverterInputs,
 ) => ReturnType<GrowableConverter>) => {
     const growablesReader = createGrowableItemsFileReader();
 
@@ -121,7 +121,7 @@ const createGrowablesConverter = (): ((
 };
 
 const createRecipeConverter = (): ((
-    input: RecipeConverterInputs
+    input: RecipeConverterInputs,
 ) => ReturnType<RecipeConverter>) => {
     const convertCraftableRecipes = createCraftableRecipeConverter();
     const convertMineableItems = createMineableItemsConverter();

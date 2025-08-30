@@ -17,7 +17,7 @@ function createItemOutputDetails(
         type: "default",
         minimumTool: DefaultToolset.none,
         maximumTool: DefaultToolset.none,
-    }
+    },
 ): ItemOutputDetails {
     return {
         createTime,
@@ -35,7 +35,7 @@ beforeEach(() => {
 
 test("throws an error given an empty string as an item name", async () => {
     const expectedError = new Error(
-        "Invalid item name provided, must be a non-empty string"
+        "Invalid item name provided, must be a non-empty string",
     );
 
     expect.assertions(1);
@@ -44,7 +44,7 @@ test("throws an error given an empty string as an item name", async () => {
             name: "",
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-        })
+        }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -55,7 +55,7 @@ test.each([
     "throws an error given number of workers that is %s",
     async (_: string, amount: number) => {
         const expectedError = new Error(
-            "Invalid number of workers provided, must be a positive number"
+            "Invalid number of workers provided, must be a positive number",
         );
 
         expect.assertions(1);
@@ -64,9 +64,9 @@ test.each([
                 name: validItemName,
                 workers: amount,
                 unit: OutputUnit.MINUTES,
-            })
+            }),
         ).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("calls the database adapter to get the output details for the provided item", async () => {
@@ -114,7 +114,7 @@ test("throws an error if no item output details are returned from DB", async () 
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-        })
+        }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -128,7 +128,7 @@ test("throws an error if an unhandled exception occurs while fetching item requi
             name: validItemName,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-        })
+        }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -145,7 +145,7 @@ test.each([
         unit: OutputUnit,
         createTime: number,
         amount: number,
-        expected: number
+        expected: number,
     ) => {
         const details = createItemOutputDetails(createTime, amount);
         mockQueryOutputDetails.mockResolvedValue([details]);
@@ -157,7 +157,7 @@ test.each([
         });
 
         expect(actual).toBeCloseTo(expected);
-    }
+    },
 );
 
 describe("handles tool modifiers", () => {
@@ -188,7 +188,7 @@ describe("handles tool modifiers", () => {
         async (
             _: string,
             minimum: DefaultToolset,
-            provided: DefaultToolset
+            provided: DefaultToolset,
         ) => {
             const details = createItemOutputDetails(2, 3, {
                 type: "default",
@@ -197,7 +197,7 @@ describe("handles tool modifiers", () => {
             });
             mockQueryOutputDetails.mockResolvedValue([details]);
             const expectedError = new Error(
-                `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`
+                `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`,
             );
 
             expect.assertions(1);
@@ -207,9 +207,9 @@ describe("handles tool modifiers", () => {
                     workers: validWorkers,
                     unit: OutputUnit.MINUTES,
                     maxAvailableTool: provided,
-                })
+                }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test.each([
@@ -237,7 +237,7 @@ describe("handles tool modifiers", () => {
             });
 
             expect(actual).toBeCloseTo(expected);
-        }
+        },
     );
 
     test("returns output for max applicable tool for item if provided tool is better than max", async () => {
@@ -267,7 +267,7 @@ describe("handles machine tool recipes", () => {
         maximumTool: MachineToolset.machine,
     });
     const expectedRequiredToolsError = new Error(
-        "Unable to create item with available tools, requires machine tools"
+        "Unable to create item with available tools, requires machine tools",
     );
 
     beforeEach(() => {
@@ -289,9 +289,9 @@ describe("handles machine tool recipes", () => {
                     ...(hasMachineTools !== undefined
                         ? { hasMachineTools }
                         : {}),
-                })
+                }),
             ).rejects.toThrow(expectedRequiredToolsError);
-        }
+        },
     );
 
     test("returns expected output if machine tools are required and available", async () => {
@@ -451,7 +451,7 @@ describe("multiple recipe handling", () => {
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
                 maxAvailableTool: DefaultToolset.none,
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 });

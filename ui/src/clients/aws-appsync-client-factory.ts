@@ -10,7 +10,7 @@ import { createAuthLink, AuthOptions } from "aws-appsync-auth-link";
 
 function createClient(
     url: string,
-    region: string
+    region: string,
 ): ApolloClient<NormalizedCacheObject> {
     const authConfiguration: AuthOptions = {
         type: "AWS_IAM",

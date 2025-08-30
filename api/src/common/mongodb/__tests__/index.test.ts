@@ -49,7 +49,7 @@ test.each([
         await expect(async () => {
             await import("..");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("returns a mongo DB client", async () => {

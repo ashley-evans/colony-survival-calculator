@@ -29,7 +29,7 @@ async function clearItemsCollection() {
     const existingCollections = await db.listCollections().toArray();
     const collectionExists =
         existingCollections.find(
-            (collection) => collection.name == itemCollectionName
+            (collection) => collection.name == itemCollectionName,
         ) !== undefined;
     if (collectionExists) {
         const itemsCollection = db.collection(itemCollectionName);
@@ -65,7 +65,7 @@ test.each([
         await expect(async () => {
             await import("../store-item");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 describe("empty array handling", () => {

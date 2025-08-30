@@ -70,7 +70,7 @@ function createItem(
     input: Omit<ItemFactoryInputs, "toolset"> & {
         minimumTool?: DefaultToolset;
         maximumTool?: DefaultToolset;
-    }
+    },
 ): Item {
     const { minimumTool, maximumTool, ...rest } = input;
     return baseCreateItem({
@@ -84,7 +84,7 @@ function createItem(
 }
 
 function createItemWithMachineTools(
-    input: Omit<ItemFactoryInputs, "toolset">
+    input: Omit<ItemFactoryInputs, "toolset">,
 ): Item {
     return baseCreateItem({
         ...input,

@@ -65,7 +65,7 @@ function Selector<Item>({
             >
                 <span>
                     {itemToDisplayText(
-                        selectedItem ? selectedItem : defaultSelectedItem
+                        selectedItem ? selectedItem : defaultSelectedItem,
                     )}
                 </span>
                 <ToggleIndicatorIcon icon={faChevronDown} selected={isOpen} />

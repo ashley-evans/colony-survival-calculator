@@ -75,7 +75,7 @@ function Output({
     onSelectedItemTotalChange,
 }: OutputProps) {
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
-        GET_CALCULATOR_OUTPUT
+        GET_CALCULATOR_OUTPUT,
     );
     const [debouncedTarget] = useDebounce(target, DEFAULT_DEBOUNCE);
     const [hasInvalidResponse, setHasInvalidResponse] = useState<boolean>();
@@ -116,7 +116,7 @@ function Output({
         }
 
         const selectedItemRequirements = data.requirement.requirements.find(
-            ({ name }) => name === itemName
+            ({ name }) => name === itemName,
         );
 
         if (!selectedItemRequirements) {
@@ -130,7 +130,7 @@ function Output({
                 (acc, { workers }) => {
                     return acc + workers;
                 },
-                0
+                0,
             );
             onSelectedItemTotalChange({ workers: totalWorkers });
         } else {

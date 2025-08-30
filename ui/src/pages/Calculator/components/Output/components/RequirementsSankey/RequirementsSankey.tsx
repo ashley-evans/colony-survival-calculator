@@ -23,7 +23,7 @@ const createSankeyChartData = ({
 }: RequirementsSankeyProps): ChartData => {
     if (
         !requirements.find(
-            (requirement) => requirement.name === selectedItemName
+            (requirement) => requirement.name === selectedItemName,
         )
     ) {
         return { nodes: [], links: [] };

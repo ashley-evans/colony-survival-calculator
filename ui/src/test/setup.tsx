@@ -8,5 +8,5 @@ vi.mock(
         default: () => {
             return <></>;
         },
-    })
+    }),
 );

@@ -26,5 +26,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <ApolloProvider client={client}>
             <RouterProvider />
         </ApolloProvider>
-    </React.StrictMode>
+    </React.StrictMode>,
 );

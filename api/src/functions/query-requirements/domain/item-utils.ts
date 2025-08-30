@@ -13,7 +13,7 @@ const ROOT_GRAPH_KEY = "root";
 
 function calculateCreateTime(
     { toolset, createTime }: Pick<Item, "toolset" | "createTime">,
-    availableTool: DefaultToolset
+    availableTool: DefaultToolset,
 ) {
     if (toolset.type === "machine") {
         return createTime / ToolModifierValues["machine"];
@@ -29,7 +29,7 @@ function getUniqueItemKey(item: Pick<Item, "name" | "creator">): string {
 
 function splitItems(
     items: Items,
-    predicate: (item: Item) => boolean
+    predicate: (item: Item) => boolean,
 ): [Items, Items] {
     const matching: Items = [];
     const nonMatching: Items = [];
@@ -47,7 +47,7 @@ function splitItems(
 function createItemGraph(
     items: Items,
     recipesMap: Map<string, Items>,
-    rootItemName?: string
+    rootItemName?: string,
 ) {
     const graph = Graph();
     for (const item of items) {
@@ -80,10 +80,10 @@ function createItemGraph(
 function filterByCreatorOverrides(
     rootItemName: string,
     items: Items,
-    overrides: CreatorOverride[]
+    overrides: CreatorOverride[],
 ): Items {
     const itemMap = new Map<string, Item>(
-        items.map((item) => [getUniqueItemKey(item), item])
+        items.map((item) => [getUniqueItemKey(item), item]),
     );
     const recipesMap = groupItemsByName(items);
     const graph = createItemGraph(items, recipesMap, rootItemName);
@@ -96,10 +96,10 @@ function filterByCreatorOverrides(
 
         const adjacent = graph.adjacent(current);
         const adjacentItems = new Set(
-            adjacent.map((node) => node.split("#")[0] as string)
+            adjacent.map((node) => node.split("#")[0] as string),
         );
         const creatable = item.requires.every(({ name }) =>
-            adjacentItems.has(name)
+            adjacentItems.has(name),
         );
         if (!creatable) {
             graph.removeNode(current);
@@ -110,7 +110,7 @@ function filterByCreatorOverrides(
     for (const { itemName, creator } of overrides) {
         const [, recipesToIgnore] = splitItems(
             recipesMap.get(itemName) ?? [],
-            (item) => item.creator === creator
+            (item) => item.creator === creator,
         );
 
         for (const ignore of recipesToIgnore) {
@@ -122,7 +122,7 @@ function filterByCreatorOverrides(
     }
 
     const creatableItemSet = new Set<string>(
-        graph.depthFirstSearch([ROOT_GRAPH_KEY], false)
+        graph.depthFirstSearch([ROOT_GRAPH_KEY], false),
     );
 
     return items.filter((item) => creatableItemSet.has(getUniqueItemKey(item)));
@@ -139,7 +139,7 @@ function canCreateItem(name: string, items: Items): boolean {
 
         return recipes.some((recipe) => {
             return recipe.requires.every((requirement) =>
-                canCreateItem(requirement.name)
+                canCreateItem(requirement.name),
             );
         });
     };

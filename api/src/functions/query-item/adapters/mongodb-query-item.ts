@@ -19,7 +19,7 @@ if (!itemCollectionName) {
 
 const queryItemByField: QueryItemByFieldSecondaryPort = async (
     name,
-    creator
+    creator,
 ) => {
     const db = (await client).db(databaseName);
     const collection = db.collection<Item>(itemCollectionName);
@@ -33,7 +33,7 @@ const queryItemByField: QueryItemByFieldSecondaryPort = async (
 
 const queryItemByCreatorCount: QueryItemByCreatorCountSecondaryPort = async (
     minimumCreators,
-    name
+    name,
 ) => {
     const db = (await client).db(databaseName);
     const collection = db.collection<Item>(itemCollectionName);

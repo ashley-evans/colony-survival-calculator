@@ -51,13 +51,13 @@ const items: ItemName[] = [
 const expectedFirstItemName = items[0].name;
 const expectedFirstItemOverrides = generateItemCreatorOverrides(
     expectedFirstItemName,
-    2
+    2,
 );
 const expectedSecondItemName = items[2].name;
 const expectedSecondItemOverrides = generateItemCreatorOverrides(
     expectedSecondItemName,
     3,
-    2
+    2,
 );
 
 const expectedCreatorOverrides: CreatorOverride[] = [
@@ -68,7 +68,7 @@ const expectedCreatorOverrides: CreatorOverride[] = [
 function generateItemCreatorOverrides(
     name: string,
     amount: number,
-    creatorOffset = 0
+    creatorOffset = 0,
 ): CreatorOverride[] {
     const overrides: CreatorOverride[] = [];
     for (let i = 0; i < amount; i++) {
@@ -133,7 +133,7 @@ const server = setupServer(
                 })),
             },
         });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -159,7 +159,7 @@ test("queries all known item names", async () => {
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCreatorOverrideQueryName
+        expectedCreatorOverrideQueryName,
     );
 
     await renderSettingsTab();
@@ -182,7 +182,7 @@ describe("handles creator override list loading", () => {
             graphql.query(expectedCreatorOverrideQueryName, async () => {
                 await delay("infinite");
                 return HttpResponse.json({});
-            })
+            }),
         );
     });
 
@@ -204,7 +204,7 @@ describe("handles creator override list loading", () => {
         expect(
             screen.queryByRole("button", {
                 name: expectedAddCreatorOverrideButtonText,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -218,7 +218,7 @@ describe("given no creator overrides returned", () => {
                         item: [],
                     },
                 });
-            })
+            }),
         );
     });
 
@@ -226,7 +226,7 @@ describe("given no creator overrides returned", () => {
         await renderSettingsTab();
 
         expect(await screen.findByRole("alert")).toHaveTextContent(
-            expectedNoOverridesMessage
+            expectedNoOverridesMessage,
         );
     });
 
@@ -235,7 +235,7 @@ describe("given no creator overrides returned", () => {
         await screen.findByRole("alert");
 
         expect(
-            screen.queryByText(expectedLoadingMessage)
+            screen.queryByText(expectedLoadingMessage),
         ).not.toBeInTheDocument();
     });
 
@@ -246,7 +246,7 @@ describe("given no creator overrides returned", () => {
         expect(
             screen.queryByRole("button", {
                 name: expectedAddCreatorOverrideButtonText,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -264,7 +264,7 @@ describe("given items w/ multiple creators returned", () => {
         expect(
             await screen.findByRole("button", {
                 name: expectedAddCreatorOverrideButtonText,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -281,7 +281,7 @@ describe("given items w/ multiple creators returned", () => {
         const expectedItemName = "Test item";
         const expectedOverrides = generateItemCreatorOverrides(
             expectedItemName,
-            2
+            2,
         );
 
         beforeEach(() => {
@@ -293,11 +293,11 @@ describe("given items w/ multiple creators returned", () => {
                                 ({ itemName, creator }) => ({
                                     name: itemName,
                                     creator,
-                                })
+                                }),
                             ),
                         },
                     });
-                })
+                }),
             );
         });
 
@@ -308,7 +308,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -322,14 +322,14 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedItemName);
             expect(screen.getAllByRole("option")).toHaveLength(1);
             expect(
                 screen.getByRole("option", {
                     name: expectedItemName,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -340,7 +340,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -354,14 +354,14 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedItemName);
             expect(screen.getAllByRole("option")).toHaveLength(1);
             expect(
                 screen.getByRole("option", {
                     name: expectedItemName,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -372,7 +372,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -385,7 +385,7 @@ describe("given items w/ multiple creators returned", () => {
 
             for (const { creator } of expectedOverrides) {
                 expect(
-                    await screen.findByRole("option", { name: creator })
+                    await screen.findByRole("option", { name: creator }),
                 ).toBeVisible();
             }
         });
@@ -402,13 +402,13 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedOverrides[0].creator);
             expect(
                 screen.getByRole("option", {
                     name: expectedDefaultCreator,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -422,7 +422,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 screen.queryByRole("button", {
                     name: expectedAddCreatorOverrideButtonText,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
 
@@ -433,7 +433,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("button", {
                     name: expectedRemoveCreatorOverrideButtonText,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -445,13 +445,13 @@ describe("given items w/ multiple creators returned", () => {
             });
             await clickByName(
                 expectedRemoveCreatorOverrideButtonText,
-                "button"
+                "button",
             );
 
             expect(
                 await screen.findByRole("button", {
                     name: expectedAddCreatorOverrideButtonText,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -463,7 +463,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await clickByName(
                 expectedRemoveCreatorOverrideButtonText,
-                "button"
+                "button",
             );
             await screen.findByRole("button", {
                 name: expectedAddCreatorOverrideButtonText,
@@ -472,7 +472,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 screen.queryByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
     });
@@ -488,13 +488,13 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedFirstItemName);
             expect(
                 screen.getByRole("option", {
                     name: expectedFirstItemName,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -508,12 +508,12 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("option", {
                     name: expectedFirstItemName,
-                })
+                }),
             ).toBeVisible();
             expect(
                 screen.getByRole("option", {
                     name: expectedSecondItemName,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -526,11 +526,11 @@ describe("given items w/ multiple creators returned", () => {
 
             const creatorOptions = await screen.findAllByRole("option");
             expect(creatorOptions).toHaveLength(
-                expectedFirstItemOverrides.length
+                expectedFirstItemOverrides.length,
             );
             for (const { creator } of expectedFirstItemOverrides) {
                 expect(
-                    screen.getByRole("option", { name: creator })
+                    screen.getByRole("option", { name: creator }),
                 ).toBeVisible();
             }
         });
@@ -548,11 +548,11 @@ describe("given items w/ multiple creators returned", () => {
 
             const creatorOptions = await screen.findAllByRole("option");
             expect(creatorOptions).toHaveLength(
-                expectedSecondItemOverrides.length
+                expectedSecondItemOverrides.length,
             );
             for (const { creator } of expectedSecondItemOverrides) {
                 expect(
-                    screen.getByRole("option", { name: creator })
+                    screen.getByRole("option", { name: creator }),
                 ).toBeVisible();
             }
         });
@@ -573,13 +573,13 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedCreator);
             expect(
                 screen.getByRole("option", {
                     name: expectedCreator,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -593,7 +593,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findByRole("button", {
                     name: expectedAddCreatorOverrideButtonText,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -605,12 +605,12 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 await screen.findAllByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toHaveLength(2);
             expect(
                 screen.getAllByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).toHaveLength(2);
         });
 
@@ -623,7 +623,7 @@ describe("given items w/ multiple creators returned", () => {
                 name: expectedItemSelectOverrideLabel,
             });
             expect(itemOverrideSelects[1]).toHaveTextContent(
-                expectedSecondItemName
+                expectedSecondItemName,
             );
         });
 
@@ -636,33 +636,33 @@ describe("given items w/ multiple creators returned", () => {
                 _: string,
                 __: string,
                 index: number,
-                expectedMissingItem: string
+                expectedMissingItem: string,
             ) => {
                 const user = userEvent.setup();
 
                 await renderSettingsTab();
                 await clickByName(
                     expectedAddCreatorOverrideButtonText,
-                    "button"
+                    "button",
                 );
                 await clickByName(
                     expectedAddCreatorOverrideButtonText,
-                    "button"
+                    "button",
                 );
                 const itemOverrideSelects = await screen.findAllByRole(
                     "combobox",
                     {
                         name: expectedItemSelectOverrideLabel,
-                    }
+                    },
                 );
                 await user.click(itemOverrideSelects[index]);
 
                 expect(
                     screen.queryByRole("option", {
                         name: expectedMissingItem,
-                    })
+                    }),
                 ).not.toBeInTheDocument();
-            }
+            },
         );
 
         test("re-adds the other item as an option if the related item's creator override is removed", async () => {
@@ -683,10 +683,10 @@ describe("given items w/ multiple creators returned", () => {
                 await screen.findByRole("option", {
                     name: expectedSecondItemName,
                     selected: true,
-                })
+                }),
             ).toBeVisible();
             expect(
-                screen.getByRole("option", { name: expectedFirstItemName })
+                screen.getByRole("option", { name: expectedFirstItemName }),
             ).toBeVisible();
         });
 
@@ -699,7 +699,7 @@ describe("given items w/ multiple creators returned", () => {
                 expect(
                     screen.queryByRole("button", {
                         name: expectedAddCreatorOverrideButtonText,
-                    })
+                    }),
                 ).not.toBeInTheDocument();
             });
         });
@@ -723,10 +723,10 @@ describe("given items w/ multiple creators returned", () => {
                 name: expectedItemSelectOverrideLabel,
             });
             expect(itemOverrideSelects[0]).toHaveTextContent(
-                expectedFirstItemName
+                expectedFirstItemName,
             );
             expect(itemOverrideSelects[1]).toHaveTextContent(
-                expectedSecondItemName
+                expectedSecondItemName,
             );
         });
 
@@ -749,10 +749,10 @@ describe("given items w/ multiple creators returned", () => {
                 name: expectedCreatorSelectOverrideLabel,
             });
             expect(creatorOverrideSelects[0]).toHaveTextContent(
-                expectedFirstItemOverrides[0].creator
+                expectedFirstItemOverrides[0].creator,
             );
             expect(creatorOverrideSelects[1]).toHaveTextContent(
-                expectedSecondItemOverrides[0].creator
+                expectedSecondItemOverrides[0].creator,
             );
         });
 
@@ -777,7 +777,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 screen.getByRole("combobox", {
                     name: expectedItemSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expectedSecondItemName);
         });
 
@@ -804,7 +804,7 @@ describe("given items w/ multiple creators returned", () => {
             expect(
                 screen.getByRole("combobox", {
                     name: expectedCreatorSelectOverrideLabel,
-                })
+                }),
             ).toHaveTextContent(expected);
         });
 
@@ -821,7 +821,7 @@ describe("given items w/ multiple creators returned", () => {
                         name: expectedItem,
                         creator: expectedCreator,
                     },
-                }
+                },
             );
 
             await renderSettingsTab();
@@ -856,7 +856,7 @@ describe("given items w/ multiple creators returned", () => {
                             hasMachineTools: false,
                         },
                     },
-                }
+                },
             );
 
             await renderSettingsTab();
@@ -874,7 +874,7 @@ describe("given items w/ multiple creators returned", () => {
             await clickByName(expectedSettingsTab, "tab");
             await clickByName(
                 expectedRemoveCreatorOverrideButtonText,
-                "button"
+                "button",
             );
             await clickByName(expectedCalculatorTab, "tab");
 
@@ -901,7 +901,7 @@ describe("given items w/ multiple creators returned", () => {
                 server,
                 "POST",
                 expectedGraphQLAPIURL,
-                expectedCalculatorOutputQueryName
+                expectedCalculatorOutputQueryName,
             );
 
             await renderSettingsTab();
@@ -909,7 +909,7 @@ describe("given items w/ multiple creators returned", () => {
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
             const creatorOverrideSelects = await screen.findAllByRole(
                 "combobox",
-                { name: expectedCreatorSelectOverrideLabel }
+                { name: expectedCreatorSelectOverrideLabel },
             );
             await user.click(creatorOverrideSelects[0]);
             const firstItemCreatorOption = await screen.findByRole("option", {
@@ -958,7 +958,7 @@ describe("given items w/ multiple creators returned", () => {
                     unit: OutputUnit.Minutes,
                     maxAvailableTool: expectedTool,
                     hasMachineTools: false,
-                }
+                },
             );
 
             await renderSettingsTab();
@@ -971,7 +971,7 @@ describe("given items w/ multiple creators returned", () => {
             await clickByName(expectedSettingsTab, "tab");
             await clickByName(
                 expectedRemoveCreatorOverrideButtonText,
-                "button"
+                "button",
             );
             await clickByName(expectedCalculatorTab, "tab");
 
@@ -994,7 +994,7 @@ describe("given items w/ multiple creators returned", () => {
                 server,
                 "POST",
                 expectedGraphQLAPIURL,
-                expectedCalculatorOutputQueryName
+                expectedCalculatorOutputQueryName,
             );
 
             await renderSettingsTab();

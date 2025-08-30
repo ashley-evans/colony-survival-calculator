@@ -55,7 +55,7 @@ const server = setupServer(
     createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -81,9 +81,9 @@ describe("tab rendering", async () => {
             const tablist = await screen.findByRole("tablist");
 
             expect(
-                within(tablist).getByRole("tab", { name: expected })
+                within(tablist).getByRole("tab", { name: expected }),
             ).toBeVisible();
-        }
+        },
     );
 
     test("renders the calculator tab as selected by default", async () => {
@@ -130,7 +130,7 @@ describe("tab rendering", async () => {
             await within(panel).findByRole("heading", {
                 level: 2,
                 name: expectedCalculatorTabHeader,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -185,7 +185,7 @@ describe("tab rendering", async () => {
             await within(panel).findByRole("heading", {
                 level: 2,
                 name: expectedSettingsTabHeader,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -195,7 +195,7 @@ describe("tab rendering", async () => {
         const panel = await screen.findByRole("tabpanel");
 
         expect(
-            await within(panel).findByText(expectedAboutVersionExplanation)
+            await within(panel).findByText(expectedAboutVersionExplanation),
         ).toBeVisible();
     });
 
@@ -211,7 +211,7 @@ describe("tab rendering", async () => {
             within(panel).queryByRole("heading", {
                 level: 2,
                 name: expectedSettingsTabHeader,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -224,7 +224,7 @@ describe("tab rendering", async () => {
         });
 
         expect(
-            within(panel).queryByText(expectedAboutVersionExplanation)
+            within(panel).queryByText(expectedAboutVersionExplanation),
         ).not.toBeInTheDocument();
     });
 
@@ -242,7 +242,7 @@ describe("tab rendering", async () => {
             within(panel).queryByRole("heading", {
                 level: 2,
                 name: expectedSettingsTabHeader,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -254,7 +254,7 @@ describe("tab rendering", async () => {
         await clickByName(expectedCalculatorTab, "tab");
 
         expect(
-            within(panel).queryByText(expectedAboutVersionExplanation)
+            within(panel).queryByText(expectedAboutVersionExplanation),
         ).not.toBeInTheDocument();
     });
 
@@ -271,7 +271,7 @@ describe("tab rendering", async () => {
             within(panel).queryByRole("heading", {
                 level: 2,
                 name: expectedCalculatorTabHeader,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 });
@@ -292,7 +292,7 @@ describe("optimal farm size note rendering", () => {
         await screen.findByRole("combobox", { name: expectedItemSelectLabel });
 
         expect(
-            screen.queryByText(expectedFarmSizeNotePrefix, { exact: false })
+            screen.queryByText(expectedFarmSizeNotePrefix, { exact: false }),
         ).not.toBeInTheDocument();
     });
 
@@ -305,8 +305,8 @@ describe("optimal farm size note rendering", () => {
                         errors: [{ message: "Error Message" }],
                     });
                 },
-                { once: true }
-            )
+                { once: true },
+            ),
         );
 
         render(<Calculator />);
@@ -316,7 +316,7 @@ describe("optimal farm size note rendering", () => {
         await screen.findByRole("alert");
 
         expect(
-            screen.queryByText(expectedFarmSizeNotePrefix, { exact: false })
+            screen.queryByText(expectedFarmSizeNotePrefix, { exact: false }),
         ).not.toBeInTheDocument();
     });
 });
@@ -332,10 +332,10 @@ describe("about tab rendering", () => {
         });
         expect(link).toHaveAttribute(
             "href",
-            expectedGameDataReferenceRepositoryLink
+            expectedGameDataReferenceRepositoryLink,
         );
         expect(link.parentElement).toHaveTextContent(
-            expectedGameDataReferenceRepositoryExplanation
+            expectedGameDataReferenceRepositoryExplanation,
         );
     });
 });

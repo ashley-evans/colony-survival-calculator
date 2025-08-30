@@ -25,24 +25,24 @@ const flattenDemands = (requirement: Requirement): FlatRequirement[] => {
 const convertRequirementToNode = (
     { name, amount }: Pick<Requirement, "name" | "amount">,
     children: RequirementTreeNode[] = [],
-    depth = 0
+    depth = 0,
 ): RequirementTreeNode => ({ name, amount, children, depth });
 
 const createRequirementMap = (requirements: Requirement[]) =>
     new Map<string, Requirement>(
-        requirements.map((requirement) => [requirement.name, requirement])
+        requirements.map((requirement) => [requirement.name, requirement]),
     );
 
 const createTree = (
     requirements: Requirement[],
-    rootItemName: string
+    rootItemName: string,
 ): RequirementTreeNode => {
     const map = createRequirementMap(requirements);
 
     const createNode = (
         requirementName: string,
         depth: number,
-        amount?: number
+        amount?: number,
     ): RequirementTreeNode => {
         const requirement = map.get(requirementName);
         if (!requirement) {
@@ -51,13 +51,13 @@ const createTree = (
 
         const demands = flattenDemands(requirement);
         const children = demands.map((demand) =>
-            createNode(demand.name, depth + 1, demand.amount)
+            createNode(demand.name, depth + 1, demand.amount),
         );
 
         return convertRequirementToNode(
             { name: requirement.name, amount: amount ?? requirement.amount },
             children,
-            depth
+            depth,
         );
     };
 

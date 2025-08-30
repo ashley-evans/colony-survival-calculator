@@ -13,7 +13,7 @@ const createCalculatorOutputResponseHandler = (requirements: Requirement[]) =>
                 data: {
                     requirement: { __typename: "Requirements", requirements },
                 },
-            })
+            }),
     );
 
 const createCalculatorOutputUserErrorHandler = (input: {
@@ -29,7 +29,7 @@ const createCalculatorOutputUserErrorHandler = (input: {
                         message: input.requirementsUserError,
                     },
                 },
-            })
+            }),
     );
 };
 

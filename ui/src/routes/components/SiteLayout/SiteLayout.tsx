@@ -23,7 +23,7 @@ function SiteLayout() {
 
     useEffect(() => {
         function handleColourSchemePreference(
-            event: Pick<MediaQueryListEvent, "matches" | "media">
+            event: Pick<MediaQueryListEvent, "matches" | "media">,
         ) {
             if (event.matches) {
                 setDarkTheme(event.media === DARK_THEME_MEDIA_MATCH);
@@ -32,28 +32,28 @@ function SiteLayout() {
 
         const darkPreferenceMatcher = window.matchMedia(DARK_THEME_MEDIA_MATCH);
         const lightPreferenceMatcher = window.matchMedia(
-            LIGHT_THEME_MEDIA_MATCH
+            LIGHT_THEME_MEDIA_MATCH,
         );
 
         handleColourSchemePreference(lightPreferenceMatcher);
 
         darkPreferenceMatcher.addEventListener(
             "change",
-            handleColourSchemePreference
+            handleColourSchemePreference,
         );
         lightPreferenceMatcher.addEventListener(
             "change",
-            handleColourSchemePreference
+            handleColourSchemePreference,
         );
 
         return () => {
             darkPreferenceMatcher.removeEventListener(
                 "change",
-                handleColourSchemePreference
+                handleColourSchemePreference,
             );
             lightPreferenceMatcher.removeEventListener(
                 "change",
-                handleColourSchemePreference
+                handleColourSchemePreference,
             );
         };
     }, []);

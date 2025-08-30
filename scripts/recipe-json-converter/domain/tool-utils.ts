@@ -94,13 +94,13 @@ const getDefaultMinMaxTools = (creator: string): PiplizTools[] => {
 
 const getToolset = (
     recipe: Recipe,
-    npcToolsetMapping: Map<string, PiplizTools[]>
+    npcToolsetMapping: Map<string, PiplizTools[]>,
 ): Item["toolset"] => {
     const { itemName, creator } = splitPiplizName(recipe.name);
     const tools = npcToolsetMapping.get(creator);
     if (!tools) {
         console.log(
-            `Defaulting to default toolset for recipe: ${itemName} from creator: ${creator}`
+            `Defaulting to default toolset for recipe: ${itemName} from creator: ${creator}`,
         );
 
         const defaultTools = getDefaultMinMaxTools(creator);

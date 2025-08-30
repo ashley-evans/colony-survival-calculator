@@ -19,7 +19,7 @@ import {
 
 async function getItemOutputDetails(
     name: string,
-    creator?: string
+    creator?: string,
 ): Promise<ItemOutputDetails[]> {
     try {
         return await queryOutputDetails({
@@ -34,10 +34,10 @@ async function getItemOutputDetails(
 function filterCreatableItems(
     items: ItemOutputDetails[],
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
 ): ItemOutputDetails[] {
     return items.filter((item) =>
-        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item),
     );
 }
 
@@ -45,7 +45,7 @@ function getMaxOutput(
     items: ItemOutputDetails[],
     workers: number,
     unit: OutputUnit,
-    maxAvailableTool: DefaultToolset
+    maxAvailableTool: DefaultToolset,
 ): number {
     let maximumOutputPerSecond = 0;
     for (const item of items) {
@@ -84,11 +84,11 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     const creatableRecipes = filterCreatableItems(
         outputDetails,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
     );
     if (creatableRecipes.length === 0) {
         const { needsMachineTools, minimumDefault } = getMinimumToolRequired(
-            outputDetails.map((details) => ({ ...details, name }))
+            outputDetails.map((details) => ({ ...details, name })),
         );
 
         const errorSuffix = needsMachineTools

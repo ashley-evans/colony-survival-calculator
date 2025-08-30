@@ -58,16 +58,16 @@ describe("field queries", () => {
             __: string,
             filters: QueryFilters | undefined,
             expectedItemName: string | undefined,
-            expectedCreator: string | undefined
+            expectedCreator: string | undefined,
         ) => {
             await queryItem(filters);
 
             expect(mockQueryItemByField).toHaveBeenCalledTimes(1);
             expect(mockQueryItemByField).toHaveBeenCalledWith(
                 expectedItemName,
-                expectedCreator
+                expectedCreator,
             );
-        }
+        },
     );
 
     test.each([
@@ -119,7 +119,7 @@ describe("field queries", () => {
 
             expect(actual).toHaveLength(received.length);
             expect(actual).toEqual(expect.arrayContaining(received));
-        }
+        },
     );
 
     describe("optimal filter handling", () => {
@@ -334,7 +334,7 @@ describe("field queries", () => {
 
                 expect(actual).toHaveLength(1);
                 expect(actual[0]).toEqual(expected);
-            }
+            },
         );
 
         test("prefers optimal recipe regardless of whether item has recipe with machine tools", async () => {
@@ -436,16 +436,16 @@ describe("creator count queries", () => {
             _: string,
             filters: QueryFilters | undefined,
             expectedMinimumCreators: number,
-            expectedItemName: string | undefined
+            expectedItemName: string | undefined,
         ) => {
             await queryItem(filters);
 
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledTimes(1);
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledWith(
                 expectedMinimumCreators,
-                expectedItemName
+                expectedItemName,
             );
-        }
+        },
     );
 
     test.each([
@@ -476,7 +476,7 @@ describe("creator count queries", () => {
 
             expect(actual).toHaveLength(received.length);
             expect(actual).toEqual(expect.arrayContaining(received));
-        }
+        },
     );
 
     test("throws an error if an exception occurs while fetching item details", async () => {
@@ -485,7 +485,7 @@ describe("creator count queries", () => {
 
         expect.assertions(1);
         await expect(queryItem({ minimumCreators: 1 })).rejects.toThrow(
-            expectedError
+            expectedError,
         );
     });
 
@@ -670,18 +670,18 @@ describe("creator count queries", () => {
 
     test("throws an error if a minimum creator filter is provided with a creator name filter", async () => {
         const expectedError = new Error(
-            "Invalid filter combination provided: Cannot filter by minimum creator and creator name"
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator name",
         );
 
         expect.assertions(1);
         await expect(
-            queryItem({ minimumCreators: 1, creator: "test creator" })
+            queryItem({ minimumCreators: 1, creator: "test creator" }),
         ).rejects.toThrow(expectedError);
     });
 
     test("logs an error message to console if a minimum creator filter is provided with a creator name filter", async () => {
         const expectedError = new Error(
-            "Invalid filter combination provided: Cannot filter by minimum creator and creator name"
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator name",
         );
 
         try {

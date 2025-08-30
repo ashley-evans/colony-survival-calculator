@@ -33,11 +33,11 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
 
         const currentOptimalOutput = calculateOutput(
             currentOptimalItem,
-            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool
+            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool,
         );
         const itemOutput = calculateOutput(
             item,
-            maxAvailableTool ?? item.toolset.maximumTool
+            maxAvailableTool ?? item.toolset.maximumTool,
         );
 
         if (itemOutput > currentOptimalOutput) {
@@ -49,7 +49,7 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
 }
 
 const queryItem: QueryItemPrimaryPort = async (
-    filters: QueryFilters | undefined
+    filters: QueryFilters | undefined,
 ) => {
     if (filters?.minimumCreators && filters.creator) {
         console.error(INVALID_FILTER_ERROR);

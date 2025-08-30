@@ -36,13 +36,13 @@ test("renders an input with the provided label text", async () => {
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -54,7 +54,7 @@ test("calls the provided on change handler if a valid input is entered", async (
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: expectedValue });
 
@@ -68,7 +68,7 @@ test("renders the provided error message if an invalid input is entered", async 
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
@@ -84,7 +84,7 @@ test("does not render an error message by default", async () => {
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
-        />
+        />,
     );
     await screen.findByLabelText(expectedLabelText, {
         selector: "input",
@@ -99,7 +99,7 @@ test("does not render an error message if invalid input is entered with no error
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
@@ -112,14 +112,14 @@ test("sets the input to invalid if an invalid input is entered", async () => {
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toBeInvalid();
 });
 
@@ -129,13 +129,13 @@ test("does not set the input to invalid by default", async () => {
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toBeValid();
 });
 
@@ -145,14 +145,14 @@ test("clears invalid state after changing input to valid input", async () => {
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toBeInvalid();
 
     await clearInput({ label: expectedLabelText });
@@ -160,7 +160,7 @@ test("clears invalid state after changing input to valid input", async () => {
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toBeValid();
 });
 
@@ -171,7 +171,7 @@ test("clears error message if provided after changing input to valid input", asy
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             errorMessage={expectedErrorMessage}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
@@ -188,7 +188,7 @@ test("provides undefined to change handler if invalid input is provided", async 
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: invalidInput });
 
@@ -202,12 +202,12 @@ test("renders a clear input button with the provided label if specified and valu
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             clearIconLabel={expectedClearLabel}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: "1" });
 
     expect(
-        await screen.findByRole("button", { name: expectedClearLabel })
+        await screen.findByRole("button", { name: expectedClearLabel }),
     ).toBeVisible();
 });
 
@@ -217,7 +217,7 @@ test("does not render a clear input button if no label is specified and value en
             label={expectedLabelText}
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: "1" });
 
@@ -231,7 +231,7 @@ test("does not render a clear input button if no value entered and label is spec
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             clearIconLabel={expectedClearLabel}
-        />
+        />,
     );
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
@@ -246,7 +246,7 @@ test("clears the currently entered value if the clear input button is pressed", 
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             clearIconLabel={expectedClearLabel}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: expectedRemovedValue });
     await click({ label: expectedClearLabel });
@@ -255,8 +255,8 @@ test("clears the currently entered value if the clear input button is pressed", 
         expect(
             screen.getByLabelText(expectedLabelText, {
                 selector: "input",
-            })
-        ).not.toHaveValue(expectedRemovedValue)
+            }),
+        ).not.toHaveValue(expectedRemovedValue),
     );
 });
 
@@ -267,7 +267,7 @@ test("provides undefined to change handler if input is cleared", async () => {
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             clearIconLabel={expectedClearLabel}
-        />
+        />,
     );
     await typeValue({ label: expectedLabelText, value: "123" });
     await click({ label: expectedClearLabel });
@@ -284,13 +284,13 @@ test("sets the provided value as default if specified", async () => {
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             defaultValue={expectedDefault}
-        />
+        />,
     );
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toHaveValue(expectedDefault);
 });
 
@@ -302,7 +302,7 @@ test("changes the displayed value when the default value is changed after initia
             parseValue={parseValue}
             onChange={mockOnChangeHandler}
             defaultValue={"1"}
-        />
+        />,
     );
 
     rerender(
@@ -312,13 +312,13 @@ test("changes the displayed value when the default value is changed after initia
                 parseValue={parseValue}
                 onChange={mockOnChangeHandler}
                 defaultValue={expectedDefault}
-            />
-        )
+            />,
+        ),
     );
 
     expect(
         await screen.findByLabelText(expectedLabelText, {
             selector: "input",
-        })
+        }),
     ).toHaveValue(expectedDefault);
 });

@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [react()],
     define: {
         "globalThis.__DEV__": JSON.stringify(
-            process.env.NODE_ENV === "development"
+            process.env.NODE_ENV === "development",
         ),
     },
     test: {

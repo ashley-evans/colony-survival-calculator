@@ -41,7 +41,7 @@ const server = setupServer(
     createCalculatorOutputResponseHandler([]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -93,7 +93,7 @@ describe("worker input rendering", () => {
                 });
 
                 expect(await screen.findByRole("alert")).toHaveTextContent(
-                    expectedErrorMessage
+                    expectedErrorMessage,
                 );
             });
 
@@ -108,10 +108,10 @@ describe("worker input rendering", () => {
                 expect(
                     screen.queryByRole("heading", {
                         name: expectedRequirementsHeading,
-                    })
+                    }),
                 ).not.toBeInTheDocument();
             });
-        }
+        },
     );
 
     test("clears error message after changing input to a valid input", async () => {
@@ -143,7 +143,7 @@ describe("worker input rendering", () => {
         expect(
             await within(inputContainer).findByRole("button", {
                 name: "Clear output item workers",
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -162,7 +162,7 @@ describe("worker input rendering", () => {
         expect(
             await screen.findByLabelText(expectedWorkerInputLabel, {
                 selector: "input",
-            })
+            }),
         ).toHaveValue(expectedWorkerValue);
     });
 });
@@ -178,7 +178,7 @@ describe("target amount input rendering", () => {
             expectedTargetAmountInputLabel,
             {
                 selector: "input",
-            }
+            },
         );
         expect(input).toBeVisible();
         expect(input).toHaveValue("");
@@ -209,7 +209,7 @@ describe("target amount input rendering", () => {
                 });
 
                 expect(await screen.findByRole("alert")).toHaveTextContent(
-                    expectedErrorMessage
+                    expectedErrorMessage,
                 );
             });
 
@@ -224,10 +224,10 @@ describe("target amount input rendering", () => {
                 expect(
                     screen.queryByRole("heading", {
                         name: expectedRequirementsHeading,
-                    })
+                    }),
                 ).not.toBeInTheDocument();
             });
-        }
+        },
     );
 
     test("clears error message after changing input to a valid input", async () => {
@@ -259,7 +259,7 @@ describe("target amount input rendering", () => {
         expect(
             await within(inputContainer).findByRole("button", {
                 name: "Clear output item target",
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -278,7 +278,7 @@ describe("target amount input rendering", () => {
         expect(
             await screen.findByLabelText(expectedTargetAmountInputLabel, {
                 selector: "input",
-            })
+            }),
         ).toHaveValue(expectedValue);
     });
 });
