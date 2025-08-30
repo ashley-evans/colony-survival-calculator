@@ -32,7 +32,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run formatters
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -65,7 +65,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run linters
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -99,7 +99,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Lint Commits
               run: |
                   yarn commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
@@ -133,7 +133,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run validators
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -166,7 +166,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Build Project
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -199,7 +199,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run Unit Tests
               run: |
                   if [ "${{ github.ref }}" != "refs/heads/master" ]; then
@@ -242,7 +242,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run dry run deployment
               env:
                   TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}
@@ -283,7 +283,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Create Tags
               env:
                   GITHUB_TOKEN: ${{ secrets.TAG_TOKEN }}

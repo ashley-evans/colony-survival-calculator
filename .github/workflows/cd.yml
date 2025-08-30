@@ -37,7 +37,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run deployment
               env:
                   TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}
