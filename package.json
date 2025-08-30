@@ -2,7 +2,7 @@
     "name": "@colony-survival-calculator/root",
     "private": true,
     "version": "0.0.0",
-    "packageManager": "yarn@3.6.1",
+    "packageManager": "yarn@4.9.4",
     "workspaces": {
         "packages": [
             ".",
@@ -25,21 +25,26 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@commitlint/cli": "^17.5.1",
-        "@commitlint/config-conventional": "^17.4.4",
-        "@commitlint/types": "^17.4.4",
-        "@typescript-eslint/eslint-plugin": "^5.57.1",
-        "@typescript-eslint/parser": "^5.57.1",
-        "commitizen": "^4.3.0",
+        "@commitlint/cli": "^19.8.1",
+        "@commitlint/config-conventional": "^19.8.1",
+        "@commitlint/types": "^19.8.1",
+        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/js": "^9.34.0",
+        "commitizen": "^4.3.1",
         "cz-conventional-changelog": "^3.3.0",
-        "eslint": "^8.37.0",
-        "eslint-config-prettier": "^8.8.0",
-        "husky": "^8.0.3",
-        "lerna": "^7.1.5",
-        "npm-package-json-lint": "^6.4.0",
-        "prettier": "^2.8.7",
-        "semantic-release": "^21.0.1",
-        "typescript": "^5.0.3"
+        "eslint": "^9.34.0",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^16.3.0",
+        "husky": "^9.1.7",
+        "lerna": "^8.2.3",
+        "npm-package-json-lint": "^9.0.0",
+        "prettier": "^3.6.2",
+        "semantic-release": "^24.2.7",
+        "typescript": "^5.9.2",
+        "typescript-eslint": "^8.41.0"
+    },
+    "resolutions": {
+        "globals": "^16.3.0"
     },
     "config": {
         "commitizen": {

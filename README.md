@@ -9,8 +9,8 @@ Job/Resource ratio calculator for Colony Survival
 
 The currently deployed version of the application can be found at the following URLs:
 
--   https://factorycalculator.com/
--   https://factorycalculator.co.uk/
+- https://factorycalculator.com/
+- https://factorycalculator.co.uk/
 
 ## Requirements
 

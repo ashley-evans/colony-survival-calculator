@@ -8,7 +8,7 @@ import {
 } from "./interfaces/query-item-primary-port";
 
 function mapOptimalFilter(
-    input?: OptimalFilter | null
+    input?: OptimalFilter | null,
 ): DomainOptimalFilter | undefined {
     return input
         ? {
@@ -46,9 +46,9 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
             minimumTool: GraphQLToolsSchemaMap[toolset.minimumTool],
             ...rest,
         }));
-    } catch (ex) {
+    } catch {
         throw new Error(
-            "An error occurred while fetching item details, please try again."
+            "An error occurred while fetching item details, please try again.",
         );
     }
 };

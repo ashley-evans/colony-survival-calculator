@@ -30,3 +30,7 @@ lerna-debug.log
 # Temporary test files
 
 **/temp/**
+
+# Generated files
+
+**/__generated__/*.*
