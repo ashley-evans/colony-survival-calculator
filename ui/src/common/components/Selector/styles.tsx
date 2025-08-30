@@ -83,6 +83,10 @@ export const Input = styled.input`
     color: inherit;
 `;
 
+export const InputIconsContainer = styled.div`
+    display: flex;
+`;
+
 export const InputIconContainer = styled.div`
     display: flex;
 `;

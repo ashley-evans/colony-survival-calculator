@@ -79,7 +79,7 @@ function Input<Type>({
                         tabIndex={0}
                         onClick={handleInputClear}
                     >
-                        <FontAwesomeIcon icon={faTimes} role="button" />
+                        <FontAwesomeIcon icon={faTimes} />
                     </IconContainer>
                 ) : null}
             </InputContainer>

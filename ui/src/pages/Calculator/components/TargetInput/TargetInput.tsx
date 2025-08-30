@@ -14,10 +14,9 @@ export type Target =
       }
     | { amount: number };
 
-type TargetInputProps = { onTargetChange: (target: Target) => void } & Pick<
-    AmountInputProps,
-    "defaultAmount"
-> &
+type TargetInputProps = {
+    onTargetChange: (target?: Target) => void;
+} & Pick<AmountInputProps, "defaultAmount"> &
     Pick<WorkerInputProps, "defaultWorkers">;
 
 function TargetInput({
@@ -26,13 +25,17 @@ function TargetInput({
     defaultWorkers,
 }: TargetInputProps) {
     const handleWorkerChange = (workers?: number) => {
-        if (workers) {
+        if (workers === undefined) {
+            onTargetChange(undefined);
+        } else {
             onTargetChange({ workers });
         }
     };
 
     const handleAmountChange = (amount?: number) => {
-        if (amount) {
+        if (amount === undefined) {
+            onTargetChange(undefined);
+        } else {
             onTargetChange({ amount });
         }
     };

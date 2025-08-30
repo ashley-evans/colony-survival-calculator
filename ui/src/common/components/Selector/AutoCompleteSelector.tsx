@@ -12,6 +12,7 @@ import {
     Container,
     Input,
     InputIconContainer,
+    InputIconsContainer,
     Item,
     Label,
     Menu,
@@ -91,27 +92,29 @@ function AutoCompleteSelector<Item>({
             <Label {...getLabelProps()}>{labelText}</Label>
             <SelectorInputContainer $palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
-                <InputIconContainer>
+                <InputIconsContainer>
                     {inputValue && clearIconLabelText ? (
-                        <ClearInputIcon
-                            icon={faTimes}
+                        <InputIconContainer
                             role="button"
-                            onClick={() => selectItem(null)}
-                            aria-hidden={false}
                             aria-label={clearIconLabelText}
                             tabIndex={0}
-                        />
+                            onClick={() => selectItem(null)}
+                        >
+                            <ClearInputIcon icon={faTimes} />
+                        </InputIconContainer>
                     ) : null}
-                    <ToggleIndicatorIcon
+                    <InputIconContainer
                         {...getToggleButtonProps()}
-                        icon={faChevronDown}
-                        selected={isOpen}
                         role="button"
-                        aria-hidden={false}
                         aria-label={toggleLabelText}
                         tabIndex={0}
-                    />
-                </InputIconContainer>
+                    >
+                        <ToggleIndicatorIcon
+                            icon={faChevronDown}
+                            selected={isOpen}
+                        />
+                    </InputIconContainer>
+                </InputIconsContainer>
             </SelectorInputContainer>
             <Menu
                 {...getMenuProps()}

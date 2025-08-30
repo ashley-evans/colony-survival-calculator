@@ -36,16 +36,19 @@ async function selectItemAndTarget(input: SelectItemAndTargetParams) {
         },
     );
 
-    if (input.clear) {
-        await user.clear(workerInput);
-        await user.clear(amountInput);
-    }
-
     if ("workers" in input && input.workers) {
+        if (input.clear) {
+            await user.clear(workerInput);
+        }
+
         await user.type(workerInput, input.workers.toString());
     }
 
     if ("amount" in input && input.amount) {
+        if (input.clear) {
+            await user.clear(amountInput);
+        }
+
         await user.type(amountInput, input.amount.toString());
     }
 

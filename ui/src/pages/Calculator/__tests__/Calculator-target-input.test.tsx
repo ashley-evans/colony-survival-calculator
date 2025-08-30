@@ -11,16 +11,27 @@ import {
     expectedSettingsTab,
     clickByName,
     expectedSettingsTabHeader,
-    ItemName,
     expectedCreatorOverrideQueryName,
     expectedItemDetailsQueryName,
     expectedItemNameQueryName,
     expectedTargetAmountInputLabel,
     expectedRequirementsHeading,
+    createRequirement,
+    createRequirementCreator,
 } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
-const item: ItemName = { name: "Item 1" };
+const item = createRequirement({
+    name: "Required Item 1",
+    amount: 30,
+    creators: [
+        createRequirementCreator({
+            recipeName: "Required Item 1",
+            amount: 30,
+            workers: 20,
+        }),
+    ],
+});
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
@@ -37,7 +48,7 @@ const server = setupServer(
             },
         });
     }),
-    createCalculatorOutputResponseHandler([]),
+    createCalculatorOutputResponseHandler([item]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
     }),
