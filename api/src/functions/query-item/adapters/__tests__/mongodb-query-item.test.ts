@@ -1,5 +1,6 @@
 import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
+import { vi } from "vitest";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
 import type { Items } from "../../../../types";
@@ -9,20 +10,15 @@ const itemCollectionName = "Items";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
-jest.mock("@colony-survival-calculator/mongodb-client", async () => {
-    mongoDBMemoryServer = await createMemoryServer(databaseName);
-    return MongoClient.connect(mongoDBMemoryServer.getUri());
-});
-
-import mockClient from "@colony-survival-calculator/mongodb-client";
-
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
     await storeItem(items);
 }
 
 async function clearItemsCollection() {
-    const client = await mockClient;
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
     const db = client.db(databaseName);
 
     const existingCollections = await db.listCollections().toArray();
@@ -56,9 +52,21 @@ function createItemWithNumberOfRecipes(
     return items;
 }
 
+beforeAll(async () => {
+    mongoDBMemoryServer = await createMemoryServer(databaseName);
+
+    vi.doMock("@colony-survival-calculator/mongodb-client", async () => {
+        const clientPromise = MongoClient.connect(mongoDBMemoryServer.getUri());
+        return {
+            default: clientPromise,
+        };
+    });
+});
+
 beforeEach(async () => {
-    process.env["DATABASE_NAME"] = databaseName;
-    process.env["ITEM_COLLECTION_NAME"] = itemCollectionName;
+    vi.resetModules();
+    vi.stubEnv("DATABASE_NAME", databaseName);
+    vi.stubEnv("ITEM_COLLECTION_NAME", itemCollectionName);
 
     await clearItemsCollection();
 });
@@ -338,6 +346,9 @@ describe("creator count queries", () => {
 });
 
 afterAll(async () => {
-    (await mockClient).close(true);
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
+    await client.close(true);
     await mongoDBMemoryServer.stop();
 });

@@ -228,7 +228,7 @@ function validateInput(
 const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const {
         name,
-        maxAvailableTool = DefaultToolset.none,
+        maxAvailableTool = "none" as DefaultToolset,
         hasMachineTools = false,
         unit = OutputUnit.SECONDS,
         creatorOverrides,

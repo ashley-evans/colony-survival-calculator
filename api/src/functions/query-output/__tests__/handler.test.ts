@@ -1,5 +1,6 @@
 import type { AppSyncResolverEvent } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import { handler } from "../handler";
 import { calculateOutput } from "../domain/output-calculator";
@@ -10,11 +11,11 @@ import type {
 } from "../../../graphql/schema";
 import { DefaultToolset as SchemaTools } from "../../../types";
 
-jest.mock("../domain/output-calculator", () => ({
-    calculateOutput: jest.fn(),
+vi.mock("../domain/output-calculator", () => ({
+    calculateOutput: vi.fn(),
 }));
 
-const mockCalculateOutput = calculateOutput as jest.Mock;
+const mockCalculateOutput = calculateOutput as Mock;
 
 function createMockEvent(
     name: string,
@@ -63,12 +64,12 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
 });
 
 test.each<[AvailableTools, SchemaTools]>([
-    ["NONE", SchemaTools.none],
-    ["STONE", SchemaTools.stone],
-    ["COPPER", SchemaTools.copper],
-    ["IRON", SchemaTools.iron],
-    ["BRONZE", SchemaTools.bronze],
-    ["STEEL", SchemaTools.steel],
+    ["NONE", "none" as SchemaTools],
+    ["STONE", "stone" as SchemaTools],
+    ["COPPER", "copper" as SchemaTools],
+    ["IRON", "iron" as SchemaTools],
+    ["BRONZE", "bronze" as SchemaTools],
+    ["STEEL", "steel" as SchemaTools],
 ])(
     "calls the domain to calculate output given a valid event w/ %s tool",
     async (provided: AvailableTools, expectedTool: SchemaTools) => {

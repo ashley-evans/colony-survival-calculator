@@ -1,5 +1,6 @@
 import type { AppSyncResolverEvent } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
@@ -15,11 +16,11 @@ import type {
 } from "../../../graphql/schema";
 import { QueryFilters } from "../interfaces/query-item-primary-port";
 
-jest.mock("../domain/query-item", () => ({
-    queryItem: jest.fn(),
+vi.mock("../domain/query-item", () => ({
+    queryItem: vi.fn(),
 }));
 
-const mockQueryItem = queryItem as jest.Mock;
+const mockQueryItem = queryItem as Mock;
 
 function createOptimalFilter(
     maxAvailableTool?: AvailableTools,
@@ -128,7 +129,7 @@ test.each([
     [
         "an optimal filter specified w/ max tool",
         mockEventWithOptimalFilterAndMaxTool,
-        { optimal: { maxAvailableTool: DomainTools.copper } },
+        { optimal: { maxAvailableTool: "copper" as DomainTools } },
     ],
     [
         "an item name, creator, and minimum number of creators specified in filter",
@@ -137,7 +138,7 @@ test.each([
             name: expectedItemName,
             minimumCreators: expectedMinimumCreators,
             creator: expectedCreator,
-            optimal: { maxAvailableTool: DomainTools.steel },
+            optimal: { maxAvailableTool: "steel" as DomainTools },
         },
     ],
     [
@@ -189,8 +190,8 @@ test.each([
                 output: 3,
                 requirements: [],
                 creator: "test 1 creator",
-                minimumTool: DomainTools.none,
-                maximumTool: DomainTools.steel,
+                minimumTool: "none" as DomainTools,
+                maximumTool: "steel" as DomainTools,
             }),
             createItem({
                 name: "test 2",
@@ -198,8 +199,8 @@ test.each([
                 output: 6,
                 requirements: [],
                 creator: "test 2 creator",
-                minimumTool: DomainTools.copper,
-                maximumTool: DomainTools.bronze,
+                minimumTool: "copper" as DomainTools,
+                maximumTool: "bronze" as DomainTools,
             }),
             createItemWithMachineTools({
                 name: "test 3",
@@ -252,8 +253,8 @@ test.each([
                 width: 1,
                 height: 2,
                 creator: "test 1 creator",
-                minimumTool: DomainTools.none,
-                maximumTool: DomainTools.steel,
+                minimumTool: "none" as DomainTools,
+                maximumTool: "steel" as DomainTools,
             }),
             createItem({
                 name: "test 2",
@@ -263,8 +264,8 @@ test.each([
                 width: 3,
                 height: 4,
                 creator: "test 2 creator",
-                minimumTool: DomainTools.copper,
-                maximumTool: DomainTools.bronze,
+                minimumTool: "copper" as DomainTools,
+                maximumTool: "bronze" as DomainTools,
             }),
             createItemWithMachineTools({
                 name: "test 3",

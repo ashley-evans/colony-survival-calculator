@@ -1,5 +1,5 @@
 import type { S3Event, S3EventRecord } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
 
 export function createS3EventBucketDetails(
     name?: string,

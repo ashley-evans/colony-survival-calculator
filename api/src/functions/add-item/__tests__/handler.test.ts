@@ -8,7 +8,8 @@ import {
 import { mockClient } from "aws-sdk-client-mock";
 import { sdkStreamMixin } from "@aws-sdk/util-stream-node";
 import { Readable } from "stream";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import {
     createS3Event,
@@ -19,18 +20,18 @@ import {
 } from "../../../../test";
 import { addItem } from "../domain/add-item";
 
-jest.mock("../domain/add-item", () => ({
-    addItem: jest.fn(),
+vi.mock("../domain/add-item", () => ({
+    addItem: vi.fn(),
 }));
 
-const mockAddItem = addItem as jest.Mock;
+const mockAddItem = addItem as Mock;
 
 import { handler } from "../handler";
 
 const mockS3Client = mockClient(S3Client);
 
 beforeAll(() => {
-    jest.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
 });
 
 const EXPECTED_BUCKET_NAME = "test_bucket_name";

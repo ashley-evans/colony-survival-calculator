@@ -4,8 +4,10 @@
         "outDir": "dist",
         "resolveJsonModule": true,
         "verbatimModuleSyntax": false,
+        "isolatedModules": false,
         "moduleResolution": "bundler",
-        "module": "es6"
+        "module": "es2022",
+        "types": ["vitest/globals"]
     },
     "include": ["./src/**/*"],
     "exclude": ["./dist/**/*"]

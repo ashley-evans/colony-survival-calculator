@@ -77,8 +77,8 @@ function createItem(
         ...rest,
         toolset: {
             type: "default",
-            minimumTool: minimumTool ?? DefaultToolset.none,
-            maximumTool: maximumTool ?? DefaultToolset.none,
+            minimumTool: minimumTool ?? ("none" as DefaultToolset),
+            maximumTool: maximumTool ?? ("none" as DefaultToolset),
         },
     });
 }
@@ -90,8 +90,8 @@ function createItemWithMachineTools(
         ...input,
         toolset: {
             type: "machine",
-            minimumTool: MachineToolset.machine,
-            maximumTool: MachineToolset.machine,
+            minimumTool: "machine" as MachineToolset,
+            maximumTool: "machine" as MachineToolset,
         },
     });
 }

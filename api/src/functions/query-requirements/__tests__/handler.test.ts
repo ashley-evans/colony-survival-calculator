@@ -1,5 +1,6 @@
 import type { AppSyncResolverEvent } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import type {
     CreatorOverride,
@@ -13,14 +14,14 @@ import type {
 import type { Requirement } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
-import { DefaultToolset as SchemaTools } from "../../../types";
+import type { DefaultToolset as SchemaTools } from "../../../types";
 import { OutputUnit } from "../../../common";
 
-jest.mock("../domain/query-requirements", () => ({
-    queryRequirements: jest.fn(),
+vi.mock("../domain/query-requirements", () => ({
+    queryRequirements: vi.fn(),
 }));
 
-const mockQueryRequirements = queryRequirements as jest.Mock;
+const mockQueryRequirements = queryRequirements as Mock;
 
 const isUserError = (
     requirementResult: RequirementResult,
@@ -96,12 +97,12 @@ test("calls the domain to fetch requirements to satisfy target output given even
 });
 
 test.each<[AvailableTools, SchemaTools]>([
-    ["NONE", SchemaTools.none],
-    ["STONE", SchemaTools.stone],
-    ["COPPER", SchemaTools.copper],
-    ["IRON", SchemaTools.iron],
-    ["BRONZE", SchemaTools.bronze],
-    ["STEEL", SchemaTools.steel],
+    ["NONE", "none" as SchemaTools],
+    ["STONE", "stone" as SchemaTools],
+    ["COPPER", "copper" as SchemaTools],
+    ["IRON", "iron" as SchemaTools],
+    ["BRONZE", "bronze" as SchemaTools],
+    ["STEEL", "steel" as SchemaTools],
 ])(
     "calls the domain to fetch requirements for provided event w/ %s tool modifier",
     async (provided: AvailableTools, expectedTool: SchemaTools) => {
@@ -310,7 +311,7 @@ test.each([
 
         const actual = await handler(event);
         if (isUserError(actual)) {
-            fail();
+            assert.fail();
         }
 
         expect(actual.__typename).toEqual("Requirements");
@@ -350,7 +351,7 @@ test.each([
 
         const actual = await handler(event);
         if (!isUserError(actual)) {
-            fail();
+            assert.fail();
         }
 
         expect(actual).toEqual({ __typename: "UserError", message: error });

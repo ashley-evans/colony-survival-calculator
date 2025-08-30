@@ -64,7 +64,7 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     name,
     workers,
     unit,
-    maxAvailableTool = DefaultToolset.none,
+    maxAvailableTool = "none" as DefaultToolset,
     hasMachineTools = false,
     creator,
 }) => {

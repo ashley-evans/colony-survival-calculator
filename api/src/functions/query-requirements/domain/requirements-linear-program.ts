@@ -176,7 +176,7 @@ function createDemandVariables(
                     optional.likelihood *
                     OutputUnitSecondMappings[unit];
                 if (optional.name === recipe.name) {
-                    const newOutput =
+                    const newOutput: number =
                         (recipeVariable[baseRecipeOutputPropertyName] ?? 0) +
                         optionalOutput;
                     recipeVariable[baseRecipeOutputPropertyName] = newOutput;

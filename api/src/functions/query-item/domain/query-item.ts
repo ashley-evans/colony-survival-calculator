@@ -15,7 +15,8 @@ const INVALID_FILTER_ERROR =
 
 function filterByOptimal(items: Items, filters: OptimalFilter): Items {
     const itemMap = new Map<string, Item>();
-    const maxAvailableTool = filters.maxAvailableTool ?? DefaultToolset.steel;
+    const maxAvailableTool =
+        filters.maxAvailableTool ?? ("steel" as DefaultToolset);
     const hasMachineTools = filters.hasMachineTools ?? true;
 
     for (const item of items) {

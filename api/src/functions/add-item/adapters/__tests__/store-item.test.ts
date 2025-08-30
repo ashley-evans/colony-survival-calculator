@@ -9,21 +9,18 @@ const itemCollectionName = "Items";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
-jest.mock("@colony-survival-calculator/mongodb-client", async () => {
-    mongoDBMemoryServer = await createMemoryServer(databaseName);
-    return MongoClient.connect(mongoDBMemoryServer.getUri());
-});
-
-import mockClient from "@colony-survival-calculator/mongodb-client";
-
 async function getItemsCollection() {
-    const client = await mockClient;
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
     const db = client.db(databaseName);
     return db.collection(itemCollectionName);
 }
 
 async function clearItemsCollection() {
-    const client = await mockClient;
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
     const db = client.db(databaseName);
 
     const existingCollections = await db.listCollections().toArray();
@@ -37,9 +34,21 @@ async function clearItemsCollection() {
     }
 }
 
+beforeAll(async () => {
+    mongoDBMemoryServer = await createMemoryServer(databaseName);
+
+    vi.doMock("@colony-survival-calculator/mongodb-client", async () => {
+        const clientPromise = MongoClient.connect(mongoDBMemoryServer.getUri());
+        return {
+            default: clientPromise,
+        };
+    });
+});
+
 beforeEach(async () => {
-    process.env["DATABASE_NAME"] = databaseName;
-    process.env["ITEM_COLLECTION_NAME"] = "Items";
+    vi.resetModules();
+    vi.stubEnv("DATABASE_NAME", databaseName);
+    vi.stubEnv("ITEM_COLLECTION_NAME", itemCollectionName);
 
     await clearItemsCollection();
 });
@@ -97,8 +106,8 @@ describe.each([
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: "test", amount: 1 }],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
                 creator: "Test Creator 1",
             }),
         ],
@@ -111,8 +120,8 @@ describe.each([
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: "test", amount: 1 }],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.bronze,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "bronze" as DefaultToolset,
                 creator: "Test Creator 1",
             }),
             createItem({
@@ -120,8 +129,8 @@ describe.each([
                 createTime: 1,
                 output: 4,
                 requirements: [{ name: "world", amount: 3 }],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
                 creator: "Test Creator 2",
             }),
         ],
@@ -153,16 +162,16 @@ test("removes any old entries prior to storing new items", async () => {
         createTime: 1,
         output: 2,
         requirements: [],
-        minimumTool: DefaultToolset.none,
-        maximumTool: DefaultToolset.none,
+        minimumTool: "none" as DefaultToolset,
+        maximumTool: "none" as DefaultToolset,
     });
     const newItem = createItem({
         name: "new",
         createTime: 2,
         output: 3,
         requirements: [],
-        minimumTool: DefaultToolset.bronze,
-        maximumTool: DefaultToolset.steel,
+        minimumTool: "bronze" as DefaultToolset,
+        maximumTool: "steel" as DefaultToolset,
     });
     const { storeItem } = await import("../store-item");
 
@@ -176,6 +185,9 @@ test("removes any old entries prior to storing new items", async () => {
 });
 
 afterAll(async () => {
-    (await mockClient).close(true);
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
+    await client.close(true);
     await mongoDBMemoryServer.stop();
 });
