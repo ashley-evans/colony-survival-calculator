@@ -1,4 +1,3 @@
-import React from "react";
 import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen } from "@testing-library/react";
@@ -69,7 +68,7 @@ const server = setupServer(
     ]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -85,7 +84,7 @@ test("renders a select for tools", async () => {
     render(<Calculator />, expectedGraphQLAPIURL);
 
     expect(
-        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel }),
     ).toBeVisible();
 });
 
@@ -96,7 +95,7 @@ test.each(["None", "Stone", "Copper", "Iron", "Bronze", "Steel"])(
         await openSelectMenu({ label: expectedToolSelectLabel });
 
         expect(await screen.findByRole("option", { name: tool })).toBeVisible();
-    }
+    },
 );
 
 test("renders the tool options in order of unlock", async () => {
@@ -120,10 +119,10 @@ test("renders none as the selected tool by default", async () => {
     await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel }),
     ).toHaveTextContent(expected);
     expect(
-        screen.getByRole("option", { name: expected, selected: true })
+        screen.getByRole("option", { name: expected, selected: true }),
     ).toBeVisible();
 });
 
@@ -135,13 +134,13 @@ test("updates the selected tool if selected is changed", async () => {
     await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel }),
     ).toHaveTextContent(expected);
     expect(
         screen.getByRole("option", {
             name: expected,
             selected: true,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -152,7 +151,7 @@ test("queries calculator with provided tool if non default selected", async () =
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -191,7 +190,7 @@ test("queries optimal output again if tool is changed after first query", async 
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
             hasMachineTools: false,
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -215,7 +214,7 @@ test("queries requirements with provided tool if non default selected", async ()
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -254,7 +253,7 @@ test("queries requirements again if tool is changed after first query", async ()
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
             hasMachineTools: false,
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -287,7 +286,7 @@ test("queries item details with provided tool if non default selected", async ()
                     hasMachineTools: false,
                 },
             },
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -316,7 +315,7 @@ test("queries item details again if tool is changed after first query", async ()
                     hasMachineTools: false,
                 },
             },
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -343,7 +342,7 @@ test("does not reset the currently selected tool after changing tabs", async () 
     await clickByName(expectedCalculatorTab, "tab");
 
     expect(
-        await screen.findByRole("combobox", { name: expectedToolSelectLabel })
+        await screen.findByRole("combobox", { name: expectedToolSelectLabel }),
     ).toHaveTextContent(expected);
 });
 
@@ -368,7 +367,7 @@ describe("machine tool selection", () => {
         expect(
             screen.getByRole("checkbox", {
                 name: expectedMachineToolCheckboxLabel,
-            })
+            }),
         ).toBeChecked();
     });
 
@@ -388,7 +387,7 @@ describe("machine tool selection", () => {
         expect(
             await screen.findByRole("checkbox", {
                 name: expectedMachineToolCheckboxLabel,
-            })
+            }),
         ).toBeChecked();
     });
 
@@ -407,7 +406,7 @@ describe("machine tool selection", () => {
                         hasMachineTools: true,
                     },
                 },
-            }
+            },
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);

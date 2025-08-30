@@ -52,7 +52,7 @@ const STATIC_RECIPES: Items = [
 const getGrowables = async (
     inputDirectoryPath: string,
     findFiles: FileFinder,
-    readGrowablesFile: JSONFileReader<Growables>
+    readGrowablesFile: JSONFileReader<Growables>,
 ) => {
     const growablesFiles = await findFiles({
         root: inputDirectoryPath,
@@ -62,11 +62,11 @@ const getGrowables = async (
 
     if (growablesFiles.length === 0) {
         throw new Error(
-            `No ${FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`
+            `No ${FILE_NAME}${JSON_FILE_EXTENSION} file found in provided directory`,
         );
     } else if (growablesFiles.length > 1) {
         throw new Error(
-            `Multiple ${FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`
+            `Multiple ${FILE_NAME}${JSON_FILE_EXTENSION} files found, ensure only one exists`,
         );
     }
 
@@ -113,28 +113,28 @@ const mapToItem = (growable: Growables[number]): Item => {
     const userFriendlyName = getUserFriendlyItemName(growable.identifier);
     if (!userFriendlyName) {
         throw new Error(
-            `User friendly name unavailable for growable: ${growable.identifier}`
+            `User friendly name unavailable for growable: ${growable.identifier}`,
         );
     }
 
     const creator = getUserFriendlyCreatorName(growable.identifier);
     if (!creator) {
         throw new Error(
-            `User friendly creator name unavailable for growable: ${growable.identifier}`
+            `User friendly creator name unavailable for growable: ${growable.identifier}`,
         );
     }
 
     const expectedOutput = getExpectedOutput(growable.identifier);
     if (!expectedOutput) {
         throw new Error(
-            `Expected output for growable: ${growable.identifier} not known`
+            `Expected output for growable: ${growable.identifier} not known`,
         );
     }
 
     const daysToGrow = growable.stages.length - 1;
     if (daysToGrow <= 0) {
         throw new Error(
-            `Provided growable: ${growable.identifier} grows in less than one day`
+            `Provided growable: ${growable.identifier} grows in less than one day`,
         );
     }
 
@@ -163,7 +163,7 @@ const convertGrowables: GrowableConverter = async ({
     const growables = await getGrowables(
         inputDirectoryPath,
         findFiles,
-        readGrowablesFile
+        readGrowablesFile,
     );
 
     const converted = growables
@@ -172,7 +172,7 @@ const convertGrowables: GrowableConverter = async ({
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(
-            `Multiple growable recipes for item: ${containsDuplicate.name}, please remove one`
+            `Multiple growable recipes for item: ${containsDuplicate.name}, please remove one`,
         );
     }
 

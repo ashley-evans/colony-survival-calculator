@@ -17,4 +17,4 @@ interface FileFinder {
     (input: FileFinderInput): Promise<string[]>;
 }
 
-export { FileFinder };
+export type { FileFinder };

@@ -1,14 +1,15 @@
 import type { AppSyncResolverEvent } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import { handler } from "../handler";
 import { queryDistinctItemNames } from "../domain/query-distinct-item-names";
 
-jest.mock("../domain/query-distinct-item-names", () => ({
-    queryDistinctItemNames: jest.fn(),
+vi.mock("../domain/query-distinct-item-names", () => ({
+    queryDistinctItemNames: vi.fn(),
 }));
 
-const mockQueryDistinctItemNames = queryDistinctItemNames as jest.Mock;
+const mockQueryDistinctItemNames = queryDistinctItemNames as Mock;
 
 const validEvent = mock<AppSyncResolverEvent<never>>();
 
@@ -33,7 +34,7 @@ test.each([
         const actual = await handler(validEvent);
 
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("throws an error if any unhandled exceptions occur while querying distinct item names", async () => {

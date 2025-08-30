@@ -1,26 +1,19 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { ByRoleMatcher, render, within } from "@testing-library/react";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider } from "styled-components";
 
 import { darkTheme } from "../routes/components/SiteLayout/theme";
-import {
-    ApolloClient,
-    ApolloProvider,
-    HttpLink,
-    InMemoryCache,
-    NormalizedCacheObject,
-} from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import AppRouterProvider, {
     AppRouterProviderProps,
 } from "../routes/AppRouterProvider";
 
 const defaultGraphQLURL = "https://localhost:3000/graphql";
 
-function createApolloClient(
-    apiURL: string
-): ApolloClient<NormalizedCacheObject> {
+function createApolloClient(apiURL: string): ApolloClient {
     const httpLink = new HttpLink({ uri: apiURL });
     return new ApolloClient({
         link: httpLink,
@@ -30,7 +23,7 @@ function createApolloClient(
 
 function wrapWithTestProviders(
     children: ReactElement,
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     const client = createApolloClient(apiURL);
 
@@ -43,7 +36,7 @@ function wrapWithTestProviders(
 
 function renderWithRouterProvider(
     routerProps: AppRouterProviderProps = {},
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     const client = createApolloClient(apiURL);
 
@@ -52,14 +45,14 @@ function renderWithRouterProvider(
         ...render(
             <ApolloProvider client={client}>
                 <AppRouterProvider {...routerProps} />
-            </ApolloProvider>
+            </ApolloProvider>,
         ),
     };
 }
 
 function renderWithTestProviders(
     children: ReactElement,
-    apiURL = defaultGraphQLURL
+    apiURL = defaultGraphQLURL,
 ) {
     return {
         ...render(wrapWithTestProviders(children, apiURL)),

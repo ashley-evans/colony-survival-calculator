@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     UseComboboxProps,
     UseComboboxStateChange,
@@ -12,6 +12,7 @@ import {
     Container,
     Input,
     InputIconContainer,
+    InputIconsContainer,
     Item,
     Label,
     Menu,
@@ -55,7 +56,7 @@ function AutoCompleteSelector<Item>({
         setFiltered(
             getItemFilter && inputValue
                 ? items.filter(getItemFilter(inputValue))
-                : items
+                : items,
         );
     };
 
@@ -87,36 +88,38 @@ function AutoCompleteSelector<Item>({
     }, [defaultSelectedItem]);
 
     return (
-        <Container palette={palette} className={className}>
+        <Container $palette={palette} className={className}>
             <Label {...getLabelProps()}>{labelText}</Label>
-            <SelectorInputContainer palette={palette}>
+            <SelectorInputContainer $palette={palette}>
                 <Input {...getInputProps()} placeholder={inputPlaceholder} />
-                <InputIconContainer>
+                <InputIconsContainer>
                     {inputValue && clearIconLabelText ? (
-                        <ClearInputIcon
-                            icon={faTimes}
+                        <InputIconContainer
                             role="button"
-                            onClick={() => selectItem(null)}
-                            aria-hidden={false}
                             aria-label={clearIconLabelText}
                             tabIndex={0}
-                        />
+                            onClick={() => selectItem(null)}
+                        >
+                            <ClearInputIcon icon={faTimes} />
+                        </InputIconContainer>
                     ) : null}
-                    <ToggleIndicatorIcon
+                    <InputIconContainer
                         {...getToggleButtonProps()}
-                        icon={faChevronDown}
-                        selected={isOpen}
                         role="button"
-                        aria-hidden={false}
                         aria-label={toggleLabelText}
                         tabIndex={0}
-                    />
-                </InputIconContainer>
+                    >
+                        <ToggleIndicatorIcon
+                            icon={faChevronDown}
+                            selected={isOpen}
+                        />
+                    </InputIconContainer>
+                </InputIconsContainer>
             </SelectorInputContainer>
             <Menu
                 {...getMenuProps()}
-                isOpen={isOpen && filtered.length > 0}
-                palette={palette}
+                $isOpen={isOpen && filtered.length > 0}
+                $palette={palette}
             >
                 {isOpen ? (
                     <>
@@ -124,7 +127,7 @@ function AutoCompleteSelector<Item>({
                             <Item
                                 key={itemToKey(item, index)}
                                 {...getItemProps({ item, index })}
-                                palette={palette}
+                                $palette={palette}
                             >
                                 {itemToDisplayText(item)}
                             </Item>

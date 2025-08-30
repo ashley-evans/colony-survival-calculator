@@ -28,7 +28,7 @@ const server = setupServer(
     }),
     graphql.query(expectedItemDetailsQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 const mockMatchesMedia = vi.fn();
@@ -65,7 +65,7 @@ describe("root rendering", () => {
         expect(
             await screen.findByRole("heading", {
                 name: EXPECTED_APPLICATION_TITLE,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -92,7 +92,7 @@ describe("root rendering", () => {
         expect(
             within(banner).getByRole("button", {
                 name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -110,14 +110,14 @@ describe("root rendering", () => {
         expect(
             await within(banner).findByRole("button", {
                 name: EXPECTED_DARK_THEME_BUTTON_LABEL,
-            })
+            }),
         ).toBeVisible();
 
         user.click(themeButton);
         expect(
             await within(banner).findByRole("button", {
                 name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -127,15 +127,15 @@ describe("root rendering", () => {
         expect(
             await screen.findByRole("combobox", {
                 name: EXPECTED_CALCULATOR_ITEM_LABEL,
-            })
+            }),
         ).toBeVisible();
         expect(
-            screen.getByRole("heading", { name: EXPECTED_CALCULATOR_HEADER })
+            screen.getByRole("heading", { name: EXPECTED_CALCULATOR_HEADER }),
         ).toBeVisible();
         expect(
             screen.getByLabelText(EXPECTED_CALCULATOR_WORKER_LABEL, {
                 selector: "input",
-            })
+            }),
         );
     });
 });
@@ -156,7 +156,7 @@ describe("unknown path rendering", () => {
         expect(
             await screen.findByRole("heading", {
                 name: EXPECTED_APPLICATION_TITLE,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -181,7 +181,7 @@ describe("unknown path rendering", () => {
         expect(
             within(banner).getByRole("button", {
                 name: EXPECTED_LIGHT_THEME_BUTTON_LABEL,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -197,7 +197,7 @@ describe("unknown path rendering", () => {
         renderWithRouterProvider({ defaultRoute: invalidPath });
 
         expect(
-            await screen.findByRole("link", { name: expectedLinkText })
+            await screen.findByRole("link", { name: expectedLinkText }),
         ).toBeVisible();
     });
 
@@ -213,15 +213,15 @@ describe("unknown path rendering", () => {
         expect(
             await screen.findByRole("combobox", {
                 name: EXPECTED_CALCULATOR_ITEM_LABEL,
-            })
+            }),
         ).toBeVisible();
         expect(
-            screen.getByRole("heading", { name: EXPECTED_CALCULATOR_HEADER })
+            screen.getByRole("heading", { name: EXPECTED_CALCULATOR_HEADER }),
         ).toBeVisible();
         expect(
             screen.getByLabelText(EXPECTED_CALCULATOR_WORKER_LABEL, {
                 selector: "input",
-            })
+            }),
         );
     });
 });
@@ -234,7 +234,7 @@ describe("theme preference handling", () => {
         `renders in %s theme given preference`,
         async (theme: string, expectedLabel: string) => {
             mockMatchesMedia.mockReturnValue(
-                `(prefers-color-scheme: ${theme})`
+                `(prefers-color-scheme: ${theme})`,
             );
 
             renderWithRouterProvider();
@@ -246,8 +246,8 @@ describe("theme preference handling", () => {
             expect(
                 await within(banner).findByRole("button", {
                     name: expectedLabel,
-                })
+                }),
             ).toBeVisible();
-        }
+        },
     );
 });

@@ -1,4 +1,3 @@
-import React from "react";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 import {

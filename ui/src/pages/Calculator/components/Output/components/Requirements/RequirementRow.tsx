@@ -1,5 +1,3 @@
-import React from "react";
-
 import { BreakdownRow } from "./styles";
 import {
     MultipleCreatorRequirementsTableRow,

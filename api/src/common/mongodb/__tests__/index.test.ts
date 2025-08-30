@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import { vi } from "vitest";
 
 const databaseName = "TestDatabase";
 
@@ -17,10 +18,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-    process.env["MONGO_DB_URI"] = mongoDBMemoryServer.getUri();
-    process.env["AWS_ACCESS_KEY_ID"] = "test_access_key_id";
-    process.env["AWS_SECRET_ACCESS_KEY"] = "test_secret_access_key";
-    process.env["TEST_ENV"] = "true";
+    vi.resetModules();
+    vi.stubEnv("MONGO_DB_URI", mongoDBMemoryServer.getUri());
+    vi.stubEnv("AWS_ACCESS_KEY_ID", "test_access_key_id");
+    vi.stubEnv("AWS_SECRET_ACCESS_KEY", "test_secret_access_key");
+    vi.stubEnv("TEST_ENV", "true");
 });
 
 test.each([
@@ -49,7 +51,7 @@ test.each([
         await expect(async () => {
             await import("..");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("returns a mongo DB client", async () => {

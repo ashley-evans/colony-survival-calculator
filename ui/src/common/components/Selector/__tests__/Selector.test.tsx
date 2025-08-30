@@ -1,4 +1,3 @@
-import React from "react";
 import { screen } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -23,11 +22,11 @@ test("renders a select with the provided label text", async () => {
             defaultSelectedItem={items[0]}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
 
     expect(
-        await screen.findByRole("combobox", { name: expectedLabelText })
+        await screen.findByRole("combobox", { name: expectedLabelText }),
     ).toBeVisible();
 });
 
@@ -39,13 +38,13 @@ test("does not render any options by default", async () => {
             defaultSelectedItem={items[0]}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
     await screen.findByRole("combobox", { name: expectedLabelText });
 
     for (const item of items) {
         expect(
-            screen.queryByRole("option", { name: item.name })
+            screen.queryByRole("option", { name: item.name }),
         ).not.toBeInTheDocument();
     }
 });
@@ -60,11 +59,11 @@ test("shows the provided default value as the default shown item", async () => {
             defaultSelectedItem={expectedDefaultItem}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
 
     expect(
-        await screen.findByRole("combobox", { name: expectedLabelText })
+        await screen.findByRole("combobox", { name: expectedLabelText }),
     ).toHaveTextContent(expectedDefaultItem.name);
 });
 
@@ -76,13 +75,13 @@ test("show each item provided as an option in the select when clicked", async ()
             defaultSelectedItem={items[0]}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
     await openSelectMenu({ label: expectedLabelText });
 
     for (const item of items) {
         expect(
-            await screen.findByRole("option", { name: item.name })
+            await screen.findByRole("option", { name: item.name }),
         ).toBeVisible();
     }
 });
@@ -97,7 +96,7 @@ test("shows the provided default item as selected in the option list by default"
             defaultSelectedItem={expectedDefaultItem}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
     await openSelectMenu({ label: expectedLabelText });
 
@@ -105,7 +104,7 @@ test("shows the provided default item as selected in the option list by default"
         await screen.findByRole("option", {
             name: expectedDefaultItem.name,
             selected: true,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -119,13 +118,13 @@ test("updates the shown item when a different item is selected", async () => {
             defaultSelectedItem={items[0]}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
     await openSelectMenu({ label: expectedLabelText });
     await selectOption({ optionName: expectedShownItem.name });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedLabelText })
+        await screen.findByRole("combobox", { name: expectedLabelText }),
     ).toHaveTextContent(expectedShownItem.name);
 });
 
@@ -140,7 +139,7 @@ test("updates the selected item in the option list after a different item is sel
             defaultSelectedItem={expectedDeselectedItem}
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
-        />
+        />,
     );
     await openSelectMenu({ label: expectedLabelText });
     await selectOption({ optionName: expectedSelectedItem.name });
@@ -150,13 +149,13 @@ test("updates the selected item in the option list after a different item is sel
         await screen.findByRole("option", {
             name: expectedSelectedItem.name,
             selected: true,
-        })
+        }),
     ).toBeVisible();
     expect(
         screen.getByRole("option", {
             name: expectedDeselectedItem.name,
             selected: false,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -172,7 +171,7 @@ test("calls the provided on change function when an item is selected", async () 
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
             onSelectedItemChange={mockOnItemChange}
-        />
+        />,
     );
     await openSelectMenu({ label: expectedLabelText });
     await selectOption({ optionName: expectedItem.name });
@@ -193,7 +192,7 @@ test("calls the provided on change function when the default item is changed", a
             itemToKey={itemToKey}
             itemToDisplayText={itemToDisplayText}
             onSelectedItemChange={mockOnItemChange}
-        />
+        />,
     );
 
     rerender(
@@ -205,8 +204,8 @@ test("calls the provided on change function when the default item is changed", a
                 itemToKey={itemToKey}
                 itemToDisplayText={itemToDisplayText}
                 onSelectedItemChange={mockOnItemChange}
-            />
-        )
+            />,
+        ),
     );
 
     expect(mockOnItemChange).toHaveBeenCalledTimes(1);

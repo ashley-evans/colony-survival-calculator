@@ -4,22 +4,24 @@ import fs from "fs";
 import { findFiles } from "../fs-file-adapter";
 import { createDirectory, emptyDirectory } from "./utils";
 
-const tempDirectory = path.join(__dirname, "./temp");
+const tempDirectoryParent = path.join(__dirname, "./temp");
+const tempDirectory = path.join(tempDirectoryParent, "./fs-file-adapter");
 
 describe("invalid root path handling", () => {
     test("throws an error if the provided root path does not exist", async () => {
         expect.assertions(1);
         await expect(findFiles({ root: tempDirectory })).rejects.toThrowError(
-            `Provided folder: ${tempDirectory} is not valid`
+            `Provided folder: ${tempDirectory} is not valid`,
         );
     });
 
     test("throws an error if the provided root path is not a directory", async () => {
+        createDirectory(tempDirectoryParent);
         fs.writeFileSync(tempDirectory, "");
 
         expect.assertions(1);
         await expect(findFiles({ root: tempDirectory })).rejects.toThrowError(
-            `Provided folder: ${tempDirectory} is not valid`
+            `Provided folder: ${tempDirectory} is not valid`,
         );
     });
 
@@ -107,7 +109,7 @@ describe("valid root path handling", () => {
             expected: string[],
             extension?: string,
             prefix?: string,
-            exact?: string
+            exact?: string,
         ) => {
             for (const file of files) {
                 const filePath = path.join(tempDirectory, file);
@@ -126,7 +128,7 @@ describe("valid root path handling", () => {
                 const filePath = path.join(tempDirectory, file);
                 expect(actual).toContainEqual(filePath);
             }
-        }
+        },
     );
 
     afterAll(() => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelect, UseSelectProps, UseSelectStateChange } from "downshift";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
@@ -57,27 +57,27 @@ function Selector<Item>({
     }, [defaultSelectedItem]);
 
     return (
-        <Container palette={palette} className={className}>
+        <Container $palette={palette} className={className}>
             <Label {...getLabelProps()}>{labelText}</Label>
             <SelectorInputContainer
                 {...getToggleButtonProps()}
-                palette={palette}
+                $palette={palette}
             >
                 <span>
                     {itemToDisplayText(
-                        selectedItem ? selectedItem : defaultSelectedItem
+                        selectedItem ? selectedItem : defaultSelectedItem,
                     )}
                 </span>
                 <ToggleIndicatorIcon icon={faChevronDown} selected={isOpen} />
             </SelectorInputContainer>
-            <Menu {...getMenuProps()} isOpen={isOpen} palette={palette}>
+            <Menu {...getMenuProps()} $isOpen={isOpen} $palette={palette}>
                 {isOpen ? (
                     <>
                         {items.map((item, index) => (
                             <Item
                                 key={itemToKey(item, index)}
                                 {...getItemProps({ item, index })}
-                                palette={palette}
+                                $palette={palette}
                             >
                                 {itemToDisplayText(item)}
                             </Item>

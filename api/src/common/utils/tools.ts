@@ -10,14 +10,14 @@ type MinimumTools = {
 
 function getHighestDefaultTool(
     a: DefaultToolset,
-    b: DefaultToolset
+    b: DefaultToolset,
 ): DefaultToolset {
     return ToolModifierValues[a] > ToolModifierValues[b] ? a : b;
 }
 
 function getLowestDefaultTool(
     a: DefaultToolset,
-    b: DefaultToolset
+    b: DefaultToolset,
 ): DefaultToolset {
     return ToolModifierValues[a] < ToolModifierValues[b] ? a : b;
 }
@@ -26,14 +26,17 @@ function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
     if (group.length === 1) {
         const item = group[0] as RequiredToolFields;
         return item.toolset.type === "machine"
-            ? { needsMachineTools: true, minimumDefault: DefaultToolset.none }
+            ? {
+                  needsMachineTools: true,
+                  minimumDefault: "none" as DefaultToolset,
+              }
             : {
                   needsMachineTools: false,
                   minimumDefault: item.toolset.minimumTool,
               };
     }
 
-    let minimumDefault = DefaultToolset.steel;
+    let minimumDefault = "steel" as DefaultToolset;
     let needsMachineTools = false;
     for (const { toolset } of group) {
         if (toolset.type === "machine") {
@@ -43,7 +46,7 @@ function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
 
         minimumDefault = getLowestDefaultTool(
             minimumDefault,
-            toolset.minimumTool
+            toolset.minimumTool,
         );
     }
 
@@ -51,7 +54,7 @@ function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
 }
 
 function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
-    let minimumDefault = DefaultToolset.none;
+    let minimumDefault = "none" as DefaultToolset;
     let needsMachineTools = false;
 
     const grouped = groupItemsByName(items);
@@ -63,7 +66,7 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
 
         minimumDefault = getHighestDefaultTool(
             minimumDefault,
-            groupMin.minimumDefault
+            groupMin.minimumDefault,
         );
     }
 
@@ -72,7 +75,7 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
 
 function isAvailableDefaultToolSufficient(
     minimum: DefaultToolset,
-    available: DefaultToolset
+    available: DefaultToolset,
 ): boolean {
     const minimumToolModifier = ToolModifierValues[minimum];
     const availableToolModifier = ToolModifierValues[available];
@@ -82,7 +85,7 @@ function isAvailableDefaultToolSufficient(
 function isAvailableToolSufficient(
     available: DefaultToolset,
     hasMachineTools: boolean,
-    item: Pick<Item, "toolset">
+    item: Pick<Item, "toolset">,
 ) {
     if (item.toolset.type === "machine") {
         return hasMachineTools;
@@ -90,18 +93,21 @@ function isAvailableToolSufficient(
 
     return isAvailableDefaultToolSufficient(
         item.toolset.minimumTool,
-        available
+        available,
     );
 }
 
 function hasMinimumRequiredTools(
     items: RequiredToolFields[],
     maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean
+    hasMachineTools: boolean,
 ): { hasRequired: true } | { hasRequired: false; requiredTool: AllToolsets } {
     const { minimumDefault, needsMachineTools } = getMinimumToolRequired(items);
     if (needsMachineTools && !hasMachineTools) {
-        return { hasRequired: false, requiredTool: MachineToolset.machine };
+        return {
+            hasRequired: false,
+            requiredTool: "machine" as MachineToolset,
+        };
     } else if (
         !isAvailableDefaultToolSufficient(minimumDefault, maxAvailableTool)
     ) {

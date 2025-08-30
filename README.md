@@ -9,14 +9,14 @@ Job/Resource ratio calculator for Colony Survival
 
 The currently deployed version of the application can be found at the following URLs:
 
--   https://factorycalculator.com/
--   https://factorycalculator.co.uk/
+- https://factorycalculator.com/
+- https://factorycalculator.co.uk/
 
 ## Requirements
 
-| Name      | Version  | Instructions                                        |
-| --------- | -------- | --------------------------------------------------- |
-| Terraform | >= 1.3.7 | https://developer.hashicorp.com/terraform/downloads |
+| Name      | Version   | Instructions                                        |
+| --------- | --------- | --------------------------------------------------- |
+| Terraform | >= 1.10.5 | https://developer.hashicorp.com/terraform/downloads |
 
 ## Setup
 

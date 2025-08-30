@@ -1,4 +1,3 @@
-import React from "react";
 import { ResponsiveSankey, DefaultLink, DefaultNode } from "@nivo/sankey";
 
 import { SankeyContainer } from "./styles";
@@ -23,7 +22,7 @@ const createSankeyChartData = ({
 }: RequirementsSankeyProps): ChartData => {
     if (
         !requirements.find(
-            (requirement) => requirement.name === selectedItemName
+            (requirement) => requirement.name === selectedItemName,
         )
     ) {
         return { nodes: [], links: [] };

@@ -30,7 +30,7 @@ import {
 import { canCreateItem, filterByCreatorOverrides } from "./item-utils";
 
 function findMultipleOverrides(
-    overrides?: CreatorOverride[]
+    overrides?: CreatorOverride[],
 ): string | undefined {
     if (!overrides) {
         return undefined;
@@ -51,7 +51,7 @@ function findMultipleOverrides(
 function getOverriddenRequirements(
     inputItemName: string,
     items: Items,
-    overrides?: CreatorOverride[]
+    overrides?: CreatorOverride[],
 ) {
     if (!overrides) {
         return items;
@@ -76,17 +76,17 @@ async function getRequiredItemDetails(name: string): Promise<Items> {
 function getRecipeKey(
     recipeName: string,
     creator: string,
-    outputItem = recipeName
+    outputItem = recipeName,
 ): string {
     return `${recipeName}-${creator}-${outputItem}`;
 }
 
 function createRecipeDemandMap(
-    variables: [string, number][]
+    variables: [string, number][],
 ): Map<string, Demand[]> {
     const map = new Map<string, Demand[]>();
     const demandVariables = variables.filter(([key]) =>
-        isRequirementVariable(key)
+        isRequirementVariable(key),
     );
 
     for (const [key, amount] of demandVariables) {
@@ -100,7 +100,7 @@ function createRecipeDemandMap(
         const currentDemands = map.get(recipeDemandKey) ?? [];
         map.set(
             recipeDemandKey,
-            currentDemands.concat([{ name: requirement, amount }])
+            currentDemands.concat([{ name: requirement, amount }]),
         );
     }
 
@@ -108,13 +108,13 @@ function createRecipeDemandMap(
 }
 
 function createRecipeMap(
-    variables: [string, number][]
+    variables: [string, number][],
 ): [Map<string, string[]>, Map<string, RequirementRecipe>] {
     const itemRecipeMap = new Map<string, string[]>();
     const recipeMap = new Map<string, RequirementRecipe>();
 
     const productionOutputVariables = variables.filter(
-        ([key]) => isProductionVariable(key) || isOutputVariable(key)
+        ([key]) => isProductionVariable(key) || isOutputVariable(key),
     );
 
     for (const [key, value] of productionOutputVariables) {
@@ -149,7 +149,7 @@ function createRecipeMap(
 
 function mapResults(
     inputItemName: string,
-    results?: VertexOutput
+    results?: VertexOutput,
 ): Requirement[] {
     if (!results) {
         return [];
@@ -163,7 +163,7 @@ function mapResults(
     const [itemRecipeMap, recipeCreatorMap] = createRecipeMap(variablesArray);
 
     const totalOutputVariables = variablesArray.filter(([key]) =>
-        isTotalVariable(key)
+        isTotalVariable(key),
     );
 
     const result: Requirement[] = [];
@@ -193,19 +193,22 @@ function mapResults(
             name: totalKey,
             amount,
             creators: creatorsWithDemands.filter(
-                (creator) => creator.workers > 0
+                (creator) => creator.workers > 0,
             ),
         };
-        totalKey === inputItemName
-            ? result.unshift(mapped)
-            : result.push(mapped);
+
+        if (totalKey === inputItemName) {
+            result.unshift(mapped);
+        } else {
+            result.push(mapped);
+        }
     }
 
     return result;
 }
 
 function validateInput(
-    input: QueryRequirementsParams
+    input: QueryRequirementsParams,
 ): QueryRequirementsParams {
     if (input.name === "") {
         throw new Error(INVALID_ITEM_NAME_ERROR);
@@ -225,7 +228,7 @@ function validateInput(
 const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const {
         name,
-        maxAvailableTool = DefaultToolset.none,
+        maxAvailableTool = "none" as DefaultToolset,
         hasMachineTools = false,
         unit = OutputUnit.SECONDS,
         creatorOverrides,
@@ -239,7 +242,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const multipleOverride = findMultipleOverrides(creatorOverrides);
     if (multipleOverride) {
         throw new Error(
-            `${MULTIPLE_OVERRIDE_ERROR_PREFIX} ${multipleOverride}`
+            `${MULTIPLE_OVERRIDE_ERROR_PREFIX} ${multipleOverride}`,
         );
     }
 
@@ -251,13 +254,13 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const overriddenRequirements = getOverriddenRequirements(
         name,
         requirements,
-        creatorOverrides
+        creatorOverrides,
     );
 
     const required = hasMinimumRequiredTools(
         overriddenRequirements,
         maxAvailableTool,
-        hasMachineTools
+        hasMachineTools,
     );
     if (!required.hasRequired) {
         const errorSuffix =

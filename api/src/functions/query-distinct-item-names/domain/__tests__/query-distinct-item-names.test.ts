@@ -1,11 +1,13 @@
+import { vi, Mock } from "vitest";
+
 import { queryDistinctItemNames as dbQueryItemNames } from "../../adapters/mongodb-distinct-item-name-adapter";
 import { queryDistinctItemNames as domain } from "../query-distinct-item-names";
 
-jest.mock("../../adapters/mongodb-distinct-item-name-adapter", () => ({
-    queryDistinctItemNames: jest.fn(),
+vi.mock("../../adapters/mongodb-distinct-item-name-adapter", () => ({
+    queryDistinctItemNames: vi.fn(),
 }));
 
-const mockQueryDistinctItemNames = dbQueryItemNames as jest.Mock;
+const mockQueryDistinctItemNames = dbQueryItemNames as Mock;
 
 beforeEach(() => {
     mockQueryDistinctItemNames.mockReset();
@@ -28,7 +30,7 @@ test.each([
         const actual = await domain();
 
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("throws an error if any unhandled exceptions occur while querying distinct item names from database", async () => {

@@ -23,7 +23,7 @@ const isUserError = ({ message }: Error): boolean => {
 };
 
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
-    event
+    event,
 ) => {
     const { name, workers, unit, maxAvailableTool, creator, hasMachineTools } =
         event.arguments;

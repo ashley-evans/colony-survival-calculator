@@ -1,5 +1,5 @@
 import { DefaultBodyType, StrictRequest } from "msw";
-import { SetupServer } from "msw/lib/node";
+import { SetupServer } from "msw/node";
 
 type GraphQLOperationBody<Arguments extends DefaultBodyType> = {
     operationName: string;
@@ -17,7 +17,7 @@ type RequestListenerResponseWithDetails<Arguments extends DefaultBodyType> =
     };
 
 async function getQueryDetails<Arguments extends DefaultBodyType>(
-    req: StrictRequest<GraphQLOperationBody<Arguments>>
+    req: StrictRequest<GraphQLOperationBody<Arguments>>,
 ): Promise<GraphQLOperationBody<Arguments> | undefined | null> {
     try {
         return req.clone().json();
@@ -29,21 +29,21 @@ async function getQueryDetails<Arguments extends DefaultBodyType>(
 function waitForRequest(
     server: SetupServer,
     method: string,
-    url: string
+    url: string,
 ): Promise<RequestListenerResponse<DefaultBodyType>>;
 function waitForRequest<Arguments extends DefaultBodyType>(
     server: SetupServer,
     method: string,
     url: string,
     operationName?: string,
-    requiredArguments?: Arguments
+    requiredArguments?: Arguments,
 ): Promise<RequestListenerResponseWithDetails<Arguments>>;
 function waitForRequest<Arguments extends DefaultBodyType>(
     server: SetupServer,
     method: string,
     url: string,
     operationName?: string,
-    requiredArguments?: Arguments
+    requiredArguments?: Arguments,
 ): Promise<
     | RequestListenerResponse<DefaultBodyType>
     | RequestListenerResponseWithDetails<Arguments>
@@ -86,7 +86,7 @@ function waitForRequest<Arguments extends DefaultBodyType>(
                     requestId = currentRequestId;
                     requestDetails = details;
                 }
-            }
+            },
         );
 
         server.events.on(
@@ -103,14 +103,14 @@ function waitForRequest<Arguments extends DefaultBodyType>(
                             matchedRequestDetails: requestDetails,
                             detailsUpToMatch: matchingRequestDetails.slice(
                                 0,
-                                matchingRequestDetails.length - 1
+                                matchingRequestDetails.length - 1,
                             ),
                         });
                     }
 
                     resolve({ matchedRequest: request });
                 }
-            }
+            },
         );
 
         server.events.on(
@@ -120,11 +120,11 @@ function waitForRequest<Arguments extends DefaultBodyType>(
                     const url = new URL(request.url);
                     reject(
                         new Error(
-                            `The ${request.method} ${url.href} request was unhandled.`
-                        )
+                            `The ${request.method} ${url.href} request was unhandled.`,
+                        ),
                     );
                 }
-            }
+            },
         );
     });
 }

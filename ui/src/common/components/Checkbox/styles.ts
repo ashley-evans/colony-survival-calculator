@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 import { ColorPalettes } from "../..";
 
 type PaletteProps = {
-    palette: ColorPalettes;
+    $palette: ColorPalettes;
 };
 
 export const Container = styled.div`
@@ -11,22 +11,22 @@ export const Container = styled.div`
 `;
 
 export const StyledCheckbox = styled.input<PaletteProps>`
-    ${({ theme, palette }) => css`
-        border: 1px solid ${theme.color[palette].container};
-        background-color: ${theme.color[palette].container};
+    ${({ theme, $palette }) => css`
+        border: 1px solid ${theme.color[$palette].container};
+        background-color: ${theme.color[$palette].container};
 
-        :hover {
-            border-color: ${theme.color[palette].on_container};
+        &:hover {
+            border-color: ${theme.color[$palette].on_container};
         }
 
-        ::before {
+        &::before {
             content: "";
             width: 60%;
             height: 60%;
         }
 
-        :checked::before {
-            background-color: ${theme.color[palette].on_container};
+        &:checked::before {
+            background-color: ${theme.color[$palette].on_container};
             clip-path: polygon(
                 14% 44%,
                 0 65%,

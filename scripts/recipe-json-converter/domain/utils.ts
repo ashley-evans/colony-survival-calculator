@@ -4,7 +4,7 @@ type FilterByConditionResult<T> = { matching: T[]; nonMatching: T[] };
 
 const filterByCondition = <T>(
     array: T[],
-    condition: (item: T) => boolean
+    condition: (item: T) => boolean,
 ): FilterByConditionResult<T> =>
     array.reduce(
         (acc, current) => {
@@ -16,14 +16,14 @@ const filterByCondition = <T>(
 
             return acc;
         },
-        { matching: [], nonMatching: [] } as FilterByConditionResult<T>
+        { matching: [], nonMatching: [] } as FilterByConditionResult<T>,
     );
 
 const splitPiplizCreator = (creator: string): string => {
     const [, parsed] = creator.split(".");
     if (!parsed) {
         throw new Error(
-            `Unknown format of pipliz creator provided: ${creator}`
+            `Unknown format of pipliz creator provided: ${creator}`,
         );
     }
 
@@ -31,7 +31,7 @@ const splitPiplizCreator = (creator: string): string => {
 };
 
 const splitPiplizName = (
-    name: string
+    name: string,
 ): { itemName: string; creator: string } => {
     const [, creator, itemName] = name.split(".");
     if (!creator || !itemName) {
@@ -42,7 +42,7 @@ const splitPiplizName = (
 };
 
 const checkDuplication = (
-    items: Items
+    items: Items,
 ):
     | { duplicateFound: true; name: string; creator: string }
     | { duplicateFound: false } => {

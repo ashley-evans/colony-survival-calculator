@@ -1,5 +1,3 @@
-import React from "react";
-
 import { AvailableTools } from "../../../../graphql/__generated__/graphql";
 import { ToolSelectorMappings } from "../../utils";
 import { Selector } from "../../../../common/components";

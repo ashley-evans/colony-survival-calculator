@@ -22,7 +22,7 @@ const testSchema: JSONSchemaType<TestType> = {
 
 const adapter = factory(testSchema);
 
-const tempDirectory = path.join(__dirname, "./temp");
+const tempDirectory = path.join(__dirname, "./temp/json-file-adapter");
 
 beforeAll(() => {
     createDirectory(tempDirectory);
@@ -33,33 +33,33 @@ test("throws an error if the provided file does not exist", async () => {
 
     expect.assertions(1);
     await expect(adapter(nonExistentFile)).rejects.toThrowError(
-        `File at path: ${nonExistentFile} does not exist`
+        `File at path: ${nonExistentFile} does not exist`,
     );
 });
 
 test("throws an error if the provided file is not a JSON file", async () => {
     const invalidFileExtension = path.join(
         tempDirectory,
-        "./incorrect-file-extension.txt"
+        "./incorrect-file-extension.txt",
     );
     fs.writeFileSync(invalidFileExtension, "");
 
     expect.assertions(1);
     await expect(adapter(invalidFileExtension)).rejects.toThrowError(
-        `File at path: ${invalidFileExtension} is not a .json file`
+        `File at path: ${invalidFileExtension} is not a .json file`,
     );
 });
 
 test("throws an error if the JSON inside the file does not match the provided schema", async () => {
     const invalidJSONFile = path.join(
         tempDirectory,
-        "invalid-json-schema.json"
+        "invalid-json-schema.json",
     );
     writeJSONToFile(invalidJSONFile, { test: "test property value" });
 
     expect.assertions(1);
     await expect(adapter(invalidJSONFile)).rejects.toThrowError(
-        `File at path: ${invalidJSONFile} does not match provided schema`
+        `File at path: ${invalidJSONFile} does not match provided schema`,
     );
 });
 

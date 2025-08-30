@@ -1,10 +1,4 @@
-import React, {
-    FormEvent,
-    HTMLAttributes,
-    useEffect,
-    useId,
-    useState,
-} from "react";
+import { FormEvent, HTMLAttributes, useEffect, useId, useState } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -69,14 +63,14 @@ function Input<Type>({
     return (
         <Container className={className}>
             <Label htmlFor={inputID}>{label}</Label>
-            <InputContainer palette={palette}>
+            <InputContainer $palette={palette}>
                 <StyledInput
                     id={inputID}
                     inputMode={inputMode}
                     value={value}
                     onChange={handleInputChange}
                     aria-invalid={isInvalid}
-                    palette={palette}
+                    $palette={palette}
                 />
                 {clearIconLabel && value ? (
                     <IconContainer
@@ -85,7 +79,7 @@ function Input<Type>({
                         tabIndex={0}
                         onClick={handleInputClear}
                     >
-                        <FontAwesomeIcon icon={faTimes} role="button" />
+                        <FontAwesomeIcon icon={faTimes} />
                     </IconContainer>
                 ) : null}
             </InputContainer>

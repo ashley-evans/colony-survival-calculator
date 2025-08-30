@@ -70,28 +70,28 @@ function createItem(
     input: Omit<ItemFactoryInputs, "toolset"> & {
         minimumTool?: DefaultToolset;
         maximumTool?: DefaultToolset;
-    }
+    },
 ): Item {
     const { minimumTool, maximumTool, ...rest } = input;
     return baseCreateItem({
         ...rest,
         toolset: {
             type: "default",
-            minimumTool: minimumTool ?? DefaultToolset.none,
-            maximumTool: maximumTool ?? DefaultToolset.none,
+            minimumTool: minimumTool ?? ("none" as DefaultToolset),
+            maximumTool: maximumTool ?? ("none" as DefaultToolset),
         },
     });
 }
 
 function createItemWithMachineTools(
-    input: Omit<ItemFactoryInputs, "toolset">
+    input: Omit<ItemFactoryInputs, "toolset">,
 ): Item {
     return baseCreateItem({
         ...input,
         toolset: {
             type: "machine",
-            minimumTool: MachineToolset.machine,
-            maximumTool: MachineToolset.machine,
+            minimumTool: "machine" as MachineToolset,
+            maximumTool: "machine" as MachineToolset,
         },
     });
 }

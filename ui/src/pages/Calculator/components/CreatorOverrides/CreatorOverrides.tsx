@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client/react";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 
 import { gql } from "../../../../graphql/__generated__";
@@ -46,7 +46,7 @@ function CreatorOverrides({
 
     const [allItems, setAllItems] = useState<string[]>([]);
     const [activeOverrides, setActiveOverrides] = useState<Map<string, string>>(
-        new Map()
+        new Map(),
     );
 
     useEffect(() => {
@@ -62,7 +62,7 @@ function CreatorOverrides({
                 defaultOverrides.map(({ itemName, creator }) => [
                     itemName,
                     creator,
-                ])
+                ]),
             );
             setActiveOverrides(active);
         }
@@ -70,7 +70,7 @@ function CreatorOverrides({
 
     useEffect(() => {
         const overrides: CreatorOverride[] = Array.from(
-            activeOverrides.entries()
+            activeOverrides.entries(),
         ).map(([itemName, creator]) => ({ itemName, creator }));
         onOverridesUpdate(overrides);
     }, [activeOverrides]);
@@ -88,7 +88,7 @@ function CreatorOverrides({
 
     const getNextOverride = (): [string, string[]] => {
         const availableItems = allItems.filter(
-            (override) => !activeOverrides.has(override)
+            (override) => !activeOverrides.has(override),
         );
 
         const nextItem = availableItems[0];
@@ -134,7 +134,7 @@ function CreatorOverrides({
                                 items={allItems.filter(
                                     (override) =>
                                         !activeOverrides.has(override) ||
-                                        override === item
+                                        override === item,
                                 )}
                                 creators={getItemCreators(item)}
                                 defaultOverride={{
@@ -145,7 +145,7 @@ function CreatorOverrides({
                                 onSelectedCreatorChange={setOverride}
                                 onRemove={removeOverride}
                             />
-                        )
+                        ),
                     )}
                     {canOverrideBeAdded() ? (
                         <LargeAddButton

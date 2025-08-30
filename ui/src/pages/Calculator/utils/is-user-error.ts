@@ -5,7 +5,7 @@ import {
 } from "../../../graphql/__generated__/graphql";
 
 function isUserError(
-    input: RequirementResult | OutputResult
+    input: RequirementResult | OutputResult,
 ): input is UserError {
     return "message" in input && input.__typename === "UserError";
 }

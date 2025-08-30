@@ -1,5 +1,6 @@
 import path from "path";
-import { when } from "jest-when";
+import { vi } from "vitest";
+import { when } from "vitest-when";
 
 import { CraftableRecipeConverterInputs } from "../../interfaces/craftable-recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../craftable-recipe-converter";
@@ -13,10 +14,10 @@ import {
     DefaultToolset,
 } from "../../types";
 
-const mockFindFiles = jest.fn();
-const mockReadToolFile = jest.fn();
-const mockReadBehaviourFile = jest.fn();
-const mockReadRecipeFile = jest.fn();
+const mockFindFiles = vi.fn();
+const mockReadToolFile = vi.fn();
+const mockReadBehaviourFile = vi.fn();
+const mockReadRecipeFile = vi.fn();
 
 const convertRecipes = (input: CraftableRecipeConverterInputs) =>
     baseConvertRecipes({
@@ -34,7 +35,7 @@ const input: CraftableRecipeConverterInputs = {
 const toolsetFile = path.join(input.inputDirectoryPath, "/toolsets.json");
 const blockBehavioursFile = path.join(
     input.inputDirectoryPath,
-    "/generateblocks.json"
+    "/generateblocks.json",
 );
 const recipeFiles = [
     path.join(input.inputDirectoryPath, "/recipes_1.json"),
@@ -81,20 +82,20 @@ const machineToolset: PiplizToolsets[number] = {
     usable: [PiplizTools.machinetools],
 };
 
-const consoleLogSpy = jest
+const consoleLogSpy = vi
     .spyOn(console, "log")
     .mockImplementation(() => undefined);
 
 beforeEach(() => {
     when(mockFindFiles)
         .calledWith(expectedToolsetFileFindInput)
-        .mockResolvedValue([toolsetFile]);
+        .thenResolve([toolsetFile]);
     when(mockFindFiles)
         .calledWith(expectedBlockBehavioursFileFindInput)
-        .mockResolvedValue([blockBehavioursFile]);
+        .thenResolve([blockBehavioursFile]);
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue(recipeFiles);
+        .thenResolve(recipeFiles);
 
     mockReadToolFile.mockResolvedValue([
         noToolset,
@@ -112,7 +113,7 @@ test("finds the toolset json file in the provided input directory", async () => 
     expect(mockFindFiles).toHaveBeenCalledTimes(3);
     expect(mockFindFiles).toHaveBeenNthCalledWith(
         1,
-        expectedToolsetFileFindInput
+        expectedToolsetFileFindInput,
     );
 });
 
@@ -129,13 +130,13 @@ describe.each([
         beforeEach(() => {
             when(mockFindFiles)
                 .calledWith(expectedToolsetFileFindInput)
-                .mockResolvedValue(filesFound);
+                .thenResolve(filesFound);
         });
 
         test("throws an error", async () => {
             expect.assertions(1);
             await expect(convertRecipes(input)).rejects.toThrowError(
-                expectedError
+                expectedError,
             );
         });
 
@@ -147,7 +148,7 @@ describe.each([
             }
 
             expect(mockFindFiles).not.toHaveBeenCalledWith(
-                expectedBlockBehavioursFileFindInput
+                expectedBlockBehavioursFileFindInput,
             );
         });
 
@@ -159,10 +160,10 @@ describe.each([
             }
 
             expect(mockFindFiles).not.toHaveBeenCalledWith(
-                expectedRecipesFileFindInput
+                expectedRecipesFileFindInput,
             );
         });
-    }
+    },
 );
 
 test("parses the JSON found in the toolset file", async () => {
@@ -178,7 +179,7 @@ test("finds the block behaviours file in the provided input directory", async ()
     expect(mockFindFiles).toHaveBeenCalledTimes(3);
     expect(mockFindFiles).toHaveBeenNthCalledWith(
         2,
-        expectedBlockBehavioursFileFindInput
+        expectedBlockBehavioursFileFindInput,
     );
 });
 
@@ -186,13 +187,13 @@ describe("handles no block behaviour file found", () => {
     beforeEach(() => {
         when(mockFindFiles)
             .calledWith(expectedBlockBehavioursFileFindInput)
-            .mockResolvedValue([]);
+            .thenResolve([]);
     });
 
     test("throws an error", async () => {
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            "No generateblocks*.json file(s) found in provided directory"
+            "No generateblocks*.json file(s) found in provided directory",
         );
     });
 
@@ -204,7 +205,7 @@ describe("handles no block behaviour file found", () => {
         }
 
         expect(mockFindFiles).not.toHaveBeenCalledWith(
-            expectedRecipesFileFindInput
+            expectedRecipesFileFindInput,
         );
     });
 });
@@ -213,7 +214,7 @@ test("parses each block behaviour file returned if multiple found", async () => 
     const expected = ["generateblocks.json", "generateblocks_decorative.json"];
     when(mockFindFiles)
         .calledWith(expectedBlockBehavioursFileFindInput)
-        .mockResolvedValue(expected);
+        .thenResolve(expected);
 
     await convertRecipes(input);
 
@@ -253,7 +254,7 @@ test("parses each json file returned given recipes found in provided directory",
 test("does not attempt to parse any recipes from the merchant", async () => {
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue([
+        .thenResolve([
             path.join(input.inputDirectoryPath, "recipes_merchant.json"),
         ]);
 
@@ -265,7 +266,7 @@ test("does not attempt to parse any recipes from the merchant", async () => {
 test("does not attempt to parse any recipes given no recipe files found in provided directory", async () => {
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue([]);
+        .thenResolve([]);
 
     await convertRecipes(input);
 
@@ -276,7 +277,7 @@ describe("recipe to item mapping", () => {
     beforeEach(() => {
         when(mockFindFiles)
             .calledWith(expectedRecipesFileFindInput)
-            .mockResolvedValue([recipeFiles[0]]);
+            .thenResolve([recipeFiles[0]]);
     });
 
     test.each([
@@ -287,7 +288,7 @@ describe("recipe to item mapping", () => {
         async (
             _: string,
             specifiedOutput: number | undefined,
-            expectedOutput: number
+            expectedOutput: number,
         ) => {
             const creator = "alchemist";
             const output = "poisondart";
@@ -337,7 +338,7 @@ describe("recipe to item mapping", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
-        }
+        },
     );
 
     test("throws an error if invalid toolset specified for provided creator", async () => {
@@ -373,7 +374,7 @@ describe("recipe to item mapping", () => {
 
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            `Unknown toolset: ${invalidToolset} required by ${creator}`
+            `Unknown toolset: ${invalidToolset} required by ${creator}`,
         );
     });
 
@@ -423,7 +424,7 @@ describe("recipe to item mapping", () => {
 
             expect(consoleLogSpy).toHaveBeenCalledTimes(1);
             expect(consoleLogSpy).toHaveBeenCalledWith(
-                `Defaulting to default toolset for recipe: ${output} from creator: ${creator}`
+                `Defaulting to default toolset for recipe: ${output} from creator: ${creator}`,
             );
         });
     });
@@ -467,7 +468,7 @@ describe("recipe to item mapping", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
-        }
+        },
     );
 
     test.each([
@@ -503,9 +504,9 @@ describe("recipe to item mapping", () => {
 
             expect.assertions(1);
             await expect(convertRecipes(input)).rejects.toThrowError(
-                `Unable to find primary output for recipe: ${output} from creator: ${creator}`
+                `Unable to find primary output for recipe: ${output} from creator: ${creator}`,
             );
-        }
+        },
     );
 
     test("throws an error if provided an item with an unknown name", async () => {
@@ -536,7 +537,7 @@ describe("recipe to item mapping", () => {
 
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            `User friendly name unavailable for item: ${output}`
+            `User friendly name unavailable for item: ${output}`,
         );
     });
 
@@ -568,7 +569,7 @@ describe("recipe to item mapping", () => {
 
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            `User friendly name unavailable for creator: ${creator}`
+            `User friendly name unavailable for creator: ${creator}`,
         );
     });
 
@@ -580,7 +581,7 @@ describe("recipe to item mapping", () => {
         async (
             _: string,
             specifiedOutput: number | undefined,
-            expectedOutput: number
+            expectedOutput: number,
         ) => {
             const creator = "alchemist";
             const primaryOutput = "poisondart";
@@ -643,7 +644,7 @@ describe("recipe to item mapping", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
-        }
+        },
     );
 
     test.each([
@@ -654,7 +655,7 @@ describe("recipe to item mapping", () => {
         async (
             _: string,
             specifiedLikelihood: number | undefined,
-            expectedLikelihood: number
+            expectedLikelihood: number,
         ) => {
             const creator = "alchemist";
             const primaryOutput = "poisondart";
@@ -716,7 +717,7 @@ describe("recipe to item mapping", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
-        }
+        },
     );
 
     test("throws an error if provided an optional output with an unknown name", async () => {
@@ -751,7 +752,7 @@ describe("recipe to item mapping", () => {
 
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            `User friendly name unavailable for item: ${optionalOutput}`
+            `User friendly name unavailable for item: ${optionalOutput}`,
         );
     });
 
@@ -804,7 +805,7 @@ describe("recipe to item mapping", () => {
             await convertRecipes(input);
 
             expect(consoleLogSpy).toHaveBeenCalledWith(
-                `Skipping recipe: ${output} from creator: ${creator} as requires unsupported toolset`
+                `Skipping recipe: ${output} from creator: ${creator} as requires unsupported toolset`,
             );
         });
     });
@@ -882,7 +883,7 @@ describe("recipe to item mapping", () => {
             min: PiplizTools,
             max: PiplizTools,
             expectedMin: DefaultToolset,
-            expectedMax: DefaultToolset
+            expectedMax: DefaultToolset,
         ) => {
             const toolsKey = "test tools";
             const toolset: PiplizToolsets[number] = {
@@ -934,7 +935,7 @@ describe("recipe to item mapping", () => {
                     maximumTool: expectedMax,
                 },
             });
-        }
+        },
     );
 
     test("returns converted recipes given multiple valid recipes", async () => {
@@ -1018,7 +1019,7 @@ describe("recipe to item mapping", () => {
         async (
             _: string,
             specifiedAmount: number | undefined,
-            expectedAmount: number
+            expectedAmount: number,
         ) => {
             const creator = "alchemist";
             const output = "poisondart";
@@ -1073,7 +1074,7 @@ describe("recipe to item mapping", () => {
 
             expect(actual).toHaveLength(1);
             expect(actual[0]).toEqual(expected);
-        }
+        },
     );
 
     test("throws an error if provided an requirement with an unknown name", async () => {
@@ -1113,7 +1114,7 @@ describe("recipe to item mapping", () => {
 
         expect.assertions(1);
         await expect(convertRecipes(input)).rejects.toThrowError(
-            `User friendly name unavailable for item: ${requirement}`
+            `User friendly name unavailable for item: ${requirement}`,
         );
     });
 
@@ -1430,7 +1431,7 @@ describe("recipe to item mapping", () => {
 
                 expect(actual).toHaveLength(1);
                 expect(actual[0]).toEqual(expected);
-            }
+            },
         );
 
         test.each([
@@ -1520,7 +1521,7 @@ describe("recipe to item mapping", () => {
 
                 expect(actual).toHaveLength(1);
                 expect(actual[0]).toEqual(expected);
-            }
+            },
         );
     });
 

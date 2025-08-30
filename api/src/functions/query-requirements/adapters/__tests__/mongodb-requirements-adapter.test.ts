@@ -10,26 +10,21 @@ const validItemName = "test item 1";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
-jest.mock("@colony-survival-calculator/mongodb-client", async () => {
-    mongoDBMemoryServer = await createMemoryServer(databaseName);
-    return MongoClient.connect(mongoDBMemoryServer.getUri());
-});
-
-import mockClient from "@colony-survival-calculator/mongodb-client";
-
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
     await storeItem(items);
 }
 
 async function clearItemsCollection() {
-    const client = await mockClient;
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
     const db = client.db(databaseName);
 
     const existingCollections = await db.listCollections().toArray();
     const collectionExists =
         existingCollections.find(
-            (collection) => collection.name == itemCollectionName
+            (collection) => collection.name == itemCollectionName,
         ) !== undefined;
     if (collectionExists) {
         const itemsCollection = db.collection(itemCollectionName);
@@ -37,9 +32,21 @@ async function clearItemsCollection() {
     }
 }
 
+beforeAll(async () => {
+    mongoDBMemoryServer = await createMemoryServer(databaseName);
+
+    vi.doMock("@colony-survival-calculator/mongodb-client", async () => {
+        const clientPromise = MongoClient.connect(mongoDBMemoryServer.getUri());
+        return {
+            default: clientPromise,
+        };
+    });
+});
+
 beforeEach(async () => {
-    process.env["DATABASE_NAME"] = databaseName;
-    process.env["ITEM_COLLECTION_NAME"] = itemCollectionName;
+    vi.resetModules();
+    vi.stubEnv("DATABASE_NAME", databaseName);
+    vi.stubEnv("ITEM_COLLECTION_NAME", itemCollectionName);
 
     await clearItemsCollection();
 });
@@ -64,7 +71,7 @@ test.each([
         await expect(async () => {
             await import("../mongodb-requirements-adapter");
         }).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
@@ -83,8 +90,8 @@ test("returns only the specified item if only that item is stored in the items c
         createTime: 2,
         output: 3,
         requirements: [],
-        minimumTool: DefaultToolset.none,
-        maximumTool: DefaultToolset.steel,
+        minimumTool: "none" as DefaultToolset,
+        maximumTool: "steel" as DefaultToolset,
     });
     await storeItems([{ ...stored }]);
     const { queryRequirements } = await import(
@@ -106,16 +113,16 @@ test.each([
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 4,
                 requirements: [{ name: "required item 1", amount: 4 }],
-                minimumTool: DefaultToolset.stone,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "stone" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
         ],
         [
@@ -124,16 +131,16 @@ test.each([
                 createTime: 1,
                 output: 2,
                 requirements: [],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 4,
                 requirements: [{ name: "required item 1", amount: 4 }],
-                minimumTool: DefaultToolset.stone,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "stone" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
         ],
     ],
@@ -249,16 +256,16 @@ test.each([
                 createTime: 3,
                 output: 4,
                 requirements: [],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
                 name: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [{ name: "required item 2", amount: 5 }],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.bronze,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "bronze" as DefaultToolset,
             }),
             createItem({
                 name: validItemName,
@@ -273,16 +280,16 @@ test.each([
                 createTime: 3,
                 output: 4,
                 requirements: [],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
                 name: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [{ name: "required item 2", amount: 5 }],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.bronze,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "bronze" as DefaultToolset,
             }),
             createItem({
                 name: validItemName,
@@ -304,7 +311,7 @@ test.each([
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
-    }
+    },
 );
 
 test("removes duplicate items w/ same creator when input item has multiple creators that require the same item", async () => {
@@ -344,6 +351,9 @@ test("removes duplicate items w/ same creator when input item has multiple creat
 });
 
 afterAll(async () => {
-    (await mockClient).close(true);
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
+    await client.close(true);
     await mongoDBMemoryServer.stop();
 });

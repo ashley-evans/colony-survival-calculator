@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "normalize.css";
 import { Amplify } from "aws-amplify";
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 
 import RouterProvider from "./routes/AppRouterProvider";
 
@@ -26,5 +26,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <ApolloProvider client={client}>
             <RouterProvider />
         </ApolloProvider>
-    </React.StrictMode>
+    </React.StrictMode>,
 );

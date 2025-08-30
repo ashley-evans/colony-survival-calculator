@@ -8,7 +8,8 @@ import {
 import { mockClient } from "aws-sdk-client-mock";
 import { sdkStreamMixin } from "@aws-sdk/util-stream-node";
 import { Readable } from "stream";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import {
     createS3Event,
@@ -19,18 +20,18 @@ import {
 } from "../../../../test";
 import { addItem } from "../domain/add-item";
 
-jest.mock("../domain/add-item", () => ({
-    addItem: jest.fn(),
+vi.mock("../domain/add-item", () => ({
+    addItem: vi.fn(),
 }));
 
-const mockAddItem = addItem as jest.Mock;
+const mockAddItem = addItem as Mock;
 
 import { handler } from "../handler";
 
 const mockS3Client = mockClient(S3Client);
 
 beforeAll(() => {
-    jest.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
 });
 
 const EXPECTED_BUCKET_NAME = "test_bucket_name";
@@ -42,8 +43,8 @@ function createValidEventRecord(key: string): S3EventRecord {
     return createS3EventRecord(
         createS3EventNotificationDetails(
             createS3EventBucketDetails(EXPECTED_BUCKET_NAME),
-            createS3EventBucketObjectDetails(key)
-        )
+            createS3EventBucketObjectDetails(key),
+        ),
     );
 }
 
@@ -67,8 +68,8 @@ describe.each([
             createS3EventRecord(
                 createS3EventNotificationDetails(
                     undefined,
-                    createS3EventBucketObjectDetails(EXPECTED_KEY)
-                )
+                    createS3EventBucketObjectDetails(EXPECTED_KEY),
+                ),
             ),
         ],
     ],
@@ -78,8 +79,8 @@ describe.each([
             createS3EventRecord(
                 createS3EventNotificationDetails(
                     createS3EventBucketDetails(),
-                    createS3EventBucketObjectDetails(EXPECTED_KEY)
-                )
+                    createS3EventBucketObjectDetails(EXPECTED_KEY),
+                ),
             ),
         ],
     ],
@@ -89,8 +90,8 @@ describe.each([
             createS3EventRecord(
                 createS3EventNotificationDetails(
                     createS3EventBucketDetails(EXPECTED_BUCKET_NAME),
-                    undefined
-                )
+                    undefined,
+                ),
             ),
         ],
     ],
@@ -100,8 +101,8 @@ describe.each([
             createS3EventRecord(
                 createS3EventNotificationDetails(
                     createS3EventBucketDetails(EXPECTED_BUCKET_NAME),
-                    createS3EventBucketObjectDetails()
-                )
+                    createS3EventBucketObjectDetails(),
+                ),
             ),
         ],
     ],
@@ -206,7 +207,7 @@ describe("error handling", () => {
     test("throws an error if the seed key is not configured", async () => {
         delete process.env[EXPECTED_PROCESS_SEED_KEY];
         const expectedError = new Error(
-            `Missing ${EXPECTED_PROCESS_SEED_KEY} environment variable`
+            `Missing ${EXPECTED_PROCESS_SEED_KEY} environment variable`,
         );
 
         expect.assertions(1);

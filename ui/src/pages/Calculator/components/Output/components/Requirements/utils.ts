@@ -26,7 +26,7 @@ type NumberProperties<T> = {
 function sortBy(
     unsorted: Readonly<RequirementsTableRow[]>,
     order: ValidSortDirections,
-    property: keyof SortableFields
+    property: keyof SortableFields,
 ): RequirementsTableRow[] {
     const sort = <U>(unsorted: U[], property: NumberProperties<U>) => {
         const reference = [...unsorted];
@@ -34,11 +34,11 @@ function sortBy(
         switch (order) {
             case "descending":
                 return reference.sort(
-                    (a, b) => (b[property] as number) - (a[property] as number)
+                    (a, b) => (b[property] as number) - (a[property] as number),
                 );
             case "ascending":
                 return reference.sort(
-                    (a, b) => (a[property] as number) - (b[property] as number)
+                    (a, b) => (a[property] as number) - (b[property] as number),
                 );
             default:
                 return reference;
@@ -49,7 +49,7 @@ function sortBy(
         property === "amount" ? sort(demands, "amount") : demands;
 
     const sortCreatorBreakdown = (
-        breakdown: CreatorBreakdownTableRow
+        breakdown: CreatorBreakdownTableRow,
     ): CreatorBreakdownTableRow =>
         breakdown.type === RowType.CreatorBreakdown
             ? { ...breakdown, demands: sortDemands(breakdown.demands) }
@@ -65,12 +65,12 @@ function sortBy(
             case RowType.MultipleCreator: {
                 const breakdownsWithSortedDemands =
                     current.creatorBreakdownRows.map((breakdown) =>
-                        sortCreatorBreakdown(breakdown)
+                        sortCreatorBreakdown(breakdown),
                     );
 
                 const sortedBreakdowns = sort(
                     breakdownsWithSortedDemands,
-                    property
+                    property,
                 );
                 return { ...current, creatorBreakdownRows: sortedBreakdowns };
             }
@@ -83,12 +83,12 @@ function sortBy(
 }
 
 function mapRequirementsToRows(
-    requirements: Readonly<Requirement[]>
+    requirements: Readonly<Requirement[]>,
 ): RequirementsTableRow[] {
     return requirements.reduce((acc, requirement) => {
         const totalWorkers = requirement.creators.reduce(
             (acc, current) => acc + current.workers,
-            0
+            0,
         );
 
         if (requirement.creators.length === 1) {
@@ -149,7 +149,7 @@ type BreakdownRowIndex = {
 
 function findRowIndex(
     key: string,
-    rows: Readonly<RequirementsTableRow[]>
+    rows: Readonly<RequirementsTableRow[]>,
 ): CreatorRowIndex | BreakdownRowIndex | undefined {
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -176,7 +176,7 @@ function findRowIndex(
 
 function toggleBreakdown(
     key: string,
-    rows: Readonly<RequirementsTableRow[]>
+    rows: Readonly<RequirementsTableRow[]>,
 ): Readonly<RequirementsTableRow[]> {
     const indices = findRowIndex(key, rows);
     if (!indices) {

@@ -7,7 +7,7 @@ import {
 import { ColorPalettes } from "../../types";
 
 type CommonProps = {
-    palette: ColorPalettes;
+    $palette: ColorPalettes;
 };
 
 export const Container = styled.div<CommonProps>`
@@ -17,14 +17,14 @@ export const Container = styled.div<CommonProps>`
 `;
 
 export const SelectorInputContainer = styled.div<CommonProps>`
-    ${({ theme, palette }) => css`
-        color: ${theme.color[palette].on_container};
-        background-color: ${theme.color[palette].container};
-        border: 1px solid ${theme.color[palette].container};
+    ${({ theme, $palette }) => css`
+        color: ${theme.color[$palette].on_container};
+        background-color: ${theme.color[$palette].container};
+        border: 1px solid ${theme.color[$palette].container};
 
-        :hover,
-        :focus-within {
-            border-color: ${theme.color[palette].on_container};
+        &:hover,
+        &:focus-within {
+            border-color: ${theme.color[$palette].on_container};
         }
     `};
 
@@ -37,15 +37,15 @@ export const SelectorInputContainer = styled.div<CommonProps>`
 `;
 
 type MenuProps = {
-    isOpen: boolean;
+    $isOpen: boolean;
 } & CommonProps;
 
 export const Menu = styled.div<MenuProps>`
-    ${({ theme, isOpen, palette }) => css`
-        color: ${theme.color[palette].on_container};
-        background-color: ${theme.color[palette].container};
-        border: 2px solid ${theme.color[palette].outline};
-        display: ${!isOpen ? "none" : "inline-block"};
+    ${({ theme, $isOpen, $palette }) => css`
+        color: ${theme.color[$palette].on_container};
+        background-color: ${theme.color[$palette].container};
+        border: 2px solid ${theme.color[$palette].outline};
+        display: ${!$isOpen ? "none" : "inline-block"};
     `};
 
     position: absolute;
@@ -62,13 +62,13 @@ export const Menu = styled.div<MenuProps>`
 `;
 
 export const Item = styled.li<CommonProps>`
-    ${({ theme, palette }) => css`
-        :hover {
-            background-color: ${theme.color[palette].outline};
+    ${({ theme, $palette }) => css`
+        &:hover {
+            background-color: ${theme.color[$palette].outline};
         }
 
-        :not(:first-child) {
-            border-top: 2px solid ${theme.color[palette].outline};
+        &:not(:first-child) {
+            border-top: 2px solid ${theme.color[$palette].outline};
         }
     `};
 
@@ -83,6 +83,10 @@ export const Input = styled.input`
     color: inherit;
 `;
 
+export const InputIconsContainer = styled.div`
+    display: flex;
+`;
+
 export const InputIconContainer = styled.div`
     display: flex;
 `;
@@ -92,7 +96,7 @@ interface ToggleIndicatorIconProps extends FontAwesomeIconProps {
 }
 
 export const ToggleIndicatorIcon = styled(
-    FontAwesomeIcon
+    FontAwesomeIcon,
 )<ToggleIndicatorIconProps>`
     ${({ selected }) => {
         if (selected) {
@@ -108,8 +112,8 @@ export const ToggleIndicatorIcon = styled(
 
 export const ClearInputIcon = styled(FontAwesomeIcon)`
     ${({ theme }) => css`
-        :hover,
-        :focus {
+        &:hover,
+        &:focus {
             color: ${theme.color.error.main};
         }
     `}

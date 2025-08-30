@@ -2,7 +2,7 @@ import { RecipeConverter } from "../interfaces/recipe-converter";
 import { Item, Items } from "../types";
 
 const createRecipeMap = (
-    items: Readonly<Items>
+    items: Readonly<Items>,
 ): Map<string, Map<string, Item>> => {
     const knownRecipes = new Map<string, Map<string, Item>>();
     for (const item of items) {
@@ -21,7 +21,7 @@ const filterUncreatableItems = (items: Readonly<Items>): Items => {
 
     const isCreatable = (item: Item) =>
         item.requires.every(
-            (requirement) => map.get(requirement.name)?.size ?? 0 > 0
+            (requirement) => map.get(requirement.name)?.size ?? 0 > 0,
         );
 
     const deleteRecipe = (item: Item) => {
@@ -31,7 +31,7 @@ const filterUncreatableItems = (items: Readonly<Items>): Items => {
 
     const logRemoval = (item: Item) =>
         console.log(
-            `Removed recipe: ${item.name} from ${item.creator} as depends on item that cannot be created`
+            `Removed recipe: ${item.name} from ${item.creator} as depends on item that cannot be created`,
         );
 
     for (const item of items) {

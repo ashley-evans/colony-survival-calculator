@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-types */
 // Taken from: https://github.com/JWally/jsLPSolver/blob/master/types/main.d.ts
 
 declare module "javascript-lp-solver" {
@@ -55,7 +54,7 @@ declare module "javascript-lp-solver" {
      */
     export interface IModelBase<
         TSolutionVar extends string = string,
-        TInternalVar extends string = string
+        TInternalVar extends string = string,
     > {
         /**
          * Optimization constraints.
@@ -122,7 +121,7 @@ declare module "javascript-lp-solver" {
      */
     export interface ISingleObjectiveModel<
         TSolutionVar extends string = string,
-        TInternalVar extends string = string
+        TInternalVar extends string = string,
     > extends IModelBase<TSolutionVar, TInternalVar> {
         /** Name of the variable that will be the optimization objective. */
         optimize: TSolutionVar | TInternalVar;
@@ -137,7 +136,7 @@ declare module "javascript-lp-solver" {
      */
     export interface IMultiObjectiveModel<
         TSolutionVar extends string = string,
-        TInternalVar extends string = string
+        TInternalVar extends string = string,
     > extends IModelBase<TSolutionVar, TInternalVar> {
         /**
          * Name of the variables that will be the optimization objectives.
@@ -201,12 +200,12 @@ declare module "javascript-lp-solver" {
      */
     export function Solve<
         TSolutionVar extends string,
-        TInternalVar extends string
+        TInternalVar extends string,
     >(
         model: ISingleObjectiveModel<TSolutionVar, TInternalVar>,
         precision?: number,
         full?: boolean,
-        validate?: unknown
+        validate?: unknown,
     ): Solution<TSolutionVar>;
 
     /**
@@ -217,17 +216,16 @@ declare module "javascript-lp-solver" {
      */
     export function MultiObjective<
         TSolutionVar extends string,
-        TInternalVar extends string
+        TInternalVar extends string,
     >(model: IMultiObjectiveModel<TSolutionVar, TInternalVar>): object;
 
     /**
      * @internal
      */
     export class Term {
-        public constructor(
-            public variable: Variable,
-            public coefficient: number
-        );
+        public variable: Variable;
+        public coefficient: number;
+        public constructor(variable: Variable, coefficient: number);
     }
 
     /**
@@ -244,20 +242,24 @@ declare module "javascript-lp-solver" {
         | "weak";
 
     /**
+    /**
      * @internal
      */
     export class Variable {
-        public constructor(
-            public id: any,
-            public cost: number,
-            public index: number,
-            public priority: VariablePriority
-        );
+        public id: any;
+        public cost: number;
+        public index: number;
+        public priority: VariablePriority;
         public value: number;
         public readonly isInteger?: boolean;
         public readonly isSlack?: boolean;
+        public constructor(
+            id: any,
+            cost: number,
+            index: number,
+            priority: VariablePriority,
+        );
     }
-
     /**
      * @internal
      */
@@ -302,7 +304,7 @@ declare module "javascript-lp-solver" {
             id: any,
             isInteger: any,
             isUnrestricted: any,
-            priority: any
+            priority: any,
         ): any;
 
         debug(debugCheckForCycles: any): void;
@@ -340,7 +342,7 @@ declare module "javascript-lp-solver" {
         updateConstraintCoefficient(
             constraint: any,
             variable: any,
-            difference: any
+            difference: any,
         ): any;
 
         updateRightHandSide(constraint: any, difference: any): any;
@@ -386,7 +388,7 @@ declare module "javascript-lp-solver" {
             width: any,
             height: any,
             variables: any,
-            unrestrictedVars: any
+            unrestrictedVars: any,
         ): void;
 
         isIntegral(): any;
@@ -420,7 +422,7 @@ declare module "javascript-lp-solver" {
         updateConstraintCoefficient(
             constraint: any,
             variable: any,
-            difference: any
+            difference: any,
         ): void;
 
         updateCost(variable: any, difference: any): void;

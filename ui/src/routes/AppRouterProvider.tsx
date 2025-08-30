@@ -1,4 +1,4 @@
-import React, { ReactElement, Suspense, lazy } from "react";
+import { ReactElement, Suspense, lazy } from "react";
 import {
     RouterProvider,
     createBrowserRouter,
@@ -9,7 +9,7 @@ import SiteLayout from "./components/SiteLayout/SiteLayout";
 
 const Calculator = lazy(() => import("../pages/Calculator/Calculator"));
 const MissingRoute = lazy(
-    () => import("./components/MissingRoute/MissingRoute")
+    () => import("./components/MissingRoute/MissingRoute"),
 );
 
 type LazyLoadingWrapperProps = {

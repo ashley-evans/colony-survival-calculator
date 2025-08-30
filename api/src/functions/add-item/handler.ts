@@ -63,7 +63,7 @@ function getSeedKey(): string {
 
 async function fetchObjectContent(
     key: string,
-    bucket: string
+    bucket: string,
 ): Promise<string | undefined> {
     const input: GetObjectCommandInput = {
         Key: key,
@@ -89,7 +89,7 @@ const handler: S3EventHandler<void> = async (event) => {
 
             const content = await fetchObjectContent(
                 key,
-                record.s3.bucket.name
+                record.s3.bucket.name,
             );
             if (content) {
                 const added = await addItem(content);

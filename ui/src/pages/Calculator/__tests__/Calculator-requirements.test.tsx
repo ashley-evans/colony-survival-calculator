@@ -1,4 +1,3 @@
-import React from "react";
 import { HttpResponse, delay, graphql } from "msw";
 import { setupServer } from "msw/node";
 import { screen, within, waitFor } from "@testing-library/react";
@@ -173,11 +172,11 @@ const server = setupServer(
         });
     }),
     createCalculatorOutputResponseHandler(
-        createRequirements([requirementsWithSingleCreator[0]])
+        createRequirements([requirementsWithSingleCreator[0]]),
     ),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -195,7 +194,7 @@ describe("response delay handling", () => {
             graphql.query(expectedCalculatorOutputQueryName, async () => {
                 await delay("infinite");
                 return HttpResponse.json({});
-            })
+            }),
         );
     });
 
@@ -207,12 +206,12 @@ describe("response delay handling", () => {
         });
 
         expect(
-            await screen.findByText(expectedLoadingOutputMessage)
+            await screen.findByText(expectedLoadingOutputMessage),
         ).toBeVisible();
         expect(
             screen.queryByRole("heading", {
                 name: expectedRequirementsHeading,
-            })
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -224,7 +223,7 @@ describe("response delay handling", () => {
         });
 
         expect(
-            await screen.findByText(expectedLoadingOutputMessage)
+            await screen.findByText(expectedLoadingOutputMessage),
         ).toBeVisible();
         expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
@@ -241,7 +240,7 @@ describe("requirements rendering given requirements", () => {
         expect(
             await screen.findByRole("heading", {
                 name: expectedRequirementsHeading,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -256,27 +255,27 @@ describe("requirements rendering given requirements", () => {
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedItemNameColumnName,
-            })
+            }),
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedCreatorColumnName,
-            })
+            }),
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedDemandedItemColumName,
-            })
+            }),
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedAmountColumnName,
-            })
+            }),
         ).toBeVisible();
         expect(
             within(requirementsTable).getByRole("columnheader", {
                 name: expectedWorkerColumnName,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -295,7 +294,7 @@ describe("requirements rendering given requirements", () => {
                     expect(
                         within(requirementsTable).getByRole("button", {
                             name: columnName,
-                        })
+                        }),
                     ).toBeVisible();
                 });
 
@@ -308,11 +307,11 @@ describe("requirements rendering given requirements", () => {
 
                     const requirementsTable = await screen.findByRole("table");
                     const sortableColumnHeader = within(
-                        requirementsTable
+                        requirementsTable,
                     ).getByRole("columnheader", { name: columnName });
                     expect(sortableColumnHeader).toHaveAttribute(
                         "aria-sort",
-                        "none"
+                        "none",
                     );
                 });
 
@@ -325,7 +324,7 @@ describe("requirements rendering given requirements", () => {
                     async (
                         _: string,
                         expectedOrder: string,
-                        numberOfClicks: number
+                        numberOfClicks: number,
                     ) => {
                         const user = userEvent.setup();
 
@@ -334,11 +333,10 @@ describe("requirements rendering given requirements", () => {
                             itemName: selectedItemName,
                             workers: 5,
                         });
-                        const requirementsTable = await screen.findByRole(
-                            "table"
-                        );
+                        const requirementsTable =
+                            await screen.findByRole("table");
                         const sortableColumnHeader = within(
-                            requirementsTable
+                            requirementsTable,
                         ).getByRole("columnheader", {
                             name: columnName,
                         });
@@ -349,12 +347,12 @@ describe("requirements rendering given requirements", () => {
                         await waitFor(() =>
                             expect(sortableColumnHeader).toHaveAttribute(
                                 "aria-sort",
-                                expectedOrder
-                            )
+                                expectedOrder,
+                            ),
                         );
-                    }
+                    },
                 );
-            }
+            },
         );
 
         test("pressing the worker sort resets the amount sort", async () => {
@@ -367,12 +365,12 @@ describe("requirements rendering given requirements", () => {
             });
             const requirementsTable = await screen.findByRole("table");
             const workersSortableColumnHeader = within(
-                requirementsTable
+                requirementsTable,
             ).getByRole("columnheader", {
                 name: expectedWorkerColumnName,
             });
             const amountSortableColumnHeader = within(
-                requirementsTable
+                requirementsTable,
             ).getByRole("columnheader", {
                 name: expectedAmountColumnName,
             });
@@ -380,20 +378,20 @@ describe("requirements rendering given requirements", () => {
             await waitFor(() =>
                 expect(amountSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
-                    "descending"
-                )
+                    "descending",
+                ),
             );
 
             await user.click(workersSortableColumnHeader);
             await waitFor(() =>
                 expect(workersSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
-                    "descending"
-                )
+                    "descending",
+                ),
             );
             expect(amountSortableColumnHeader).toHaveAttribute(
                 "aria-sort",
-                "none"
+                "none",
             );
         });
 
@@ -407,12 +405,12 @@ describe("requirements rendering given requirements", () => {
             });
             const requirementsTable = await screen.findByRole("table");
             const workersSortableColumnHeader = within(
-                requirementsTable
+                requirementsTable,
             ).getByRole("columnheader", {
                 name: expectedWorkerColumnName,
             });
             const amountSortableColumnHeader = within(
-                requirementsTable
+                requirementsTable,
             ).getByRole("columnheader", {
                 name: expectedAmountColumnName,
             });
@@ -420,20 +418,20 @@ describe("requirements rendering given requirements", () => {
             await waitFor(() =>
                 expect(workersSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
-                    "descending"
-                )
+                    "descending",
+                ),
             );
 
             await user.click(amountSortableColumnHeader);
             await waitFor(() =>
                 expect(amountSortableColumnHeader).toHaveAttribute(
                     "aria-sort",
-                    "descending"
-                )
+                    "descending",
+                ),
             );
             expect(workersSortableColumnHeader).toHaveAttribute(
                 "aria-sort",
-                "none"
+                "none",
             );
         });
     });
@@ -502,7 +500,7 @@ describe("requirements rendering given requirements", () => {
                 expected: Omit<
                     SingleCreatorRequirementsTableRow,
                     "key" | "isExpanded" | "type" | "demands"
-                >[]
+                >[],
             ) => {
                 server.use(createCalculatorOutputResponseHandler(response));
 
@@ -518,7 +516,7 @@ describe("requirements rendering given requirements", () => {
                 for (const requirement of expected) {
                     const requirementCell = within(requirementsTable).getByRole(
                         "cell",
-                        { name: requirement.name }
+                        { name: requirement.name },
                     );
                     const requirementRow =
                         requirementCell.parentElement as HTMLElement;
@@ -528,31 +526,31 @@ describe("requirements rendering given requirements", () => {
 
                     expect(cells).toHaveLength(5);
                     expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                        requirement.creator
+                        requirement.creator,
                     );
                     expect(cells[Columns.CREATOR]).toBeVisible();
                     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
-                        ""
+                        "",
                     );
                     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
                     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        requirement.amount.toString()
+                        requirement.amount.toString(),
                     );
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                     expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                        requirement.workers.toString()
+                        requirement.workers.toString(),
                     );
                     expect(cells[Columns.WORKERS]).toBeVisible();
                 }
-            }
+            },
         );
 
         test("re-renders the requirements table if the tools change back to an already selected", async () => {
             const expected = requirementsWithSingleCreator[1];
             server.use(
                 createCalculatorOutputResponseHandler(
-                    createRequirements([expected])
-                )
+                    createRequirements([expected]),
+                ),
             );
 
             render(<Calculator />, expectedGraphQLAPIURL);
@@ -564,8 +562,8 @@ describe("requirements rendering given requirements", () => {
 
             server.use(
                 createCalculatorOutputResponseHandler(
-                    createRequirements([requirementsWithSingleCreator[0]])
-                )
+                    createRequirements([requirementsWithSingleCreator[0]]),
+                ),
             );
 
             await selectTool(AvailableTools.Steel);
@@ -578,17 +576,17 @@ describe("requirements rendering given requirements", () => {
             const requirementRow = rows[2];
             const cells = within(requirementRow).getAllByRole("cell");
             expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                expected.creators[0].creator
+                expected.creators[0].creator,
             );
             expect(cells[Columns.CREATOR]).toBeVisible();
             expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName("");
             expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
             expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                expected.amount.toString()
+                expected.amount.toString(),
             );
             expect(cells[Columns.AMOUNT]).toBeVisible();
             expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                expected.creators[0].workers.toString()
+                expected.creators[0].workers.toString(),
             );
             expect(cells[Columns.WORKERS]).toBeVisible();
         });
@@ -606,7 +604,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 within(itemCell).queryByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
 
@@ -623,7 +621,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 within(itemCell).queryByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
 
@@ -640,7 +638,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 within(itemCell).queryByRole("button", {
                     name: expectedExpandDemandBreakdownLabel,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
 
@@ -666,7 +664,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     within(itemCell).getByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -687,7 +685,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(itemCell).findByRole("button", {
                         name: expectedCollapseDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -712,7 +710,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(itemCell).findByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -727,7 +725,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const amountColumnHeader = within(requirementsTable).getByRole(
                     "columnheader",
-                    { name: expectedAmountColumnName }
+                    { name: expectedAmountColumnName },
                 );
                 await user.click(amountColumnHeader);
                 const itemCell = await screen.findByRole("cell", {
@@ -742,7 +740,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(itemCell).findByRole("button", {
                         name: expectedCollapseDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
                 await click({
                     label: expectedCollapseDemandBreakdownLabel,
@@ -751,7 +749,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(itemCell).findByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -772,12 +770,12 @@ describe("requirements rendering given requirements", () => {
                     expect(
                         within(requirementsTable).queryByRole("cell", {
                             name: demand.name,
-                        })
+                        }),
                     ).not.toBeInTheDocument();
                     expect(
                         within(requirementsTable).queryByRole("cell", {
                             name: demand.amount.toString(),
-                        })
+                        }),
                     ).not.toBeInTheDocument();
                 }
             });
@@ -802,20 +800,20 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 expect(rows).toHaveLength(
-                    demands.length + requirements.length + 2
+                    demands.length + requirements.length + 2,
                 );
                 for (let i = 2; i < demands.length; i++) {
                     const cells = within(rows[i + demands.length]).getAllByRole(
-                        "cell"
+                        "cell",
                     );
 
                     expect(cells).toHaveLength(5);
                     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
-                        demands[i].name
+                        demands[i].name,
                     );
                     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
                     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        demands[i].amount.toString()
+                        demands[i].amount.toString(),
                     );
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                 }
@@ -843,7 +841,7 @@ describe("requirements rendering given requirements", () => {
             const requirementsTable = await screen.findByRole("table");
             const requirementCell = within(requirementsTable).getByRole(
                 "cell",
-                { name: requirementWithMultipleCreators.name }
+                { name: requirementWithMultipleCreators.name },
             );
             const requirementRow = requirementCell.parentElement as HTMLElement;
             const cells = within(requirementRow).getAllByRole("cell");
@@ -859,8 +857,8 @@ describe("requirements rendering given requirements", () => {
             async (_: string, response: Requirement) => {
                 server.use(
                     createCalculatorOutputResponseHandler(
-                        createRequirements([response])
-                    )
+                        createRequirements([response]),
+                    ),
                 );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
@@ -871,7 +869,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const requirementCell = within(requirementsTable).getByRole(
                     "cell",
-                    { name: response.name }
+                    { name: response.name },
                 );
                 const requirementRow =
                     requirementCell.parentElement as HTMLElement;
@@ -879,7 +877,7 @@ describe("requirements rendering given requirements", () => {
 
                 expect(cells[Columns.CREATOR]).toHaveAccessibleName("");
                 expect(cells[Columns.CREATOR]).toBeVisible();
-            }
+            },
         );
 
         test("renders a expand button to view creator breakdown", async () => {
@@ -895,7 +893,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 within(itemCell).getByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -913,7 +911,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedCollapseCreatorBreakdownLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -932,7 +930,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -947,7 +945,7 @@ describe("requirements rendering given requirements", () => {
             const requirementsTable = await screen.findByRole("table");
             const workersColumnHeader = within(requirementsTable).getByRole(
                 "columnheader",
-                { name: expectedWorkerColumnName }
+                { name: expectedWorkerColumnName },
             );
             await user.click(workersColumnHeader);
             const itemCell = await screen.findByRole("cell", {
@@ -961,7 +959,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedCollapseCreatorBreakdownLabel,
-                })
+                }),
             ).toBeVisible();
             await click({
                 label: expectedCollapseCreatorBreakdownLabel,
@@ -970,7 +968,7 @@ describe("requirements rendering given requirements", () => {
             expect(
                 await within(itemCell).findByRole("button", {
                     name: expectedExpandCreatorBreakdownLabel,
-                })
+                }),
             ).toBeVisible();
         });
 
@@ -988,17 +986,17 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     within(requirementsTable).queryByRole("cell", {
                         name: creator.creator,
-                    })
+                    }),
                 ).not.toBeInTheDocument();
                 expect(
                     within(requirementsTable).queryByRole("cell", {
                         name: creator.amount.toString(),
-                    })
+                    }),
                 ).not.toBeInTheDocument();
                 expect(
                     within(requirementsTable).queryByRole("cell", {
                         name: creator.workers.toString(),
-                    })
+                    }),
                 ).not.toBeInTheDocument();
             }
         });
@@ -1018,25 +1016,25 @@ describe("requirements rendering given requirements", () => {
             const rows = within(requirementsTable).getAllByRole("row");
 
             expect(rows).toHaveLength(
-                expectedCreators.length + requirements.length + 2
+                expectedCreators.length + requirements.length + 2,
             );
 
             for (let i = 2; i < expectedCreators.length; i++) {
                 const cells = within(
-                    rows[i + expectedCreators.length]
+                    rows[i + expectedCreators.length],
                 ).getAllByRole("cell");
 
                 expect(cells).toHaveLength(5);
                 expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                    expectedCreators[i].creator
+                    expectedCreators[i].creator,
                 );
                 expect(cells[Columns.CREATOR]).toBeVisible();
                 expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                    expectedCreators[i].amount.toString()
+                    expectedCreators[i].amount.toString(),
                 );
                 expect(cells[Columns.AMOUNT]).toBeVisible();
                 expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                    expectedCreators[i].workers.toString()
+                    expectedCreators[i].workers.toString(),
                 );
                 expect(cells[Columns.WORKERS]).toBeVisible();
             }
@@ -1050,8 +1048,8 @@ describe("requirements rendering given requirements", () => {
             beforeEach(() => {
                 server.use(
                     createCalculatorOutputResponseHandler(
-                        createRequirements(requirements)
-                    )
+                        createRequirements(requirements),
+                    ),
                 );
             });
 
@@ -1075,7 +1073,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     within(creatorCell).getByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -1103,7 +1101,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     within(creatorCell).getByRole("button", {
                         name: expectedCollapseDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -1135,7 +1133,7 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(creatorCell).findByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
@@ -1150,7 +1148,7 @@ describe("requirements rendering given requirements", () => {
                 const requirementsTable = await screen.findByRole("table");
                 const amountColumnHeader = within(requirementsTable).getByRole(
                     "columnheader",
-                    { name: expectedAmountColumnName }
+                    { name: expectedAmountColumnName },
                 );
                 await user.click(amountColumnHeader);
                 const itemCell = await screen.findByRole("cell", {
@@ -1175,14 +1173,14 @@ describe("requirements rendering given requirements", () => {
                 expect(
                     await within(creatorCell).findByRole("button", {
                         name: expectedExpandDemandBreakdownLabel,
-                    })
+                    }),
                 ).toBeVisible();
             });
 
             test("does not show demand breakdown by default", async () => {
                 const demands =
                     requirementWithMultipleCreatorsAndDemands.creators.flatMap(
-                        (creator) => creator.demands
+                        (creator) => creator.demands,
                     );
 
                 render(<Calculator />, expectedGraphQLAPIURL);
@@ -1198,12 +1196,12 @@ describe("requirements rendering given requirements", () => {
                     expect(
                         within(requirementsTable).queryByRole("cell", {
                             name: demand.name,
-                        })
+                        }),
                     ).not.toBeInTheDocument();
                     expect(
                         within(requirementsTable).queryByRole("cell", {
                             name: demand.amount.toString(),
-                        })
+                        }),
                     ).not.toBeInTheDocument();
                 }
             });
@@ -1240,20 +1238,20 @@ describe("requirements rendering given requirements", () => {
                 const rows = within(requirementsTable).getAllByRole("row");
 
                 expect(rows).toHaveLength(
-                    expectedOffset + requirements.length + 2
+                    expectedOffset + requirements.length + 2,
                 );
                 for (let i = 0; i < demands.length; i++) {
                     const cells = within(
-                        rows[i + expectedOffset - 1]
+                        rows[i + expectedOffset - 1],
                     ).getAllByRole("cell");
 
                     expect(cells).toHaveLength(5);
                     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
-                        demands[i].name
+                        demands[i].name,
                     );
                     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
                     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        demands[i].amount.toString()
+                        demands[i].amount.toString(),
                     );
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                 }
@@ -1302,8 +1300,8 @@ describe("requirements rendering given requirements", () => {
                             }),
                         ],
                     }),
-                ])
-            )
+                ]),
+            ),
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1316,7 +1314,7 @@ describe("requirements rendering given requirements", () => {
         expect(
             within(requirementsTable).getByRole("cell", {
                 name: expected,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -1337,8 +1335,8 @@ describe("requirements rendering given requirements", () => {
                             }),
                         ],
                     }),
-                ])
-            )
+                ]),
+            ),
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -1351,7 +1349,7 @@ describe("requirements rendering given requirements", () => {
         expect(
             within(requirementsTable).getByRole("cell", {
                 name: expectedWorkers,
-            })
+            }),
         ).toBeVisible();
     });
 
@@ -1681,19 +1679,19 @@ describe("requirements rendering given requirements", () => {
                     amount: number;
                     workers: string;
                 }[],
-                numberOfClicks: number
+                numberOfClicks: number,
             ) => {
                 server.use(
                     graphql.query(expectedItemNameQueryName, () => {
                         return HttpResponse.json({
                             data: {
                                 distinctItemNames: unsorted.map(
-                                    (item) => item.name
+                                    (item) => item.name,
                                 ),
                             },
                         });
                     }),
-                    createCalculatorOutputResponseHandler(unsorted)
+                    createCalculatorOutputResponseHandler(unsorted),
                 );
 
                 const user = userEvent.setup();
@@ -1708,7 +1706,7 @@ describe("requirements rendering given requirements", () => {
                     "columnheader",
                     {
                         name: expectedWorkerColumnName,
-                    }
+                    },
                 );
                 await click({
                     label: expectedExpandDemandBreakdownLabel,
@@ -1726,27 +1724,27 @@ describe("requirements rendering given requirements", () => {
                     const cells = within(rows[i + 1]).getAllByRole("cell");
 
                     expect(cells[Columns.ITEM_NAME]).toHaveAccessibleName(
-                        row.name
+                        row.name,
                     );
                     expect(cells[Columns.ITEM_NAME]).toBeVisible();
                     expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                        row.creator
+                        row.creator,
                     );
                     expect(cells[Columns.CREATOR]).toBeVisible();
                     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
-                        row.demand
+                        row.demand,
                     );
                     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
                     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        row.amount.toString()
+                        row.amount.toString(),
                     );
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                     expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                        row.workers
+                        row.workers,
                     );
                     expect(cells[Columns.WORKERS]).toBeVisible();
                 }
-            }
+            },
         );
 
         test.each([
@@ -2074,19 +2072,19 @@ describe("requirements rendering given requirements", () => {
                     amount: number;
                     workers: string;
                 }[],
-                numberOfClicks: number
+                numberOfClicks: number,
             ) => {
                 server.use(
                     graphql.query(expectedItemNameQueryName, () => {
                         return HttpResponse.json({
                             data: {
                                 distinctItemNames: unsorted.map(
-                                    (item) => item.name
+                                    (item) => item.name,
                                 ),
                             },
                         });
                     }),
-                    createCalculatorOutputResponseHandler(unsorted)
+                    createCalculatorOutputResponseHandler(unsorted),
                 );
 
                 const user = userEvent.setup();
@@ -2101,7 +2099,7 @@ describe("requirements rendering given requirements", () => {
                     "columnheader",
                     {
                         name: expectedAmountColumnName,
-                    }
+                    },
                 );
                 await click({
                     label: expectedExpandDemandBreakdownLabel,
@@ -2119,27 +2117,27 @@ describe("requirements rendering given requirements", () => {
                     const cells = within(rows[i + 1]).getAllByRole("cell");
 
                     expect(cells[Columns.ITEM_NAME]).toHaveAccessibleName(
-                        row.name
+                        row.name,
                     );
                     expect(cells[Columns.ITEM_NAME]).toBeVisible();
                     expect(cells[Columns.CREATOR]).toHaveAccessibleName(
-                        row.creator
+                        row.creator,
                     );
                     expect(cells[Columns.CREATOR]).toBeVisible();
                     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName(
-                        row.demand
+                        row.demand,
                     );
                     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
                     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-                        row.amount.toString()
+                        row.amount.toString(),
                     );
                     expect(cells[Columns.AMOUNT]).toBeVisible();
                     expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-                        row.workers
+                        row.workers,
                     );
                     expect(cells[Columns.WORKERS]).toBeVisible();
                 }
-            }
+            },
         );
     });
 });
@@ -2170,18 +2168,18 @@ test("renders only the selected item if it has no requirements", async () => {
     expect(cells[Columns.DEMANDED_ITEM]).toHaveAccessibleName("");
     expect(cells[Columns.DEMANDED_ITEM]).toBeVisible();
     expect(cells[Columns.AMOUNT]).toHaveAccessibleName(
-        selectedItemAmount.toString()
+        selectedItemAmount.toString(),
     );
     expect(cells[Columns.AMOUNT]).toBeVisible();
     expect(cells[Columns.WORKERS]).toHaveAccessibleName(
-        selectedItemWorkers.toString()
+        selectedItemWorkers.toString(),
     );
     expect(cells[Columns.WORKERS]).toBeVisible();
 });
 
 test("renders an error message if the target output item cannot be found in requirements table", async () => {
     server.use(
-        createCalculatorOutputResponseHandler(requirementsWithSingleCreator)
+        createCalculatorOutputResponseHandler(requirementsWithSingleCreator),
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -2191,13 +2189,13 @@ test("renders an error message if the target output item cannot be found in requ
     });
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-        expectedRequirementsUnhandledErrorText
+        expectedRequirementsUnhandledErrorText,
     );
 });
 
 test("clears error message if the target output item is found on subsequent requests", async () => {
     server.use(
-        createCalculatorOutputResponseHandler(requirementsWithSingleCreator)
+        createCalculatorOutputResponseHandler(requirementsWithSingleCreator),
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -2208,8 +2206,8 @@ test("clears error message if the target output item is found on subsequent requ
     await screen.findByRole("alert");
     server.use(
         createCalculatorOutputResponseHandler(
-            createRequirements(requirementsWithSingleCreator)
-        )
+            createRequirements(requirementsWithSingleCreator),
+        ),
     );
     await selectItemAndTarget({ workers: 10 });
     await screen.findByRole("heading", { name: expectedRequirementsHeading });
@@ -2222,7 +2220,7 @@ describe("total row rendering", () => {
 
     test("does not render a total row if the item has no requirements", async () => {
         server.use(
-            createCalculatorOutputResponseHandler(createRequirements([]))
+            createCalculatorOutputResponseHandler(createRequirements([])),
         );
 
         render(<Calculator />, expectedGraphQLAPIURL);
@@ -2233,7 +2231,7 @@ describe("total row rendering", () => {
         const requirementsTable = await screen.findByRole("table");
 
         expect(
-            within(requirementsTable).queryByText(expectedTotalRowName)
+            within(requirementsTable).queryByText(expectedTotalRowName),
         ).not.toBeInTheDocument();
     });
 
@@ -2276,7 +2274,7 @@ describe("total row rendering", () => {
         async (
             _: string,
             requirements: Requirement[],
-            expectedTotalWorkers: number
+            expectedTotalWorkers: number,
         ) => {
             server.use(createCalculatorOutputResponseHandler(requirements));
 
@@ -2293,9 +2291,9 @@ describe("total row rendering", () => {
             const totalRow = totalCell.parentElement as HTMLElement;
             const totalRowCells = within(totalRow).getAllByRole("cell");
             expect(totalRowCells[Columns.WORKERS]).toHaveAccessibleName(
-                expectedTotalWorkers.toString()
+                expectedTotalWorkers.toString(),
             );
-        }
+        },
     );
 });
 

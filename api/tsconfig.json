@@ -1,11 +1,13 @@
 {
-    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node20/tsconfig"],
+    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node22/tsconfig"],
     "compilerOptions": {
         "outDir": "dist",
         "resolveJsonModule": true,
         "verbatimModuleSyntax": false,
+        "isolatedModules": false,
         "moduleResolution": "bundler",
-        "module": "es6"
+        "module": "es2022",
+        "types": ["vitest/globals"]
     },
     "include": ["./src/**/*"],
     "exclude": ["./dist/**/*"]

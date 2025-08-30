@@ -4,14 +4,15 @@ import {
     createItemWithMachineTools,
     createOptionalOutput,
 } from "../../../../../test";
+import { vi, Mock } from "vitest";
 
 import { storeItem } from "../../adapters/store-item";
 
-jest.mock("../../adapters/store-item", () => ({
-    storeItem: jest.fn(),
+vi.mock("../../adapters/store-item", () => ({
+    storeItem: vi.fn(),
 }));
 
-const mockStoreItem = storeItem as jest.Mock;
+const mockStoreItem = storeItem as Mock;
 
 import { addItem } from "../add-item";
 
@@ -20,8 +21,8 @@ const validItem = createItem({
     createTime: 2,
     output: 3,
     requirements: [],
-    minimumTool: DefaultToolset.none,
-    maximumTool: DefaultToolset.none,
+    minimumTool: "none" as DefaultToolset,
+    maximumTool: "none" as DefaultToolset,
     width: 10,
     height: 2,
 });
@@ -30,8 +31,8 @@ const validItemWithReqs = createItem({
     createTime: 1,
     output: 2,
     requirements: [{ name: "item name 1", amount: 2 }],
-    minimumTool: DefaultToolset.none,
-    maximumTool: DefaultToolset.none,
+    minimumTool: "none" as DefaultToolset,
+    maximumTool: "none" as DefaultToolset,
 });
 const validItemWithOptionalOutputs = createItem({
     name: "test item",
@@ -60,7 +61,7 @@ const validItems = [
     validItemWithMachineTools,
 ];
 
-const errorLogSpy = jest
+const errorLogSpy = vi
     .spyOn(console, "error")
     .mockImplementation(() => undefined);
 
@@ -83,8 +84,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -99,8 +100,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -116,8 +117,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -133,8 +134,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -149,8 +150,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -166,8 +167,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -183,8 +184,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -199,8 +200,8 @@ describe.each([
                 output: 1,
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -216,8 +217,8 @@ describe.each([
                 requires: "test",
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -233,8 +234,8 @@ describe.each([
                 requires: ["test"],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -250,8 +251,8 @@ describe.each([
                 requires: [{ amount: 1 }],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -267,8 +268,8 @@ describe.each([
                 requires: [{ name: "wibble" }],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -279,8 +280,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -296,8 +297,8 @@ describe.each([
                 requires: [{ name: "wibble", amount: "test" }],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -308,8 +309,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -326,8 +327,8 @@ describe.each([
                 size: "wibble",
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -346,8 +347,8 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -367,8 +368,8 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -387,8 +388,8 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -408,8 +409,8 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -444,8 +445,8 @@ describe.each([
                     height: "test",
                 },
                 toolset: {
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -465,8 +466,8 @@ describe.each([
                 },
                 toolset: {
                     type: "unknown",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -486,7 +487,7 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    maximumTool: DefaultToolset.none,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -507,7 +508,7 @@ describe.each([
                 toolset: {
                     type: "default",
                     minimumTool: "unknown",
-                    maximumTool: DefaultToolset.none,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -527,7 +528,7 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -547,7 +548,7 @@ describe.each([
                 },
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
                     maximumTool: "unknown",
                 },
                 creator: "test creator",
@@ -564,8 +565,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -582,8 +583,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -599,8 +600,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -617,8 +618,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -634,8 +635,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -653,8 +654,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -670,8 +671,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -689,8 +690,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -706,8 +707,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -724,8 +725,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -741,8 +742,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -760,8 +761,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -777,8 +778,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -796,8 +797,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -813,8 +814,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -832,8 +833,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -849,8 +850,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
                 optionalOutputs: [
@@ -868,8 +869,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: "test creator",
             },
@@ -885,8 +886,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
             },
         ]),
@@ -901,8 +902,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: 1,
             },
@@ -918,8 +919,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "machine",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: MachineToolset.machine,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "machine" as MachineToolset,
                 },
                 creator: 1,
             },
@@ -935,8 +936,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "machine",
-                    minimumTool: MachineToolset.machine,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "machine" as MachineToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: 1,
             },
@@ -952,8 +953,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: MachineToolset.machine,
-                    maximumTool: DefaultToolset.none,
+                    minimumTool: "machine" as MachineToolset,
+                    maximumTool: "none" as DefaultToolset,
                 },
                 creator: 1,
             },
@@ -969,8 +970,8 @@ describe.each([
                 requires: [],
                 toolset: {
                     type: "default",
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: MachineToolset.machine,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "machine" as MachineToolset,
                 },
                 creator: 1,
             },
@@ -993,7 +994,7 @@ describe.each([
             expect.assertions(1);
             await expect(addItem(input)).rejects.toMatchSnapshot();
         });
-    }
+    },
 );
 
 describe.each([
@@ -1026,8 +1027,8 @@ describe.each([
             createTime: 1,
             output: 2,
             requirements: [],
-            minimumTool: DefaultToolset.stone,
-            maximumTool: DefaultToolset.none,
+            minimumTool: "stone" as DefaultToolset,
+            maximumTool: "none" as DefaultToolset,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
@@ -1038,8 +1039,8 @@ describe.each([
             createTime: 1,
             output: 2,
             requirements: [],
-            minimumTool: DefaultToolset.copper,
-            maximumTool: DefaultToolset.stone,
+            minimumTool: "copper" as DefaultToolset,
+            maximumTool: "stone" as DefaultToolset,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
@@ -1050,8 +1051,8 @@ describe.each([
             createTime: 1,
             output: 2,
             requirements: [],
-            minimumTool: DefaultToolset.iron,
-            maximumTool: DefaultToolset.copper,
+            minimumTool: "iron" as DefaultToolset,
+            maximumTool: "copper" as DefaultToolset,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
@@ -1062,8 +1063,8 @@ describe.each([
             createTime: 1,
             output: 2,
             requirements: [],
-            minimumTool: DefaultToolset.bronze,
-            maximumTool: DefaultToolset.iron,
+            minimumTool: "bronze" as DefaultToolset,
+            maximumTool: "iron" as DefaultToolset,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],
@@ -1074,8 +1075,8 @@ describe.each([
             createTime: 1,
             output: 2,
             requirements: [],
-            minimumTool: DefaultToolset.steel,
-            maximumTool: DefaultToolset.bronze,
+            minimumTool: "steel" as DefaultToolset,
+            maximumTool: "bronze" as DefaultToolset,
         }),
         "Invalid item: test item, minimum tool is better than maximum tool",
     ],

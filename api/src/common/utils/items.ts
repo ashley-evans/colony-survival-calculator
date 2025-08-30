@@ -1,7 +1,7 @@
 import { Item } from "../../types";
 
 function groupItemsByName<T extends Pick<Item, "name">>(
-    items: readonly T[]
+    items: readonly T[],
 ): Map<T["name"], T[]> {
     const itemTools = new Map<string, T[]>();
     for (const item of items) {

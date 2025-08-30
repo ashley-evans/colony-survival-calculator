@@ -1,4 +1,3 @@
-import React from "react";
 import { HttpResponse, graphql } from "msw";
 import { setupServer } from "msw/node";
 import {
@@ -80,7 +79,7 @@ const server = setupServer(
     createCalculatorOutputResponseHandler([item]),
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });
-    })
+    }),
 );
 
 beforeAll(() => {
@@ -101,9 +100,9 @@ test.each(["Seconds", "Minutes", "Game days"])(
         expect(
             await screen.findByRole("option", {
                 name: unit,
-            })
+            }),
         ).toBeVisible();
-    }
+    },
 );
 
 test("selects the Minutes option by default", async () => {
@@ -113,13 +112,13 @@ test("selects the Minutes option by default", async () => {
     await openSelectMenu({ label: expectedOutputUnitLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel }),
     ).toHaveTextContent(expected);
     expect(
         screen.getByRole("option", {
             name: expected,
             selected: true,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -131,13 +130,13 @@ test("updates the selected output unit if selected is changed", async () => {
     await openSelectMenu({ label: expectedOutputUnitLabel });
 
     expect(
-        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel }),
     ).toHaveTextContent(expected);
     expect(
         screen.getByRole("option", {
             name: expected,
             selected: true,
-        })
+        }),
     ).toBeVisible();
 });
 
@@ -154,7 +153,7 @@ test("does not reset the currently selected output unit after changing tabs", as
     await clickByName(expectedCalculatorTab, "tab");
 
     expect(
-        await screen.findByRole("combobox", { name: expectedOutputUnitLabel })
+        await screen.findByRole("combobox", { name: expectedOutputUnitLabel }),
     ).toHaveTextContent(expected);
 });
 
@@ -164,7 +163,7 @@ test("queries calculator output if item and workers inputted with default unit s
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -191,7 +190,7 @@ test("queries calculator output if item and workers inputted with non-default un
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -219,7 +218,7 @@ test("queries calculator output if item and target amount inputted with default 
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -247,7 +246,7 @@ test("queries calculator output if item and target amount inputted with non-defa
         server,
         "POST",
         expectedGraphQLAPIURL,
-        expectedCalculatorOutputQueryName
+        expectedCalculatorOutputQueryName,
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -290,7 +289,7 @@ describe.each([
         _: string,
         handler,
         expected: string,
-        expectedErrorTestText: string
+        expectedErrorTestText: string,
     ) => {
         beforeEach(() => {
             server.use(handler());
@@ -304,7 +303,7 @@ describe.each([
             });
 
             expect(await screen.findByRole("alert")).toHaveTextContent(
-                expected
+                expected,
             );
         });
 
@@ -319,7 +318,7 @@ describe.each([
             expect(
                 screen.queryByRole("heading", {
                     name: expectedRequirementsHeading,
-                })
+                }),
             ).not.toBeInTheDocument();
         });
 
@@ -333,7 +332,7 @@ describe.each([
 
             expect(screen.queryByRole("table")).not.toBeInTheDocument();
         });
-    }
+    },
 );
 
 test("queries optimal output and requirements with machine tool availability once checked", async () => {
@@ -350,7 +349,7 @@ test("queries optimal output and requirements with machine tool availability onc
             unit: OutputUnit.Minutes,
             maxAvailableTool: "NONE",
             hasMachineTools: true,
-        }
+        },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
@@ -429,10 +428,10 @@ test.each([
             expect(
                 screen.getByLabelText(expectedWorkerInputLabel, {
                     selector: "input",
-                })
-            ).toHaveValue(expected.toString())
+                }),
+            ).toHaveValue(expected.toString()),
         );
-    }
+    },
 );
 
 test("sets output target amount to total output amount if workers entered", async () => {
@@ -449,8 +448,8 @@ test("sets output target amount to total output amount if workers entered", asyn
         expect(
             screen.getByLabelText(expectedTargetAmountInputLabel, {
                 selector: "input",
-            })
-        ).toHaveValue(item.amount.toString())
+            }),
+        ).toHaveValue(item.amount.toString()),
     );
 });
 
@@ -472,7 +471,7 @@ describe("debounces output requests", () => {
                 amount: null,
                 workers: 3,
                 unit: expectedOutputUnit,
-            }
+            },
         );
 
         const { rerender } = rtlRender(
@@ -485,8 +484,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         rerender(
             wrapWithTestProviders(
@@ -498,8 +497,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         rerender(
             wrapWithTestProviders(
@@ -511,8 +510,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         act(() => {
             vi.advanceTimersByTime(500);
@@ -520,7 +519,7 @@ describe("debounces output requests", () => {
         const { detailsUpToMatch } = await expectedLastRequest;
 
         expect(detailsUpToMatch).not.toContainEqual(
-            expect.objectContaining({ workers: 2 })
+            expect.objectContaining({ workers: 2 }),
         );
     });
 
@@ -537,7 +536,7 @@ describe("debounces output requests", () => {
                 amount: 3,
                 workers: null,
                 unit: expectedOutputUnit,
-            }
+            },
         );
 
         const { rerender } = rtlRender(
@@ -550,8 +549,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         rerender(
             wrapWithTestProviders(
@@ -563,8 +562,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         rerender(
             wrapWithTestProviders(
@@ -576,8 +575,8 @@ describe("debounces output requests", () => {
                         return;
                     }}
                 />,
-                expectedGraphQLAPIURL
-            )
+                expectedGraphQLAPIURL,
+            ),
         );
         act(() => {
             vi.advanceTimersByTime(500);
@@ -585,7 +584,7 @@ describe("debounces output requests", () => {
         const { detailsUpToMatch } = await expectedLastRequest;
 
         expect(detailsUpToMatch).not.toContainEqual(
-            expect.objectContaining({ amount: 2 })
+            expect.objectContaining({ amount: 2 }),
         );
     });
 

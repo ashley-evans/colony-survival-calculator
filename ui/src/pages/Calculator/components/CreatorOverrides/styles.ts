@@ -19,7 +19,7 @@ export const LargeAddButton = styled.button`
         background-color: ${theme.color.primary.container};
         border: 1px solid ${theme.color.primary.container};
 
-        :hover {
+        &:hover {
             border-color: ${theme.color.primary.on_container};
         }
     `};
@@ -43,7 +43,7 @@ export const RemoveButton = styled.button`
         background-color: ${theme.color.error.container};
         border: 1px solid ${theme.color.error.container};
 
-        :hover {
+        &:hover {
             border-color: ${theme.color.error.on_container};
         }
     `};

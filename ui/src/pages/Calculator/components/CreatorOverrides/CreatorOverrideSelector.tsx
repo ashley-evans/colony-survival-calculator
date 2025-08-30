@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { faRemove } from "@fortawesome/free-solid-svg-icons";
 
 import { Selector } from "../../../../common";
@@ -28,7 +28,7 @@ function CreatorOverrideSelector({
     onRemove,
 }: CreatorOverrideSelectorProps) {
     const [selectedItem, setSelectedItem] = useState<string>(
-        defaultOverride.itemName
+        defaultOverride.itemName,
     );
 
     const handleSelectedItemChange = (value?: string) => {

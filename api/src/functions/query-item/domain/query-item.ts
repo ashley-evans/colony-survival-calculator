@@ -15,7 +15,8 @@ const INVALID_FILTER_ERROR =
 
 function filterByOptimal(items: Items, filters: OptimalFilter): Items {
     const itemMap = new Map<string, Item>();
-    const maxAvailableTool = filters.maxAvailableTool ?? DefaultToolset.steel;
+    const maxAvailableTool =
+        filters.maxAvailableTool ?? ("steel" as DefaultToolset);
     const hasMachineTools = filters.hasMachineTools ?? true;
 
     for (const item of items) {
@@ -33,11 +34,11 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
 
         const currentOptimalOutput = calculateOutput(
             currentOptimalItem,
-            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool
+            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool,
         );
         const itemOutput = calculateOutput(
             item,
-            maxAvailableTool ?? item.toolset.maximumTool
+            maxAvailableTool ?? item.toolset.maximumTool,
         );
 
         if (itemOutput > currentOptimalOutput) {
@@ -49,7 +50,7 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
 }
 
 const queryItem: QueryItemPrimaryPort = async (
-    filters: QueryFilters | undefined
+    filters: QueryFilters | undefined,
 ) => {
     if (filters?.minimumCreators && filters.creator) {
         console.error(INVALID_FILTER_ERROR);

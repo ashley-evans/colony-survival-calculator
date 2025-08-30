@@ -36,7 +36,7 @@ const factory = <T>(schema: Schema): JSONFileReader<T> => {
         }
 
         throw new Error(
-            `File at path: ${filePath} does not match provided schema`
+            `File at path: ${filePath} does not match provided schema`,
         );
     };
 };

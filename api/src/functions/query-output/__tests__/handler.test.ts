@@ -1,5 +1,6 @@
 import type { AppSyncResolverEvent } from "aws-lambda";
-import { mock } from "jest-mock-extended";
+import { mock } from "vitest-mock-extended";
+import { vi, Mock } from "vitest";
 
 import { handler } from "../handler";
 import { calculateOutput } from "../domain/output-calculator";
@@ -10,11 +11,11 @@ import type {
 } from "../../../graphql/schema";
 import { DefaultToolset as SchemaTools } from "../../../types";
 
-jest.mock("../domain/output-calculator", () => ({
-    calculateOutput: jest.fn(),
+vi.mock("../domain/output-calculator", () => ({
+    calculateOutput: vi.fn(),
 }));
 
-const mockCalculateOutput = calculateOutput as jest.Mock;
+const mockCalculateOutput = calculateOutput as Mock;
 
 function createMockEvent(
     name: string,
@@ -22,7 +23,7 @@ function createMockEvent(
     unit: OutputUnit,
     maxAvailableTool?: AvailableTools,
     hasMachineTools?: boolean,
-    creator?: string
+    creator?: string,
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
@@ -44,7 +45,7 @@ const expectedUnit = "GAME_DAYS";
 const validEvent = createMockEvent(
     expectedItemName,
     expectedWorkers,
-    expectedUnit
+    expectedUnit,
 );
 
 beforeEach(() => {
@@ -63,12 +64,12 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
 });
 
 test.each<[AvailableTools, SchemaTools]>([
-    ["NONE", SchemaTools.none],
-    ["STONE", SchemaTools.stone],
-    ["COPPER", SchemaTools.copper],
-    ["IRON", SchemaTools.iron],
-    ["BRONZE", SchemaTools.bronze],
-    ["STEEL", SchemaTools.steel],
+    ["NONE", "none" as SchemaTools],
+    ["STONE", "stone" as SchemaTools],
+    ["COPPER", "copper" as SchemaTools],
+    ["IRON", "iron" as SchemaTools],
+    ["BRONZE", "bronze" as SchemaTools],
+    ["STEEL", "steel" as SchemaTools],
 ])(
     "calls the domain to calculate output given a valid event w/ %s tool",
     async (provided: AvailableTools, expectedTool: SchemaTools) => {
@@ -79,7 +80,7 @@ test.each<[AvailableTools, SchemaTools]>([
             expectedItemName,
             expectedWorkers,
             expectedUnit,
-            provided
+            provided,
         );
 
         await handler(event);
@@ -91,7 +92,7 @@ test.each<[AvailableTools, SchemaTools]>([
             unit: expectedUnit,
             maxAvailableTool: expectedTool,
         });
-    }
+    },
 );
 
 test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
@@ -102,7 +103,7 @@ test("calls the domain to calculate output given a valid event w/ specific creat
         expectedUnit,
         undefined,
         undefined,
-        expectedCreator
+        expectedCreator,
     );
 
     await handler(event);
@@ -129,7 +130,7 @@ test.each([
             expectedUnit,
             undefined,
             hasMachineTools,
-            expectedCreator
+            expectedCreator,
         );
 
         await handler(event);
@@ -142,7 +143,7 @@ test.each([
             creator: expectedCreator,
             hasMachineTools,
         });
-    }
+    },
 );
 
 test("returns the calculated output", async () => {
@@ -173,7 +174,7 @@ test.each([
         const actual = await handler(validEvent);
 
         expect(actual).toEqual({ __typename: "UserError", message: error });
-    }
+    },
 );
 
 test("throws an error if any unhandled exceptions occur while calculating output", async () => {

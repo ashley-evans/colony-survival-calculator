@@ -24,7 +24,7 @@ jobs:
                   role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
             - uses: hashicorp/setup-terraform@v3
               with:
-                  terraform_version: 1.3.7
+                  terraform_version: 1.10.5
                   terraform_wrapper: false
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
@@ -37,7 +37,7 @@ jobs:
                       ${{ runner.os }}-dependencies-v1-
             - name: Install Dependencies
               run: |
-                  yarn install
+                  yarn install --immutable
             - name: Run deployment
               env:
                   TF_VAR_mongodb_private_key: ${{ secrets.MONGODB_PRIVATE_KEY }}

@@ -16,7 +16,7 @@ terraform {
   }
 
 
-  required_version = ">= 1.3.7"
+  required_version = ">= 1.10.5"
 }
 
 provider "aws" {
@@ -156,10 +156,16 @@ resource "aws_iam_policy" "add_item_lambda" {
 
 resource "aws_iam_role" "add_item_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
-  managed_policy_arns = [
-    aws_iam_policy.add_item_lambda.arn,
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "add_item_lambda_execution_attachment" {
+  role       = aws_iam_role.add_item_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "add_item_lambda_policy_attachment" {
+  role       = aws_iam_role.add_item_lambda.name
+  policy_arn = aws_iam_policy.add_item_lambda.arn
 }
 
 resource "aws_lambda_function" "add_item_lambda" {
@@ -242,9 +248,11 @@ resource "aws_s3_object" "query_item_lambda" {
 
 resource "aws_iam_role" "query_item_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_item_lambda_execution_attachment" {
+  role       = aws_iam_role.query_item_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "query_item_lambda" {
@@ -298,9 +306,11 @@ resource "aws_iam_policy" "query_item_lambda_access" {
 
 resource "aws_iam_role" "query_item_lambda_access" {
   assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
-  managed_policy_arns = [
-    aws_iam_policy.query_item_lambda_access.arn,
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_item_lambda_access_policy_attachment" {
+  role       = aws_iam_role.query_item_lambda_access.name
+  policy_arn = aws_iam_policy.query_item_lambda_access.arn
 }
 
 resource "aws_appsync_datasource" "query_item_lambda" {
@@ -339,9 +349,11 @@ resource "aws_s3_object" "query_requirements_lambda" {
 
 resource "aws_iam_role" "query_requirements_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_requirements_lambda_execution_attachment" {
+  role       = aws_iam_role.query_requirements_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "query_requirements_lambda" {
@@ -396,9 +408,11 @@ resource "aws_iam_policy" "query_requirements_lambda_access" {
 
 resource "aws_iam_role" "query_requirements_lambda_access" {
   assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
-  managed_policy_arns = [
-    aws_iam_policy.query_requirements_lambda_access.arn,
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_requirements_lambda_access_policy_attachment" {
+  role       = aws_iam_role.query_requirements_lambda_access.name
+  policy_arn = aws_iam_policy.query_requirements_lambda_access.arn
 }
 
 resource "aws_appsync_datasource" "query_requirements_lambda" {
@@ -437,9 +451,11 @@ resource "aws_s3_object" "query_output_lambda" {
 
 resource "aws_iam_role" "query_output_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_output_lambda_execution_attachment" {
+  role       = aws_iam_role.query_output_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "query_output_lambda" {
@@ -493,9 +509,11 @@ resource "aws_iam_policy" "query_output_lambda_access" {
 
 resource "aws_iam_role" "query_output_lambda_access" {
   assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
-  managed_policy_arns = [
-    aws_iam_policy.query_output_lambda_access.arn,
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_output_lambda_access_policy_attachment" {
+  role       = aws_iam_role.query_output_lambda_access.name
+  policy_arn = aws_iam_policy.query_output_lambda_access.arn
 }
 
 resource "aws_appsync_datasource" "query_output_lambda" {
@@ -534,9 +552,11 @@ resource "aws_s3_object" "query_distinct_item_names_lambda" {
 
 resource "aws_iam_role" "query_distinct_item_names_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_policy_document.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_distinct_item_names_lambda_execution_attachment" {
+  role       = aws_iam_role.query_distinct_item_names_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "query_distinct_item_names_lambda" {
@@ -590,9 +610,11 @@ resource "aws_iam_policy" "query_distinct_item_names_lambda_access" {
 
 resource "aws_iam_role" "query_distinct_item_names_lambda_access" {
   assume_role_policy = data.aws_iam_policy_document.appsync_policy_document.json
-  managed_policy_arns = [
-    aws_iam_policy.query_distinct_item_names_lambda_access.arn,
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "query_distinct_item_names_lambda_access_policy_attachment" {
+  role       = aws_iam_role.query_distinct_item_names_lambda_access.name
+  policy_arn = aws_iam_policy.query_distinct_item_names_lambda_access.arn
 }
 
 resource "aws_appsync_datasource" "query_distinct_item_names_lambda" {
@@ -661,9 +683,11 @@ resource "aws_iam_role" "unauthenticated_api_access" {
       },
     ]
   })
-  managed_policy_arns = [
-    aws_iam_policy.unauthenticated_api_access.arn,
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "unauthenticated_api_access_policy_attachment" {
+  role       = aws_iam_role.unauthenticated_api_access.name
+  policy_arn = aws_iam_policy.unauthenticated_api_access.arn
 }
 
 resource "aws_cognito_identity_pool_roles_attachment" "main" {

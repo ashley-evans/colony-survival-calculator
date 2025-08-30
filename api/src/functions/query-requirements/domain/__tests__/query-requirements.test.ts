@@ -1,3 +1,5 @@
+import { vi, Mock } from "vitest";
+
 import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import { createItem, createItemWithMachineTools } from "../../../../../test";
@@ -8,12 +10,12 @@ import {
 } from "../../interfaces/query-requirements-primary-port";
 import { OutputUnit } from "../../../../common";
 
-jest.mock("../../adapters/mongodb-requirements-adapter", () => ({
-    queryRequirements: jest.fn(),
+vi.mock("../../adapters/mongodb-requirements-adapter", () => ({
+    queryRequirements: vi.fn(),
 }));
 
-const mockMongoDBQueryRequirements = mongoDBQueryRequirements as jest.Mock;
-const consoleLogSpy = jest
+const mockMongoDBQueryRequirements = mongoDBQueryRequirements as Mock;
+const consoleLogSpy = vi
     .spyOn(console, "log")
     .mockImplementation(() => undefined);
 
@@ -22,7 +24,7 @@ const validWorkers = 5;
 
 function findRequirement(
     requirements: Requirement[],
-    itemName: string
+    itemName: string,
 ): Requirement | undefined {
     return requirements.find((workers) => workers.name === itemName);
 }
@@ -34,12 +36,12 @@ beforeEach(() => {
 
 test("throws an error given an empty string as an item name", async () => {
     const expectedError = new Error(
-        "Invalid item name provided, must be a non-empty string"
+        "Invalid item name provided, must be a non-empty string",
     );
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: "", workers: validWorkers })
+        queryRequirements({ name: "", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -50,14 +52,14 @@ test.each([
     "throws an error given number of workers that is %s",
     async (_: string, workers: number) => {
         const expectedError = new Error(
-            "Invalid number of workers provided, must be a positive number"
+            "Invalid number of workers provided, must be a positive number",
         );
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers })
+            queryRequirements({ name: validItemName, workers }),
         ).rejects.toThrow(expectedError);
-    }
+    },
 );
 
 test("calls the database adapter to get the requirements given valid input", async () => {
@@ -81,7 +83,7 @@ test("throws an error if no requirements are returned at all (item does not exis
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -97,7 +99,7 @@ test("throws an error if the provided item details are not returned from DB", as
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -144,7 +146,7 @@ test("throws an error if provided item requires an item that does not exist in d
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -560,39 +562,43 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers })
+        queryRequirements({ name: validItemName, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
 describe("handles tool modifiers", () => {
     test.each([
-        ["stone min, none provided", DefaultToolset.stone, DefaultToolset.none],
+        [
+            "stone min, none provided",
+            "stone" as DefaultToolset,
+            "none" as DefaultToolset,
+        ],
         [
             "copper min, stone provided",
-            DefaultToolset.copper,
-            DefaultToolset.stone,
+            "copper" as DefaultToolset,
+            "stone" as DefaultToolset,
         ],
         [
             "iron min, copper provided",
-            DefaultToolset.iron,
-            DefaultToolset.copper,
+            "iron" as DefaultToolset,
+            "copper" as DefaultToolset,
         ],
         [
             "bronze min, iron provided",
-            DefaultToolset.bronze,
-            DefaultToolset.iron,
+            "bronze" as DefaultToolset,
+            "iron" as DefaultToolset,
         ],
         [
             "steel min, bronze provided",
-            DefaultToolset.steel,
-            DefaultToolset.bronze,
+            "steel" as DefaultToolset,
+            "bronze" as DefaultToolset,
         ],
     ])(
         "throws an error if the provided tool is less the minimum requirement for the specified item (%s)",
         async (
             _: string,
             minimum: DefaultToolset,
-            provided: DefaultToolset
+            provided: DefaultToolset,
         ) => {
             const item = createItem({
                 name: validItemName,
@@ -600,7 +606,7 @@ describe("handles tool modifiers", () => {
                 output: 3,
                 requirements: [],
                 minimumTool: minimum,
-                maximumTool: DefaultToolset.steel,
+                maximumTool: "steel" as DefaultToolset,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([item]);
             const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
@@ -611,39 +617,43 @@ describe("handles tool modifiers", () => {
                     name: validItemName,
                     workers: validWorkers,
                     maxAvailableTool: provided,
-                })
+                }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test.each([
-        ["stone min, none provided", DefaultToolset.stone, DefaultToolset.none],
+        [
+            "stone min, none provided",
+            "stone" as DefaultToolset,
+            "none" as DefaultToolset,
+        ],
         [
             "copper min, stone provided",
-            DefaultToolset.copper,
-            DefaultToolset.stone,
+            "copper" as DefaultToolset,
+            "stone" as DefaultToolset,
         ],
         [
             "iron min, copper provided",
-            DefaultToolset.iron,
-            DefaultToolset.copper,
+            "iron" as DefaultToolset,
+            "copper" as DefaultToolset,
         ],
         [
             "bronze min, iron provided",
-            DefaultToolset.bronze,
-            DefaultToolset.iron,
+            "bronze" as DefaultToolset,
+            "iron" as DefaultToolset,
         ],
         [
             "steel min, bronze provided",
-            DefaultToolset.steel,
-            DefaultToolset.bronze,
+            "steel" as DefaultToolset,
+            "bronze" as DefaultToolset,
         ],
     ])(
         "throws an error if the provided tool is less the minimum requirement for any item's requirements (%s)",
         async (
             _: string,
             minimum: DefaultToolset,
-            provided: DefaultToolset
+            provided: DefaultToolset,
         ) => {
             const requiredItem = createItem({
                 name: "another item",
@@ -651,15 +661,15 @@ describe("handles tool modifiers", () => {
                 output: 3,
                 requirements: [],
                 minimumTool: minimum,
-                maximumTool: DefaultToolset.steel,
+                maximumTool: "steel" as DefaultToolset,
             });
             const item = createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: requiredItem.name, amount: 3 }],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([
                 item,
@@ -673,51 +683,51 @@ describe("handles tool modifiers", () => {
                     name: validItemName,
                     workers: validWorkers,
                     maxAvailableTool: provided,
-                })
+                }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test("throws an error with lowest required tool in message given multiple items w/ unmet tool requirements", async () => {
-        const expectedMinimumTool = DefaultToolset.iron;
+        const expectedMinimumTool = "iron" as DefaultToolset;
         const requiredItem = createItem({
             name: "another item",
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: DefaultToolset.stone,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "stone" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: DefaultToolset.iron,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "iron" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([requiredItem, item]);
         const expectedError = `Unable to create item with available tools, minimum tool is: ${expectedMinimumTool}`;
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers })
+            queryRequirements({ name: validItemName, workers: validWorkers }),
         ).rejects.toThrow(expectedError);
     });
 
     test.each([
-        [DefaultToolset.none, 7.5, 5],
-        [DefaultToolset.stone, 15, 10],
-        [DefaultToolset.copper, 30, 20],
-        [DefaultToolset.iron, 39.75, 26.5],
-        [DefaultToolset.bronze, 46.125, 30.75],
-        [DefaultToolset.steel, 60, 40],
+        ["none" as DefaultToolset, 7.5, 5],
+        ["stone" as DefaultToolset, 15, 10],
+        ["copper" as DefaultToolset, 30, 20],
+        ["iron" as DefaultToolset, 39.75, 26.5],
+        ["bronze" as DefaultToolset, 46.125, 30.75],
+        ["steel" as DefaultToolset, 60, 40],
     ])(
         "returns expected output for requirement given item with applicable tool: %s and requirement with no tools",
         async (
             provided: DefaultToolset,
             expectedOutput: number,
-            expectedWorkers: number
+            expectedWorkers: number,
         ) => {
             const requiredItemName = "another item";
             const requiredItem = createItem({
@@ -725,16 +735,16 @@ describe("handles tool modifiers", () => {
                 createTime: 2,
                 output: 3,
                 requirements: [],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.none,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "none" as DefaultToolset,
             });
             const item = createItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
                 requirements: [{ name: requiredItem.name, amount: 3 }],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([
                 item,
@@ -749,15 +759,15 @@ describe("handles tool modifiers", () => {
 
             const requirement = findRequirement(
                 actual,
-                requiredItemName
+                requiredItemName,
             ) as Requirement;
 
             expect(requirement.amount).toBeCloseTo(expectedOutput);
             expect(requirement.creators[0]?.amount).toBeCloseTo(expectedOutput);
             expect(requirement.creators[0]?.workers).toBeCloseTo(
-                expectedWorkers
+                expectedWorkers,
             );
-        }
+        },
     );
 
     test("returns required output/workers to satisfy input item given tool better than applicable to input item", async () => {
@@ -767,27 +777,27 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.none,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "none" as DefaultToolset,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.copper,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "copper" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: DefaultToolset.steel,
+            maxAvailableTool: "steel" as DefaultToolset,
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.amount).toBeCloseTo(30);
@@ -802,27 +812,27 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.none,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "none" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: DefaultToolset.steel,
+            maxAvailableTool: "steel" as DefaultToolset,
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.creators[0]?.workers).toBeCloseTo(0.625);
@@ -835,27 +845,27 @@ describe("handles tool modifiers", () => {
             createTime: 2,
             output: 3,
             requirements: [],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.copper,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "copper" as DefaultToolset,
         });
         const item = createItem({
             name: validItemName,
             createTime: 2,
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 3 }],
-            minimumTool: DefaultToolset.none,
-            maximumTool: DefaultToolset.none,
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "none" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: DefaultToolset.steel,
+            maxAvailableTool: "steel" as DefaultToolset,
         });
         const requirement = findRequirement(
             actual,
-            requiredItemName
+            requiredItemName,
         ) as Requirement;
 
         expect(requirement.creators[0]?.workers).toBeCloseTo(1.25);
@@ -1150,7 +1160,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: DefaultToolset.stone,
+            maximumTool: "stone" as DefaultToolset,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1158,7 +1168,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            maximumTool: DefaultToolset.steel,
+            maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1169,7 +1179,7 @@ describe("multiple recipe handling", () => {
         const actual = await queryRequirements({
             name: validItemName,
             workers: validWorkers,
-            maxAvailableTool: DefaultToolset.steel,
+            maxAvailableTool: "steel" as DefaultToolset,
         });
 
         expect(actual).toEqual([
@@ -1215,7 +1225,7 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: DefaultToolset.stone,
+            maximumTool: "stone" as DefaultToolset,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1223,8 +1233,8 @@ describe("multiple recipe handling", () => {
             output: 6,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            minimumTool: DefaultToolset.steel,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "steel" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1351,8 +1361,8 @@ describe("multiple recipe handling", () => {
             output: 3,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 1",
-            maximumTool: DefaultToolset.stone,
-            minimumTool: DefaultToolset.stone,
+            maximumTool: "stone" as DefaultToolset,
+            minimumTool: "stone" as DefaultToolset,
         });
         const moreOptimalItemRecipe = createItem({
             name: validItemName,
@@ -1360,19 +1370,19 @@ describe("multiple recipe handling", () => {
             output: 6,
             requirements: [{ name: requiredItem.name, amount: 4 }],
             creator: "creator 2",
-            minimumTool: DefaultToolset.steel,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "steel" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
             moreOptimalItemRecipe,
             requiredItem,
         ]);
-        const expectedError = `Unable to create item with available tools, minimum tool is: ${DefaultToolset.stone}`;
+        const expectedError = `Unable to create item with available tools, minimum tool is: stone`;
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers })
+            queryRequirements({ name: validItemName, workers: validWorkers }),
         ).rejects.toThrow(expectedError);
     });
 });
@@ -1537,7 +1547,7 @@ describe("creator override handling", () => {
                     { itemName: validItemName, creator: overrideCreator },
                     { itemName: validItemName, creator: "another creator" },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -1704,7 +1714,7 @@ describe("creator override handling", () => {
                 creatorOverrides: [
                     { itemName: validItemName, creator: override },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -1735,7 +1745,7 @@ describe("creator override handling", () => {
                 creatorOverrides: [
                     { itemName: requiredItem.name, creator: override },
                 ],
-            })
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -2007,7 +2017,7 @@ describe("handles multiple output units", () => {
             });
 
             expect(actual).toEqual(expected);
-        }
+        },
     );
 });
 
@@ -2025,7 +2035,7 @@ describe("handles machine tools", () => {
         requirements: [{ name: machineToolsItem.name, amount: 5 }],
     });
     const expectedRequiredToolsError = new Error(
-        "Unable to create item with available tools, requires machine tools"
+        "Unable to create item with available tools, requires machine tools",
     );
 
     beforeEach(() => {
@@ -2052,7 +2062,7 @@ describe("handles machine tools", () => {
                         name: machineToolsItem.name,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
-                    })
+                    }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
 
@@ -2063,21 +2073,21 @@ describe("handles machine tools", () => {
                         name: baseItem.name,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
-                    })
+                    }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
-        }
+        },
     );
 
     test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
-        const expectedError = `Unable to create item with available tools, minimum tool is: ${DefaultToolset.steel}`;
+        const expectedError = `Unable to create item with available tools, minimum tool is: steel`;
         const baseItemSteelMin = createItem({
             name: "base item",
             createTime: 3,
             output: 5,
             requirements: [{ name: machineToolsItem.name, amount: 5 }],
-            minimumTool: DefaultToolset.steel,
-            maximumTool: DefaultToolset.steel,
+            minimumTool: "steel" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             baseItemSteelMin,
@@ -2090,8 +2100,8 @@ describe("handles machine tools", () => {
                 name: baseItem.name,
                 workers: validWorkers,
                 hasMachineTools: true,
-                maxAvailableTool: DefaultToolset.iron,
-            })
+                maxAvailableTool: "iron" as DefaultToolset,
+            }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -2181,14 +2191,14 @@ describe("handles calculating requirements for target output", () => {
         "throws an error given target amount that is %s",
         async (_: string, amount: number) => {
             const expectedError = new Error(
-                "Invalid target output provided, must be a positive number"
+                "Invalid target output provided, must be a positive number",
             );
 
             expect.assertions(1);
             await expect(
-                queryRequirements({ name: validItemName, amount })
+                queryRequirements({ name: validItemName, amount }),
             ).rejects.toThrow(expectedError);
-        }
+        },
     );
 
     test.each([
@@ -2382,14 +2392,14 @@ describe("handles calculating requirements for target output", () => {
             });
 
             expect(actual).toEqual(expected);
-        }
+        },
     );
 });
 
 test("logs out requirements query to console", async () => {
     const expectedParams: QueryRequirementsParams = {
         name: validItemName,
-        maxAvailableTool: DefaultToolset.copper,
+        maxAvailableTool: "copper" as DefaultToolset,
         hasMachineTools: true,
         unit: OutputUnit.GAME_DAYS,
         creatorOverrides: [

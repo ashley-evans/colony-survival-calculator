@@ -33,7 +33,7 @@ function validateRequirements(items: Items): void {
         for (const requirement of item.requires) {
             if (!itemMap.has(requirement.name)) {
                 throw new Error(
-                    `Missing requirement: ${requirement.name} in ${item.name}`
+                    `Missing requirement: ${requirement.name} in ${item.name}`,
                 );
             }
         }
@@ -50,7 +50,7 @@ function validateOptionalOutputs(items: Items): void {
         for (const optionalOutput of item.optionalOutputs) {
             if (!itemMap.has(optionalOutput.name)) {
                 throw new Error(
-                    `Missing optional output: ${optionalOutput.name} in ${item.name}`
+                    `Missing optional output: ${optionalOutput.name} in ${item.name}`,
                 );
             }
         }
@@ -67,7 +67,7 @@ function validateTools(items: Items): void {
         const maxToolValue = ToolModifierValues[item.toolset.maximumTool];
         if (minToolValue > maxToolValue) {
             throw new Error(
-                `Invalid item: ${item.name}, minimum tool is better than maximum tool`
+                `Invalid item: ${item.name}, minimum tool is better than maximum tool`,
             );
         }
     }
@@ -81,7 +81,7 @@ function validateCreators(items: Items): void {
             itemMap.set(item.name, new Set([item.creator]));
         } else if (creatorSet.has(item.creator)) {
             throw new Error(
-                `Items provided with same name: ${item.name} and creator: ${item.creator}`
+                `Items provided with same name: ${item.name} and creator: ${item.creator}`,
             );
         } else {
             creatorSet.add(item.creator);
