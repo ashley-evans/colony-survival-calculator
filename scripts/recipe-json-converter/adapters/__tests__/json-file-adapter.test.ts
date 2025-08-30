@@ -22,7 +22,7 @@ const testSchema: JSONSchemaType<TestType> = {
 
 const adapter = factory(testSchema);
 
-const tempDirectory = path.join(__dirname, "./temp");
+const tempDirectory = path.join(__dirname, "./temp/json-file-adapter");
 
 beforeAll(() => {
     createDirectory(tempDirectory);

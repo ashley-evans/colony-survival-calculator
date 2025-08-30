@@ -1,13 +1,14 @@
 import path from "path";
+import { vi } from "vitest";
 
 import { RecipeConverterInputs } from "../../interfaces/recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../recipe-converter";
 import { DefaultToolset, Item, Items, MachineToolset } from "../../types";
 
-const mockConvertCrafteableRecipes = jest.fn();
-const mockConvertMineableItems = jest.fn();
-const mockConvertGrowables = jest.fn();
-const mockWriteJSON = jest.fn();
+const mockConvertCrafteableRecipes = vi.fn();
+const mockConvertMineableItems = vi.fn();
+const mockConvertGrowables = vi.fn();
+const mockWriteJSON = vi.fn();
 
 const convertRecipes = (input: RecipeConverterInputs) =>
     baseConvertRecipes({
@@ -92,7 +93,7 @@ const expectedGrowables: Items = [
     },
 ];
 
-const consoleLogSpy = jest
+const consoleLogSpy = vi
     .spyOn(console, "log")
     .mockImplementation(() => undefined);
 

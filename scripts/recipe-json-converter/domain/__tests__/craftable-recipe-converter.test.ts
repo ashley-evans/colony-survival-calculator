@@ -1,5 +1,6 @@
 import path from "path";
-import { when } from "jest-when";
+import { vi } from "vitest";
+import { when } from "vitest-when";
 
 import { CraftableRecipeConverterInputs } from "../../interfaces/craftable-recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "../craftable-recipe-converter";
@@ -13,10 +14,10 @@ import {
     DefaultToolset,
 } from "../../types";
 
-const mockFindFiles = jest.fn();
-const mockReadToolFile = jest.fn();
-const mockReadBehaviourFile = jest.fn();
-const mockReadRecipeFile = jest.fn();
+const mockFindFiles = vi.fn();
+const mockReadToolFile = vi.fn();
+const mockReadBehaviourFile = vi.fn();
+const mockReadRecipeFile = vi.fn();
 
 const convertRecipes = (input: CraftableRecipeConverterInputs) =>
     baseConvertRecipes({
@@ -81,20 +82,20 @@ const machineToolset: PiplizToolsets[number] = {
     usable: [PiplizTools.machinetools],
 };
 
-const consoleLogSpy = jest
+const consoleLogSpy = vi
     .spyOn(console, "log")
     .mockImplementation(() => undefined);
 
 beforeEach(() => {
     when(mockFindFiles)
         .calledWith(expectedToolsetFileFindInput)
-        .mockResolvedValue([toolsetFile]);
+        .thenResolve([toolsetFile]);
     when(mockFindFiles)
         .calledWith(expectedBlockBehavioursFileFindInput)
-        .mockResolvedValue([blockBehavioursFile]);
+        .thenResolve([blockBehavioursFile]);
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue(recipeFiles);
+        .thenResolve(recipeFiles);
 
     mockReadToolFile.mockResolvedValue([
         noToolset,
@@ -129,7 +130,7 @@ describe.each([
         beforeEach(() => {
             when(mockFindFiles)
                 .calledWith(expectedToolsetFileFindInput)
-                .mockResolvedValue(filesFound);
+                .thenResolve(filesFound);
         });
 
         test("throws an error", async () => {
@@ -186,7 +187,7 @@ describe("handles no block behaviour file found", () => {
     beforeEach(() => {
         when(mockFindFiles)
             .calledWith(expectedBlockBehavioursFileFindInput)
-            .mockResolvedValue([]);
+            .thenResolve([]);
     });
 
     test("throws an error", async () => {
@@ -213,7 +214,7 @@ test("parses each block behaviour file returned if multiple found", async () => 
     const expected = ["generateblocks.json", "generateblocks_decorative.json"];
     when(mockFindFiles)
         .calledWith(expectedBlockBehavioursFileFindInput)
-        .mockResolvedValue(expected);
+        .thenResolve(expected);
 
     await convertRecipes(input);
 
@@ -253,7 +254,7 @@ test("parses each json file returned given recipes found in provided directory",
 test("does not attempt to parse any recipes from the merchant", async () => {
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue([
+        .thenResolve([
             path.join(input.inputDirectoryPath, "recipes_merchant.json"),
         ]);
 
@@ -265,7 +266,7 @@ test("does not attempt to parse any recipes from the merchant", async () => {
 test("does not attempt to parse any recipes given no recipe files found in provided directory", async () => {
     when(mockFindFiles)
         .calledWith(expectedRecipesFileFindInput)
-        .mockResolvedValue([]);
+        .thenResolve([]);
 
     await convertRecipes(input);
 
@@ -276,7 +277,7 @@ describe("recipe to item mapping", () => {
     beforeEach(() => {
         when(mockFindFiles)
             .calledWith(expectedRecipesFileFindInput)
-            .mockResolvedValue([recipeFiles[0]]);
+            .thenResolve([recipeFiles[0]]);
     });
 
     test.each([

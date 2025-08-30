@@ -4,7 +4,8 @@ import fs from "fs";
 import { findFiles } from "../fs-file-adapter";
 import { createDirectory, emptyDirectory } from "./utils";
 
-const tempDirectory = path.join(__dirname, "./temp");
+const tempDirectoryParent = path.join(__dirname, "./temp");
+const tempDirectory = path.join(tempDirectoryParent, "./fs-file-adapter");
 
 describe("invalid root path handling", () => {
     test("throws an error if the provided root path does not exist", async () => {
@@ -15,6 +16,7 @@ describe("invalid root path handling", () => {
     });
 
     test("throws an error if the provided root path is not a directory", async () => {
+        createDirectory(tempDirectoryParent);
         fs.writeFileSync(tempDirectory, "");
 
         expect.assertions(1);

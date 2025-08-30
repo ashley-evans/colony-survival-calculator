@@ -1,11 +1,12 @@
 import path from "path";
+import { vi } from "vitest";
 
 import { MineableItemConverterInputs } from "../../interfaces/mineable-item-converter";
 import { convertMineableItems as baseConvertMineableItems } from "../mineable-item-converter";
 import { DefaultToolset, Item, Items, MineableItems } from "../../types";
 
-const mockFindFiles = jest.fn();
-const mockReadMineableItemsFile = jest.fn();
+const mockFindFiles = vi.fn();
+const mockReadMineableItemsFile = vi.fn();
 
 const convertMineableItems = (input: MineableItemConverterInputs) =>
     baseConvertMineableItems({

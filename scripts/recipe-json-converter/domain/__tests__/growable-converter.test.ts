@@ -1,11 +1,12 @@
 import path from "path";
+import { vi } from "vitest";
 
 import { GrowableConverterInputs } from "../../interfaces/growable-converter";
 import { convertGrowables as baseConvertGrowables } from "../growable-converter";
 import { DefaultToolset, Growables, Item, Items } from "../../types";
 
-const mockFindFiles = jest.fn();
-const mockReadGrowablesFile = jest.fn();
+const mockFindFiles = vi.fn();
+const mockReadGrowablesFile = vi.fn();
 
 const convertGrowables = (input: GrowableConverterInputs) =>
     baseConvertGrowables({

@@ -36,7 +36,7 @@ interface RecipeConverter {
     (params: RecipeConverterParameters): Promise<boolean>;
 }
 
-export {
+export type {
     RecipeConverter,
     RecipeConverterDependencies,
     RecipeConverterInputs,

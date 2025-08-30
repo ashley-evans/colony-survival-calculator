@@ -1,11 +1,11 @@
-export * from "./generated/block-behaviours";
-export * from "./generated/mineable-items";
-export * from "./generated/growables";
-import { Recipes } from "./generated/recipes";
+export * from "./__generated__/block-behaviours";
+export * from "./__generated__/mineable-items";
+export * from "./__generated__/growables";
+import { Recipes } from "./__generated__/recipes";
 import {
     Tools as PiplizTools,
     Toolsets as PiplizToolsets,
-} from "./generated/tools";
+} from "./__generated__/tools";
 import {
     Item,
     Items,
@@ -14,7 +14,7 @@ import {
     OptionalOutput,
     DefaultToolset,
     MachineToolset,
-} from "./generated/items";
+} from "./__generated__/items";
 
 type APITools = DefaultToolset | MachineToolset;
 
@@ -26,18 +26,16 @@ type NPCToolsetMapping = {
 type Recipe = Recipes[number];
 type RecipeResult = Recipe["results"][number];
 
-export {
+export { PiplizTools, DefaultToolset, MachineToolset };
+export type {
     NPCToolsetMapping,
     Item,
     Items,
     Requirement,
     Requirements,
     OptionalOutput,
-    PiplizTools,
     PiplizToolsets,
     APITools,
-    DefaultToolset,
-    MachineToolset,
     Recipes,
     Recipe,
     RecipeResult,

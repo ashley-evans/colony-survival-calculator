@@ -1,11 +1,12 @@
 import path from "path";
 import fs from "fs";
 import fsPromises from "fs/promises";
+import { vi } from "vitest";
 
 import { createDirectory, readJSONFile } from "./utils";
 import { writeJSONToFile } from "../json-file-writer";
 
-const tempDirectory = path.join(__dirname, "./temp");
+const tempDirectory = path.join(__dirname, "./temp/json-file-writer");
 const expectedFilePath = path.join(tempDirectory, "test.json");
 const expectedContent = { test: "test" };
 
@@ -28,7 +29,7 @@ test("returns true if the provided content was successfully written to file", as
 
 test("returns false if an error occurs writing content to file", async () => {
     const expectedError = new Error("Test Error");
-    jest.spyOn(fsPromises, "writeFile").mockRejectedValueOnce(expectedError);
+    vi.spyOn(fsPromises, "writeFile").mockRejectedValueOnce(expectedError);
 
     const actual = await writeJSONToFile(expectedFilePath, expectedContent);
 

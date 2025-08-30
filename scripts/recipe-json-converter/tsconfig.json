@@ -4,7 +4,8 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "verbatimModuleSyntax": false,
-        "outDir": "dist"
+        "outDir": "dist",
+        "types": ["vitest/globals"]
     },
-    "exclude": ["jest.config.js"]
+    "exclude": ["jest.config.ts"]
 }
