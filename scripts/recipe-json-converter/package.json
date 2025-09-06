@@ -3,7 +3,7 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "build": "run -T tsc --noEmit --project tsconfig.build.json",
+        "build": "run -T tsc --noEmit --project tsconfig.json",
         "convert": "tsx ./index.ts",
         "test": "vitest run",
         "test:watch": "vitest watch",
