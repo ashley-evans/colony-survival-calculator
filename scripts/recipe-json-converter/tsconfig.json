@@ -6,6 +6,5 @@
         "verbatimModuleSyntax": false,
         "outDir": "dist",
         "types": ["vitest/globals"]
-    },
-    "exclude": ["jest.config.ts"]
+    }
 }

@@ -22,17 +22,19 @@
         "validate": "./scripts/validate-terraform.sh -r ./infra/",
         "format:check": "prettier --check . '!(api|ui|scripts/recipe-json-converter)/**/*' && terraform fmt -recursive ./infra/",
         "format:write": "prettier --write . '!(api|ui|scripts/recipe-json-converter)/**/*' && terraform fmt -recursive ./infra/",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "dependency:check": "npx npm-check-updates --deep",
+        "dependency:update": "npx npm-check-updates -u --deep && yarn install"
     },
     "devDependencies": {
         "@commitlint/cli": "^19.8.1",
         "@commitlint/config-conventional": "^19.8.1",
         "@commitlint/types": "^19.8.1",
         "@eslint/eslintrc": "^3.3.1",
-        "@eslint/js": "^9.34.0",
+        "@eslint/js": "^9.35.0",
         "commitizen": "^4.3.1",
         "cz-conventional-changelog": "^3.3.0",
-        "eslint": "^9.34.0",
+        "eslint": "^9.35.0",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^16.3.0",
         "husky": "^9.1.7",
@@ -41,7 +43,7 @@
         "prettier": "^3.6.2",
         "semantic-release": "^24.2.7",
         "typescript": "^5.9.2",
-        "typescript-eslint": "^8.41.0"
+        "typescript-eslint": "^8.42.0"
     },
     "resolutions": {
         "globals": "^16.3.0"
