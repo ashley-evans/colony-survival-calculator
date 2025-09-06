@@ -7,7 +7,7 @@
         "isolatedModules": false,
         "moduleResolution": "bundler",
         "module": "es2022",
-        "types": ["vitest/globals"]
+        "types": ["node", "vitest/globals"]
     },
     "include": ["./src/**/*"],
     "exclude": ["./dist/**/*"]

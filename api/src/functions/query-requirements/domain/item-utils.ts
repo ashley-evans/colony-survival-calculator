@@ -1,4 +1,4 @@
-import { Graph } from "graph-data-structure";
+import { Graph, depthFirstSearch } from "graph-data-structure";
 
 import { DefaultToolset, Item, Items } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
@@ -49,7 +49,7 @@ function createItemGraph(
     recipesMap: Map<string, Items>,
     rootItemName?: string,
 ) {
-    const graph = Graph();
+    const graph = new Graph();
     for (const item of items) {
         const itemRecipeKey = getUniqueItemKey(item);
         graph.addNode(itemRecipeKey);
@@ -94,7 +94,7 @@ function filterByCreatorOverrides(
             throw new Error(INTERNAL_SERVER_ERROR);
         }
 
-        const adjacent = graph.adjacent(current);
+        const adjacent = [...(graph.adjacent(current) || new Set())];
         const adjacentItems = new Set(
             adjacent.map((node) => node.split("#")[0] as string),
         );
@@ -115,14 +115,17 @@ function filterByCreatorOverrides(
 
         for (const ignore of recipesToIgnore) {
             const ignoreKey = getUniqueItemKey(ignore);
-            const adjacent = graph.adjacent(ignoreKey);
+            const adjacent = [...(graph.adjacent(ignoreKey) || new Set())];
             graph.removeNode(ignoreKey);
             adjacent.map((node) => removeUncreatableNodes(node));
         }
     }
 
     const creatableItemSet = new Set<string>(
-        graph.depthFirstSearch([ROOT_GRAPH_KEY], false),
+        depthFirstSearch(graph, {
+            sourceNodes: [ROOT_GRAPH_KEY],
+            includeSourceNodes: false,
+        }),
     );
 
     return items.filter((item) => creatableItemSet.has(getUniqueItemKey(item)));

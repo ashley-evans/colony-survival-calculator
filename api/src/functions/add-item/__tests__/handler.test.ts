@@ -6,7 +6,7 @@ import {
     GetObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
-import { sdkStreamMixin } from "@aws-sdk/util-stream-node";
+import { sdkStreamMixin } from "@smithy/util-stream";
 import { Readable } from "stream";
 import { mock } from "vitest-mock-extended";
 import { vi, Mock } from "vitest";
@@ -46,6 +46,14 @@ function createValidEventRecord(key: string): S3EventRecord {
             createS3EventBucketObjectDetails(key),
         ),
     );
+}
+
+function createGetObjectBody(
+    content: string[],
+): Required<GetObjectCommandOutput>["Body"] {
+    const nodeStream = Readable.from(content);
+    const mixed = sdkStreamMixin(nodeStream);
+    return mixed as Required<GetObjectCommandOutput>["Body"];
 }
 
 const validRecord = createValidEventRecord(EXPECTED_KEY);
@@ -129,7 +137,7 @@ describe("handles valid item list create events", () => {
 
     beforeEach(() => {
         const output = mock<GetObjectCommandOutput>();
-        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
+        output.Body = createGetObjectBody([EXPECTED_CONTENT]);
         mockS3Client.on(GetObjectCommand).resolves(output);
     });
 
@@ -154,7 +162,7 @@ describe("handles valid item list create events", () => {
 
     test("does not call domain if no content returned", async () => {
         const output = mock<GetObjectCommandOutput>();
-        output.Body = sdkStreamMixin(Readable.from([]));
+        output.Body = createGetObjectBody([]);
         mockS3Client.on(GetObjectCommand).resolves(output);
 
         await handler(event);
@@ -169,7 +177,7 @@ describe("given multiple records, one valid and one invalid", () => {
 
     beforeEach(() => {
         const output = mock<GetObjectCommandOutput>();
-        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
+        output.Body = createGetObjectBody([EXPECTED_CONTENT]);
         mockS3Client
             .on(GetObjectCommand, { Key: EXPECTED_KEY })
             .resolves(output);
@@ -200,7 +208,7 @@ describe("error handling", () => {
 
     beforeEach(() => {
         const output = mock<GetObjectCommandOutput>();
-        output.Body = sdkStreamMixin(Readable.from([EXPECTED_CONTENT]));
+        output.Body = createGetObjectBody([EXPECTED_CONTENT]);
         mockS3Client.on(GetObjectCommand).resolves(output);
     });
 
