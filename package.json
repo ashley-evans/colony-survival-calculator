@@ -46,6 +46,9 @@
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.51.0"
     },
+    "resolutions": {
+        "globals": "^17.0.0"
+    },
     "config": {
         "commitizen": {
             "path": "./node_modules/cz-conventional-changelog"
