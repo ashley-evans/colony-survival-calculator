@@ -7,7 +7,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
 
     mongodbatlas = {
@@ -16,7 +16,7 @@ terraform {
   }
 
 
-  required_version = ">= 1.10.5"
+  required_version = ">= 1.14.3"
 }
 
 provider "aws" {
@@ -73,18 +73,22 @@ resource "mongodbatlas_advanced_cluster" "main" {
   name         = "${local.resource_prefix}cluster"
   cluster_type = "REPLICASET"
 
-  replication_specs {
-    region_configs {
-      region_name           = replace(upper(var.region), "-", "_")
-      provider_name         = "TENANT"
-      backing_provider_name = "AWS"
-      priority              = 7
+  replication_specs = [
+    {
+      region_configs = [
+        {
+          region_name           = replace(upper(var.region), "-", "_")
+          provider_name         = "TENANT"
+          backing_provider_name = "AWS"
+          priority              = 7
 
-      electable_specs {
-        instance_size = "M0"
-      }
+          electable_specs = {
+            instance_size = "M0"
+          }
+        }
+      ]
     }
-  }
+  ]
 }
 
 resource "mongodbatlas_project_ip_access_list" "main" {
@@ -189,7 +193,7 @@ resource "aws_lambda_function" "add_item_lambda" {
       ITEM_SEED_KEY        = "${local.seed_file_key_prefix}items.json"
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.standard_srv
     }
   }
 
@@ -275,7 +279,7 @@ resource "aws_lambda_function" "query_item_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.standard_srv
     }
   }
 }
@@ -378,7 +382,7 @@ resource "aws_lambda_function" "query_requirements_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.standard_srv
     }
   }
 }
@@ -481,7 +485,7 @@ resource "aws_lambda_function" "query_output_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.standard_srv
     }
   }
 }
@@ -584,7 +588,7 @@ resource "aws_lambda_function" "query_distinct_item_names_lambda" {
     variables = {
       DATABASE_NAME        = local.mongodb_database_name
       ITEM_COLLECTION_NAME = local.mongodb_item_collection_name
-      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.0.standard_srv
+      MONGO_DB_URI         = mongodbatlas_advanced_cluster.main.connection_strings.standard_srv
     }
   }
 }

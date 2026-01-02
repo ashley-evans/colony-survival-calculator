@@ -24,7 +24,7 @@
         "@graphql-codegen/cli": "^5.0.7",
         "@graphql-codegen/typescript": "^4.1.6",
         "@smithy/util-stream": "^4.3.0",
-        "@tsconfig/node22": "^22.0.2",
+        "@tsconfig/node24": "^24.0.3",
         "@tsconfig/strictest": "^2.0.5",
         "@types/aws-lambda": "^8.10.152",
         "aws-sdk-client-mock": "^4.1.0",

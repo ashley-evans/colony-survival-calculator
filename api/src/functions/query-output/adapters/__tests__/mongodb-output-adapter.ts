@@ -165,9 +165,8 @@ test.each([
         expected: ItemOutputDetails[],
     ) => {
         await storeItems(stored);
-        const { queryOutputDetails } = await import(
-            "../mongodb-output-adapter"
-        );
+        const { queryOutputDetails } =
+            await import("../mongodb-output-adapter");
 
         const actual = await queryOutputDetails({ name: validItemName });
 
