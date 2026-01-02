@@ -24,7 +24,8 @@
         "format:write": "prettier --write . '!(api|ui|scripts/recipe-json-converter)/**/*' && terraform fmt -recursive ./infra/",
         "prepare": "husky install",
         "dependency:check": "npx npm-check-updates --deep",
-        "dependency:update": "npx npm-check-updates -u --deep && yarn install"
+        "dependency:update": "npx npm-check-updates -u --deep && yarn install",
+        "sso": "aws sso login --profile dev"
     },
     "devDependencies": {
         "@commitlint/cli": "^19.8.1",
