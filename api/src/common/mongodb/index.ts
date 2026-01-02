@@ -15,17 +15,10 @@ if (!secretAccessKey) {
     throw new Error("Misconfigured: AWS Secret Access Key not provided");
 }
 
-const client = MongoClient.connect(mongoURI, {
-    ...(process.env["TEST_ENV"]
-        ? {}
-        : {
-              auth: {
-                  username: accessKeyID,
-                  password: secretAccessKey,
-              },
-              authSource: "$external",
-              authMechanism: "MONGODB-AWS",
-          }),
-});
+const url = process.env["TEST_ENV"]
+    ? mongoURI
+    : `${mongoURI}?authMechanism=MONGODB-AWS`;
+
+const client = MongoClient.connect(url);
 
 export default client;
