@@ -3,10 +3,11 @@
     "private": true,
     "version": "0.0.0",
     "dependencies": {
+        "@aws-sdk/credential-providers": "3.958.0",
         "@colony-survival-calculator/mongodb-client": "workspace:^",
         "aws4": "1.13.2",
         "graph-data-structure": "4.5.0",
         "javascript-lp-solver": "0.4.24",
-        "mongodb": "6.19.0"
+        "mongodb": "7.0.0"
     }
 }

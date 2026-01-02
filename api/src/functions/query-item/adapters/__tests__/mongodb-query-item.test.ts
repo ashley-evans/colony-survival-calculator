@@ -260,9 +260,8 @@ describe("field queries", () => {
 
 describe("creator count queries", () => {
     test("returns an empty array if no items are stored in the items collection", async () => {
-        const { queryItemByCreatorCount } = await import(
-            "../mongodb-query-item"
-        );
+        const { queryItemByCreatorCount } =
+            await import("../mongodb-query-item");
 
         const actual = await queryItemByCreatorCount(2);
 
@@ -284,9 +283,8 @@ describe("creator count queries", () => {
             ...expected,
         ];
         await storeItems(stored);
-        const { queryItemByCreatorCount } = await import(
-            "../mongodb-query-item"
-        );
+        const { queryItemByCreatorCount } =
+            await import("../mongodb-query-item");
 
         const actual = await queryItemByCreatorCount(2);
 
@@ -304,9 +302,8 @@ describe("creator count queries", () => {
             ...expected,
         ];
         await storeItems(stored);
-        const { queryItemByCreatorCount } = await import(
-            "../mongodb-query-item"
-        );
+        const { queryItemByCreatorCount } =
+            await import("../mongodb-query-item");
 
         const actual = await queryItemByCreatorCount(3);
 
@@ -322,9 +319,8 @@ describe("creator count queries", () => {
             ...expected,
         ];
         await storeItems(stored);
-        const { queryItemByCreatorCount } = await import(
-            "../mongodb-query-item"
-        );
+        const { queryItemByCreatorCount } =
+            await import("../mongodb-query-item");
 
         const actual = await queryItemByCreatorCount(3, expectedItemName);
 
@@ -335,9 +331,8 @@ describe("creator count queries", () => {
     test("returns no items if no item matches the specified name given items with minimum creator requirement", async () => {
         const stored = createItemWithNumberOfRecipes("item w/ 3 recipes", 3);
         await storeItems(stored);
-        const { queryItemByCreatorCount } = await import(
-            "../mongodb-query-item"
-        );
+        const { queryItemByCreatorCount } =
+            await import("../mongodb-query-item");
 
         const actual = await queryItemByCreatorCount(3, "unknown");
 

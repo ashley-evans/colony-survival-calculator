@@ -2,7 +2,7 @@
     "name": "@colony-survival-calculator/root",
     "private": true,
     "version": "0.0.0",
-    "packageManager": "yarn@4.9.4",
+    "packageManager": "yarn@4.12.0",
     "workspaces": {
         "packages": [
             ".",
@@ -24,29 +24,30 @@
         "format:write": "prettier --write . '!(api|ui|scripts/recipe-json-converter)/**/*' && terraform fmt -recursive ./infra/",
         "prepare": "husky install",
         "dependency:check": "npx npm-check-updates --deep",
-        "dependency:update": "npx npm-check-updates -u --deep && yarn install"
+        "dependency:update": "npx npm-check-updates -u --deep && yarn install",
+        "sso": "aws sso login --profile dev"
     },
     "devDependencies": {
-        "@commitlint/cli": "^19.8.1",
-        "@commitlint/config-conventional": "^19.8.1",
-        "@commitlint/types": "^19.8.1",
-        "@eslint/eslintrc": "^3.3.1",
-        "@eslint/js": "^9.35.0",
+        "@commitlint/cli": "^20.3.0",
+        "@commitlint/config-conventional": "^20.3.0",
+        "@commitlint/types": "^20.2.0",
+        "@eslint/eslintrc": "^3.3.3",
+        "@eslint/js": "^9.39.2",
         "commitizen": "^4.3.1",
         "cz-conventional-changelog": "^3.3.0",
-        "eslint": "^9.35.0",
+        "eslint": "^9.39.2",
         "eslint-config-prettier": "^10.1.8",
-        "globals": "^16.3.0",
+        "globals": "^17.0.0",
         "husky": "^9.1.7",
-        "lerna": "^8.2.3",
-        "npm-package-json-lint": "^9.0.0",
-        "prettier": "^3.6.2",
-        "semantic-release": "^24.2.7",
-        "typescript": "^5.9.2",
-        "typescript-eslint": "^8.42.0"
+        "lerna": "^9.0.3",
+        "npm-package-json-lint": "^9.1.0",
+        "prettier": "^3.7.4",
+        "semantic-release": "^25.0.2",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.51.0"
     },
     "resolutions": {
-        "globals": "^16.3.0"
+        "globals": "^17.0.0"
     },
     "config": {
         "commitizen": {

@@ -20,7 +20,7 @@ jobs:
                   node-version-file: ".nvmrc"
             - uses: hashicorp/setup-terraform@v3
               with:
-                  terraform_version: 1.10.5
+                  terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
@@ -121,7 +121,7 @@ jobs:
                   role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
             - uses: hashicorp/setup-terraform@v3
               with:
-                  terraform_version: 1.10.5
+                  terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
@@ -230,7 +230,7 @@ jobs:
                   role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
             - uses: hashicorp/setup-terraform@v3
               with:
-                  terraform_version: 1.10.5
+                  terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT

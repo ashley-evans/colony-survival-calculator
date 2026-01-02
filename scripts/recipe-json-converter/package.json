@@ -14,13 +14,13 @@
         "postinstall": "yarn generate"
     },
     "devDependencies": {
-        "@tsconfig/node22": "^22.0.2",
-        "@tsconfig/strictest": "^2.0.5",
-        "@types/yargs": "^17.0.33",
+        "@tsconfig/node24": "^24.0.3",
+        "@tsconfig/strictest": "^2.0.8",
+        "@types/yargs": "^17.0.35",
         "json-schema-to-typescript": "^15.0.4",
-        "tsx": "^4.20.5",
-        "vitest": "^3.2.4",
-        "vitest-when": "^0.8.0"
+        "tsx": "^4.21.0",
+        "vitest": "^4.0.16",
+        "vitest-when": "^0.10.0"
     },
     "dependencies": {
         "ajv": "8.17.1",

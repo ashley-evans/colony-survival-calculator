@@ -75,9 +75,8 @@ test.each([
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
-    const { queryRequirements } = await import(
-        "../mongodb-requirements-adapter"
-    );
+    const { queryRequirements } =
+        await import("../mongodb-requirements-adapter");
 
     const actual = await queryRequirements(validItemName);
 
@@ -94,9 +93,8 @@ test("returns only the specified item if only that item is stored in the items c
         maximumTool: "steel" as DefaultToolset,
     });
     await storeItems([{ ...stored }]);
-    const { queryRequirements } = await import(
-        "../mongodb-requirements-adapter"
-    );
+    const { queryRequirements } =
+        await import("../mongodb-requirements-adapter");
 
     const actual = await queryRequirements(validItemName);
 
@@ -303,9 +301,8 @@ test.each([
     "returns flattened required items list given %s",
     async (_: string, stored: Items, expected: Items) => {
         await storeItems(stored);
-        const { queryRequirements } = await import(
-            "../mongodb-requirements-adapter"
-        );
+        const { queryRequirements } =
+            await import("../mongodb-requirements-adapter");
 
         const actual = await queryRequirements(validItemName);
 
@@ -340,9 +337,8 @@ test("removes duplicate items w/ same creator when input item has multiple creat
     ];
     await storeItems(JSON.parse(JSON.stringify(expected)));
 
-    const { queryRequirements } = await import(
-        "../mongodb-requirements-adapter"
-    );
+    const { queryRequirements } =
+        await import("../mongodb-requirements-adapter");
 
     const actual = await queryRequirements(validItemName);
 

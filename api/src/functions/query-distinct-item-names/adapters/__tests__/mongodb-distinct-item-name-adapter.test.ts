@@ -76,9 +76,8 @@ test.each([
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
-    const { queryDistinctItemNames } = await import(
-        "../mongodb-distinct-item-name-adapter"
-    );
+    const { queryDistinctItemNames } =
+        await import("../mongodb-distinct-item-name-adapter");
 
     const actual = await queryDistinctItemNames();
 
@@ -157,9 +156,8 @@ test.each([
     "returns %s given %s stored in the database",
     async (_: string, __: string, items: Items, expected: string[]) => {
         await storeItems(items);
-        const { queryDistinctItemNames } = await import(
-            "../mongodb-distinct-item-name-adapter"
-        );
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
 
         const actual = await queryDistinctItemNames();
 

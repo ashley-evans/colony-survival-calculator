@@ -16,7 +16,7 @@ The currently deployed version of the application can be found at the following 
 
 | Name      | Version   | Instructions                                        |
 | --------- | --------- | --------------------------------------------------- |
-| Terraform | >= 1.10.5 | https://developer.hashicorp.com/terraform/downloads |
+| Terraform | >= 1.14.3 | https://developer.hashicorp.com/terraform/downloads |
 
 ## Setup
 
@@ -41,6 +41,7 @@ yarn ci
 Run the following command to setup the infrastructure for development:
 
 ```sh
+# export AWS_PROFILE=dev (Required if using short-lived credentials)
 yarn lerna run deploy -- -e dev
 ```
 
@@ -49,6 +50,7 @@ yarn lerna run deploy -- -e dev
 Run the following command to remove any deployed infrastructure for development:
 
 ```sh
+# export AWS_PROFILE=dev (Required if using short-lived credentials)
 yarn lerna run deploy -- -e dev -t
 ```
 
@@ -59,6 +61,7 @@ To enable the Github actions to deploy the infrastructure for production/testing
 > Note: This requires the ARNs of a S3 Bucket, DynamoDB table, Read/write policy to access the bucket and table, and an OpenID Connect Provider that is configured to work with Github Actions
 
 ```sh
+# export AWS_PROFILE=dev (Required if using short-lived credentials)
 terraform apply -chdir=./infra/deploy
 ```
 

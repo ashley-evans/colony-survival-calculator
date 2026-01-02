@@ -20,8 +20,10 @@ import {
     ToggleIndicatorIcon,
 } from "./styles";
 
-interface AutoCompleteSelectorProps<Item>
-    extends Pick<UseComboboxProps<Item>, "items" | "defaultSelectedItem"> {
+interface AutoCompleteSelectorProps<Item> extends Pick<
+    UseComboboxProps<Item>,
+    "items" | "defaultSelectedItem"
+> {
     labelText: string;
     toggleLabelText: string;
     inputPlaceholder: string;
