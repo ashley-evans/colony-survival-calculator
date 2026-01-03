@@ -1,6 +1,7 @@
 export * from "./__generated__/block-behaviours";
 export * from "./__generated__/mineable-items";
 export * from "./__generated__/growables";
+export * from "./__generated__/localisation";
 import { Recipes } from "./__generated__/recipes";
 import {
     Tools as PiplizTools,
