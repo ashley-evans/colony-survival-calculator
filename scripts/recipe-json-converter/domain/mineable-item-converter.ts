@@ -1,9 +1,8 @@
 import { FileFinder } from "../interfaces/file-finder";
 import { JSONFileReader } from "../interfaces/json-file-reader";
 import { MineableItemConverter } from "../interfaces/mineable-item-converter";
-import { DefaultToolset, Items, MineableItems } from "../types";
+import { DefaultToolset, MineableItems, UntranslatedItem } from "../types";
 import { JSON_FILE_EXTENSION } from "./constants";
-import { getUserFriendlyItemName } from "./recipe-dictionary";
 import { checkDuplication } from "./utils";
 
 const FILE_NAME = "types";
@@ -32,23 +31,14 @@ const getMineableItems = async (
     return readMineableItemsFile(mineableItemsFiles[0] as string);
 };
 
-const convertToItems = (mineable: MineableItems): Items => {
+const convertToItems = (mineable: MineableItems): UntranslatedItem[] => {
     return Object.values(mineable).reduce((acc, current) => {
         if (!current.customData?.minerMiningTime || !current.onRemoveType) {
             return acc;
         }
 
-        const userFriendlyItemName = getUserFriendlyItemName(
-            current.onRemoveType,
-        );
-        if (!userFriendlyItemName) {
-            throw new Error(
-                `User friendly name unavailable for item: ${current.onRemoveType}`,
-            );
-        }
-
         acc.push({
-            name: userFriendlyItemName,
+            id: current.onRemoveType,
             createTime: current.customData.minerMiningTime,
             output: 1,
             requires: [],
@@ -57,11 +47,11 @@ const convertToItems = (mineable: MineableItems): Items => {
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.steel,
             },
-            creator: "Miner",
+            creatorID: "minerjob",
         });
 
         return acc;
-    }, [] as Items);
+    }, [] as UntranslatedItem[]);
 };
 
 const convertMineableItems: MineableItemConverter = async ({
@@ -79,7 +69,7 @@ const convertMineableItems: MineableItemConverter = async ({
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(
-            `Multiple mineable recipes for item: ${containsDuplicate.name}, please remove one`,
+            `Multiple mineable recipes for item: ${containsDuplicate.id}, please remove one`,
         );
     }
 

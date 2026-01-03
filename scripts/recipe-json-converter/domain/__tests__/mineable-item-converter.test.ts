@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 import { MineableItemConverterInputs } from "../../interfaces/mineable-item-converter";
 import { convertMineableItems as baseConvertMineableItems } from "../mineable-item-converter";
-import { DefaultToolset, Item, Items, MineableItems } from "../../types";
+import { DefaultToolset, MineableItems, UntranslatedItem } from "../../types";
 
 const mockFindFiles = vi.fn();
 const mockReadMineableItemsFile = vi.fn();
@@ -72,31 +72,31 @@ test("parses the JSON found in the mineable items file", async () => {
 });
 
 test.each([
-    ["clay", "Clay"],
-    ["coalore", "Coal ore"],
-    ["copper", "Copper"],
-    ["goldore", "Gold ore"],
-    ["ironore", "Iron ore"],
-    ["leadore", "Lead ore"],
-    ["silicasand", "Silica sand"],
-    ["stonerubble", "Stone rubble"],
-    ["sulfur", "Sulfur"],
-    ["tin", "Tin"],
-    ["zinc", "Zinc"],
+    ["clay"],
+    ["coalore"],
+    ["copper"],
+    ["goldore"],
+    ["ironore"],
+    ["leadore"],
+    ["silicasand"],
+    ["stonerubble"],
+    ["sulfur"],
+    ["tin"],
+    ["zinc"],
 ])(
     "returns converted recipe given a single mineable item (%s) found in file",
-    async (piplizName: string, expectedName: string) => {
+    async (piplizID: string) => {
         const mineableItemsContent: MineableItems = {
             infinite: {
                 customData: {
                     minerMiningTime: 20,
                 },
-                onRemoveType: piplizName,
+                onRemoveType: piplizID,
             },
         };
         mockReadMineableItemsFile.mockResolvedValue(mineableItemsContent);
-        const expected: Item = {
-            name: expectedName,
+        const expected: UntranslatedItem = {
+            id: piplizID,
             createTime: 20,
             output: 1,
             requires: [],
@@ -105,7 +105,7 @@ test.each([
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.steel,
             },
-            creator: "Miner",
+            creatorID: "minerjob",
         };
 
         const actual = await convertMineableItems(input);
@@ -126,8 +126,8 @@ test("ignores non-mineable items found in mineable items file", async () => {
         nonMineable: { test: "test" },
     };
     mockReadMineableItemsFile.mockResolvedValue(mineableItemsContent);
-    const expected: Item = {
-        name: "Clay",
+    const expected: UntranslatedItem = {
+        id: "clay",
         createTime: 20,
         output: 1,
         requires: [],
@@ -136,7 +136,7 @@ test("ignores non-mineable items found in mineable items file", async () => {
             minimumTool: DefaultToolset.none,
             maximumTool: DefaultToolset.steel,
         },
-        creator: "Miner",
+        creatorID: "minerjob",
     };
 
     const actual = await convertMineableItems(input);
@@ -161,9 +161,9 @@ test("converts multiple items given multiple mineable items found in file", asyn
         },
     };
     mockReadMineableItemsFile.mockResolvedValue(mineableItemsContent);
-    const expected: Items = [
+    const expected: UntranslatedItem[] = [
         {
-            name: "Clay",
+            id: "clay",
             createTime: 20,
             output: 1,
             requires: [],
@@ -172,10 +172,10 @@ test("converts multiple items given multiple mineable items found in file", asyn
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.steel,
             },
-            creator: "Miner",
+            creatorID: "minerjob",
         },
         {
-            name: "Zinc",
+            id: "zinc",
             createTime: 50,
             output: 1,
             requires: [],
@@ -184,7 +184,7 @@ test("converts multiple items given multiple mineable items found in file", asyn
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.steel,
             },
-            creator: "Miner",
+            creatorID: "minerjob",
         },
     ];
 
@@ -194,28 +194,9 @@ test("converts multiple items given multiple mineable items found in file", asyn
     expect(actual).toEqual(expect.arrayContaining(expected));
 });
 
-test("throws an error if a mineable item is found with an unknown name", async () => {
-    const unknownItem = "testitem";
-    const expectedError = `User friendly name unavailable for item: ${unknownItem}`;
-    const mineableItemsContent: MineableItems = {
-        infinite: {
-            customData: {
-                minerMiningTime: 20,
-            },
-            onRemoveType: unknownItem,
-        },
-    };
-    mockReadMineableItemsFile.mockResolvedValue(mineableItemsContent);
-
-    expect.assertions(1);
-    await expect(convertMineableItems(input)).rejects.toThrowError(
-        expectedError,
-    );
-});
-
 test("throws an error if more than one recipe for same mineable item", async () => {
     const sameItemName = "stonerubble";
-    const expectedError = `Multiple mineable recipes for item: Stone rubble, please remove one`;
+    const expectedError = `Multiple mineable recipes for item: ${sameItemName}, please remove one`;
     const mineableItemsContent: MineableItems = {
         infinite: {
             customData: {

@@ -1,4 +1,4 @@
-import { Items, MineableItems } from "../types";
+import { MineableItems, UntranslatedItem } from "../types";
 import { FileFinder } from "./file-finder";
 import { JSONFileReader } from "./json-file-reader";
 
@@ -15,7 +15,7 @@ type MineableItemConverterParameters = MineableItemConverterInputs &
     MineableItemConverterDependencies;
 
 interface MineableItemConverter {
-    (params: MineableItemConverterParameters): Promise<Items>;
+    (params: MineableItemConverterParameters): Promise<UntranslatedItem[]>;
 }
 
 export type {

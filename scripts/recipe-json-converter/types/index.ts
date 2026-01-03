@@ -26,6 +26,7 @@ type NPCToolsetMapping = {
 
 type Recipe = Recipes[number];
 type RecipeResult = Recipe["results"][number];
+type UntranslatedItem = Omit<Item, "i18n">;
 
 export { PiplizTools, DefaultToolset, MachineToolset };
 export type {
@@ -40,4 +41,5 @@ export type {
     Recipes,
     Recipe,
     RecipeResult,
+    UntranslatedItem,
 };
