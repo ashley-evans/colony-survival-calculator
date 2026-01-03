@@ -266,6 +266,14 @@ const piplizItemNameMap: Readonly<Record<string, string>> = {
     rooftoolplanks: "Wooden Roof",
     rooftoolstraw: "Straw Roof",
     plankscoated: "Coated planks",
+    plaster: "Plaster",
+    bombearly: "Bomb",
+    bombfuse: "Slow Match",
+    bombfuseblock: "Fuse Cord",
+    bombfusedelay: "Time Fuse",
+    bombshapedchargedown: "Shaped Charge",
+    bombshapedchargestair: "Diagonal Shaped Charge",
+    topdownviewtrigger: "Overseer's Desk",
 };
 
 const getUserFriendlyItemName = (name: string): string | null => {

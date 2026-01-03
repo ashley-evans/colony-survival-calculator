@@ -1384,6 +1384,14 @@ describe("recipe to item mapping", () => {
             ["rooftoolplanks", "Wooden Roof"],
             ["rooftoolstraw", "Straw Roof"],
             ["plankscoated", "Coated planks"],
+            ["plaster", "Plaster"],
+            ["bombearly", "Bomb"],
+            ["bombfuse", "Slow Match"],
+            ["bombfuseblock", "Fuse Cord"],
+            ["bombfusedelay", "Time Fuse"],
+            ["bombshapedchargedown", "Shaped Charge"],
+            ["bombshapedchargestair", "Diagonal Shaped Charge"],
+            ["topdownviewtrigger", "Overseer's Desk"],
         ])(
             "can handle recipes for item: %s",
             async (itemName: string, expectedConvertedItemName: string) => {

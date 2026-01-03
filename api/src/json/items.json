@@ -136,6 +136,21 @@
         }
     },
     {
+        "name": "Plaster",
+        "creator": "Artist",
+        "createTime": 40,
+        "requires": [
+            { "name": "Clay", "amount": 10 },
+            { "name": "White paint", "amount": 1 }
+        ],
+        "output": 10,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        }
+    },
+    {
         "name": "Crown Moulding",
         "creator": "Artist",
         "createTime": 100,
@@ -943,52 +958,6 @@
         }
     },
     {
-        "name": "Red planks",
-        "creator": "Dyer",
-        "createTime": 100,
-        "requires": [
-            { "name": "Planks", "amount": 5 },
-            { "name": "Hollyhock", "amount": 100 }
-        ],
-        "output": 1,
-        "toolset": {
-            "type": "default",
-            "minimumTool": "none",
-            "maximumTool": "none"
-        }
-    },
-    {
-        "name": "Green planks",
-        "creator": "Dyer",
-        "createTime": 100,
-        "requires": [
-            { "name": "Planks", "amount": 5 },
-            { "name": "Alkanet", "amount": 50 },
-            { "name": "Wolfsbane", "amount": 50 }
-        ],
-        "output": 1,
-        "toolset": {
-            "type": "default",
-            "minimumTool": "none",
-            "maximumTool": "none"
-        }
-    },
-    {
-        "name": "Blue planks",
-        "creator": "Dyer",
-        "createTime": 100,
-        "requires": [
-            { "name": "Planks", "amount": 5 },
-            { "name": "Alkanet", "amount": 100 }
-        ],
-        "output": 1,
-        "toolset": {
-            "type": "default",
-            "minimumTool": "none",
-            "maximumTool": "none"
-        }
-    },
-    {
         "name": "Dropper trap",
         "creator": "Engineer",
         "createTime": 480,
@@ -1288,6 +1257,96 @@
         "requires": [
             { "name": "Planks", "amount": 10 },
             { "name": "Copper ingot", "amount": 5 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Bomb",
+        "creator": "Engineer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Iron wrought", "amount": 3 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Slow Match",
+        "creator": "Engineer",
+        "createTime": 20,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Hemp", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Fuse Cord",
+        "creator": "Engineer",
+        "createTime": 50,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 5,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Time Fuse",
+        "creator": "Engineer",
+        "createTime": 50,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Copper ingot", "amount": 3 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Shaped Charge",
+        "creator": "Engineer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Iron wrought", "amount": 5 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        }
+    },
+    {
+        "name": "Diagonal Shaped Charge",
+        "creator": "Engineer",
+        "createTime": 60,
+        "requires": [
+            { "name": "Gunpowder", "amount": 1 },
+            { "name": "Iron wrought", "amount": 5 }
         ],
         "output": 1,
         "toolset": {
@@ -3137,6 +3196,21 @@
         }
     },
     {
+        "name": "Straw Roof",
+        "creator": "Tinkerer",
+        "createTime": 40,
+        "requires": [
+            { "name": "Planks", "amount": 2 },
+            { "name": "Straw", "amount": 2 }
+        ],
+        "output": 4,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "stone"
+        }
+    },
+    {
         "name": "Coated planks",
         "creator": "Tinkerer",
         "createTime": 40,
@@ -3235,21 +3309,6 @@
             { "name": "Copper ingot", "amount": 3 }
         ],
         "output": 1,
-        "toolset": {
-            "type": "default",
-            "minimumTool": "none",
-            "maximumTool": "stone"
-        }
-    },
-    {
-        "name": "Straw Roof",
-        "creator": "Tinkerer",
-        "createTime": 40,
-        "requires": [
-            { "name": "Planks", "amount": 1 },
-            { "name": "Straw", "amount": 1 }
-        ],
-        "output": 2,
         "toolset": {
             "type": "default",
             "minimumTool": "none",
