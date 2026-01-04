@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 import { GrowableConverterInputs } from "../../interfaces/growable-converter";
 import { convertGrowables as baseConvertGrowables } from "../growable-converter";
-import { DefaultToolset, Growables, Item, Items } from "../../types";
+import { DefaultToolset, Growables, UntranslatedItem } from "../../types";
 
 const mockFindFiles = vi.fn();
 const mockReadGrowablesFile = vi.fn();
@@ -26,38 +26,38 @@ const expectedGrowablesFileFindInput = {
     fileExtension: ".json",
 };
 
-const expectedStaticLogRecipe: Item = {
-    name: "Log",
+const expectedStaticLogRecipe: UntranslatedItem = {
+    id: "log",
     createTime: 435,
     output: 44,
     requires: [],
     // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
-    optionalOutputs: [{ name: "Leaves", amount: 59.4, likelihood: 1 }],
+    optionalOutputs: [{ id: "leaves", amount: 59.4, likelihood: 1 }],
     toolset: {
         type: "default",
         minimumTool: DefaultToolset.none,
         maximumTool: DefaultToolset.none,
     },
-    creator: "Forester",
+    creatorID: "forester",
     size: {
         width: 3,
         height: 33,
     },
 };
 
-const expectedStaticLeavesRecipe: Item = {
-    name: "Leaves",
+const expectedStaticLeavesRecipe: UntranslatedItem = {
+    id: "leaves",
     createTime: 435,
     // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
     output: 59.4,
     requires: [],
-    optionalOutputs: [{ name: "Log", amount: 44, likelihood: 1 }],
+    optionalOutputs: [{ id: "log", amount: 44, likelihood: 1 }],
     toolset: {
         type: "default",
         minimumTool: DefaultToolset.none,
         maximumTool: DefaultToolset.none,
     },
-    creator: "Forester",
+    creatorID: "forester",
     size: {
         width: 3,
         height: 33,
@@ -120,43 +120,30 @@ test("always includes static log and leaves recipe regardless of whether include
 });
 
 test.each([
-    ["wheat", "Wheat", "Wheat farmer", 100, { height: 10, width: 10 }],
-    ["flax", "Flax", "Flax farmer", 100, { height: 10, width: 10 }],
-    ["cotton", "Cotton", "Cotton farmer", 100, { height: 10, width: 10 }],
-    ["cabbage", "Cabbage", "Cabbage farmer", 100, { height: 10, width: 10 }],
-    ["alkanet", "Alkanet", "Alkanet farmer", 100, { height: 10, width: 10 }],
-    [
-        "hollyhock",
-        "Hollyhock",
-        "Hollyhock farmer",
-        100,
-        { height: 10, width: 10 },
-    ],
-    [
-        "wolfsbane",
-        "Wolfsbane",
-        "Wolfsbane farmer",
-        100,
-        { height: 10, width: 10 },
-    ],
-    ["barley", "Barley", "Barley farmer", 100, { height: 10, width: 10 }],
-    ["hemp", "Hemp", "Hemp farmer", 100, { height: 10, width: 10 }],
-    ["wisteriaplant", "Wisteria flower", "Wisteria flower farmer", 1, null],
+    ["wheat", "wheatfarmer", 100, { height: 10, width: 10 }],
+    ["flax", "flaxfarmer", 100, { height: 10, width: 10 }],
+    ["cotton", "cottonfarmer", 100, { height: 10, width: 10 }],
+    ["cabbage", "cabbagefarmer", 100, { height: 10, width: 10 }],
+    ["alkanet", "alkanetfarmer", 100, { height: 10, width: 10 }],
+    ["hollyhock", "hollyhockfarmer", 100, { height: 10, width: 10 }],
+    ["wolfsbane", "wolfsbanefarmer", 100, { height: 10, width: 10 }],
+    ["barley", "barleyfarmer", 100, { height: 10, width: 10 }],
+    ["hemp", "hempfarmer", 100, { height: 10, width: 10 }],
+    ["wisteriaflower", "wisteriafarmer", 1, null],
 ])(
     "returns converted recipe given single growable (%s) found in file (2 stages)",
     async (
-        piplizName: string,
-        expectedName: string,
-        expectedCreator: string,
+        piplizID: string,
+        expectedCreatorID: string,
         expectedOutput: number,
         expectedSize: { height: number; width: number } | null,
     ) => {
         const growables: Growables = [
-            { identifier: piplizName, stages: [{}, {}] },
+            { identifier: piplizID, stages: [{}, {}] },
         ];
         mockReadGrowablesFile.mockResolvedValue(growables);
-        const expected: Item = {
-            name: expectedName,
+        const expected: UntranslatedItem = {
+            id: piplizID,
             createTime: 435,
             output: expectedOutput,
             requires: [],
@@ -165,7 +152,7 @@ test.each([
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.none,
             },
-            creator: expectedCreator,
+            creatorID: expectedCreatorID,
             ...(expectedSize ? { size: expectedSize } : {}),
         };
 
@@ -181,8 +168,8 @@ test("returns converted recipe given single growable with more than 2 stages", a
         { identifier: "wheat", stages: [{}, {}, {}] },
     ];
     mockReadGrowablesFile.mockResolvedValue(growables);
-    const expected: Item = {
-        name: "Wheat",
+    const expected: UntranslatedItem = {
+        id: "wheat",
         createTime: 870,
         output: 100,
         requires: [],
@@ -191,7 +178,7 @@ test("returns converted recipe given single growable with more than 2 stages", a
             minimumTool: DefaultToolset.none,
             maximumTool: DefaultToolset.none,
         },
-        creator: "Wheat farmer",
+        creatorID: "wheatfarmer",
         size: {
             width: 10,
             height: 10,
@@ -204,20 +191,7 @@ test("returns converted recipe given single growable with more than 2 stages", a
     expect(actual).toContainEqual(expected);
 });
 
-test("throws an error if provided growable with unknown user friendly name", async () => {
-    const unknownName = "testname";
-    const growables: Growables = [
-        { identifier: unknownName, stages: [{}, {}, {}] },
-    ];
-    mockReadGrowablesFile.mockResolvedValue(growables);
-
-    expect.assertions(1);
-    await expect(convertGrowables(input)).rejects.toThrowError(
-        `User friendly name unavailable for growable: ${unknownName}`,
-    );
-});
-
-test("throws an error if provided growable with unknown user friendly creator name", async () => {
+test("throws an error if provided growable with unknown creator ID", async () => {
     const unknownCreator = "woodfloor";
     const growables: Growables = [
         { identifier: unknownCreator, stages: [{}, {}, {}] },
@@ -226,20 +200,7 @@ test("throws an error if provided growable with unknown user friendly creator na
 
     expect.assertions(1);
     await expect(convertGrowables(input)).rejects.toThrowError(
-        `User friendly creator name unavailable for growable: ${unknownCreator}`,
-    );
-});
-
-test("throws an error if provided growable has unknown expected output", async () => {
-    const unknownOutput = "jobblockcrafter";
-    const growables: Growables = [
-        { identifier: unknownOutput, stages: [{}, {}, {}] },
-    ];
-    mockReadGrowablesFile.mockResolvedValue(growables);
-
-    expect.assertions(1);
-    await expect(convertGrowables(input)).rejects.toThrowError(
-        `Expected output for growable: ${unknownOutput} not known`,
+        `Creator ID unavailable for growable: ${unknownCreator}`,
     );
 });
 
@@ -262,9 +223,9 @@ test("converts multiple items given multiple growables found in file", async () 
         { identifier: "flax", stages: [{}, {}] },
     ];
     mockReadGrowablesFile.mockResolvedValue(growables);
-    const expected: Items = [
+    const expected: UntranslatedItem[] = [
         {
-            name: "Wheat",
+            id: "wheat",
             createTime: 870,
             output: 100,
             requires: [],
@@ -273,14 +234,14 @@ test("converts multiple items given multiple growables found in file", async () 
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.none,
             },
-            creator: "Wheat farmer",
+            creatorID: "wheatfarmer",
             size: {
                 width: 10,
                 height: 10,
             },
         },
         {
-            name: "Flax",
+            id: "flax",
             createTime: 435,
             output: 100,
             requires: [],
@@ -289,7 +250,7 @@ test("converts multiple items given multiple growables found in file", async () 
                 minimumTool: DefaultToolset.none,
                 maximumTool: DefaultToolset.none,
             },
-            creator: "Flax farmer",
+            creatorID: "flaxfarmer",
             size: {
                 width: 10,
                 height: 10,
@@ -305,7 +266,7 @@ test("converts multiple items given multiple growables found in file", async () 
 
 test("throws an error if more than one recipe for same growable item", async () => {
     const sameItemName = "wheat";
-    const expectedError = `Multiple growable recipes for item: Wheat, please remove one`;
+    const expectedError = `Multiple growable recipes for item: ${sameItemName}, please remove one`;
     const growables: Growables = [
         { identifier: sameItemName, stages: [{}, {}, {}] },
         { identifier: sameItemName, stages: [{}, {}] },

@@ -1,4 +1,4 @@
-import { Growables, Items } from "../types";
+import { Growables, UntranslatedItem } from "../types";
 import { FileFinder } from "./file-finder";
 import { JSONFileReader } from "./json-file-reader";
 
@@ -15,7 +15,7 @@ type GrowableConverterParameters = GrowableConverterInputs &
     GrowableConverterDependencies;
 
 interface GrowableConverter {
-    (params: GrowableConverterParameters): Promise<Items>;
+    (params: GrowableConverterParameters): Promise<UntranslatedItem[]>;
 }
 
 export type {

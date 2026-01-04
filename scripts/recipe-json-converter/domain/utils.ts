@@ -1,4 +1,4 @@
-import { Items } from "../types";
+import { Item, UntranslatedItem } from "../types";
 
 type FilterByConditionResult<T> = { matching: T[]; nonMatching: T[] };
 
@@ -42,15 +42,15 @@ const splitPiplizName = (
 };
 
 const checkDuplication = (
-    items: Items,
+    items: (UntranslatedItem | Item)[],
 ):
-    | { duplicateFound: true; name: string; creator: string }
+    | { duplicateFound: true; id: string; creatorID: string }
     | { duplicateFound: false } => {
     const existingSet = new Set<string>();
-    for (const { name, creator } of items) {
-        const hash = JSON.stringify({ name, creator });
+    for (const { id, creatorID } of items) {
+        const hash = JSON.stringify({ id, creatorID });
         if (existingSet.has(hash)) {
-            return { duplicateFound: true, name, creator };
+            return { duplicateFound: true, id, creatorID };
         }
 
         existingSet.add(hash);

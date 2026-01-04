@@ -8,6 +8,7 @@ import recipesSchema from "./schemas/recipes.json";
 import behavioursSchema from "./schemas/block-behaviours.json";
 import mineableItemsSchema from "./schemas/mineable-items.json";
 import growablesSchema from "./schemas/growables.json";
+import localisationSchema from "./schemas/localisation.json";
 import { JSONFileReader } from "./interfaces/json-file-reader";
 import {
     BlockBehaviours,
@@ -15,12 +16,14 @@ import {
     PiplizToolsets,
     MineableItems,
     Growables,
+    Localisation,
 } from "./types";
 import { factory as createJSONFileAdapter } from "./adapters/json-file-adapter";
 import { convertRecipes as baseConvertCraftableRecipes } from "./domain/craftable-recipe-converter";
 import { convertRecipes as baseConvertRecipes } from "./domain/recipe-converter";
 import { convertMineableItems as baseConvertMineableItems } from "./domain/mineable-item-converter";
 import { convertGrowables as baseConvertGrowables } from "./domain/growable-converter";
+import { convertLocalisationFiles as baseConvertLocalisationFiles } from "./domain/localisation-converter";
 import { findFiles } from "./adapters/fs-file-adapter";
 import { writeJSONToFile } from "./adapters/json-file-writer";
 import {
@@ -39,6 +42,10 @@ import {
     GrowableConverter,
     GrowableConverterInputs,
 } from "./interfaces/growable-converter";
+import {
+    LocalisationConverter,
+    LocalisationConverterInputs,
+} from "./interfaces/localisation-converter";
 
 const parser = yargs(hideBin(process.argv)).options({
     inputDirectory: {
@@ -67,6 +74,10 @@ const createBehavioursFileReader = (): JSONFileReader<BlockBehaviours> => {
 
 const createRecipesFileReader = (): JSONFileReader<Recipes> => {
     return createJSONFileAdapter(recipesSchema);
+};
+
+const createLocalisationFileReader = (): JSONFileReader<Localisation> => {
+    return createJSONFileAdapter(localisationSchema);
 };
 
 const createCraftableRecipeConverter = (): ((
@@ -120,12 +131,26 @@ const createGrowablesConverter = (): ((
         });
 };
 
+const createLocalisationConverter = (): ((
+    input: LocalisationConverterInputs,
+) => ReturnType<LocalisationConverter>) => {
+    const localisationReader = createLocalisationFileReader();
+
+    return (input) =>
+        baseConvertLocalisationFiles({
+            ...input,
+            findFiles,
+            readLocalisationFile: localisationReader,
+        });
+};
+
 const createRecipeConverter = (): ((
     input: RecipeConverterInputs,
 ) => ReturnType<RecipeConverter>) => {
     const convertCraftableRecipes = createCraftableRecipeConverter();
     const convertMineableItems = createMineableItemsConverter();
     const convertGrowables = createGrowablesConverter();
+    const convertLocalisation = createLocalisationConverter();
 
     return (input) =>
         baseConvertRecipes({
@@ -133,6 +158,7 @@ const createRecipeConverter = (): ((
             convertCraftableRecipes,
             convertMineableItems,
             convertGrowables,
+            convertLocalisation,
             writeJSON: writeJSONToFile,
         });
 };

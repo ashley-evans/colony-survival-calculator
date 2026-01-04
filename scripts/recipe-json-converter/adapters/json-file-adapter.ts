@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import Ajv, { Schema } from "ajv";
-import stripJSONComments from "strip-json-comments";
+import JSON5 from "json5";
 import { JSONFileReader } from "../interfaces/json-file-reader";
 
 const checkFileExists = async (filePath: string): Promise<boolean> => {
@@ -29,8 +29,7 @@ const factory = <T>(schema: Schema): JSONFileReader<T> => {
         }
 
         const content = await fs.readFile(filePath, "utf-8");
-        const strippedContent = stripJSONComments(content);
-        const parsed = JSON.parse(strippedContent);
+        const parsed = JSON5.parse(content);
         if (validate(parsed)) {
             return parsed;
         }

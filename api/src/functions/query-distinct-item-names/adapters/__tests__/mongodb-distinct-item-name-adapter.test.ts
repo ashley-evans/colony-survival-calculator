@@ -79,89 +79,240 @@ test("returns an empty array if no items are stored in the items collection", as
     const { queryDistinctItemNames } =
         await import("../mongodb-distinct-item-name-adapter");
 
-    const actual = await queryDistinctItemNames();
+    const actual = await queryDistinctItemNames("en-US");
 
     expect(actual).toEqual([]);
 });
 
-test.each([
+type ItemNamePair = { id: string; name: string };
+
+test.each<[string, string, Items, string, ItemNamePair[]]>([
     [
-        "a single item name",
+        "a single item",
         "one item",
         [
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 5,
                 output: 3,
                 requirements: [],
+                i18n: {
+                    name: { "en-US": "test item 1" },
+                    creator: { "en-US": "test creator 1" },
+                },
             }),
         ],
-        ["test item 1"],
+        "en-US",
+        [{ id: "testitem1", name: "test item 1" }],
     ],
     [
-        "all item names",
-        "multiple none duplicate items",
+        "all items",
+        "multiple non-duplicate items",
         [
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 5,
                 output: 3,
                 requirements: [],
+                i18n: {
+                    name: { "en-US": "test item 1" },
+                    creator: { "en-US": "test creator 1" },
+                },
             }),
             createItem({
-                name: "test item 2",
+                id: "testitem2",
                 createTime: 5,
                 output: 3,
                 requirements: [],
+                i18n: {
+                    name: { "en-US": "test item 2" },
+                    creator: { "en-US": "test creator 2" },
+                },
             }),
         ],
-        ["test item 1", "test item 2"],
+        "en-US",
+        [
+            { id: "testitem1", name: "test item 1" },
+            { id: "testitem2", name: "test item 2" },
+        ],
     ],
     [
-        "distinct item names",
-        "multiple duplicate items",
+        "distinct items",
+        "multiple items with same id but different creators",
         [
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                creator: "test creator 1",
+                creatorID: "testcreator1",
+                i18n: {
+                    name: { "en-US": "test item 1" },
+                    creator: { "en-US": "test creator 1" },
+                },
             }),
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                creator: "test creator 2",
+                creatorID: "testcreator2",
+                i18n: {
+                    name: { "en-US": "test item 1" },
+                    creator: { "en-US": "test creator 2" },
+                },
             }),
             createItem({
-                name: "test item 2",
+                id: "testitem2",
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                creator: "test creator 1",
+                creatorID: "testcreator1",
+                i18n: {
+                    name: { "en-US": "test item 2" },
+                    creator: { "en-US": "test creator 1" },
+                },
             }),
             createItem({
-                name: "test item 2",
+                id: "testitem2",
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                creator: "test creator 2",
+                creatorID: "testcreator2",
+                i18n: {
+                    name: { "en-US": "test item 2" },
+                    creator: { "en-US": "test creator 2" },
+                },
             }),
         ],
-        ["test item 1", "test item 2"],
+        "en-US",
+        [
+            { id: "testitem1", name: "test item 1" },
+            { id: "testitem2", name: "test item 2" },
+        ],
+    ],
+    [
+        "localized items for requested locale",
+        "items with multiple locales",
+        [
+            createItem({
+                id: "testitem1",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: {
+                        "en-US": "English Item 1",
+                        "de-DE": "German Item 1",
+                    },
+                    creator: {
+                        "en-US": "English Creator",
+                        "de-DE": "German Creator",
+                    },
+                },
+            }),
+            createItem({
+                id: "testitem2",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: {
+                        "en-US": "English Item 2",
+                        "de-DE": "German Item 2",
+                    },
+                    creator: {
+                        "en-US": "English Creator",
+                        "de-DE": "German Creator",
+                    },
+                },
+            }),
+        ],
+        "de-DE",
+        [
+            { id: "testitem1", name: "German Item 1" },
+            { id: "testitem2", name: "German Item 2" },
+        ],
+    ],
+    [
+        "only items with the requested locale",
+        "items where some are missing the requested locale",
+        [
+            createItem({
+                id: "testitem1",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: {
+                        "en-US": "English Item 1",
+                        "de-DE": "German Item 1",
+                    },
+                    creator: {
+                        "en-US": "English Creator",
+                        "de-DE": "German Creator",
+                    },
+                },
+            }),
+            createItem({
+                id: "testitem2",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "English Only Item" },
+                    creator: { "en-US": "English Creator" },
+                },
+            }),
+        ],
+        "de-DE",
+        [{ id: "testitem1", name: "German Item 1" }],
+    ],
+    [
+        "no items",
+        "items where none have the requested locale",
+        [
+            createItem({
+                id: "testitem1",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "English Only Item 1" },
+                    creator: { "en-US": "English Creator" },
+                },
+            }),
+            createItem({
+                id: "testitem2",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "English Only Item 2" },
+                    creator: { "en-US": "English Creator" },
+                },
+            }),
+        ],
+        "de-DE",
+        [],
     ],
 ])(
     "returns %s given %s stored in the database",
-    async (_: string, __: string, items: Items, expected: string[]) => {
+    async (
+        _: string,
+        __: string,
+        items: Items,
+        locale: string,
+        expected: ItemNamePair[],
+    ) => {
         await storeItems(items);
         const { queryDistinctItemNames } =
             await import("../mongodb-distinct-item-name-adapter");
 
-        const actual = await queryDistinctItemNames();
+        const actual = await queryDistinctItemNames(locale);
 
         expect(actual).toEqual(expect.arrayContaining(expected));
+        expect(actual).toHaveLength(expected.length);
     },
 );
 

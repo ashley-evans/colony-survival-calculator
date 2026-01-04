@@ -28,12 +28,12 @@ function parseItems(input: string): Items {
 }
 
 function validateRequirements(items: Items): void {
-    const itemMap = new Set<string>(items.map((item) => item.name));
+    const itemMap = new Set<string>(items.map((item) => item.id));
     for (const item of items) {
         for (const requirement of item.requires) {
-            if (!itemMap.has(requirement.name)) {
+            if (!itemMap.has(requirement.id)) {
                 throw new Error(
-                    `Missing requirement: ${requirement.name} in ${item.name}`,
+                    `Missing requirement: ${requirement.id} in ${item.id}`,
                 );
             }
         }
@@ -41,16 +41,16 @@ function validateRequirements(items: Items): void {
 }
 
 function validateOptionalOutputs(items: Items): void {
-    const itemMap = new Set<string>(items.map((item) => item.name));
+    const itemMap = new Set<string>(items.map((item) => item.id));
     for (const item of items) {
         if (!item.optionalOutputs) {
             continue;
         }
 
         for (const optionalOutput of item.optionalOutputs) {
-            if (!itemMap.has(optionalOutput.name)) {
+            if (!itemMap.has(optionalOutput.id)) {
                 throw new Error(
-                    `Missing optional output: ${optionalOutput.name} in ${item.name}`,
+                    `Missing optional output: ${optionalOutput.id} in ${item.id}`,
                 );
             }
         }
@@ -67,7 +67,7 @@ function validateTools(items: Items): void {
         const maxToolValue = ToolModifierValues[item.toolset.maximumTool];
         if (minToolValue > maxToolValue) {
             throw new Error(
-                `Invalid item: ${item.name}, minimum tool is better than maximum tool`,
+                `Invalid item: ${item.id}, minimum tool is better than maximum tool`,
             );
         }
     }
@@ -76,15 +76,15 @@ function validateTools(items: Items): void {
 function validateCreators(items: Items): void {
     const itemMap = new Map<string, Set<string>>();
     for (const item of items) {
-        const creatorSet = itemMap.get(item.name);
+        const creatorSet = itemMap.get(item.id);
         if (!creatorSet) {
-            itemMap.set(item.name, new Set([item.creator]));
-        } else if (creatorSet.has(item.creator)) {
+            itemMap.set(item.id, new Set([item.creatorID]));
+        } else if (creatorSet.has(item.creatorID)) {
             throw new Error(
-                `Items provided with same name: ${item.name} and creator: ${item.creator}`,
+                `Items provided with same id: ${item.id} and creator: ${item.creatorID}`,
             );
         } else {
-            creatorSet.add(item.creator);
+            creatorSet.add(item.creatorID);
         }
     }
 }

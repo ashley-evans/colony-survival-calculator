@@ -3,22 +3,17 @@ import { JSONFileReader } from "../interfaces/json-file-reader";
 import { CraftableRecipeConverter } from "../interfaces/craftable-recipe-converter";
 import {
     BlockBehaviours,
-    Item,
     NPCToolsetMapping,
     Recipes,
     PiplizTools,
     PiplizToolsets,
     RecipeResult,
-    Items,
     OptionalOutput,
     Requirements,
     Recipe,
+    UntranslatedItem,
 } from "../types";
 import { UNSUPPORTED_TOOL_ERROR, getToolset } from "./tool-utils";
-import {
-    getUserFriendlyCreatorName,
-    getUserFriendlyItemName,
-} from "./recipe-dictionary";
 import {
     checkDuplication,
     filterByCondition,
@@ -165,19 +160,9 @@ const mapPiplizRequirementsToAPIRequirements = (
     requirements: Recipe["requires"],
 ): Requirements =>
     requirements.map((requirement) => {
-        const convertedRequirementName = getUserFriendlyItemName(
-            requirement.type,
-        );
-
-        if (!convertedRequirementName) {
-            throw new Error(
-                `User friendly name unavailable for item: ${requirement.type}`,
-            );
-        }
-
         const amount = requirement.amount ?? 1;
         return {
-            name: convertedRequirementName,
+            id: requirement.type,
             amount,
         };
     });
@@ -186,20 +171,10 @@ const mapPiplizOptionalOutputsToAPIRequirements = (
     outputs: Recipe["results"],
 ): OptionalOutput[] =>
     outputs.map((result) => {
-        const convertedOptionalOutputName = getUserFriendlyItemName(
-            result.type,
-        );
-
-        if (!convertedOptionalOutputName) {
-            throw new Error(
-                `User friendly name unavailable for item: ${result.type}`,
-            );
-        }
-
         const amount = result.amount ?? 1;
         const likelihood = "chance" in result ? result.chance : 1;
         return {
-            name: convertedOptionalOutputName,
+            id: result.type,
             likelihood,
             amount,
         };
@@ -208,7 +183,7 @@ const mapPiplizOptionalOutputsToAPIRequirements = (
 const mapRecipeToItem = (
     recipe: Recipe,
     npcToolsetMapping: Map<string, PiplizTools[]>,
-): Item => {
+): UntranslatedItem => {
     const { itemName, creator } = splitPiplizName(recipe.name);
     const toolset = getToolset(recipe, npcToolsetMapping);
     const { matching, nonMatching } = filterByCondition(
@@ -227,18 +202,6 @@ const mapRecipeToItem = (
 
     const primaryOutputResult = matching[0] as RecipeResult;
     const output = primaryOutputResult.amount ?? 1;
-    const convertedItemName = getUserFriendlyItemName(itemName);
-    if (!convertedItemName) {
-        throw new Error(`User friendly name unavailable for item: ${itemName}`);
-    }
-
-    const convertedCreator = getUserFriendlyCreatorName(creator);
-    if (!convertedCreator) {
-        throw new Error(
-            `User friendly name unavailable for creator: ${creator}`,
-        );
-    }
-
     const requirements = mapPiplizRequirementsToAPIRequirements(
         recipe.requires,
     );
@@ -246,8 +209,8 @@ const mapRecipeToItem = (
         mapPiplizOptionalOutputsToAPIRequirements(nonMatching);
 
     return {
-        name: convertedItemName,
-        creator: convertedCreator,
+        id: itemName,
+        creatorID: creator,
         createTime: recipe.cooldown,
         requires: requirements,
         output,
@@ -295,12 +258,12 @@ const convertRecipes: CraftableRecipeConverter = async ({
         }
 
         return acc;
-    }, [] as Items);
+    }, [] as UntranslatedItem[]);
 
     const containsDuplicate = checkDuplication(converted);
     if (containsDuplicate.duplicateFound) {
         throw new Error(
-            `Multiple recipes for item: ${containsDuplicate.name} from creator: ${containsDuplicate.creator}, please remove one`,
+            `Multiple recipes for item: ${containsDuplicate.id} from creator: ${containsDuplicate.creatorID}, please remove one`,
         );
     }
 

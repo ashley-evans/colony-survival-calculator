@@ -1,5 +1,7 @@
+import { ItemName } from "../../../graphql/schema";
+
 interface QueryDistinctItemNamesPrimaryPort {
-    (): Promise<string[]>;
+    (locale?: string): Promise<ItemName[]>;
 }
 
 export { QueryDistinctItemNamesPrimaryPort };

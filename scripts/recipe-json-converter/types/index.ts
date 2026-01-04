@@ -1,6 +1,7 @@
 export * from "./__generated__/block-behaviours";
 export * from "./__generated__/mineable-items";
 export * from "./__generated__/growables";
+export * from "./__generated__/localisation";
 import { Recipes } from "./__generated__/recipes";
 import {
     Tools as PiplizTools,
@@ -25,6 +26,7 @@ type NPCToolsetMapping = {
 
 type Recipe = Recipes[number];
 type RecipeResult = Recipe["results"][number];
+type UntranslatedItem = Omit<Item, "i18n">;
 
 export { PiplizTools, DefaultToolset, MachineToolset };
 export type {
@@ -39,4 +41,5 @@ export type {
     Recipes,
     Recipe,
     RecipeResult,
+    UntranslatedItem,
 };

@@ -102,13 +102,12 @@ describe.each([
         "a single item",
         [
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 2,
                 output: 3,
-                requirements: [{ name: "test", amount: 1 }],
+                requirements: [{ id: "test", amount: 1 }],
                 minimumTool: "none" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
-                creator: "Test Creator 1",
             }),
         ],
     ],
@@ -116,22 +115,20 @@ describe.each([
         "multiple items",
         [
             createItem({
-                name: "test item 1",
+                id: "testitem1",
                 createTime: 2,
                 output: 3,
-                requirements: [{ name: "test", amount: 1 }],
+                requirements: [{ id: "test", amount: 1 }],
                 minimumTool: "copper" as DefaultToolset,
                 maximumTool: "bronze" as DefaultToolset,
-                creator: "Test Creator 1",
             }),
             createItem({
-                name: "test item 2",
+                id: "testitem2",
                 createTime: 1,
                 output: 4,
-                requirements: [{ name: "world", amount: 3 }],
+                requirements: [{ id: "world", amount: 3 }],
                 minimumTool: "none" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
-                creator: "Test Creator 2",
             }),
         ],
     ],
@@ -158,7 +155,7 @@ describe.each([
 
 test("removes any old entries prior to storing new items", async () => {
     const oldItem = createItem({
-        name: "old",
+        id: "old",
         createTime: 1,
         output: 2,
         requirements: [],
@@ -166,7 +163,7 @@ test("removes any old entries prior to storing new items", async () => {
         maximumTool: "none" as DefaultToolset,
     });
     const newItem = createItem({
-        name: "new",
+        id: "new",
         createTime: 2,
         output: 3,
         requirements: [],
