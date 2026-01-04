@@ -8,61 +8,71 @@ import {
     Toolset,
 } from "../src/types";
 
-function createRequirements(name: string, amount: number): Requirement {
+function createRequirements(id: string, amount: number): Requirement {
     return {
-        name,
+        id,
         amount,
     };
 }
 
 function createOptionalOutput({
-    name,
+    id,
     amount,
     likelihood,
 }: {
-    name: string;
+    id: string;
     amount: number;
     likelihood: number;
 }): OptionalOutput {
     return {
-        name,
+        id,
         amount,
         likelihood,
     };
 }
 
 type ItemFactoryInputs = {
-    name: string;
+    id: string;
     createTime: number;
     output: number;
     requirements: Requirements;
     toolset: Toolset;
-    creator?: string;
+    creatorID?: string;
     optionalOutputs?: OptionalOutput[];
     width?: number;
     height?: number;
+    i18n?: Item["i18n"];
 };
 
 function baseCreateItem({
-    name,
+    id,
     createTime,
     output,
     requirements,
     toolset,
-    creator = `${name} creator`,
+    creatorID = `${id}creator`,
     optionalOutputs,
     width,
     height,
+    i18n,
 }: ItemFactoryInputs): Item {
     return {
-        name,
+        id,
         createTime,
         output,
-        creator,
+        creatorID,
         requires: requirements,
         ...(width && height ? { size: { width, height } } : {}),
         toolset,
         ...(optionalOutputs ? { optionalOutputs } : {}),
+        ...(i18n
+            ? { i18n }
+            : {
+                  i18n: {
+                      name: { "en-US": id },
+                      creator: { "en-US": creatorID },
+                  },
+              }),
     };
 }
 

@@ -2,11 +2,11 @@
 
 exports[`handles invalid input (schema validation) given a non JSON array > throws a validation error 1`] = `"Validation Error: [{"instancePath":"","schemaPath":"#/type","keyword":"type","params":{"type":"array"},"message":"must be array"}]"`;
 
-exports[`handles invalid input (schema validation) given an item with a invalid creator name > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/creator","schemaPath":"#/items/properties/creator/type","keyword":"type","params":{"type":"string"},"message":"must be string"}]"`;
+exports[`handles invalid input (schema validation) given an item with a invalid creator ID type > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/creatorID","schemaPath":"#/items/properties/creatorID/type","keyword":"type","params":{"type":"string"},"message":"must be string"}]"`;
 
-exports[`handles invalid input (schema validation) given an item with a missing creator name > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"creator"},"message":"must have required property 'creator'"}]"`;
+exports[`handles invalid input (schema validation) given an item with a missing creator ID > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"creatorID"},"message":"must have required property 'creatorID'"}]"`;
 
-exports[`handles invalid input (schema validation) given an item with a missing name > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"name"},"message":"must have required property 'name'"}]"`;
+exports[`handles invalid input (schema validation) given an item with a missing id > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"id"},"message":"must have required property 'id'"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with a missing toolset > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"toolset"},"message":"must have required property 'toolset'"}]"`;
 
@@ -14,7 +14,7 @@ exports[`handles invalid input (schema validation) given an item with a non-obje
 
 exports[`handles invalid input (schema validation) given an item with a requirement that has a non-numeric requirement amount > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/requires/0/amount","schemaPath":"#/items/properties/requires/items/properties/amount/type","keyword":"type","params":{"type":"number"},"message":"must be number"}]"`;
 
-exports[`handles invalid input (schema validation) given an item with a requirement that is missing a name > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/requires/0","schemaPath":"#/items/properties/requires/items/required","keyword":"required","params":{"missingProperty":"name"},"message":"must have required property 'name'"}]"`;
+exports[`handles invalid input (schema validation) given an item with a requirement that is missing an id > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/requires/0","schemaPath":"#/items/properties/requires/items/required","keyword":"required","params":{"missingProperty":"id"},"message":"must have required property 'id'"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with a requirement that is missing requirement amount > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/requires/0","schemaPath":"#/items/properties/requires/items/required","keyword":"required","params":{"missingProperty":"amount"},"message":"must have required property 'amount'"}]"`;
 
@@ -40,7 +40,7 @@ exports[`handles invalid input (schema validation) given an item with an optiona
 
 exports[`handles invalid input (schema validation) given an item with an optional output that has output likelihood less than zero > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/optionalOutputs/0/likelihood","schemaPath":"#/items/properties/optionalOutputs/items/properties/likelihood/exclusiveMinimum","keyword":"exclusiveMinimum","params":{"comparison":">","limit":0},"message":"must be > 0"}]"`;
 
-exports[`handles invalid input (schema validation) given an item with an optional output that is missing a name > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/optionalOutputs/0","schemaPath":"#/items/properties/optionalOutputs/items/required","keyword":"required","params":{"missingProperty":"name"},"message":"must have required property 'name'"}]"`;
+exports[`handles invalid input (schema validation) given an item with an optional output that is missing an id > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/optionalOutputs/0","schemaPath":"#/items/properties/optionalOutputs/items/required","keyword":"required","params":{"missingProperty":"id"},"message":"must have required property 'id'"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with an optional output that is missing an output amount > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/optionalOutputs/0","schemaPath":"#/items/properties/optionalOutputs/items/required","keyword":"required","params":{"missingProperty":"amount"},"message":"must have required property 'amount'"}]"`;
 
@@ -55,6 +55,10 @@ exports[`handles invalid input (schema validation) given an item with farm size 
 exports[`handles invalid input (schema validation) given an item with farm size that is missing a height > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/size","schemaPath":"#/items/properties/size/required","keyword":"required","params":{"missingProperty":"height"},"message":"must have required property 'height'"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with farm size that is missing a width > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/size","schemaPath":"#/items/properties/size/required","keyword":"required","params":{"missingProperty":"width"},"message":"must have required property 'width'"}]"`;
+
+exports[`handles invalid input (schema validation) given an item with i18n missing creator field > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/i18n","schemaPath":"#/items/properties/i18n/required","keyword":"required","params":{"missingProperty":"creator"},"message":"must have required property 'creator'"}]"`;
+
+exports[`handles invalid input (schema validation) given an item with i18n missing name field > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/i18n","schemaPath":"#/items/properties/i18n/required","keyword":"required","params":{"missingProperty":"name"},"message":"must have required property 'name'"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with missing creation time > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0","schemaPath":"#/items/required","keyword":"required","params":{"missingProperty":"createTime"},"message":"must have required property 'createTime'"}]"`;
 
@@ -73,6 +77,8 @@ exports[`handles invalid input (schema validation) given an item with non-numeri
 exports[`handles invalid input (schema validation) given an item with non-numeric output amount > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/output","schemaPath":"#/items/properties/output/type","keyword":"type","params":{"type":"number"},"message":"must be number"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with non-object farm size > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/size","schemaPath":"#/items/properties/size/type","keyword":"type","params":{"type":"object"},"message":"must be object"}]"`;
+
+exports[`handles invalid input (schema validation) given an item with non-object i18n > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/i18n","schemaPath":"#/items/properties/i18n/type","keyword":"type","params":{"type":"object"},"message":"must be object"}]"`;
 
 exports[`handles invalid input (schema validation) given an item with specified default tools but machine tools specified as maximum > throws a validation error 1`] = `"Validation Error: [{"instancePath":"/0/toolset/maximumTool","schemaPath":"#/definitions/defaultToolset/enum","keyword":"enum","params":{"allowedValues":["none","stone","copper","iron","bronze","steel"]},"message":"must be equal to one of the allowed values"},{"instancePath":"/0/toolset/type","schemaPath":"#/oneOf/1/properties/type/const","keyword":"const","params":{"allowedValue":"machine"},"message":"must be equal to constant"},{"instancePath":"/0/toolset","schemaPath":"#/oneOf","keyword":"oneOf","params":{"passingSchemas":null},"message":"must match exactly one schema in oneOf"}]"`;
 
