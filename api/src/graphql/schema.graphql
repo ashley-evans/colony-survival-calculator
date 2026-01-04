@@ -94,8 +94,13 @@ input ItemsFilters {
     optimal: OptimalFilter
 }
 
+type ItemName {
+    id: ID!
+    name: String!
+}
+
 type Query {
-    distinctItemNames: [String!]!
+    distinctItemNames(locale: String): [ItemName!]!
     item(filters: ItemsFilters): [Item!]!
     requirement(
         name: ID!
