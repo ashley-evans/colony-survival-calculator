@@ -1,15 +1,15 @@
 import { Item } from "../../types";
 
-function groupItemsByName<T extends Pick<Item, "name">>(
+function groupItemsByID<T extends Pick<Item, "id">>(
     items: readonly T[],
-): Map<T["name"], T[]> {
+): Map<T["id"], T[]> {
     const itemTools = new Map<string, T[]>();
     for (const item of items) {
-        const recipes = itemTools.get(item.name) ?? [];
-        itemTools.set(item.name, [...recipes, item]);
+        const recipes = itemTools.get(item.id) ?? [];
+        itemTools.set(item.id, [...recipes, item]);
     }
 
     return itemTools;
 }
 
-export { groupItemsByName };
+export { groupItemsByID };

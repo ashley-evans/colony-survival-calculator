@@ -11,20 +11,20 @@ import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
 import {
     INTERNAL_SERVER_ERROR,
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     UNKNOWN_ITEM_ERROR,
     TOOL_LEVEL_ERROR_PREFIX,
 } from "./errors";
 
 async function getItemOutputDetails(
-    name: string,
-    creator?: string,
+    id: string,
+    creatorID?: string,
 ): Promise<ItemOutputDetails[]> {
     try {
         return await queryOutputDetails({
-            name,
-            ...(creator ? { creator } : {}),
+            id,
+            ...(creatorID ? { creatorID } : {}),
         });
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
@@ -61,22 +61,22 @@ function getMaxOutput(
 }
 
 const calculateOutput: QueryOutputPrimaryPort = async ({
-    name,
+    id,
     workers,
     unit,
     maxAvailableTool = "none" as DefaultToolset,
     hasMachineTools = false,
-    creator,
+    creatorID,
 }) => {
-    if (name === "") {
-        throw new Error(INVALID_ITEM_NAME_ERROR);
+    if (id === "") {
+        throw new Error(INVALID_ITEM_ID_ERROR);
     }
 
     if (workers <= 0) {
         throw new Error(INVALID_WORKERS_ERROR);
     }
 
-    const outputDetails = await getItemOutputDetails(name, creator);
+    const outputDetails = await getItemOutputDetails(id, creatorID);
     if (outputDetails.length === 0) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
@@ -88,7 +88,7 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     );
     if (creatableRecipes.length === 0) {
         const { needsMachineTools, minimumDefault } = getMinimumToolRequired(
-            outputDetails.map((details) => ({ ...details, name })),
+            outputDetails.map((details) => ({ ...details, id })),
         );
 
         const errorSuffix = needsMachineTools

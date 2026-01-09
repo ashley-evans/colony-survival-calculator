@@ -114,12 +114,12 @@ type Query {
         amount: Float
     ): RequirementResult!
     output(
-        name: ID!
+        id: ID!
         workers: Int!
         unit: OutputUnit!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
-        creator: String
+        creatorID: String
     ): OutputResult!
 }
 

@@ -1,5 +1,6 @@
 import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
+import { vi } from "vitest";
 
 import { createItem, createMemoryServer } from "../../../../../test/index";
 
@@ -8,17 +9,12 @@ const itemCollectionName = "Items";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
-jest.mock("@colony-survival-calculator/mongodb-client", async () => {
-    mongoDBMemoryServer = await createMemoryServer(databaseName);
-    return MongoClient.connect(mongoDBMemoryServer.getUri());
-});
-
-import mockClient from "@colony-survival-calculator/mongodb-client";
-import { Items, DefaultToolset } from "../../../../types";
+import { DefaultToolset } from "../../../../types";
+import type { Items } from "../../../../types";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 
-const validItemName = "test item";
-const validCreatorName = "a test item creator";
+const validItemID = "testitem";
+const validCreatorID = "testitemcreator";
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
@@ -26,7 +22,9 @@ async function storeItems(items: Items) {
 }
 
 async function clearItemsCollection() {
-    const client = await mockClient;
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
     const db = client.db(databaseName);
 
     const existingCollections = await db.listCollections().toArray();
@@ -40,9 +38,21 @@ async function clearItemsCollection() {
     }
 }
 
+beforeAll(async () => {
+    mongoDBMemoryServer = await createMemoryServer(databaseName);
+
+    vi.doMock("@colony-survival-calculator/mongodb-client", async () => {
+        const clientPromise = MongoClient.connect(mongoDBMemoryServer.getUri());
+        return {
+            default: clientPromise,
+        };
+    });
+});
+
 beforeEach(async () => {
-    process.env["DATABASE_NAME"] = databaseName;
-    process.env["ITEM_COLLECTION_NAME"] = itemCollectionName;
+    vi.resetModules();
+    vi.stubEnv("DATABASE_NAME", databaseName);
+    vi.stubEnv("ITEM_COLLECTION_NAME", itemCollectionName);
 
     await clearItemsCollection();
 });
@@ -73,7 +83,7 @@ test.each([
 test("returns an empty array if no items are stored in the items collection", async () => {
     const { queryOutputDetails } = await import("../mongodb-output-adapter");
 
-    const actual = await queryOutputDetails({ name: validItemName });
+    const actual = await queryOutputDetails({ id: validItemID });
 
     expect(actual).toEqual([]);
 });
@@ -84,12 +94,12 @@ test.each([
         "only one item stored in database",
         [
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.copper,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "copper" as DefaultToolset,
             }),
         ],
         [
@@ -98,8 +108,8 @@ test.each([
                 output: 3,
                 toolset: {
                     type: "default" as const,
-                    minimumTool: DefaultToolset.none,
-                    maximumTool: DefaultToolset.copper,
+                    minimumTool: "none" as DefaultToolset,
+                    maximumTool: "copper" as DefaultToolset,
                 },
             },
         ],
@@ -109,20 +119,21 @@ test.each([
         "multiple items stored in database",
         [
             createItem({
-                name: validItemName,
+                id: validItemID,
+                creatorID: validCreatorID,
                 createTime: 5,
                 output: 3,
                 requirements: [],
-                minimumTool: DefaultToolset.copper,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "copper" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
-                name: "another item",
+                id: "anotheritem",
                 createTime: 2,
                 output: 1,
                 requirements: [],
-                minimumTool: DefaultToolset.none,
-                maximumTool: DefaultToolset.steel,
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
             }),
         ],
         [
@@ -131,8 +142,8 @@ test.each([
                 output: 3,
                 toolset: {
                     type: "default" as const,
-                    minimumTool: DefaultToolset.copper,
-                    maximumTool: DefaultToolset.steel,
+                    minimumTool: "copper" as DefaultToolset,
+                    maximumTool: "steel" as DefaultToolset,
                 },
             },
         ],
@@ -142,13 +153,13 @@ test.each([
         "no relevant items stored in database",
         [
             createItem({
-                name: "another item",
+                id: "anotheritem",
                 createTime: 2,
                 output: 1,
                 requirements: [],
             }),
             createItem({
-                name: "yet another item",
+                id: "yetanotheritem",
                 createTime: 5,
                 output: 3,
                 requirements: [],
@@ -168,27 +179,27 @@ test.each([
         const { queryOutputDetails } =
             await import("../mongodb-output-adapter");
 
-        const actual = await queryOutputDetails({ name: validItemName });
+        const actual = await queryOutputDetails({ id: validItemID });
 
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(expect.arrayContaining(expected));
     },
 );
 
-test("only returns output details related to provided creator if item is created by more than one creator", async () => {
+test("only returns output details related to provided creator ID if item is created by more than one creator", async () => {
     const expected: ItemOutputDetails = {
         createTime: 1,
         output: 3,
         toolset: {
             type: "default",
-            minimumTool: DefaultToolset.stone,
-            maximumTool: DefaultToolset.copper,
+            minimumTool: "stone" as DefaultToolset,
+            maximumTool: "copper" as DefaultToolset,
         },
     };
     const expectedItem = createItem({
-        name: validItemName,
+        id: validItemID,
         requirements: [],
-        creator: validCreatorName,
+        creatorID: validCreatorID,
         createTime: expected.createTime,
         output: expected.output,
         minimumTool: expected.toolset.minimumTool as DefaultToolset,
@@ -197,19 +208,19 @@ test("only returns output details related to provided creator if item is created
     const stored = [
         expectedItem,
         createItem({
-            name: validItemName,
+            id: validItemID,
             createTime: 2,
             output: 4,
             requirements: [],
-            creator: "another creator",
+            creatorID: "anothercreator",
         }),
     ];
     await storeItems(stored);
     const { queryOutputDetails } = await import("../mongodb-output-adapter");
 
     const actual = await queryOutputDetails({
-        name: validItemName,
-        creator: validCreatorName,
+        id: validItemID,
+        creatorID: validCreatorID,
     });
 
     expect(actual).toHaveLength(1);
@@ -219,25 +230,28 @@ test("only returns output details related to provided creator if item is created
 test("returns no output details if an item is not created by the provided creator", async () => {
     const stored = [
         createItem({
-            name: validItemName,
+            id: validItemID,
             createTime: 2,
             output: 4,
             requirements: [],
-            creator: "another creator",
+            creatorID: "anothercreator",
         }),
     ];
     await storeItems(stored);
     const { queryOutputDetails } = await import("../mongodb-output-adapter");
 
     const actual = await queryOutputDetails({
-        name: validItemName,
-        creator: validCreatorName,
+        id: validItemID,
+        creatorID: validCreatorID,
     });
 
     expect(actual).toHaveLength(0);
 });
 
 afterAll(async () => {
-    (await mockClient).close(true);
+    const client = await (
+        await import("@colony-survival-calculator/mongodb-client")
+    ).default;
+    await client.close(true);
     await mongoDBMemoryServer.stop();
 });

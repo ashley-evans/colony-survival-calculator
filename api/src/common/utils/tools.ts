@@ -1,8 +1,8 @@
 import { ToolModifierValues } from "..";
 import { AllToolsets, DefaultToolset, Item, MachineToolset } from "../../types";
-import { groupItemsByName } from "./items";
+import { groupItemsByID } from "./items";
 
-type RequiredToolFields = Pick<Item, "name" | "toolset">;
+type RequiredToolFields = Pick<Item, "id" | "toolset">;
 type MinimumTools = {
     minimumDefault: DefaultToolset;
     needsMachineTools: boolean;
@@ -57,7 +57,7 @@ function getMinimumToolRequired(items: RequiredToolFields[]): MinimumTools {
     let minimumDefault = "none" as DefaultToolset;
     let needsMachineTools = false;
 
-    const grouped = groupItemsByName(items);
+    const grouped = groupItemsByID(items);
     for (const group of Array.from(grouped.values())) {
         const groupMin = getMinimumToolWithinGroup(group);
         if (groupMin.needsMachineTools) {

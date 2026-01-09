@@ -28,22 +28,22 @@ function createItemOutputDetails(
     };
 }
 
-const validItemName = "test item name";
+const validItemID = "testitem";
 const validWorkers = 5;
 
 beforeEach(() => {
     mockQueryOutputDetails.mockReset();
 });
 
-test("throws an error given an empty string as an item name", async () => {
+test("throws an error given an empty string as an item ID", async () => {
     const expectedError = new Error(
-        "Invalid item name provided, must be a non-empty string",
+        "Invalid item ID provided, must be a non-empty string",
     );
 
     expect.assertions(1);
     await expect(
         calculateOutput({
-            name: "",
+            id: "",
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
         }),
@@ -63,7 +63,7 @@ test.each([
         expect.assertions(1);
         await expect(
             calculateOutput({
-                name: validItemName,
+                id: validItemID,
                 workers: amount,
                 unit: OutputUnit.MINUTES,
             }),
@@ -76,14 +76,14 @@ test("calls the database adapter to get the output details for the provided item
     mockQueryOutputDetails.mockResolvedValue([details]);
 
     await calculateOutput({
-        name: validItemName,
+        id: validItemID,
         workers: validWorkers,
         unit: OutputUnit.MINUTES,
     });
 
     expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
     expect(mockQueryOutputDetails).toHaveBeenCalledWith({
-        name: validItemName,
+        id: validItemID,
     });
 });
 
@@ -93,16 +93,16 @@ test("provides the creator name to database adapter if provided", async () => {
     mockQueryOutputDetails.mockResolvedValue([details]);
 
     await calculateOutput({
-        name: validItemName,
+        id: validItemID,
         workers: validWorkers,
         unit: OutputUnit.MINUTES,
-        creator: expectedCreatorName,
+        creatorID: expectedCreatorName,
     });
 
     expect(mockQueryOutputDetails).toHaveBeenCalledTimes(1);
     expect(mockQueryOutputDetails).toHaveBeenCalledWith({
-        name: validItemName,
-        creator: expectedCreatorName,
+        id: validItemID,
+        creatorID: expectedCreatorName,
     });
 });
 
@@ -113,7 +113,7 @@ test("throws an error if no item output details are returned from DB", async () 
     expect.assertions(1);
     await expect(
         calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
         }),
@@ -127,7 +127,7 @@ test("throws an error if an unhandled exception occurs while fetching item requi
     expect.assertions(1);
     await expect(
         calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
         }),
@@ -153,7 +153,7 @@ test.each([
         mockQueryOutputDetails.mockResolvedValue([details]);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit,
         });
@@ -209,7 +209,7 @@ describe("handles tool modifiers", () => {
             expect.assertions(1);
             await expect(
                 calculateOutput({
-                    name: validItemName,
+                    id: validItemID,
                     workers: validWorkers,
                     unit: OutputUnit.MINUTES,
                     maxAvailableTool: provided,
@@ -236,7 +236,7 @@ describe("handles tool modifiers", () => {
             mockQueryOutputDetails.mockResolvedValue([details]);
 
             const actual = await calculateOutput({
-                name: validItemName,
+                id: validItemID,
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
                 maxAvailableTool: provided,
@@ -256,7 +256,7 @@ describe("handles tool modifiers", () => {
         mockQueryOutputDetails.mockResolvedValue([details]);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             maxAvailableTool: "steel" as DefaultToolset,
@@ -289,7 +289,7 @@ describe("handles machine tool recipes", () => {
             expect.assertions(1);
             await expect(
                 calculateOutput({
-                    name: validItemName,
+                    id: validItemID,
                     workers: validWorkers,
                     unit: OutputUnit.MINUTES,
                     ...(hasMachineTools !== undefined
@@ -304,7 +304,7 @@ describe("handles machine tool recipes", () => {
         const expected = 600;
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             hasMachineTools: true,
@@ -322,7 +322,7 @@ describe("handles machine tool recipes", () => {
         ]);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             hasMachineTools: false,
@@ -344,7 +344,7 @@ describe("handles machine tool recipes", () => {
         ]);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             hasMachineTools: true,
@@ -373,7 +373,7 @@ describe("multiple recipe handling", () => {
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             maxAvailableTool: "steel" as DefaultToolset,
@@ -399,7 +399,7 @@ describe("multiple recipe handling", () => {
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             maxAvailableTool: "steel" as DefaultToolset,
@@ -425,7 +425,7 @@ describe("multiple recipe handling", () => {
         mockQueryOutputDetails.mockResolvedValue(recipes);
 
         const actual = await calculateOutput({
-            name: validItemName,
+            id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
             maxAvailableTool: "none" as DefaultToolset,
@@ -454,7 +454,7 @@ describe("multiple recipe handling", () => {
         expect.assertions(1);
         await expect(
             calculateOutput({
-                name: validItemName,
+                id: validItemID,
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
                 maxAvailableTool: "none" as DefaultToolset,
