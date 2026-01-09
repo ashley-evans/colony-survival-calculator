@@ -22,9 +22,11 @@ enum Tools {
 }
 
 type Item {
-    name: ID!
+    id: ID!
+    name: String!
     createTime: Float!
     output: Float!
+    creatorID: String!
     creator: String!
     minimumTool: Tools!
     maximumTool: Tools!
@@ -88,9 +90,9 @@ input OptimalFilter {
 }
 
 input ItemsFilters {
-    name: ID
+    id: ID
     minimumCreators: Int
-    creator: String
+    creatorID: String
     optimal: OptimalFilter
 }
 
@@ -101,7 +103,7 @@ type ItemName {
 
 type Query {
     distinctItemNames(locale: String): [ItemName!]!
-    item(filters: ItemsFilters): [Item!]!
+    item(filters: ItemsFilters, locale: String): [Item!]!
     requirement(
         name: ID!
         maxAvailableTool: AvailableTools

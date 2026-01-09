@@ -5,8 +5,11 @@ import {
     queryItemByCreatorCount,
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
-import { DefaultToolset, type Items } from "../../../../types";
-import { createItem, createItemWithMachineTools } from "../../../../../test";
+import { DefaultToolset, TranslatedItem } from "../../../../types";
+import {
+    createTranslatedItem,
+    createTranslatedItemWithMachineTools,
+} from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
 
 vi.mock("../../adapters/mongodb-query-item", () => ({
@@ -26,32 +29,65 @@ beforeEach(() => {
     consoleErrorSpy.mockClear();
 });
 
-const expectedItemName = "expected item name";
+const expectedItemID = "expected item ID";
 const expectedMinimumCreators = 1;
-const expectedCreator = "expected item creator";
+const expectedCreatorID = "expected item creator ID";
 
 describe("field queries", () => {
     test.each([
         [
             "all items",
-            "no field filters provided",
+            "no field filters provided (default locale)",
             undefined,
+            undefined,
+            "en-US",
+            undefined,
+            undefined,
+        ],
+        [
+            "all items",
+            "no field filters provided (specific locale)",
+            undefined,
+            "fr-FR",
+            "fr-FR",
             undefined,
             undefined,
         ],
         [
             "a specific item",
-            "an item name provided",
-            { name: expectedItemName },
-            expectedItemName,
+            "an item ID provided (default locale)",
+            { id: expectedItemID },
+            undefined,
+            "en-US",
+            expectedItemID,
+            undefined,
+        ],
+        [
+            "a specific item",
+            "an item ID provided (specific locale)",
+            { id: expectedItemID },
+            "fr-FR",
+            "fr-FR",
+            expectedItemID,
             undefined,
         ],
         [
             "a specific creator",
-            "a creator provided",
-            { creator: expectedCreator },
+            "a creator ID provided (default locale)",
+            { creatorID: expectedCreatorID },
             undefined,
-            expectedCreator,
+            "en-US",
+            undefined,
+            expectedCreatorID,
+        ],
+        [
+            "a specific creator",
+            "a creator ID provided (specific locale)",
+            { creatorID: expectedCreatorID },
+            "fr-FR",
+            "fr-FR",
+            undefined,
+            expectedCreatorID,
         ],
     ])(
         "queries the database via fields to fetch %s given %s",
@@ -59,15 +95,18 @@ describe("field queries", () => {
             _: string,
             __: string,
             filters: QueryFilters | undefined,
-            expectedItemName: string | undefined,
-            expectedCreator: string | undefined,
+            locale: string | undefined,
+            expectedLocale: string,
+            expectedItemID: string | undefined,
+            expectedCreatorID: string | undefined,
         ) => {
-            await queryItem(filters);
+            await queryItem(filters, locale);
 
             expect(mockQueryItemByField).toHaveBeenCalledTimes(1);
             expect(mockQueryItemByField).toHaveBeenCalledWith(
-                expectedItemName,
-                expectedCreator,
+                expectedLocale,
+                expectedItemID,
+                expectedCreatorID,
             );
         },
     );
@@ -77,13 +116,13 @@ describe("field queries", () => {
         [
             "multiple received w/ no farm sizes",
             [
-                createItem({
+                createTranslatedItem({
                     name: "test 1",
                     createTime: 1,
                     output: 3,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: "test 2",
                     createTime: 4,
                     output: 6,
@@ -94,7 +133,7 @@ describe("field queries", () => {
         [
             "multiple received w/ farm sizes",
             [
-                createItem({
+                createTranslatedItem({
                     name: "test 1",
                     createTime: 1,
                     output: 3,
@@ -102,7 +141,7 @@ describe("field queries", () => {
                     width: 1,
                     height: 2,
                 }),
-                createItem({
+                createTranslatedItem({
                     name: "test 2",
                     createTime: 4,
                     output: 6,
@@ -114,7 +153,7 @@ describe("field queries", () => {
         ],
     ])(
         "returns all items retrieved by field query given %s (no optimal filter provided)",
-        async (_: string, received: Items) => {
+        async (_: string, received: TranslatedItem[]) => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem();
@@ -127,7 +166,7 @@ describe("field queries", () => {
     describe("optimal filter handling", () => {
         test("returns only the item with highest output with no tools given multiple recipes for single item (no max tool specified in filter)", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 5,
@@ -135,7 +174,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 5,
                     output: 2,
@@ -154,13 +193,13 @@ describe("field queries", () => {
             const itemName1 = "item 1";
             const itemName2 = "item 2";
             const expected = [
-                createItem({
+                createTranslatedItem({
                     name: itemName1,
                     createTime: 1,
                     output: 5,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: itemName2,
                     createTime: 3,
                     output: 10,
@@ -169,13 +208,13 @@ describe("field queries", () => {
             ];
             const received = [
                 ...expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName1,
                     createTime: 5,
                     output: 2,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: itemName2,
                     createTime: 10,
                     output: 12,
@@ -192,7 +231,7 @@ describe("field queries", () => {
 
         test("returns item with highest output (due to better possible tool) given multiple recipes and no tool specified", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 5,
@@ -201,7 +240,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 8,
@@ -219,7 +258,7 @@ describe("field queries", () => {
 
         test("returns item with highest output given items that cannot utilize max tool available", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -228,7 +267,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -248,7 +287,7 @@ describe("field queries", () => {
 
         test("ignores any item that cannot be created by provided tool even if optimal", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -258,7 +297,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -279,7 +318,7 @@ describe("field queries", () => {
 
         test("ignores any item that requires machine tools if no machine tools are available even if more optimal", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -289,7 +328,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItemWithMachineTools({
+                createTranslatedItemWithMachineTools({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -313,7 +352,7 @@ describe("field queries", () => {
             "returns item with machine tools if more optimal (%s)",
             async (_: string, hasMachineTools: boolean | undefined) => {
                 const itemName = "item 1";
-                const expected = createItemWithMachineTools({
+                const expected = createTranslatedItemWithMachineTools({
                     name: itemName,
                     createTime: 1,
                     output: 2,
@@ -321,7 +360,7 @@ describe("field queries", () => {
                 });
                 const received = [
                     expected,
-                    createItem({
+                    createTranslatedItem({
                         name: itemName,
                         createTime: 1,
                         output: 2,
@@ -341,7 +380,7 @@ describe("field queries", () => {
 
         test("prefers optimal recipe regardless of whether item has recipe with machine tools", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -351,7 +390,7 @@ describe("field queries", () => {
             });
             const received = [
                 expected,
-                createItemWithMachineTools({
+                createTranslatedItemWithMachineTools({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -373,7 +412,7 @@ describe("field queries", () => {
 
         test("returns nothing if only recipe requires machine tools and no machine tools are available", async () => {
             const received = [
-                createItemWithMachineTools({
+                createTranslatedItemWithMachineTools({
                     name: "test item",
                     createTime: 1,
                     output: 3,
@@ -418,32 +457,58 @@ describe("field queries", () => {
 describe("creator count queries", () => {
     test.each([
         [
-            "a minimum creator count filter is provided",
+            "a minimum creator count filter is provided (default locale)",
             { minimumCreators: expectedMinimumCreators },
+            undefined,
+            "en-US",
             expectedMinimumCreators,
             undefined,
         ],
         [
-            "a minimum creator count filter is provided w/ an item name",
+            "a minimum creator count filter is provided (specific locale)",
+            { minimumCreators: expectedMinimumCreators },
+            "fr-FR",
+            "fr-FR",
+            expectedMinimumCreators,
+            undefined,
+        ],
+        [
+            "a minimum creator count filter is provided w/ an item ID (default locale)",
             {
                 minimumCreators: expectedMinimumCreators,
-                name: expectedItemName,
+                id: expectedItemID,
             },
+            undefined,
+            "en-US",
             expectedMinimumCreators,
-            expectedItemName,
+            expectedItemID,
+        ],
+        [
+            "a minimum creator count filter is provided w/ an item ID (specific locale)",
+            {
+                minimumCreators: expectedMinimumCreators,
+                id: expectedItemID,
+            },
+            "fr-FR",
+            "fr-FR",
+            expectedMinimumCreators,
+            expectedItemID,
         ],
     ])(
         "queries the database via creator count given %s",
         async (
             _: string,
             filters: QueryFilters | undefined,
+            locale: string | undefined,
+            expectedLocale: string,
             expectedMinimumCreators: number,
             expectedItemName: string | undefined,
         ) => {
-            await queryItem(filters);
+            await queryItem(filters, locale);
 
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledTimes(1);
             expect(mockQueryItemByCreatorCount).toHaveBeenCalledWith(
+                expectedLocale,
                 expectedMinimumCreators,
                 expectedItemName,
             );
@@ -455,13 +520,13 @@ describe("creator count queries", () => {
         [
             "multiple received",
             [
-                createItem({
+                createTranslatedItem({
                     name: "test 1",
                     createTime: 1,
                     output: 3,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: "test 1",
                     createTime: 5,
                     output: 7,
@@ -471,7 +536,7 @@ describe("creator count queries", () => {
         ],
     ])(
         "returns all items retrieved given %s",
-        async (_: string, received: Items) => {
+        async (_: string, received: TranslatedItem[]) => {
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
             const actual = await queryItem({ minimumCreators: 1 });
@@ -508,7 +573,7 @@ describe("creator count queries", () => {
     describe("optimal filter handling", () => {
         test("returns only the item with highest output with no tools given multiple recipes for single item (no max tool specified in filter)", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 5,
@@ -516,7 +581,7 @@ describe("creator count queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 5,
                     output: 2,
@@ -538,13 +603,13 @@ describe("creator count queries", () => {
             const itemName1 = "item 1";
             const itemName2 = "item 2";
             const expected = [
-                createItem({
+                createTranslatedItem({
                     name: itemName1,
                     createTime: 1,
                     output: 5,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: itemName2,
                     createTime: 3,
                     output: 10,
@@ -553,13 +618,13 @@ describe("creator count queries", () => {
             ];
             const received = [
                 ...expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName1,
                     createTime: 5,
                     output: 2,
                     requirements: [],
                 }),
-                createItem({
+                createTranslatedItem({
                     name: itemName2,
                     createTime: 10,
                     output: 12,
@@ -579,7 +644,7 @@ describe("creator count queries", () => {
 
         test("returns item with highest output (due to better possible tool) given multiple recipes and no tool specified", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 5,
@@ -588,7 +653,7 @@ describe("creator count queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 8,
@@ -609,7 +674,7 @@ describe("creator count queries", () => {
 
         test("returns item with highest output given items that cannot utilize max tool available", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -618,7 +683,7 @@ describe("creator count queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -639,7 +704,7 @@ describe("creator count queries", () => {
 
         test("ignores any item that cannot be created by provided tool even if optimal", async () => {
             const itemName = "item 1";
-            const expected = createItem({
+            const expected = createTranslatedItem({
                 name: itemName,
                 createTime: 1,
                 output: 2,
@@ -649,7 +714,7 @@ describe("creator count queries", () => {
             });
             const received = [
                 expected,
-                createItem({
+                createTranslatedItem({
                     name: itemName,
                     createTime: 1,
                     output: 3,
@@ -670,24 +735,24 @@ describe("creator count queries", () => {
         });
     });
 
-    test("throws an error if a minimum creator filter is provided with a creator name filter", async () => {
+    test("throws an error if a minimum creator filter is provided with a creator ID filter", async () => {
         const expectedError = new Error(
-            "Invalid filter combination provided: Cannot filter by minimum creator and creator name",
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator ID",
         );
 
         expect.assertions(1);
         await expect(
-            queryItem({ minimumCreators: 1, creator: "test creator" }),
+            queryItem({ minimumCreators: 1, creatorID: "test creator" }),
         ).rejects.toThrow(expectedError);
     });
 
-    test("logs an error message to console if a minimum creator filter is provided with a creator name filter", async () => {
+    test("logs an error message to console if a minimum creator filter is provided with a creator ID filter", async () => {
         const expectedError = new Error(
-            "Invalid filter combination provided: Cannot filter by minimum creator and creator name",
+            "Invalid filter combination provided: Cannot filter by minimum creator and creator ID",
         );
 
         try {
-            await queryItem({ minimumCreators: 1, creator: "test creator" });
+            await queryItem({ minimumCreators: 1, creatorID: "test creator" });
         } catch {
             // Ignore
         }

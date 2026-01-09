@@ -9,5 +9,6 @@ export type {
     DefaultToolset,
     MachineToolset,
 } from "./__generated__/items";
+export * from "./item";
 
 export type AllToolsets = DefaultToolset | MachineToolset;

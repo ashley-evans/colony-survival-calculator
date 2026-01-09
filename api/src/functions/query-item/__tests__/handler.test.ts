@@ -4,8 +4,11 @@ import { vi, Mock } from "vitest";
 
 import { handler } from "../handler";
 import { queryItem } from "../domain/query-item";
-import { DefaultToolset as DomainTools, type Items } from "../../../types";
-import { createItem, createItemWithMachineTools } from "../../../../test";
+import { DefaultToolset as DomainTools, TranslatedItem } from "../../../types";
+import {
+    createTranslatedItem,
+    createTranslatedItemWithMachineTools,
+} from "../../../../test";
 import type {
     Item,
     ItemsFilters,
@@ -33,20 +36,20 @@ function createOptimalFilter(
 }
 
 function createFilters({
-    itemName,
+    itemID,
     minimumCreators,
-    creator,
+    creatorID,
     optimal,
 }: {
-    itemName?: string;
+    itemID?: string;
     minimumCreators?: number;
-    creator?: string;
+    creatorID?: string;
     optimal?: OptimalFilter;
 }): ItemsFilters {
     return {
-        name: itemName ?? null,
+        id: itemID ?? null,
         minimumCreators: minimumCreators ?? null,
-        creator: creator ?? null,
+        creatorID: creatorID ?? null,
         optimal: optimal ?? null,
     };
 }
@@ -62,19 +65,19 @@ function createMockEvent(
     return mockEvent;
 }
 
-const expectedItemName = "test item";
+const expectedItemID = "testitem";
 const expectedMinimumCreators = 2;
-const expectedCreator = "test item creator";
+const expectedCreatorID = "testitemcreator";
 const mockEventWithoutFilters = createMockEvent();
 const mockEventWithEmptyFilters = createMockEvent(createFilters({}));
-const mockEventWithItemName = createMockEvent(
-    createFilters({ itemName: expectedItemName }),
+const mockEventWithItemID = createMockEvent(
+    createFilters({ itemID: expectedItemID }),
 );
 const mockEventWithMinimumCreators = createMockEvent(
     createFilters({ minimumCreators: expectedMinimumCreators }),
 );
-const mockEventWithCreator = createMockEvent(
-    createFilters({ creator: expectedCreator }),
+const mockEventWithCreatorID = createMockEvent(
+    createFilters({ creatorID: expectedCreatorID }),
 );
 const mockEventWithOptimalFilter = createMockEvent(
     createFilters({
@@ -88,9 +91,9 @@ const mockEventWithOptimalFilterAndMaxTool = createMockEvent(
 );
 const mockEventWithAllFilters = createMockEvent(
     createFilters({
-        itemName: expectedItemName,
+        itemID: expectedItemID,
         minimumCreators: expectedMinimumCreators,
-        creator: expectedCreator,
+        creatorID: expectedCreatorID,
         optimal: createOptimalFilter("STEEL"),
     }),
 );
@@ -102,14 +105,14 @@ beforeEach(() => {
 test.each([
     ["no filters specified", mockEventWithoutFilters, undefined],
     [
-        "no item name specified in filter",
+        "no item ID specified in filter",
         mockEventWithEmptyFilters,
-        { name: undefined },
+        { id: undefined },
     ],
     [
-        "an item name specified in filter",
-        mockEventWithItemName,
-        { name: expectedItemName },
+        "an item ID specified in filter",
+        mockEventWithItemID,
+        { id: expectedItemID },
     ],
     [
         "a minimum number of creators specified in filter",
@@ -117,9 +120,9 @@ test.each([
         { minimumCreators: expectedMinimumCreators },
     ],
     [
-        "a creator name specified in filter",
-        mockEventWithCreator,
-        { creator: expectedCreator },
+        "a creator ID specified in filter",
+        mockEventWithCreatorID,
+        { creatorID: expectedCreatorID },
     ],
     [
         "an optimal filter specified w/o max tool",
@@ -132,12 +135,12 @@ test.each([
         { optimal: { maxAvailableTool: "copper" as DomainTools } },
     ],
     [
-        "an item name, creator, and minimum number of creators specified in filter",
+        "an item ID, creator ID, and minimum number of creators specified in filter",
         mockEventWithAllFilters,
         {
-            name: expectedItemName,
+            id: expectedItemID,
             minimumCreators: expectedMinimumCreators,
-            creator: expectedCreator,
+            creatorID: expectedCreatorID,
             optimal: { maxAvailableTool: "steel" as DomainTools },
         },
     ],
@@ -184,7 +187,7 @@ test.each([
     [
         "multiple received w/ no farm sizes",
         [
-            createItem({
+            createTranslatedItem({
                 name: "test 1",
                 createTime: 1,
                 output: 3,
@@ -193,7 +196,7 @@ test.each([
                 minimumTool: "none" as DomainTools,
                 maximumTool: "steel" as DomainTools,
             }),
-            createItem({
+            createTranslatedItem({
                 name: "test 2",
                 createTime: 4,
                 output: 6,
@@ -202,8 +205,9 @@ test.each([
                 minimumTool: "copper" as DomainTools,
                 maximumTool: "bronze" as DomainTools,
             }),
-            createItemWithMachineTools({
+            createTranslatedItemWithMachineTools({
                 name: "test 3",
+                creator: "test 3 creator",
                 createTime: 6,
                 output: 8,
                 requirements: [],
@@ -212,30 +216,36 @@ test.each([
         [
             {
                 __typename: "Item" as const,
+                id: "test1",
                 name: "test 1",
                 createTime: 1,
                 output: 3,
                 requires: [],
+                creatorID: "test1creator",
                 creator: "test 1 creator",
                 minimumTool: "NONE" as Tools,
                 maximumTool: "STEEL" as Tools,
             },
             {
                 __typename: "Item" as const,
+                id: "test2",
                 name: "test 2",
                 createTime: 4,
                 output: 6,
                 requires: [],
+                creatorID: "test2creator",
                 creator: "test 2 creator",
                 minimumTool: "COPPER" as Tools,
                 maximumTool: "BRONZE" as Tools,
             },
             {
                 __typename: "Item" as const,
+                id: "test3",
                 name: "test 3",
                 createTime: 6,
                 output: 8,
                 requires: [],
+                creatorID: "test3creator",
                 creator: "test 3 creator",
                 minimumTool: "MACHINE" as Tools,
                 maximumTool: "MACHINE" as Tools,
@@ -245,7 +255,7 @@ test.each([
     [
         "multiple received w/ farm sizes",
         [
-            createItem({
+            createTranslatedItem({
                 name: "test 1",
                 createTime: 1,
                 output: 3,
@@ -256,7 +266,7 @@ test.each([
                 minimumTool: "none" as DomainTools,
                 maximumTool: "steel" as DomainTools,
             }),
-            createItem({
+            createTranslatedItem({
                 name: "test 2",
                 createTime: 4,
                 output: 6,
@@ -267,8 +277,9 @@ test.each([
                 minimumTool: "copper" as DomainTools,
                 maximumTool: "bronze" as DomainTools,
             }),
-            createItemWithMachineTools({
+            createTranslatedItemWithMachineTools({
                 name: "test 3",
+                creator: "test 3 creator",
                 createTime: 6,
                 output: 8,
                 requirements: [],
@@ -279,6 +290,7 @@ test.each([
         [
             {
                 __typename: "Item" as const,
+                id: "test1",
                 name: "test 1",
                 createTime: 1,
                 output: 3,
@@ -287,12 +299,14 @@ test.each([
                     width: 1,
                     height: 2,
                 },
+                creatorID: "test1creator",
                 creator: "test 1 creator",
                 minimumTool: "NONE" as Tools,
                 maximumTool: "STEEL" as Tools,
             },
             {
                 __typename: "Item" as const,
+                id: "test2",
                 name: "test 2",
                 createTime: 4,
                 output: 6,
@@ -301,12 +315,14 @@ test.each([
                     width: 3,
                     height: 4,
                 },
+                creatorID: "test2creator",
                 creator: "test 2 creator",
                 minimumTool: "COPPER" as Tools,
                 maximumTool: "BRONZE" as Tools,
             },
             {
                 __typename: "Item" as const,
+                id: "test3",
                 name: "test 3",
                 createTime: 6,
                 output: 8,
@@ -315,6 +331,7 @@ test.each([
                     width: 5,
                     height: 6,
                 },
+                creatorID: "test3creator",
                 creator: "test 3 creator",
                 minimumTool: "MACHINE" as Tools,
                 maximumTool: "MACHINE" as Tools,
@@ -323,7 +340,7 @@ test.each([
     ],
 ])(
     "returns all items retrieved from domain given %s",
-    async (_: string, received: Items, expected: Item[]) => {
+    async (_: string, received: TranslatedItem[], expected: Item[]) => {
         mockQueryItem.mockResolvedValue(received);
 
         const actual = await handler(mockEventWithoutFilters);

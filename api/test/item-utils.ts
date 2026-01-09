@@ -6,6 +6,7 @@ import {
     Requirement,
     Requirements,
     Toolset,
+    TranslatedItem,
 } from "../src/types";
 
 function createRequirements(id: string, amount: number): Requirement {
@@ -106,9 +107,86 @@ function createItemWithMachineTools(
     });
 }
 
+type TranslatedItemFactoryInputs = Omit<ItemFactoryInputs, "i18n" | "id"> & {
+    name: string;
+    id?: string;
+    creator?: string;
+};
+
+function baseCreateTranslatedItem({
+    name,
+    creator,
+    ...rest
+}: TranslatedItemFactoryInputs): TranslatedItem {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { i18n, ...item } = baseCreateItem({
+        ...rest,
+        id: rest.id ?? `${name.toLocaleLowerCase().replace(" ", "")}`,
+        i18n: { name: {}, creator: {} },
+    });
+
+    return {
+        ...item,
+        name: name,
+        creator: creator ?? `${name} Creator`,
+    };
+}
+
+type CreateTranslatedItemParams =
+    | { item: Item; locale: string }
+    | (Omit<TranslatedItemFactoryInputs, "toolset"> & {
+          minimumTool?: DefaultToolset;
+          maximumTool?: DefaultToolset;
+      });
+
+function createTranslatedItem(
+    params: CreateTranslatedItemParams,
+): TranslatedItem {
+    if (!("locale" in params)) {
+        return baseCreateTranslatedItem({
+            ...params,
+            toolset: {
+                type: "default",
+                minimumTool: params.minimumTool ?? ("none" as DefaultToolset),
+                maximumTool: params.maximumTool ?? ("none" as DefaultToolset),
+            },
+        });
+    }
+
+    const { i18n, ...rest } = params.item;
+    const name = i18n.name[params.locale];
+    const creator = i18n.creator[params.locale];
+    if (!name || !creator) {
+        throw new Error(
+            `Missing translation for locale: ${params.locale} in item: ${params.item.id}`,
+        );
+    }
+
+    return {
+        ...rest,
+        name,
+        creator,
+    };
+}
+
+function createTranslatedItemWithMachineTools(
+    params: Omit<TranslatedItemFactoryInputs, "toolset">,
+): TranslatedItem {
+    return baseCreateTranslatedItem({
+        ...params,
+        toolset: {
+            type: "machine",
+            minimumTool: "machine" as MachineToolset,
+            maximumTool: "machine" as MachineToolset,
+        },
+    });
+}
+
 export {
     createItem,
     createItemWithMachineTools,
     createRequirements,
     createOptionalOutput,
+    createTranslatedItem,
+    createTranslatedItemWithMachineTools,
 };

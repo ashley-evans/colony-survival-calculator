@@ -25,15 +25,15 @@ function mapOptimalFilter(
 }
 
 const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
-    const { name, minimumCreators, creator, optimal } =
+    const { id, minimumCreators, creatorID, optimal } =
         event.arguments.filters ?? {};
 
     const optimalFilter = mapOptimalFilter(optimal);
     const filters: QueryFilters | undefined = event.arguments.filters
         ? {
-              name: name ?? undefined,
+              id: id ?? undefined,
               minimumCreators: minimumCreators ?? undefined,
-              creator: creator ?? undefined,
+              creatorID: creatorID ?? undefined,
               optimal: optimalFilter,
           }
         : undefined;
