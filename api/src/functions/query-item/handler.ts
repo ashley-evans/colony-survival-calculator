@@ -27,6 +27,7 @@ function mapOptimalFilter(
 const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
     const { id, minimumCreators, creatorID, optimal } =
         event.arguments.filters ?? {};
+    const locale = event.arguments.locale ?? undefined;
 
     const optimalFilter = mapOptimalFilter(optimal);
     const filters: QueryFilters | undefined = event.arguments.filters
@@ -39,7 +40,7 @@ const handler: GraphQLEventHandler<QueryItemArgs, Item[]> = async (event) => {
         : undefined;
 
     try {
-        const items = await queryItem(filters);
+        const items = await queryItem(filters, locale);
         return items.map(({ toolset, ...rest }) => ({
             __typename: "Item",
             maximumTool: GraphQLToolsSchemaMap[toolset.maximumTool],

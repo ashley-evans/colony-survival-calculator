@@ -56,10 +56,12 @@ function createFilters({
 
 function createMockEvent(
     filters?: ItemsFilters,
+    locale?: string,
 ): AppSyncResolverEvent<QueryItemArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryItemArgs>>();
     mockEvent.arguments = {
         filters: filters ?? null,
+        locale: locale ?? null,
     };
 
     return mockEvent;
@@ -103,36 +105,42 @@ beforeEach(() => {
 });
 
 test.each([
-    ["no filters specified", mockEventWithoutFilters, undefined],
+    ["no filters specified", mockEventWithoutFilters, undefined, undefined],
     [
         "no item ID specified in filter",
         mockEventWithEmptyFilters,
         { id: undefined },
+        undefined,
     ],
     [
         "an item ID specified in filter",
         mockEventWithItemID,
         { id: expectedItemID },
+        undefined,
     ],
     [
         "a minimum number of creators specified in filter",
         mockEventWithMinimumCreators,
         { minimumCreators: expectedMinimumCreators },
+        undefined,
     ],
     [
         "a creator ID specified in filter",
         mockEventWithCreatorID,
         { creatorID: expectedCreatorID },
+        undefined,
     ],
     [
         "an optimal filter specified w/o max tool",
         mockEventWithOptimalFilter,
         { optimal: {} },
+        undefined,
     ],
     [
         "an optimal filter specified w/ max tool",
         mockEventWithOptimalFilterAndMaxTool,
         { optimal: { maxAvailableTool: "copper" as DomainTools } },
+        undefined,
     ],
     [
         "an item ID, creator ID, and minimum number of creators specified in filter",
@@ -143,6 +151,7 @@ test.each([
             creatorID: expectedCreatorID,
             optimal: { maxAvailableTool: "steel" as DomainTools },
         },
+        undefined,
     ],
     [
         "an optimal filter specified w/ machine tool indication (true)",
@@ -154,6 +163,7 @@ test.each([
         {
             optimal: { hasMachineTools: true },
         },
+        undefined,
     ],
     [
         "an optimal filter specified w/ machine tool indication (false)",
@@ -165,20 +175,43 @@ test.each([
         {
             optimal: { hasMachineTools: false },
         },
+        undefined,
+    ],
+    [
+        "a locale specified",
+        createMockEvent(undefined, "en-US"),
+        undefined,
+        "en-US",
+    ],
+    [
+        "filters and locale specified",
+        createMockEvent(createFilters({ itemID: expectedItemID }), "fr-FR"),
+        { id: expectedItemID },
+        "fr-FR",
+    ],
+    [
+        "filters specified without locale",
+        createMockEvent(createFilters({ itemID: expectedItemID })),
+        { id: expectedItemID },
+        undefined,
     ],
 ])(
     "calls the domain to fetch items given an event with %s",
     async (
         _: string,
         event: AppSyncResolverEvent<QueryItemArgs>,
-        expected: QueryFilters | undefined,
+        expectedFilters: QueryFilters | undefined,
+        expectedLocale: string | undefined,
     ) => {
         mockQueryItem.mockResolvedValue([]);
 
         await handler(event);
 
         expect(mockQueryItem).toHaveBeenCalledTimes(1);
-        expect(mockQueryItem).toHaveBeenCalledWith(expected);
+        expect(mockQueryItem).toHaveBeenCalledWith(
+            expectedFilters,
+            expectedLocale,
+        );
     },
 );
 
