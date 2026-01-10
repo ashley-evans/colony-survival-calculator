@@ -1,18 +1,24 @@
 import type { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
-import { createItem, createMemoryServer } from "../../../../../test/index";
-import { Items, DefaultToolset } from "../../../../types";
+import {
+    createItem,
+    createMemoryServer,
+    createTranslatedItem,
+} from "../../../../../test/index";
+import type { Items } from "../../../../types";
+import { DefaultToolset } from "../../../../types";
 
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
-const validItemName = "test item 1";
+const validItemID = "test item id";
+const defaultLocale = "en-US";
 
 let mongoDBMemoryServer: MongoMemoryServer;
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
-    await storeItem(items);
+    await storeItem(JSON.parse(JSON.stringify(items)));
 }
 
 async function clearItemsCollection() {
@@ -78,28 +84,36 @@ test("returns an empty array if no items are stored in the items collection", as
     const { queryRequirements } =
         await import("../mongodb-requirements-adapter");
 
-    const actual = await queryRequirements(validItemName);
+    const actual = await queryRequirements({
+        id: validItemID,
+        locale: defaultLocale,
+    });
 
     expect(actual).toEqual([]);
 });
 
 test("returns only the specified item if only that item is stored in the items collection", async () => {
     const stored = createItem({
-        name: validItemName,
+        id: validItemID,
         createTime: 2,
         output: 3,
         requirements: [],
         minimumTool: "none" as DefaultToolset,
         maximumTool: "steel" as DefaultToolset,
     });
-    await storeItems([{ ...stored }]);
+    await storeItems([stored]);
     const { queryRequirements } =
         await import("../mongodb-requirements-adapter");
 
-    const actual = await queryRequirements(validItemName);
+    const actual = await queryRequirements({
+        id: validItemID,
+        locale: defaultLocale,
+    });
 
     expect(actual).toHaveLength(1);
-    expect(actual[0]).toEqual(stored);
+    expect(actual[0]).toEqual(
+        createTranslatedItem({ item: stored, locale: defaultLocale }),
+    );
 });
 
 test.each([
@@ -107,7 +121,7 @@ test.each([
         "an item with a single requirement and no nested requirements",
         [
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
@@ -115,17 +129,17 @@ test.each([
                 maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
-                requirements: [{ name: "required item 1", amount: 4 }],
+                requirements: [{ id: "required item 1", amount: 4 }],
                 minimumTool: "stone" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
             }),
         ],
         [
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
@@ -133,10 +147,10 @@ test.each([
                 maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
-                requirements: [{ name: "required item 1", amount: 4 }],
+                requirements: [{ id: "required item 1", amount: 4 }],
                 minimumTool: "stone" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
             }),
@@ -146,47 +160,47 @@ test.each([
         "an item with multiple requirements and no nested requirements",
         [
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
                 requirements: [
-                    { name: "required item 1", amount: 4 },
-                    { name: "required item 2", amount: 5 },
+                    { id: "required item 1", amount: 4 },
+                    { id: "required item 2", amount: 5 },
                 ],
             }),
         ],
         [
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
                 requirements: [
-                    { name: "required item 1", amount: 4 },
-                    { name: "required item 2", amount: 5 },
+                    { id: "required item 1", amount: 4 },
+                    { id: "required item 2", amount: 5 },
                 ],
             }),
         ],
@@ -195,53 +209,53 @@ test.each([
         "an item with multiple requirements and other unrelated items stored",
         [
             createItem({
-                name: "unrelated item",
+                id: "unrelated item",
                 createTime: 3,
                 output: 2,
-                requirements: [{ name: "required item 1", amount: 2 }],
+                requirements: [{ id: "required item 1", amount: 2 }],
             }),
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
                 requirements: [
-                    { name: "required item 1", amount: 4 },
-                    { name: "required item 2", amount: 5 },
+                    { id: "required item 1", amount: 4 },
+                    { id: "required item 2", amount: 5 },
                 ],
             }),
         ],
         [
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
                 requirements: [],
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
                 requirements: [
-                    { name: "required item 1", amount: 4 },
-                    { name: "required item 2", amount: 5 },
+                    { id: "required item 1", amount: 4 },
+                    { id: "required item 2", amount: 5 },
                 ],
             }),
         ],
@@ -250,7 +264,7 @@ test.each([
         "an item with multiple nested requirements",
         [
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
@@ -258,23 +272,23 @@ test.each([
                 maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
-                requirements: [{ name: "required item 2", amount: 5 }],
+                requirements: [{ id: "required item 2", amount: 5 }],
                 minimumTool: "copper" as DefaultToolset,
                 maximumTool: "bronze" as DefaultToolset,
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
-                requirements: [{ name: "required item 1", amount: 4 }],
+                requirements: [{ id: "required item 1", amount: 4 }],
             }),
         ],
         [
             createItem({
-                name: "required item 2",
+                id: "required item 2",
                 createTime: 3,
                 output: 4,
                 requirements: [],
@@ -282,18 +296,18 @@ test.each([
                 maximumTool: "steel" as DefaultToolset,
             }),
             createItem({
-                name: "required item 1",
+                id: "required item 1",
                 createTime: 1,
                 output: 2,
-                requirements: [{ name: "required item 2", amount: 5 }],
+                requirements: [{ id: "required item 2", amount: 5 }],
                 minimumTool: "copper" as DefaultToolset,
                 maximumTool: "bronze" as DefaultToolset,
             }),
             createItem({
-                name: validItemName,
+                id: validItemID,
                 createTime: 2,
                 output: 4,
-                requirements: [{ name: "required item 1", amount: 4 }],
+                requirements: [{ id: "required item 1", amount: 4 }],
             }),
         ],
     ],
@@ -304,46 +318,142 @@ test.each([
         const { queryRequirements } =
             await import("../mongodb-requirements-adapter");
 
-        const actual = await queryRequirements(validItemName);
+        const actual = await queryRequirements({
+            id: validItemID,
+            locale: defaultLocale,
+        });
 
-        expect(actual).toHaveLength(expected.length);
-        expect(actual).toEqual(expect.arrayContaining(expected));
+        const expectedTranslated = expected.map((item) =>
+            createTranslatedItem({ item, locale: defaultLocale }),
+        );
+        expect(actual).toHaveLength(expectedTranslated.length);
+        expect(actual).toEqual(expect.arrayContaining(expectedTranslated));
     },
 );
 
 test("removes duplicate items w/ same creator when input item has multiple creators that require the same item", async () => {
-    const requiredItemName = "required item 1";
+    const requiredItemID = "required item 1";
     const expected = [
         createItem({
-            name: requiredItemName,
+            id: requiredItemID,
             createTime: 4,
             output: 2,
             requirements: [],
         }),
         createItem({
-            name: validItemName,
+            id: validItemID,
             createTime: 1,
             output: 8,
-            requirements: [{ name: requiredItemName, amount: 4 }],
-            creator: "test creator 1",
+            requirements: [{ id: requiredItemID, amount: 4 }],
+            creatorID: "test creator 1",
         }),
         createItem({
-            name: validItemName,
+            id: validItemID,
             createTime: 2,
             output: 4,
-            requirements: [{ name: requiredItemName, amount: 2 }],
-            creator: "test creator 2",
+            requirements: [{ id: requiredItemID, amount: 2 }],
+            creatorID: "test creator 2",
         }),
     ];
-    await storeItems(JSON.parse(JSON.stringify(expected)));
+    await storeItems(expected);
 
     const { queryRequirements } =
         await import("../mongodb-requirements-adapter");
 
-    const actual = await queryRequirements(validItemName);
+    const actual = await queryRequirements({
+        id: validItemID,
+        locale: defaultLocale,
+    });
 
-    expect(actual).toHaveLength(expected.length);
-    expect(actual).toEqual(expect.arrayContaining(expected));
+    const expectedTranslated = expected.map((item) =>
+        createTranslatedItem({ item, locale: defaultLocale }),
+    );
+    expect(actual).toHaveLength(expectedTranslated.length);
+    expect(actual).toEqual(expect.arrayContaining(expectedTranslated));
+});
+
+test("returns items with translations for specified locale", async () => {
+    const stored = [
+        createItem({
+            id: "required item 1",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            i18n: {
+                name: {
+                    "en-US": "Required Item 1",
+                    "fr-FR": "Article Requis 1",
+                },
+                creator: { "en-US": "Creator 1", "fr-FR": "Créateur 1" },
+            },
+        }),
+        createItem({
+            id: validItemID,
+            createTime: 2,
+            output: 4,
+            requirements: [{ id: "required item 1", amount: 4 }],
+            i18n: {
+                name: { "en-US": "Test Item", "fr-FR": "Article de Test" },
+                creator: {
+                    "en-US": "Test Creator",
+                    "fr-FR": "Créateur de Test",
+                },
+            },
+        }),
+    ];
+    await storeItems(stored);
+    const { queryRequirements } =
+        await import("../mongodb-requirements-adapter");
+
+    const actual = await queryRequirements({
+        id: validItemID,
+        locale: "fr-FR",
+    });
+
+    const expectedTranslated = stored.map((item) =>
+        createTranslatedItem({ item, locale: "fr-FR" }),
+    );
+    expect(actual).toHaveLength(expectedTranslated.length);
+    expect(actual).toEqual(expect.arrayContaining(expectedTranslated));
+});
+
+test("returns default (English) translations for items when requested locale not available", async () => {
+    const stored = [
+        createItem({
+            id: "required item 1",
+            createTime: 1,
+            output: 2,
+            requirements: [],
+            i18n: {
+                name: { "en-US": "Required Item 1" },
+                creator: { "en-US": "Creator 1" },
+            },
+        }),
+        createItem({
+            id: validItemID,
+            createTime: 2,
+            output: 4,
+            requirements: [{ id: "required item 1", amount: 4 }],
+            i18n: {
+                name: { "en-US": "Test Item" },
+                creator: { "en-US": "Test Creator" },
+            },
+        }),
+    ];
+    await storeItems(stored);
+    const { queryRequirements } =
+        await import("../mongodb-requirements-adapter");
+
+    const actual = await queryRequirements({
+        id: validItemID,
+        locale: "de-DE",
+    });
+
+    const expectedTranslated = stored.map((item) =>
+        createTranslatedItem({ item, locale: "en-US" }),
+    );
+    expect(actual).toHaveLength(expectedTranslated.length);
+    expect(actual).toEqual(expect.arrayContaining(expectedTranslated));
 });
 
 afterAll(async () => {

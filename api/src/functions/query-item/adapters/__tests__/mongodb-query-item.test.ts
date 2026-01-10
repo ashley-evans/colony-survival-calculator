@@ -16,7 +16,7 @@ let mongoDBMemoryServer: MongoMemoryServer;
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");
-    await storeItem(items);
+    await storeItem(JSON.parse(JSON.stringify(items)));
 }
 
 async function clearItemsCollection() {
@@ -192,7 +192,7 @@ describe("field queries", () => {
         async (_: string, locale: string, stored: Items) => {
             await storeItems(stored);
             const expected = stored.map((item) =>
-                createTranslatedItem(item, locale),
+                createTranslatedItem({ item, locale }),
             );
             const { queryItemByField } = await import("../mongodb-query-item");
 
@@ -228,7 +228,7 @@ describe("field queries", () => {
         ];
         await storeItems(stored);
         const expected = stored.map((item) =>
-            createTranslatedItem(item, "en-US"),
+            createTranslatedItem({ item, locale: "en-US" }),
         );
         const { queryItemByField } = await import("../mongodb-query-item");
 
@@ -273,7 +273,9 @@ describe("field queries", () => {
             const actual = await queryItemByField(locale, expectedItemID);
 
             expect(actual).toHaveLength(1);
-            expect(actual[0]).toEqual(createTranslatedItem(expected, locale));
+            expect(actual[0]).toEqual(
+                createTranslatedItem({ item: expected, locale }),
+            );
         },
     );
 
@@ -317,7 +319,9 @@ describe("field queries", () => {
             );
 
             expect(actual).toHaveLength(1);
-            expect(actual[0]).toEqual(createTranslatedItem(expected, locale));
+            expect(actual[0]).toEqual(
+                createTranslatedItem({ item: expected, locale }),
+            );
         },
     );
 
@@ -351,7 +355,9 @@ describe("field queries", () => {
         );
 
         expect(actual).toHaveLength(1);
-        expect(actual[0]).toEqual(createTranslatedItem(expected, "en-US"));
+        expect(actual[0]).toEqual(
+            createTranslatedItem({ item: expected, locale: "en-US" }),
+        );
     });
 
     test("returns no items if no stored items match the provided item ID in collection", async () => {
@@ -425,7 +431,9 @@ describe("creator count queries", () => {
             expect(actual).toHaveLength(expected.length);
             expect(actual).toEqual(
                 expect.arrayContaining(
-                    expected.map((item) => createTranslatedItem(item, locale)),
+                    expected.map((item) =>
+                        createTranslatedItem({ item, locale }),
+                    ),
                 ),
             );
         },
@@ -449,7 +457,9 @@ describe("creator count queries", () => {
         expect(actual).toHaveLength(expected.length);
         expect(actual).toEqual(
             expect.arrayContaining(
-                expected.map((item) => createTranslatedItem(item, "en-US")),
+                expected.map((item) =>
+                    createTranslatedItem({ item, locale: "en-US" }),
+                ),
             ),
         );
     });
@@ -479,7 +489,9 @@ describe("creator count queries", () => {
             expect(actual).toHaveLength(expected.length);
             expect(actual).toEqual(
                 expect.arrayContaining(
-                    expected.map((item) => createTranslatedItem(item, locale)),
+                    expected.map((item) =>
+                        createTranslatedItem({ item, locale }),
+                    ),
                 ),
             );
         },
@@ -491,7 +503,7 @@ describe("creator count queries", () => {
         ]);
         await storeItems(stored);
         const expected = stored.map((item) =>
-            createTranslatedItem(item, "en-US"),
+            createTranslatedItem({ item, locale: "en-US" }),
         );
         const { queryItemByCreatorCount } =
             await import("../mongodb-query-item");

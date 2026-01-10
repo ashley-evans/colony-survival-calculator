@@ -2,7 +2,10 @@ import { vi, Mock } from "vitest";
 
 import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
-import { createItem, createItemWithMachineTools } from "../../../../../test";
+import {
+    createTranslatedItem,
+    createTranslatedItemWithMachineTools,
+} from "../../../../../test";
 import { DefaultToolset } from "../../../../types";
 import {
     QueryRequirementsParams,
@@ -34,14 +37,14 @@ beforeEach(() => {
     consoleLogSpy.mockClear();
 });
 
-test("throws an error given an empty string as an item name", async () => {
+test("throws an error given an empty string as an item ID", async () => {
     const expectedError = new Error(
-        "Invalid item name provided, must be a non-empty string",
+        "Invalid item ID provided, must be a non-empty string",
     );
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: "", workers: validWorkers }),
+        queryRequirements({ id: "", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -57,25 +60,38 @@ test.each([
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers }),
+            queryRequirements({ id: "testid", workers }),
         ).rejects.toThrow(expectedError);
     },
 );
 
-test("calls the database adapter to get the requirements given valid input", async () => {
-    const item = createItem({
-        name: validItemName,
-        createTime: 2,
-        output: 3,
-        requirements: [],
-    });
-    mockMongoDBQueryRequirements.mockResolvedValue([item]);
+test.each([
+    ["default locale", undefined, "en-US"],
+    ["specified locale", "fr-FR", "fr-FR"],
+])(
+    "calls the database adapter to get the requirements given valid input and %s",
+    async (_: string, locale: string | undefined, expectedLocale: string) => {
+        const item = createTranslatedItem({
+            name: validItemName,
+            createTime: 2,
+            output: 3,
+            requirements: [],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([item]);
 
-    await queryRequirements({ name: validItemName, workers: validWorkers });
+        await queryRequirements({
+            id: item.id,
+            workers: validWorkers,
+            ...(locale ? { locale } : {}),
+        });
 
-    expect(mockMongoDBQueryRequirements).toHaveBeenCalledTimes(1);
-    expect(mockMongoDBQueryRequirements).toHaveBeenCalledWith(validItemName);
-});
+        expect(mockMongoDBQueryRequirements).toHaveBeenCalledTimes(1);
+        expect(mockMongoDBQueryRequirements).toHaveBeenCalledWith({
+            id: item.id,
+            locale: expectedLocale,
+        });
+    },
+);
 
 test("throws an error if no requirements are returned at all (item does not exist)", async () => {
     mockMongoDBQueryRequirements.mockResolvedValue([]);
@@ -83,13 +99,13 @@ test("throws an error if no requirements are returned at all (item does not exis
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers }),
+        queryRequirements({ id: "testid", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
 test("throws an error if the provided item details are not returned from DB", async () => {
-    const item = createItem({
-        name: "another item",
+    const item = createTranslatedItem({
+        name: "anotheritem",
         createTime: 2,
         output: 3,
         requirements: [],
@@ -99,12 +115,12 @@ test("throws an error if the provided item details are not returned from DB", as
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers }),
+        queryRequirements({ id: "test", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
 test("returns only output details fo provided item given provided item has no requirements", async () => {
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
@@ -113,7 +129,7 @@ test("returns only output details fo provided item given provided item has no re
     mockMongoDBQueryRequirements.mockResolvedValue([item]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -124,7 +140,7 @@ test("returns only output details fo provided item given provided item has no re
             creators: [
                 {
                     name: item.name,
-                    creator: "test item name creator",
+                    creator: item.creator,
                     amount: 7.5,
                     workers: 5,
                     demands: [],
@@ -135,38 +151,38 @@ test("returns only output details fo provided item given provided item has no re
 });
 
 test("throws an error if provided item requires an item that does not exist in database", async () => {
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
-        requirements: [{ name: "unknown item", amount: 4 }],
+        requirements: [{ id: "unknown item", amount: 4 }],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item]);
     const expectedError = new Error("Internal server error");
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers }),
+        queryRequirements({ id: item.id, workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
 test("returns requirements given item with a single requirement and no nested requirements", async () => {
-    const requiredItem = createItem({
+    const requiredItem = createTranslatedItem({
         name: "required item",
         createTime: 3,
         output: 4,
         requirements: [],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
-        requirements: [{ name: requiredItem.name, amount: 4 }],
+        requirements: [{ id: requiredItem.id, amount: 4 }],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -201,25 +217,25 @@ test("returns requirements given item with a single requirement and no nested re
 });
 
 test("returns requirements given item with multiple requirements and no nested requirements", async () => {
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
         requirements: [],
     });
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
         requirements: [
-            { name: requiredItem1.name, amount: 4 },
-            { name: requiredItem2.name, amount: 6 },
+            { id: requiredItem1.id, amount: 4 },
+            { id: requiredItem2.id, amount: 6 },
         ],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([
@@ -229,7 +245,7 @@ test("returns requirements given item with multiple requirements and no nested r
     ]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -280,23 +296,23 @@ test("returns requirements given item with multiple requirements and no nested r
 });
 
 test("returns requirements given item with single nested requirement", async () => {
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
-        requirements: [{ name: requiredItem2.name, amount: 6 }],
+        requirements: [{ id: requiredItem2.id, amount: 6 }],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
-        requirements: [{ name: requiredItem1.name, amount: 4 }],
+        requirements: [{ id: requiredItem1.id, amount: 4 }],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([
         item,
@@ -305,7 +321,7 @@ test("returns requirements given item with single nested requirement", async () 
     ]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -353,32 +369,32 @@ test("returns requirements given item with single nested requirement", async () 
 });
 
 test("returns requirements given item with multiple different nested requirements", async () => {
-    const requiredItem3 = createItem({
+    const requiredItem3 = createTranslatedItem({
         name: "required item 3",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
         requirements: [
-            { name: requiredItem2.name, amount: 6 },
-            { name: requiredItem3.name, amount: 4 },
+            { id: requiredItem2.id, amount: 6 },
+            { id: requiredItem3.id, amount: 4 },
         ],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
-        requirements: [{ name: requiredItem1.name, amount: 4 }],
+        requirements: [{ id: requiredItem1.id, amount: 4 }],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([
         item,
@@ -388,7 +404,7 @@ test("returns requirements given item with multiple different nested requirement
     ]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -452,34 +468,34 @@ test("returns requirements given item with multiple different nested requirement
 });
 
 test("returns combined requirements given item with multiple nested requirements with common requirement", async () => {
-    const requiredItem3 = createItem({
+    const requiredItem3 = createTranslatedItem({
         name: "required item 3",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
         requirements: [
-            { name: requiredItem2.name, amount: 6 },
-            { name: requiredItem3.name, amount: 4 },
+            { id: requiredItem2.id, amount: 6 },
+            { id: requiredItem3.id, amount: 4 },
         ],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
         requirements: [
-            { name: requiredItem1.name, amount: 4 },
-            { name: requiredItem3.name, amount: 2 },
+            { id: requiredItem1.id, amount: 4 },
+            { id: requiredItem3.id, amount: 2 },
         ],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([
@@ -490,7 +506,7 @@ test("returns combined requirements given item with multiple nested requirements
     ]);
 
     const actual = await queryRequirements({
-        name: validItemName,
+        id: item.id,
         workers: validWorkers,
     });
 
@@ -562,7 +578,7 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 
     expect.assertions(1);
     await expect(
-        queryRequirements({ name: validItemName, workers: validWorkers }),
+        queryRequirements({ id: "testid", workers: validWorkers }),
     ).rejects.toThrow(expectedError);
 });
 
@@ -600,7 +616,7 @@ describe("handles tool modifiers", () => {
             minimum: DefaultToolset,
             provided: DefaultToolset,
         ) => {
-            const item = createItem({
+            const item = createTranslatedItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
@@ -614,7 +630,7 @@ describe("handles tool modifiers", () => {
             expect.assertions(1);
             await expect(
                 queryRequirements({
-                    name: validItemName,
+                    id: item.id,
                     workers: validWorkers,
                     maxAvailableTool: provided,
                 }),
@@ -655,7 +671,7 @@ describe("handles tool modifiers", () => {
             minimum: DefaultToolset,
             provided: DefaultToolset,
         ) => {
-            const requiredItem = createItem({
+            const requiredItem = createTranslatedItem({
                 name: "another item",
                 createTime: 2,
                 output: 3,
@@ -663,11 +679,11 @@ describe("handles tool modifiers", () => {
                 minimumTool: minimum,
                 maximumTool: "steel" as DefaultToolset,
             });
-            const item = createItem({
+            const item = createTranslatedItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
-                requirements: [{ name: requiredItem.name, amount: 3 }],
+                requirements: [{ id: requiredItem.id, amount: 3 }],
                 minimumTool: "none" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
             });
@@ -680,7 +696,7 @@ describe("handles tool modifiers", () => {
             expect.assertions(1);
             await expect(
                 queryRequirements({
-                    name: validItemName,
+                    id: item.id,
                     workers: validWorkers,
                     maxAvailableTool: provided,
                 }),
@@ -690,7 +706,7 @@ describe("handles tool modifiers", () => {
 
     test("throws an error with lowest required tool in message given multiple items w/ unmet tool requirements", async () => {
         const expectedMinimumTool = "iron" as DefaultToolset;
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "another item",
             createTime: 2,
             output: 3,
@@ -698,11 +714,11 @@ describe("handles tool modifiers", () => {
             minimumTool: "stone" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 3 }],
+            requirements: [{ id: requiredItem.id, amount: 3 }],
             minimumTool: "iron" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
         });
@@ -711,7 +727,7 @@ describe("handles tool modifiers", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers }),
+            queryRequirements({ id: item.id, workers: validWorkers }),
         ).rejects.toThrow(expectedError);
     });
 
@@ -730,7 +746,7 @@ describe("handles tool modifiers", () => {
             expectedWorkers: number,
         ) => {
             const requiredItemName = "another item";
-            const requiredItem = createItem({
+            const requiredItem = createTranslatedItem({
                 name: requiredItemName,
                 createTime: 2,
                 output: 3,
@@ -738,11 +754,11 @@ describe("handles tool modifiers", () => {
                 minimumTool: "none" as DefaultToolset,
                 maximumTool: "none" as DefaultToolset,
             });
-            const item = createItem({
+            const item = createTranslatedItem({
                 name: validItemName,
                 createTime: 2,
                 output: 3,
-                requirements: [{ name: requiredItem.name, amount: 3 }],
+                requirements: [{ id: requiredItem.id, amount: 3 }],
                 minimumTool: "none" as DefaultToolset,
                 maximumTool: "steel" as DefaultToolset,
             });
@@ -752,7 +768,7 @@ describe("handles tool modifiers", () => {
             ]);
 
             const actual = await queryRequirements({
-                name: validItemName,
+                id: item.id,
                 workers: validWorkers,
                 maxAvailableTool: provided,
             });
@@ -772,7 +788,7 @@ describe("handles tool modifiers", () => {
 
     test("returns required output/workers to satisfy input item given tool better than applicable to input item", async () => {
         const requiredItemName = "another item";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: requiredItemName,
             createTime: 2,
             output: 3,
@@ -780,18 +796,18 @@ describe("handles tool modifiers", () => {
             minimumTool: "none" as DefaultToolset,
             maximumTool: "none" as DefaultToolset,
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 3 }],
+            requirements: [{ id: requiredItem.id, amount: 3 }],
             minimumTool: "none" as DefaultToolset,
             maximumTool: "copper" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
             maxAvailableTool: "steel" as DefaultToolset,
         });
@@ -807,7 +823,7 @@ describe("handles tool modifiers", () => {
 
     test("reduces required workers for requirement if tool provided is applicable to requirement and not input item", async () => {
         const requiredItemName = "another item";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: requiredItemName,
             createTime: 2,
             output: 3,
@@ -815,18 +831,18 @@ describe("handles tool modifiers", () => {
             minimumTool: "none" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 3 }],
+            requirements: [{ id: requiredItem.id, amount: 3 }],
             minimumTool: "none" as DefaultToolset,
             maximumTool: "none" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
             maxAvailableTool: "steel" as DefaultToolset,
         });
@@ -840,7 +856,7 @@ describe("handles tool modifiers", () => {
 
     test("reduces required workers for required item to max applicable to requirement given better tool applicable to only requirement", async () => {
         const requiredItemName = "another item";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: requiredItemName,
             createTime: 2,
             output: 3,
@@ -848,18 +864,18 @@ describe("handles tool modifiers", () => {
             minimumTool: "none" as DefaultToolset,
             maximumTool: "copper" as DefaultToolset,
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 3 }],
+            requirements: [{ id: requiredItem.id, amount: 3 }],
             minimumTool: "none" as DefaultToolset,
             maximumTool: "none" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
             maxAvailableTool: "steel" as DefaultToolset,
         });
@@ -874,25 +890,25 @@ describe("handles tool modifiers", () => {
 
 describe("optional output requirement impact", () => {
     test("factors optional output given item with single requirement that is also optional output", async () => {
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item 1",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 2 }],
+            requirements: [{ id: requiredItem.id, amount: 2 }],
             optionalOutputs: [
-                { name: requiredItem.name, amount: 1, likelihood: 0.5 },
+                { id: requiredItem.id, amount: 1, likelihood: 0.5 },
             ],
         });
         mockMongoDBQueryRequirements.mockResolvedValue([item, requiredItem]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
         });
 
@@ -934,25 +950,25 @@ describe("optional output requirement impact", () => {
     });
 
     test("factors optional output given item with nested requirement that is top level optional output", async () => {
-        const requiredItem2 = createItem({
+        const requiredItem2 = createTranslatedItem({
             name: "required item 2",
             createTime: 4,
             output: 2,
             requirements: [],
         });
-        const requiredItem1 = createItem({
+        const requiredItem1 = createTranslatedItem({
             name: "required item 1",
             createTime: 3,
             output: 4,
-            requirements: [{ name: requiredItem2.name, amount: 6 }],
+            requirements: [{ id: requiredItem2.id, amount: 6 }],
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem1.name, amount: 4 }],
+            requirements: [{ id: requiredItem1.id, amount: 4 }],
             optionalOutputs: [
-                { name: requiredItem2.name, amount: 2, likelihood: 0.5 },
+                { id: requiredItem2.id, amount: 2, likelihood: 0.5 },
             ],
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
@@ -962,7 +978,7 @@ describe("optional output requirement impact", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
         });
 
@@ -1018,28 +1034,28 @@ describe("optional output requirement impact", () => {
 
     test("uses recipe with high optional output over lower base output", async () => {
         const requirementName = "required item";
-        const higherBaseRecipe = createItem({
+        const higherBaseRecipe = createTranslatedItem({
             name: requirementName,
             createTime: 3,
             output: 4,
             requirements: [],
             creator: "creator 1",
         });
-        const higherOptionalOutputRecipe = createItem({
+        const higherOptionalOutputRecipe = createTranslatedItem({
             name: requirementName,
             createTime: 3,
             output: 1,
             requirements: [],
             optionalOutputs: [
-                { name: requirementName, amount: 4, likelihood: 1 },
+                { id: higherBaseRecipe.id, amount: 4, likelihood: 1 },
             ],
             creator: "creator 2",
         });
-        const item = createItem({
+        const item = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requirementName, amount: 2 }],
+            requirements: [{ id: higherBaseRecipe.id, amount: 2 }],
             optionalOutputs: [],
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
@@ -1049,7 +1065,7 @@ describe("optional output requirement impact", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: item.id,
             workers: validWorkers,
         });
 
@@ -1086,24 +1102,24 @@ describe("optional output requirement impact", () => {
 
 describe("multiple recipe handling", () => {
     test("uses the recipe with most output when an item has more than one creator", async () => {
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 1",
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 2",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
@@ -1113,7 +1129,7 @@ describe("multiple recipe handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
         });
 
@@ -1148,25 +1164,25 @@ describe("multiple recipe handling", () => {
     });
 
     test("factors max available tool into most output calculation when given item w/ lower base output but higher modified", async () => {
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 1",
             maximumTool: "stone" as DefaultToolset,
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 2",
             maximumTool: "steel" as DefaultToolset,
         });
@@ -1177,7 +1193,7 @@ describe("multiple recipe handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
             maxAvailableTool: "steel" as DefaultToolset,
         });
@@ -1213,26 +1229,26 @@ describe("multiple recipe handling", () => {
     });
 
     test("ignores more optimal recipe if cannot be created by provided max tool", async () => {
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "creator 1",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "creator 1",
             maximumTool: "stone" as DefaultToolset,
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 6,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "creator 2",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "creator 2",
             minimumTool: "steel" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
         });
@@ -1243,7 +1259,7 @@ describe("multiple recipe handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
         });
 
@@ -1278,31 +1294,31 @@ describe("multiple recipe handling", () => {
     });
 
     test("does not return any required items if the required item was related to a sub optimal recipe", async () => {
-        const moreOptimalRequiredItem = createItem({
+        const moreOptimalRequiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalRequiredItem = createItem({
+        const lessOptimalRequiredItem = createTranslatedItem({
             name: "another required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: lessOptimalRequiredItem.name, amount: 4 }],
-            creator: "creator 1",
+            requirements: [{ id: lessOptimalRequiredItem.id, amount: 4 }],
+            creatorID: "creator 1",
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 6,
-            requirements: [{ name: moreOptimalRequiredItem.name, amount: 4 }],
-            creator: "creator 2",
+            requirements: [{ id: moreOptimalRequiredItem.id, amount: 4 }],
+            creatorID: "creator 2",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1312,7 +1328,7 @@ describe("multiple recipe handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
         });
 
@@ -1349,26 +1365,26 @@ describe("multiple recipe handling", () => {
     });
 
     test("throws an error if an item cannot be created by any recipe w/ provided tools", async () => {
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 1",
             maximumTool: "stone" as DefaultToolset,
             minimumTool: "stone" as DefaultToolset,
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 6,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
+            requirements: [{ id: requiredItem.id, amount: 4 }],
             creator: "creator 2",
             minimumTool: "steel" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
@@ -1382,7 +1398,10 @@ describe("multiple recipe handling", () => {
 
         expect.assertions(1);
         await expect(
-            queryRequirements({ name: validItemName, workers: validWorkers }),
+            queryRequirements({
+                id: moreOptimalItemRecipe.id,
+                workers: validWorkers,
+            }),
         ).rejects.toThrow(expectedError);
     });
 });
@@ -1390,25 +1409,25 @@ describe("multiple recipe handling", () => {
 describe("creator override handling", () => {
     test("overrides more optimal recipe when given applicable item override", async () => {
         const overrideCreator = "override creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: overrideCreator,
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: overrideCreator,
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "creator 2",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "creator 2",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1417,10 +1436,13 @@ describe("creator override handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
             creatorOverrides: [
-                { itemName: validItemName, creator: overrideCreator },
+                {
+                    itemID: moreOptimalItemRecipe.id,
+                    creatorID: overrideCreator,
+                },
             ],
         });
 
@@ -1431,7 +1453,7 @@ describe("creator override handling", () => {
                 creators: [
                     {
                         name: validItemName,
-                        creator: overrideCreator,
+                        creator: lessOptimalItemRecipe.creator,
                         amount: 7.5,
                         workers: 5,
                         demands: [{ name: requiredItem.name, amount: 10 }],
@@ -1457,24 +1479,24 @@ describe("creator override handling", () => {
     test("favours less optimal requirement recipe given applicable requirement override", async () => {
         const requiredItemName = "required item";
         const overrideCreator = "override creator";
-        const moreOptimalRequirementRecipe = createItem({
+        const moreOptimalRequirementRecipe = createTranslatedItem({
             name: requiredItemName,
             createTime: 1,
             output: 4,
             requirements: [],
         });
-        const lessOptimalRequirementRecipe = createItem({
+        const lessOptimalRequirementRecipe = createTranslatedItem({
             name: requiredItemName,
             createTime: 3,
             output: 4,
             requirements: [],
-            creator: overrideCreator,
+            creatorID: overrideCreator,
         });
-        const recipe = createItem({
+        const recipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItemName, amount: 4 }],
+            requirements: [{ id: moreOptimalRequirementRecipe.id, amount: 4 }],
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             recipe,
@@ -1483,10 +1505,13 @@ describe("creator override handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: recipe.id,
             workers: validWorkers,
             creatorOverrides: [
-                { itemName: requiredItemName, creator: overrideCreator },
+                {
+                    itemID: moreOptimalRequirementRecipe.id,
+                    creatorID: overrideCreator,
+                },
             ],
         });
 
@@ -1510,7 +1535,7 @@ describe("creator override handling", () => {
                 creators: [
                     {
                         name: requiredItemName,
-                        creator: overrideCreator,
+                        creator: lessOptimalRequirementRecipe.creator,
                         amount: 20,
                         workers: 15,
                         demands: [],
@@ -1522,30 +1547,30 @@ describe("creator override handling", () => {
 
     test("throws an error if provided more than one override for a single item", async () => {
         const overrideCreator = "override creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const recipe = createItem({
+        const recipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: overrideCreator,
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: overrideCreator,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
-        const expectedError = `Invalid input: More than one creator override provided for: ${validItemName}`;
+        const expectedError = `Invalid input: More than one creator override provided for: ${recipe.id}`;
 
         expect.assertions(1);
         await expect(
             queryRequirements({
-                name: validItemName,
+                id: recipe.id,
                 workers: validWorkers,
                 creatorOverrides: [
-                    { itemName: validItemName, creator: overrideCreator },
-                    { itemName: validItemName, creator: "another creator" },
+                    { itemID: recipe.id, creatorID: overrideCreator },
+                    { itemID: recipe.id, creatorID: "another creator" },
                 ],
             }),
         ).rejects.toThrow(expectedError);
@@ -1553,25 +1578,25 @@ describe("creator override handling", () => {
 
     test("ignores any provided override that is irrelevant to calculating requirements", async () => {
         const overrideCreator = "override creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalItemRecipe = createItem({
+        const lessOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: overrideCreator,
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: overrideCreator,
         });
-        const moreOptimalItemRecipe = createItem({
+        const moreOptimalItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "creator 2",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "creator 2",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             lessOptimalItemRecipe,
@@ -1580,10 +1605,10 @@ describe("creator override handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalItemRecipe.id,
             workers: validWorkers,
             creatorOverrides: [
-                { itemName: "another item", creator: overrideCreator },
+                { itemID: "another item", creatorID: overrideCreator },
             ],
         });
 
@@ -1619,30 +1644,30 @@ describe("creator override handling", () => {
 
     test("does not return any requirement that relates to a recipe that was removed by an override", async () => {
         const override = "test override creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const overriddenRequirement = createItem({
+        const overriddenRequirement = createTranslatedItem({
             name: "overridden item requirement",
             createTime: 2,
             output: 1,
             requirements: [],
         });
-        const removedItemRecipe = createItem({
+        const removedItemRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [{ name: overriddenRequirement.name, amount: 4 }],
+            requirements: [{ id: overriddenRequirement.id, amount: 4 }],
         });
-        const usedRecipe = createItem({
+        const usedRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: override,
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: override,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             usedRecipe,
@@ -1652,9 +1677,9 @@ describe("creator override handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: usedRecipe.id,
             workers: validWorkers,
-            creatorOverrides: [{ itemName: validItemName, creator: override }],
+            creatorOverrides: [{ itemID: usedRecipe.id, creatorID: override }],
         });
 
         expect(actual).toEqual([
@@ -1664,7 +1689,7 @@ describe("creator override handling", () => {
                 creators: [
                     {
                         name: validItemName,
-                        creator: override,
+                        creator: usedRecipe.creator,
                         amount: 15,
                         workers: 5,
                         demands: [{ name: requiredItem.name, amount: 20 }],
@@ -1689,18 +1714,18 @@ describe("creator override handling", () => {
 
     test("throws an error if the provided override would result in no recipe being known for a given item (root override)", async () => {
         const override = "another creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const recipe = createItem({
+        const recipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "test creator",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "test creator",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
         const expectedError =
@@ -1709,29 +1734,27 @@ describe("creator override handling", () => {
         expect.assertions(1);
         await expect(
             queryRequirements({
-                name: validItemName,
+                id: recipe.id,
                 workers: validWorkers,
-                creatorOverrides: [
-                    { itemName: validItemName, creator: override },
-                ],
+                creatorOverrides: [{ itemID: recipe.id, creatorID: override }],
             }),
         ).rejects.toThrow(expectedError);
     });
 
     test("throws an error if the provided override would result in no recipe being known for a given item (requirement override)", async () => {
         const override = "another creator";
-        const requiredItem = createItem({
+        const requiredItem = createTranslatedItem({
             name: "required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const recipe = createItem({
+        const recipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [{ name: requiredItem.name, amount: 4 }],
-            creator: "test creator",
+            requirements: [{ id: requiredItem.id, amount: 4 }],
+            creatorID: "test creator",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
         const expectedError =
@@ -1740,45 +1763,41 @@ describe("creator override handling", () => {
         expect.assertions(1);
         await expect(
             queryRequirements({
-                name: validItemName,
+                id: recipe.id,
                 workers: validWorkers,
                 creatorOverrides: [
-                    { itemName: requiredItem.name, creator: override },
+                    { itemID: requiredItem.id, creatorID: override },
                 ],
             }),
         ).rejects.toThrow(expectedError);
     });
 
     test("does not return any requirement related to optimal but un-creatable recipes if override removes requirement", async () => {
-        const lessOptimalRecipeRequirement = createItem({
+        const lessOptimalRecipeRequirement = createTranslatedItem({
             name: "less optimal item requirement",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const moreOptimalRecipeRequirement = createItem({
+        const moreOptimalRecipeRequirement = createTranslatedItem({
             name: "more optimal required item",
             createTime: 3,
             output: 4,
             requirements: [],
         });
-        const lessOptimalRecipe = createItem({
+        const lessOptimalRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 2,
             output: 3,
-            requirements: [
-                { name: lessOptimalRecipeRequirement.name, amount: 4 },
-            ],
-            creator: "creator 1",
+            requirements: [{ id: lessOptimalRecipeRequirement.id, amount: 4 }],
+            creatorID: "creator 1",
         });
-        const moreOptimalRecipe = createItem({
+        const moreOptimalRecipe = createTranslatedItem({
             name: validItemName,
             createTime: 1,
             output: 3,
-            requirements: [
-                { name: moreOptimalRecipeRequirement.name, amount: 4 },
-            ],
-            creator: "creator 2",
+            requirements: [{ id: moreOptimalRecipeRequirement.id, amount: 4 }],
+            creatorID: "creator 2",
         });
         mockMongoDBQueryRequirements.mockResolvedValue([
             moreOptimalRecipe,
@@ -1788,12 +1807,12 @@ describe("creator override handling", () => {
         ]);
 
         const actual = await queryRequirements({
-            name: validItemName,
+            id: moreOptimalRecipe.id,
             workers: validWorkers,
             creatorOverrides: [
                 {
-                    itemName: moreOptimalRecipeRequirement.name,
-                    creator: "unknown creator",
+                    itemID: moreOptimalRecipeRequirement.id,
+                    creatorID: "unknown creator",
                 },
             ],
         });
@@ -1835,25 +1854,25 @@ describe("creator override handling", () => {
 });
 
 describe("handles multiple output units", () => {
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
         requirements: [],
     });
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
         requirements: [
-            { name: requiredItem1.name, amount: 4 },
-            { name: requiredItem2.name, amount: 6 },
+            { id: requiredItem1.id, amount: 4 },
+            { id: requiredItem2.id, amount: 6 },
         ],
     });
 
@@ -2011,7 +2030,7 @@ describe("handles multiple output units", () => {
         "returns requirement amounts in provided output given unit: %s",
         async (unit: OutputUnit, expected: Requirement[]) => {
             const actual = await queryRequirements({
-                name: validItemName,
+                id: item.id,
                 workers: validWorkers,
                 unit,
             });
@@ -2022,17 +2041,17 @@ describe("handles multiple output units", () => {
 });
 
 describe("handles machine tools", () => {
-    const machineToolsItem = createItemWithMachineTools({
+    const machineToolsItem = createTranslatedItemWithMachineTools({
         name: "machine tools item",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const baseItem = createItem({
+    const baseItem = createTranslatedItem({
         name: "base item",
         createTime: 2,
         output: 6,
-        requirements: [{ name: machineToolsItem.name, amount: 5 }],
+        requirements: [{ id: machineToolsItem.id, amount: 5 }],
     });
     const expectedRequiredToolsError = new Error(
         "Unable to create item with available tools, requires machine tools",
@@ -2059,7 +2078,7 @@ describe("handles machine tools", () => {
                 expect.assertions(1);
                 await expect(
                     queryRequirements({
-                        name: machineToolsItem.name,
+                        id: machineToolsItem.id,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
                     }),
@@ -2070,7 +2089,7 @@ describe("handles machine tools", () => {
                 expect.assertions(1);
                 await expect(
                     queryRequirements({
-                        name: baseItem.name,
+                        id: baseItem.id,
                         workers: validWorkers,
                         ...(hasMachineTools ? { hasMachineTools } : {}),
                     }),
@@ -2081,11 +2100,11 @@ describe("handles machine tools", () => {
 
     test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
         const expectedError = `Unable to create item with available tools, minimum tool is: steel`;
-        const baseItemSteelMin = createItem({
+        const baseItemSteelMin = createTranslatedItem({
             name: "base item",
             createTime: 3,
             output: 5,
-            requirements: [{ name: machineToolsItem.name, amount: 5 }],
+            requirements: [{ id: machineToolsItem.id, amount: 5 }],
             minimumTool: "steel" as DefaultToolset,
             maximumTool: "steel" as DefaultToolset,
         });
@@ -2097,7 +2116,7 @@ describe("handles machine tools", () => {
         expect.assertions(1);
         await expect(
             queryRequirements({
-                name: baseItem.name,
+                id: baseItem.id,
                 workers: validWorkers,
                 hasMachineTools: true,
                 maxAvailableTool: "iron" as DefaultToolset,
@@ -2107,7 +2126,7 @@ describe("handles machine tools", () => {
 
     test("returns expected requirements if machine tools are required and available", async () => {
         const actual = await queryRequirements({
-            name: baseItem.name,
+            id: baseItem.id,
             workers: validWorkers,
             hasMachineTools: true,
         });
@@ -2147,32 +2166,32 @@ describe("handles machine tools", () => {
 
 describe("handles calculating requirements for target output", () => {
     const targetAmount = 7.5;
-    const requiredItem3 = createItem({
+    const requiredItem3 = createTranslatedItem({
         name: "required item 3",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem2 = createItem({
+    const requiredItem2 = createTranslatedItem({
         name: "required item 2",
         createTime: 4,
         output: 2,
         requirements: [],
     });
-    const requiredItem1 = createItem({
+    const requiredItem1 = createTranslatedItem({
         name: "required item 1",
         createTime: 3,
         output: 4,
         requirements: [
-            { name: requiredItem2.name, amount: 6 },
-            { name: requiredItem3.name, amount: 4 },
+            { id: requiredItem2.id, amount: 6 },
+            { id: requiredItem3.id, amount: 4 },
         ],
     });
-    const item = createItem({
+    const item = createTranslatedItem({
         name: validItemName,
         createTime: 2,
         output: 3,
-        requirements: [{ name: requiredItem1.name, amount: 4 }],
+        requirements: [{ id: requiredItem1.id, amount: 4 }],
     });
 
     beforeEach(() => {
@@ -2196,7 +2215,7 @@ describe("handles calculating requirements for target output", () => {
 
             expect.assertions(1);
             await expect(
-                queryRequirements({ name: validItemName, amount }),
+                queryRequirements({ id: item.id, amount }),
             ).rejects.toThrow(expectedError);
         },
     );
@@ -2386,7 +2405,7 @@ describe("handles calculating requirements for target output", () => {
         "factors output unit into target amount when given non default %s",
         async (unit: OutputUnit, expected: Requirement[]) => {
             const actual = await queryRequirements({
-                name: validItemName,
+                id: item.id,
                 amount: targetAmount,
                 unit,
             });
@@ -2397,24 +2416,23 @@ describe("handles calculating requirements for target output", () => {
 });
 
 test("logs out requirements query to console", async () => {
-    const expectedParams: QueryRequirementsParams = {
+    const storedItem = createTranslatedItem({
         name: validItemName,
+        createTime: 1,
+        output: 1,
+        requirements: [],
+    });
+    const expectedParams: QueryRequirementsParams = {
+        id: storedItem.id,
         maxAvailableTool: "copper" as DefaultToolset,
         hasMachineTools: true,
         unit: OutputUnit.GAME_DAYS,
         creatorOverrides: [
-            { itemName: "Override 1", creator: "Override 1 Creator" },
+            { itemID: storedItem.id, creatorID: storedItem.creatorID },
         ],
         amount: 2,
     };
-    mockMongoDBQueryRequirements.mockResolvedValue([
-        createItem({
-            name: validItemName,
-            createTime: 1,
-            output: 1,
-            requirements: [],
-        }),
-    ]);
+    mockMongoDBQueryRequirements.mockResolvedValue([storedItem]);
 
     await queryRequirements(expectedParams);
 

@@ -5,7 +5,7 @@ import type {
 } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import {
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     UNKNOWN_ITEM_ERROR,
     TOOL_LEVEL_ERROR_PREFIX,
@@ -27,7 +27,7 @@ const amountFields = new Set([
 ]);
 
 const exactUserErrors = new Set([
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     INVALID_TARGET_ERROR,
     UNKNOWN_ITEM_ERROR,
@@ -74,11 +74,12 @@ const handler: GraphQLEventHandler<
     RequirementResult
 > = async (event) => {
     const {
-        name,
+        id,
         unit,
         maxAvailableTool,
         creatorOverrides,
         hasMachineTools,
+        locale,
         ...targetInputs
     } = event.arguments;
     const { selectionSetList } = event.info;
@@ -95,7 +96,7 @@ const handler: GraphQLEventHandler<
 
     try {
         const requirements = await queryRequirements({
-            name,
+            id,
             ...validatedTarget,
             ...(unit ? { unit: OutputUnit[unit] } : {}),
             ...(maxAvailableTool
@@ -108,6 +109,7 @@ const handler: GraphQLEventHandler<
                 ? { hasMachineTools }
                 : {}),
             ...(creatorOverrides ? { creatorOverrides } : {}),
+            ...(locale ? { locale } : {}),
         });
 
         return {

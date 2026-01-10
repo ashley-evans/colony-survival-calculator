@@ -2,8 +2,8 @@ import { OutputUnit } from "../../../common";
 import { DefaultToolset } from "../../../types";
 
 type CreatorOverride = {
-    itemName: string;
-    creator: string;
+    itemID: string;
+    creatorID: string;
 };
 
 type Demand = {
@@ -26,11 +26,12 @@ type Requirement = {
 };
 
 type QueryRequirementsBaseParams = {
-    name: string;
+    id: string;
     unit?: OutputUnit;
     maxAvailableTool?: DefaultToolset;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
+    locale?: string;
 };
 
 type QueryRequirementsTargetWorkers = QueryRequirementsBaseParams & {

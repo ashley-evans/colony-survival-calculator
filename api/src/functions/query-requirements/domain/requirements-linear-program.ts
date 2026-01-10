@@ -1,12 +1,13 @@
 import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 
-import { Item, Items, DefaultToolset } from "../../../types";
+import { DefaultToolset, TranslatedItem } from "../../../types";
 import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
-import { calculateCreateTime, groupItemsByName } from "./item-utils";
+import { calculateCreateTime } from "./item-utils";
 import {
     OutputUnit,
     OutputUnitSecondMappings,
     isAvailableToolSufficient,
+    groupItemsByID,
 } from "../../../common";
 
 export const WORKERS_PROPERTY = "workers";
@@ -21,9 +22,9 @@ type VariableProperties = NonNullable<Variables[number]>;
 export type ProgramTarget = { workers: number } | { amount: number };
 
 type ProgramInput = {
-    inputItemName: string;
+    inputItemID: string;
     target: ProgramTarget;
-    requirements: Items;
+    requirements: TranslatedItem[];
     maxAvailableTool: DefaultToolset;
     hasMachineTools: boolean;
     unit: OutputUnit;
@@ -36,31 +37,33 @@ export type VertexOutput = {
 };
 type LinearProgramOutput = { vertices: VertexOutput[] | undefined };
 
-function convertRequirementsToMap(requirements: Items): Map<string, Item> {
-    const requirementMap = new Map<string, Item>();
+function convertRequirementsToMap(
+    requirements: TranslatedItem[],
+): Map<string, TranslatedItem> {
+    const requirementMap = new Map<string, TranslatedItem>();
     for (const requirement of requirements) {
-        requirementMap.set(requirement.name, requirement);
+        requirementMap.set(requirement.id, requirement);
     }
 
     return requirementMap;
 }
 
-function createInputWorkersPropertyName(inputItemName: string): string {
-    return `${inputItemName}-${WORKERS_PROPERTY}`;
+function createInputWorkersPropertyName(inputItemID: string): string {
+    return `${inputItemID}-${WORKERS_PROPERTY}`;
 }
 
 function createVariableName({
-    name,
-    creator,
-}: Pick<Item, "name" | "creator">): string {
-    return `${name}-${creator}`;
+    id,
+    creatorID,
+}: Pick<TranslatedItem, "id" | "creatorID">): string {
+    return `${id}-${creatorID}`;
 }
 
 function filterCreatable(
-    items: Readonly<Items>,
+    items: Readonly<TranslatedItem[]>,
     maxAvailableTool: DefaultToolset,
     hasMachineTools: boolean,
-): Items {
+): TranslatedItem[] {
     return items.filter((item) =>
         isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item),
     );
@@ -71,52 +74,51 @@ function createBaseOutputPropertyName(itemName: string) {
 }
 
 function createRecipeDemandVariableName(
-    recipe: Pick<Item, "name" | "creator">,
+    recipe: Pick<TranslatedItem, "id" | "creatorID">,
     demand: string,
 ) {
     return `${REQUIREMENT_PREFIX}${createVariableName(recipe)}-${demand}`;
 }
 
 function createRecipeProductionVariableName(
-    recipe: Pick<Item, "name" | "creator">,
+    recipe: Pick<TranslatedItem, "id" | "creatorID">,
     product: string,
 ): string {
     return `${PRODUCTION_PREFIX}${createVariableName(recipe)}-${product}`;
 }
 
 function createRecipeOutputVariableName(
-    recipe: Pick<Item, "name" | "creator">,
+    recipe: Pick<TranslatedItem, "id" | "creatorID">,
     output: string,
 ): string {
     return `${OUTPUT_PREFIX}${createVariableName(recipe)}-${output}`;
 }
 
 function createDemandVariables(
-    items: Readonly<Items>,
+    items: Readonly<TranslatedItem[]>,
     maxAvailableTool: DefaultToolset,
-    inputItemName: string,
+    inputItemID: string,
     unit: OutputUnit,
 ): Variables {
-    const recipeMap = groupItemsByName(items);
+    const recipeMap = groupItemsByID(items);
 
     const inputItemWorkersPropertyName =
-        createInputWorkersPropertyName(inputItemName);
+        createInputWorkersPropertyName(inputItemID);
 
     const variables: Variables = {};
-    for (const [itemName, recipes] of recipeMap.entries()) {
+    for (const [itemID, recipes] of recipeMap.entries()) {
         const totalOutputVariable: VariableProperties = {};
 
         // Set total output properties
-        const baseItemOutputPropertyName =
-            createBaseOutputPropertyName(itemName);
-        totalOutputVariable[itemName] = 1;
+        const baseItemOutputPropertyName = createBaseOutputPropertyName(itemID);
+        totalOutputVariable[itemID] = 1;
         totalOutputVariable[baseItemOutputPropertyName] = -1;
 
         for (const recipe of recipes) {
             const recipeVariable: VariableProperties = {};
             const baseRecipeOutputPropertyName = createRecipeOutputVariableName(
                 recipe,
-                recipe.name,
+                recipe.id,
             );
 
             // Set recipe output properties
@@ -132,14 +134,14 @@ function createDemandVariables(
 
             // Set worker properties
             recipeVariable[WORKERS_PROPERTY] = 1;
-            if (itemName === inputItemName) {
+            if (itemID === inputItemID) {
                 recipeVariable[inputItemWorkersPropertyName] = 1;
             }
 
             // Set base requirement properties
             for (const requirement of recipe.requires) {
                 // Throw an error if no recipes exist for provided item
-                if (!recipeMap.get(requirement.name)) {
+                if (!recipeMap.get(requirement.id)) {
                     throw new Error(INTERNAL_SERVER_ERROR);
                 }
 
@@ -149,7 +151,7 @@ function createDemandVariables(
                 // Create specific recipe output properties
                 const recipeDemandVariableName = createRecipeDemandVariableName(
                     recipe,
-                    requirement.name,
+                    requirement.id,
                 );
                 recipeVariable[recipeDemandVariableName] =
                     (requirement.amount / createTime) *
@@ -157,7 +159,7 @@ function createDemandVariables(
                     -1;
 
                 // Add linking properties
-                specificRecipeRequirementVariable[requirement.name] = -1;
+                specificRecipeRequirementVariable[requirement.id] = -1;
                 specificRecipeRequirementVariable[recipeDemandVariableName] = 1;
 
                 variables[recipeDemandVariableName] =
@@ -167,7 +169,7 @@ function createDemandVariables(
             // Set optional output properties
             for (const optional of recipe.optionalOutputs ?? []) {
                 const baseOptionalOutputPropertyName =
-                    createBaseOutputPropertyName(optional.name);
+                    createBaseOutputPropertyName(optional.id);
 
                 // If optional output is same as base recipe, update base recipe output
                 // rather than adding separate output
@@ -175,7 +177,7 @@ function createDemandVariables(
                     (optional.amount / createTime) *
                     optional.likelihood *
                     OutputUnitSecondMappings[unit];
-                if (optional.name === recipe.name) {
+                if (optional.id === recipe.id) {
                     const newOutput: number =
                         (recipeVariable[baseRecipeOutputPropertyName] ?? 0) +
                         optionalOutput;
@@ -184,9 +186,9 @@ function createDemandVariables(
                 }
 
                 const recipeProductionVariableName =
-                    createRecipeProductionVariableName(recipe, optional.name);
+                    createRecipeProductionVariableName(recipe, optional.id);
                 const recipeOptionalOutputVariableName =
-                    createRecipeOutputVariableName(recipe, optional.name);
+                    createRecipeOutputVariableName(recipe, optional.id);
 
                 // Create/Update optional output recipe variable
                 const currentOutputVariable =
@@ -212,11 +214,11 @@ function createDemandVariables(
                 variables[recipeProductionVariableName] = currentOutputVariable;
             }
 
-            variables[createRecipeProductionVariableName(recipe, recipe.name)] =
+            variables[createRecipeProductionVariableName(recipe, recipe.id)] =
                 recipeVariable;
         }
 
-        variables[itemName] = totalOutputVariable;
+        variables[itemID] = totalOutputVariable;
     }
 
     return variables;
@@ -253,7 +255,7 @@ function createOutputConstraints(
 }
 
 function getVertexWithHighestOutputAndLowestWorkers(
-    inputItemName: string,
+    inputItemID: string,
     vertices: VertexOutput[] | undefined,
 ): VertexOutput | undefined {
     if (!vertices || vertices.length === 0) {
@@ -262,8 +264,8 @@ function getVertexWithHighestOutputAndLowestWorkers(
 
     let currentBest = vertices[0] as VertexOutput;
     for (const vertex of vertices) {
-        const currentBestOutput = currentBest[inputItemName] ?? 0;
-        const vertexOutput = vertex[inputItemName] ?? 0;
+        const currentBestOutput = currentBest[inputItemID] ?? 0;
+        const vertexOutput = vertex[inputItemID] ?? 0;
         const currentBestWorkers = currentBest[WORKERS_PROPERTY] ?? 0;
         const vertexWorkers = vertex[WORKERS_PROPERTY] ?? 0;
 
@@ -280,21 +282,21 @@ function getVertexWithHighestOutputAndLowestWorkers(
 }
 
 function createTargetConstraint(
-    inputItemName: string,
+    inputItemID: string,
     target: ProgramInput["target"],
 ): Readonly<Constraints> {
     if ("workers" in target) {
         const inputWorkersConstraintName =
-            createInputWorkersPropertyName(inputItemName);
+            createInputWorkersPropertyName(inputItemID);
 
         return { [inputWorkersConstraintName]: { equal: target.workers } };
     }
 
-    return { [inputItemName]: { equal: target.amount } };
+    return { [inputItemID]: { equal: target.amount } };
 }
 
 function computeRequirementVertices({
-    inputItemName,
+    inputItemID,
     requirements,
     maxAvailableTool,
     hasMachineTools,
@@ -302,7 +304,7 @@ function computeRequirementVertices({
     unit,
 }: ProgramInput): VertexOutput | undefined {
     const availableItems = convertRequirementsToMap(requirements);
-    const input = availableItems.get(inputItemName);
+    const input = availableItems.get(inputItemID);
     if (!input) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
@@ -315,17 +317,17 @@ function computeRequirementVertices({
     const variables = createDemandVariables(
         createAbleItems,
         maxAvailableTool,
-        inputItemName,
+        inputItemID,
         unit,
     );
 
     const demandConstraints = createMinimumConstraints(variables);
     const outputConstraints = createOutputConstraints(variables);
-    const targetConstraint = createTargetConstraint(inputItemName, target);
+    const targetConstraint = createTargetConstraint(inputItemID, target);
 
     const model: IMultiObjectiveModel = {
         optimize: {
-            [inputItemName]: "max",
+            [inputItemID]: "max",
             [WORKERS_PROPERTY]: "min",
         },
         constraints: {
@@ -338,7 +340,7 @@ function computeRequirementVertices({
 
     const result = solver.MultiObjective(model) as LinearProgramOutput;
     return getVertexWithHighestOutputAndLowestWorkers(
-        inputItemName,
+        inputItemID,
         result.vertices,
     );
 }
@@ -365,6 +367,7 @@ function isTotalVariable(variableName: string): boolean {
 }
 
 export {
+    createVariableName,
     computeRequirementVertices,
     isProductionVariable,
     isRequirementVariable,

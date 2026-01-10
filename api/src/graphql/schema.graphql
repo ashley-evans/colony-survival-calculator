@@ -34,8 +34,8 @@ type Item {
 }
 
 input CreatorOverride {
-    itemName: String!
-    creator: String!
+    itemID: String!
+    creatorID: String!
 }
 
 type CreatorDemand {
@@ -105,13 +105,14 @@ type Query {
     distinctItemNames(locale: String): [ItemName!]!
     item(filters: ItemsFilters, locale: String): [Item!]!
     requirement(
-        name: ID!
+        id: ID!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
         workers: Int
         amount: Float
+        locale: String
     ): RequirementResult!
     output(
         id: ID!

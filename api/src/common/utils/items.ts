@@ -1,6 +1,6 @@
-import { Item } from "../../types";
+import { TranslatedItem } from "../../types";
 
-function groupItemsByID<T extends Pick<Item, "id">>(
+function groupItemsByID<T extends Pick<TranslatedItem, "id">>(
     items: readonly T[],
 ): Map<T["id"], T[]> {
     const itemTools = new Map<string, T[]>();
