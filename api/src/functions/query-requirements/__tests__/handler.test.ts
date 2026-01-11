@@ -15,7 +15,11 @@ import type { Requirement } from "../interfaces/query-requirements-primary-port"
 import { queryRequirements } from "../domain/query-requirements";
 import { handler } from "../handler";
 import type { DefaultToolset as SchemaTools } from "../../../types";
-import { OutputUnit } from "../../../common";
+import {
+    UserError as UserErrorClass,
+    ErrorCode,
+    OutputUnit,
+} from "../../../common";
 
 vi.mock("../domain/query-requirements", () => ({
     queryRequirements: vi.fn(),
@@ -26,7 +30,7 @@ const mockQueryRequirements = queryRequirements as Mock;
 const isUserError = (
     requirementResult: RequirementResult,
 ): requirementResult is UserError => {
-    return "message" in requirementResult;
+    return "code" in requirementResult;
 };
 
 const expectedItemID = "test id";
@@ -277,25 +281,37 @@ test.each([
         "multiple requirements received",
         [
             {
+                id: "test-item-1",
                 name: "test item 1",
                 amount: 60,
                 creators: [
                     {
+                        id: "test-item-1-creator-1",
                         name: "test item 1",
                         creator: "test item 1 creator",
+                        creatorID: "test-item-1-creator-id-1",
                         amount: 60,
                         workers: 5,
-                        demands: [{ name: "required item 1", amount: 80 }],
+                        demands: [
+                            {
+                                id: "required-item-1",
+                                name: "required item 1",
+                                amount: 80,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: "required-item-1",
                 name: "required item 1",
                 amount: 80,
                 creators: [
                     {
+                        id: "required-item-1-creator-1",
                         name: "required item 1",
                         creator: "required item 1 creator",
+                        creatorID: "required-item-1-creator-id-1",
                         amount: 80,
                         workers: 60,
                         demands: [],
@@ -305,25 +321,37 @@ test.each([
         ],
         [
             {
+                id: "test-item-1",
                 name: "test item 1",
                 amount: 60,
                 creators: [
                     {
+                        id: "test-item-1-creator-1",
                         name: "test item 1",
                         creator: "test item 1 creator",
+                        creatorID: "test-item-1-creator-id-1",
                         amount: 60,
                         workers: 5,
-                        demands: [{ name: "required item 1", amount: 80 }],
+                        demands: [
+                            {
+                                id: "required-item-1",
+                                name: "required item 1",
+                                amount: 80,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: "required-item-1",
                 name: "required item 1",
                 amount: 80,
                 creators: [
                     {
+                        id: "required-item-1-creator-1",
                         name: "required item 1",
                         creator: "required item 1 creator",
+                        creatorID: "required-item-1-creator-id-1",
                         amount: 80,
                         workers: 60,
                         demands: [],
@@ -354,32 +382,26 @@ test.each([
 );
 
 test.each([
-    ["Invalid item", "Invalid item ID provided, must be a non-empty string"],
-    [
-        "Invalid workers",
-        "Invalid number of workers provided, must be a positive number",
-    ],
-    [
-        "Invalid target amount",
-        "Invalid target output provided, must be a positive number",
-    ],
-    ["Unknown item", "Unknown item provided"],
-    [
-        "Minimum tool",
-        "Unable to create item with available tools, minimum tool is: Steel",
-    ],
-    [
-        "Duplicate override",
-        "Invalid input: More than one creator override provided for: test",
-    ],
+    ["Invalid item", ErrorCode.INVALID_ITEM_ID],
+    ["Invalid workers", ErrorCode.INVALID_WORKERS],
+    ["Invalid target amount", ErrorCode.INVALID_TARGET],
+    ["Unknown item", ErrorCode.UNKNOWN_ITEM],
+    ["Minimum tool", ErrorCode.TOOL_LEVEL, { requiredTool: "steel" }],
+    ["Duplicate override", ErrorCode.MULTIPLE_OVERRIDE, { itemId: "test" }],
     [
         "Not craft-able due to override",
-        "Invalid input, item is not creatable with current overrides",
+        ErrorCode.INVALID_OVERRIDE_ITEM_NOT_CREATABLE,
     ],
 ])(
-    "returns a user if known error: %s occurs while fetching item requirements",
-    async (_: string, error: string) => {
-        mockQueryRequirements.mockRejectedValue(new Error(error));
+    "returns a user error if known error: %s occurs while fetching item requirements",
+    async (
+        _: string,
+        errorCode: ErrorCode,
+        details?: Record<string, string>,
+    ) => {
+        mockQueryRequirements.mockRejectedValue(
+            new UserErrorClass(errorCode, details),
+        );
         const event = createMockEvent({ id: "test", workers: 1 });
 
         const actual = await handler(event);
@@ -387,7 +409,11 @@ test.each([
             assert.fail();
         }
 
-        expect(actual).toEqual({ __typename: "UserError", message: error });
+        expect(actual.__typename).toEqual("UserError");
+        expect(actual.code).toEqual(errorCode);
+        expect(actual.details).toEqual(
+            details !== undefined ? JSON.stringify(details) : null,
+        );
     },
 );
 

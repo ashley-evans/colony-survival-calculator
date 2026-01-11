@@ -17,7 +17,8 @@ const createCalculatorOutputResponseHandler = (requirements: Requirement[]) =>
     );
 
 const createCalculatorOutputUserErrorHandler = (input: {
-    requirementsUserError: string;
+    errorCode: string;
+    details?: Record<string, unknown>;
 }) => {
     return graphql.query<GetCalculatorOutputQuery>(
         expectedCalculatorOutputQueryName,
@@ -26,7 +27,10 @@ const createCalculatorOutputUserErrorHandler = (input: {
                 data: {
                     requirement: {
                         __typename: "UserError",
-                        message: input.requirementsUserError,
+                        code: input.errorCode,
+                        details: input.details
+                            ? JSON.stringify(input.details)
+                            : null,
                     },
                 },
             }),

@@ -10,6 +10,7 @@ import type {
     AvailableTools,
 } from "../../../graphql/schema";
 import { DefaultToolset as SchemaTools } from "../../../types";
+import { ErrorCode, UserError } from "../../../common";
 
 vi.mock("../domain/output-calculator", () => ({
     calculateOutput: vi.fn(),
@@ -155,24 +156,28 @@ test("returns the calculated output", async () => {
 });
 
 test.each([
-    ["Invalid item", "Invalid item ID provided, must be a non-empty string"],
-    [
-        "Invalid workers",
-        "Invalid number of workers provided, must be a positive number",
-    ],
-    ["Unknown item", "Unknown item provided"],
-    [
-        "Minimum tool",
-        "Unable to create item with available tools, minimum tool is: Steel",
-    ],
+    ["Invalid item", ErrorCode.INVALID_ITEM_ID],
+    ["Invalid workers", ErrorCode.INVALID_WORKERS],
+    ["Unknown item", ErrorCode.UNKNOWN_ITEM],
+    ["Minimum tool", ErrorCode.TOOL_LEVEL, { requiredTool: "steel" }],
 ])(
-    "returns a user if known error: %s occurs while fetching item requirements",
-    async (_: string, error: string) => {
-        mockCalculateOutput.mockRejectedValue(new Error(error));
+    "returns a user error if known error: %s occurs while fetching item requirements",
+    async (
+        _: string,
+        errorCode: ErrorCode,
+        details?: Record<string, string>,
+    ) => {
+        mockCalculateOutput.mockRejectedValue(
+            new UserError(errorCode, details),
+        );
 
         const actual = await handler(validEvent);
 
-        expect(actual).toEqual({ __typename: "UserError", message: error });
+        expect(actual).toEqual({
+            __typename: "UserError",
+            code: errorCode,
+            details: details !== undefined ? JSON.stringify(details) : null,
+        });
     },
 );
 

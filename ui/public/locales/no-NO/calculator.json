@@ -1,0 +1,117 @@
+{
+    "loading": "Laster...",
+    "missing": {
+        "content": "Oi! Du har gått deg vill!",
+        "return": "Tilbake til kalkulatoren"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Bytt til lyst tema",
+            "changeToDark": "Bytt til mørkt tema",
+            "viewSource": "Se kildekoden på GitHub"
+        }
+    },
+    "calculator": {
+        "header": "Ønsket produksjon:",
+        "items": {
+            "loading": "Laster gjenstander...",
+            "optimalFarmSize": "Beregninger bruker optimal gårdsstørrelse: {{width}} x {{height}}",
+            "errors": {
+                "known": "Kunne ikke laste kjente gjenstander",
+                "network": "Det oppstod en feil under lasting av gjenstandsdetaljer. Vennligst oppdater siden og prøv igjen."
+            },
+            "selector": {
+                "label": "Gjenstand:",
+                "toggle": "Åpne gjenstandsliste",
+                "placeholder": "Velg en gjenstand til beregninger",
+                "clear": "Tøm gjenstand"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Antall arbeidere:",
+                "error": "Ugyldig antall arbeidere, må være et positivt heltall",
+                "clear": "Tøm antall arbeidere"
+            },
+            "amount": {
+                "label": "Målmengde:",
+                "error": "Ugyldig målmengde, må være et positivt heltall",
+                "clear": "Tøm målmengde"
+            }
+        },
+        "tools": {
+            "label": "Verktøy:",
+            "machineTools": {
+                "label": "Maskinverktøy tilgjengelig?"
+            },
+            "mapping": {
+                "none": "Ingen",
+                "stone": "Stein",
+                "copper": "Kobber",
+                "iron": "Jern",
+                "bronze": "Bronse",
+                "steel": "Stål"
+            }
+        },
+        "output": {
+            "label": "Produksjonsenheter:",
+            "error": {
+                "unhandled": "Det oppstod en feil under beregningen. Vennligst endre verdiene og prøv igjen."
+            },
+            "units": {
+                "seconds": "Sekunder",
+                "minutes": "Minutter",
+                "gameDays": "Spilldager"
+            },
+            "loading": "Beregner...",
+            "header": "Krav:",
+            "table": {
+                "item": "Gjenstand",
+                "creator": "Produsent",
+                "demand": "Etterspørsel",
+                "amount": "Mengde",
+                "workers": "Arbeidere",
+                "total": "Totalt:"
+            },
+            "creator": {
+                "collapse": "Skjul produsentoversikt",
+                "expand": "Vis produsentoversikt"
+            },
+            "demand": {
+                "collapse": "Skjul etterspørselsoversikt",
+                "expand": "Vis etterspørselsoversikt"
+            }
+        }
+    },
+    "settings": {
+        "header": "Overstyringer:",
+        "description": "Som standard bruker kalkulatoren oppskriften med høyest produksjon per sekund, med mindre en overstyring er angitt.",
+        "loading": "Laster overstyringer...",
+        "none": "Ingen overstyringer tilgjengelig",
+        "selector": {
+            "item": {
+                "label": "Gjenstand:"
+            },
+            "creator": {
+                "label": "Produsent:"
+            },
+            "remove": "Fjern",
+            "add": "Legg til produsentoverstyring"
+        }
+    },
+    "about": {
+        "version": "Beregningene er korrekte for versjon: {{version}} ({{date}})",
+        "source": "Beregningene bruker offentlige spilldatafiler fra <repoLink>Colony Survival-repositoriet</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Det oppstod en feil, vennligst prøv igjen.",
+        "INVALID_ITEM_ID": "Ugyldig gjenstand-ID, må være en ikke-tom tekststreng",
+        "INVALID_WORKERS": "Ugyldig antall arbeidere, må være et positivt tall",
+        "INVALID_TARGET": "Ugyldig målmengde, må være et positivt tall",
+        "UNKNOWN_ITEM": "Ukjent gjenstand",
+        "TOOL_LEVEL": "Kan ikke lage gjenstanden med tilgjengelige verktøy, minimumsverktøy er: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Kan ikke lage gjenstanden med tilgjengelige verktøy, krever maskinverktøy",
+        "MULTIPLE_OVERRIDE": "Mer enn én produsentoverstyring angitt for: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Gjenstanden kan ikke lages med gjeldende overstyringer"
+    }
+}

@@ -181,6 +181,7 @@ test("queries calculator output if item and workers inputted with default unit s
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -209,6 +210,7 @@ test("queries calculator output if item and workers inputted with non-default un
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -237,6 +239,7 @@ test("queries calculator output if item and target amount inputted with default 
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -264,6 +267,7 @@ test("queries calculator output if item and target amount inputted with non-defa
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -275,13 +279,52 @@ describe.each([
         "error message",
     ],
     [
-        "requirements query user errors",
+        "requirements query user errors (known)",
         () =>
             createCalculatorOutputUserErrorHandler({
-                requirementsUserError: "Requirements user error",
+                errorCode: "INVALID_WORKERS",
             }),
-        "Requirements user error",
-        "the error message from requirements query",
+        "Invalid number of workers provided, must be a positive number",
+        "user error message (known)",
+    ],
+    [
+        "requirements query user errors (stone tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "stone" },
+            }),
+        "Unable to create item with available tools, minimum tool is: Stone",
+        "user error message (tool level - stone)",
+    ],
+    [
+        "requirements query user errors (machine tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "machine" },
+            }),
+        "Unable to create item with available tools, requires machine tools",
+        "user error message (tool level - machine)",
+    ],
+    [
+        "requirements query user errors (unknown tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "unknown_tool" },
+            }),
+        "An error occurred, please try again.",
+        "user error message (tool level - unknown tool)",
+    ],
+    [
+        "requirements query user errors (unknown)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "UNKNOWN_ERROR_CODE",
+            }),
+        "An error occurred, please try again.",
+        "user error message (unknown)",
     ],
 ])(
     "handles %s errors while fetching output",
@@ -349,6 +392,7 @@ test("queries optimal output and requirements with machine tool availability onc
             unit: OutputUnit.Minutes,
             maxAvailableTool: "NONE",
             hasMachineTools: true,
+            locale: "en-US",
         },
     );
 
@@ -471,6 +515,7 @@ describe("debounces output requests", () => {
                 amount: null,
                 workers: 3,
                 unit: expectedOutputUnit,
+                locale: "en-US",
             },
         );
 
@@ -536,6 +581,7 @@ describe("debounces output requests", () => {
                 amount: 3,
                 workers: null,
                 unit: expectedOutputUnit,
+                locale: "en-US",
             },
         );
 

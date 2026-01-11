@@ -1,10 +1,13 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 function MissingRoute() {
+    const { t } = useTranslation();
+
     return (
         <>
-            <p>Oh no! You have gotten lost!</p>
-            <Link to={"/"}>Return to calculator</Link>
+            <p>{t("missing.content")}</p>
+            <Link to={"/"}>{t("missing.return")}</Link>
         </>
     );
 }

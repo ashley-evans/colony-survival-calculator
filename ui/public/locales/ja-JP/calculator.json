@@ -1,0 +1,117 @@
+{
+    "loading": "読み込み中...",
+    "missing": {
+        "content": "ページが見つかりません",
+        "return": "計算機に戻る"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "ライトテーマに切り替え",
+            "changeToDark": "ダークテーマに切り替え",
+            "viewSource": "GitHubでソースコードを見る"
+        }
+    },
+    "calculator": {
+        "header": "目標生産:",
+        "items": {
+            "loading": "アイテムを読み込み中...",
+            "optimalFarmSize": "計算は最適な農場サイズを使用: {{width}} x {{height}}",
+            "errors": {
+                "known": "既知のアイテムを読み込めませんでした",
+                "network": "アイテム詳細の読み込み中にエラーが発生しました。ページを更新してもう一度お試しください。"
+            },
+            "selector": {
+                "label": "アイテム:",
+                "toggle": "アイテムリストを開く",
+                "placeholder": "計算に使用するアイテムを選択",
+                "clear": "アイテムをクリア"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "労働者数:",
+                "error": "無効な労働者数です。正の整数を入力してください",
+                "clear": "労働者数をクリア"
+            },
+            "amount": {
+                "label": "目標数量:",
+                "error": "無効な目標数量です。正の整数を入力してください",
+                "clear": "目標数量をクリア"
+            }
+        },
+        "tools": {
+            "label": "ツール:",
+            "machineTools": {
+                "label": "機械ツールは利用可能ですか？"
+            },
+            "mapping": {
+                "none": "なし",
+                "stone": "石",
+                "copper": "銅",
+                "iron": "鉄",
+                "bronze": "青銅",
+                "steel": "鋼鉄"
+            }
+        },
+        "output": {
+            "label": "生産単位:",
+            "error": {
+                "unhandled": "計算中にエラーが発生しました。入力値を変更してもう一度お試しください。"
+            },
+            "units": {
+                "seconds": "秒",
+                "minutes": "分",
+                "gameDays": "ゲーム内日数"
+            },
+            "loading": "計算中...",
+            "header": "必要条件:",
+            "table": {
+                "item": "アイテム",
+                "creator": "生産者",
+                "demand": "需要",
+                "amount": "数量",
+                "workers": "労働者",
+                "total": "合計:"
+            },
+            "creator": {
+                "collapse": "生産者の内訳を折りたたむ",
+                "expand": "生産者の内訳を展開"
+            },
+            "demand": {
+                "collapse": "需要の内訳を折りたたむ",
+                "expand": "需要の内訳を展開"
+            }
+        }
+    },
+    "settings": {
+        "header": "上書き設定:",
+        "description": "デフォルトでは、計算機は秒あたりの生産量が最も高いレシピを使用します。上書き設定が適用されている場合を除きます。",
+        "loading": "上書き設定を読み込み中...",
+        "none": "利用可能な上書き設定はありません",
+        "selector": {
+            "item": {
+                "label": "アイテム:"
+            },
+            "creator": {
+                "label": "生産者:"
+            },
+            "remove": "削除",
+            "add": "生産者の上書きを追加"
+        }
+    },
+    "about": {
+        "version": "計算はバージョン {{version}} ({{date}}) に対応しています",
+        "source": "計算は<repoLink>Colony Survivalリポジトリ</repoLink>の公開ゲームデータファイルを使用しています。"
+    },
+    "errors": {
+        "UNKNOWN": "エラーが発生しました。もう一度お試しください。",
+        "INVALID_ITEM_ID": "無効なアイテムIDです。空でない文字列を入力してください",
+        "INVALID_WORKERS": "無効な労働者数です。正の整数を入力してください",
+        "INVALID_TARGET": "無効な目標数量です。正の整数を入力してください",
+        "UNKNOWN_ITEM": "不明なアイテムです",
+        "TOOL_LEVEL": "利用可能なツールではアイテムを作成できません。最低限必要なツール: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "利用可能なツールではアイテムを作成できません。機械ツールが必要です",
+        "MULTIPLE_OVERRIDE": "生産者の上書きが複数指定されています: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "現在の上書き設定ではアイテムを作成できません"
+    }
+}

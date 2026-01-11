@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { faRemove } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { Selector } from "../../../../common";
 import {
@@ -30,6 +31,7 @@ function CreatorOverrideSelector({
     onSelectedCreatorChange,
     onRemove,
 }: CreatorOverrideSelectorProps) {
+    const { t } = useTranslation();
     const [selectedItemID, setSelectedItemID] = useState<string>(
         defaultItem.id,
     );
@@ -62,7 +64,7 @@ function CreatorOverrideSelector({
                 items={items}
                 itemToKey={(item) => item.id}
                 itemToDisplayText={(item) => item.name}
-                labelText="Item:"
+                labelText={t("settings.selector.item.label")}
                 defaultSelectedItem={defaultItem}
                 onSelectedItemChange={handleSelectedItemChange}
             />
@@ -70,13 +72,13 @@ function CreatorOverrideSelector({
                 items={creators}
                 itemToKey={(creator) => creator.id}
                 itemToDisplayText={(creator) => creator.name}
-                labelText="Creator:"
+                labelText={t("settings.selector.creator.label")}
                 defaultSelectedItem={defaultCreator}
                 onSelectedItemChange={handleSelectedCreatorChange}
             />
             <RemoveButtonContainer>
                 <RemoveButton onClick={handleRemove}>
-                    <span>Remove</span>
+                    <span>{t("settings.selector.remove")}</span>
                     <Icon icon={faRemove} />
                 </RemoveButton>
             </RemoveButtonContainer>

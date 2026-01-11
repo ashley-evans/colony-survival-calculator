@@ -826,6 +826,7 @@ describe("given items w/ multiple creators returned", () => {
                         id: expectedSecondItem.id,
                         creatorID: expectedCreator,
                     },
+                    locale: "en-US",
                 },
             );
 
@@ -861,6 +862,7 @@ describe("given items w/ multiple creators returned", () => {
                             hasMachineTools: false,
                         },
                     },
+                    locale: "en-US",
                 },
             );
 
@@ -943,6 +945,7 @@ describe("given items w/ multiple creators returned", () => {
                 maxAvailableTool: expectedTool,
                 hasMachineTools: false,
                 creatorOverrides: expectedOverrides,
+                locale: "en-US",
             });
         });
 
@@ -962,6 +965,7 @@ describe("given items w/ multiple creators returned", () => {
                     unit: OutputUnit.Minutes,
                     maxAvailableTool: expectedTool,
                     hasMachineTools: false,
+                    locale: "en-US",
                 },
             );
 
@@ -1030,6 +1034,7 @@ describe("given items w/ multiple creators returned", () => {
                 maxAvailableTool: expectedTool,
                 hasMachineTools: false,
                 creatorOverrides: expectedOverrides,
+                locale: "en-US",
             });
         });
     });

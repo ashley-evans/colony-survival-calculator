@@ -1,4 +1,5 @@
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { CreatorBreakdownTableRow } from "./types";
 import { RequirementsRowProps } from "./RequirementRow";
@@ -20,6 +21,8 @@ function CreatorBreakdownRow({
     row,
     toggleBreakdown,
 }: CreatorBreakdownRowProps) {
+    const { i18n } = useTranslation();
+
     return (
         <>
             <StyledRow>
@@ -45,8 +48,12 @@ function CreatorBreakdownRow({
                     {row.creator}
                 </TextColumnCell>
                 <TextColumnCell />
-                <NumberColumnCell>{roundOutput(row.amount)}</NumberColumnCell>
-                <NumberColumnCell>{Math.ceil(row.workers)}</NumberColumnCell>
+                <NumberColumnCell>
+                    {roundOutput(i18n.language, row.amount)}
+                </NumberColumnCell>
+                <NumberColumnCell>
+                    {Math.ceil(row.workers).toLocaleString(i18n.language)}
+                </NumberColumnCell>
             </StyledRow>
             {row.isExpanded
                 ? row.demands.map(({ key, name, amount }) => (

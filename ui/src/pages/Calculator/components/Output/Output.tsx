@@ -1,16 +1,19 @@
 import { ReactElement, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLazyQuery } from "@apollo/client/react";
+import { useDebounce } from "use-debounce";
+
 import {
     OutputUnit,
     AvailableTools,
     CreatorOverride,
 } from "../../../../graphql/__generated__/graphql";
 import { gql } from "../../../../graphql/__generated__";
-import { useLazyQuery } from "@apollo/client/react";
-import { useDebounce } from "use-debounce";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { Requirements, RequirementsSankey } from "./components";
 import { LoadingMessage } from "./styles";
 import { Target } from "../TargetInput";
+import { useErrorTranslation } from "../../../../hooks";
 
 type OutputProps = {
     itemID: string;
@@ -50,7 +53,8 @@ const GET_CALCULATOR_OUTPUT = gql(`
                 }
             }
             ... on UserError {
-                message
+                code
+                details
             }
         }
     }
@@ -61,11 +65,10 @@ function ErrorMessage({ children }: ErrorMessageProps) {
 }
 
 function UnhandledErrorMessage() {
+    const { t } = useTranslation();
+
     return (
-        <ErrorMessage>
-            An error occurred while calculating output, please change inputs and
-            try again.
-        </ErrorMessage>
+        <ErrorMessage>{t("calculator.output.error.unhandled")}</ErrorMessage>
     );
 }
 
@@ -78,6 +81,8 @@ function Output({
     creatorOverrides,
     onSelectedItemTotalChange,
 }: OutputProps) {
+    const { t, i18n } = useTranslation();
+    const translateError = useErrorTranslation();
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
         GET_CALCULATOR_OUTPUT,
         { fetchPolicy: "no-cache" },
@@ -104,6 +109,7 @@ function Output({
                 maxAvailableTool,
                 hasMachineTools,
                 creatorOverrides: creatorOverridesFilter,
+                locale: i18n.language,
             },
         });
     }, [
@@ -113,6 +119,7 @@ function Output({
         maxAvailableTool,
         hasMachineTools,
         creatorOverrides,
+        i18n.language,
     ]);
 
     useEffect(() => {
@@ -150,11 +157,13 @@ function Output({
     }
 
     if (loading || !data?.requirement) {
-        return <LoadingMessage>Calculating output...</LoadingMessage>;
+        return (
+            <LoadingMessage>{t("calculator.output.loading")}</LoadingMessage>
+        );
     }
 
     if (isUserError(data.requirement)) {
-        return <ErrorMessage>{data.requirement.message}</ErrorMessage>;
+        return <ErrorMessage>{translateError(data.requirement)}</ErrorMessage>;
     }
 
     return (

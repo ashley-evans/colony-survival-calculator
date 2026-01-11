@@ -6,6 +6,7 @@ import {
     faSortAsc,
     faSortDesc,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import {
     RequirementsTable,
@@ -25,7 +26,6 @@ import {
 } from "./utils";
 import { RequirementsTableRow } from "./types";
 import { Requirement } from "../../../../../../graphql/__generated__/graphql";
-
 type RequirementsProps = {
     requirements: Requirement[];
 };
@@ -37,6 +37,7 @@ const sortDirectionIconMap: { [key in ValidSortDirections]: IconDefinition } = {
 };
 
 function Requirements({ requirements }: RequirementsProps) {
+    const { t } = useTranslation();
     const [amountSortDirection, setAmountSortDirection] =
         useState<ValidSortDirections>("none");
     const [workerSortDirection, setWorkerSortDirection] =
@@ -80,21 +81,29 @@ function Requirements({ requirements }: RequirementsProps) {
 
     return (
         <>
-            <Header>Requirements:</Header>
+            <Header>{t("calculator.output.header")}</Header>
             <TableContainer>
                 <RequirementsTable>
                     <thead>
                         <tr>
-                            <TextColumnHeader>Item</TextColumnHeader>
-                            <TextColumnHeader>Creator</TextColumnHeader>
-                            <TextColumnHeader>Demand</TextColumnHeader>
+                            <TextColumnHeader>
+                                {t("calculator.output.table.item")}
+                            </TextColumnHeader>
+                            <TextColumnHeader>
+                                {t("calculator.output.table.creator")}
+                            </TextColumnHeader>
+                            <TextColumnHeader>
+                                {t("calculator.output.table.demand")}
+                            </TextColumnHeader>
                             <SortableHeader
                                 item-alignment="end"
                                 aria-sort={amountSortDirection}
                                 onClick={changeAmountSortDirection}
                                 tabIndex={0}
                             >
-                                <button>Amount</button>
+                                <button>
+                                    {t("calculator.output.table.amount")}
+                                </button>
                                 <FontAwesomeIcon
                                     icon={
                                         sortDirectionIconMap[
@@ -110,7 +119,9 @@ function Requirements({ requirements }: RequirementsProps) {
                                 onClick={changeWorkerSortDirection}
                                 tabIndex={0}
                             >
-                                <button>Workers</button>
+                                <button>
+                                    {t("calculator.output.table.workers")}
+                                </button>
                                 <FontAwesomeIcon
                                     icon={
                                         sortDirectionIconMap[
@@ -134,7 +145,10 @@ function Requirements({ requirements }: RequirementsProps) {
                     {rows.length > 1 && totalWorkers ? (
                         <tfoot>
                             <TotalRow
-                                row={{ name: "Total:", workers: totalWorkers }}
+                                row={{
+                                    name: t("calculator.output.table.total"),
+                                    workers: totalWorkers,
+                                }}
                             />
                         </tfoot>
                     ) : null}

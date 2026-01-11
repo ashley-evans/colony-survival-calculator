@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Input } from "../../../../../../common/components";
 
 export type WorkerInputProps = {
@@ -6,6 +8,8 @@ export type WorkerInputProps = {
 };
 
 function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
+    const { t, i18n } = useTranslation();
+
     const parseValue = (value: unknown): number => {
         const input = Number(value);
         if (!isNaN(input) && input > 0 && input % 1 === 0) {
@@ -17,15 +21,15 @@ function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
 
     return (
         <Input
-            label="Output item workers:"
+            label={t("calculator.target.workers.label")}
             parseValue={parseValue}
             onChange={onWorkerChange}
-            errorMessage="Invalid output item workers, must be a positive non-zero whole number"
+            errorMessage={t("calculator.target.workers.error")}
             inputMode="numeric"
-            clearIconLabel="Clear output item workers"
+            clearIconLabel={t("calculator.target.workers.clear")}
             defaultValue={
                 defaultWorkers
-                    ? Math.ceil(defaultWorkers).toString()
+                    ? Math.ceil(defaultWorkers).toLocaleString(i18n.language)
                     : undefined
             }
         />

@@ -1,4 +1,5 @@
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import {
     ExpandRowIcon,
@@ -25,6 +26,8 @@ type RowProps = {
 );
 
 function Row({ className, row, ...rest }: RowProps) {
+    const { i18n } = useTranslation();
+
     return (
         <tr className={className}>
             <TextColumnCell>
@@ -51,10 +54,12 @@ function Row({ className, row, ...rest }: RowProps) {
             <TextColumnCell>{row.creator}</TextColumnCell>
             <TextColumnCell>{row.demandName}</TextColumnCell>
             <NumberColumnCell>
-                {row.amount ? roundOutput(row.amount) : ""}
+                {row.amount ? roundOutput(i18n.language, row.amount) : ""}
             </NumberColumnCell>
             <NumberColumnCell>
-                {row.workers ? Math.ceil(row.workers) : ""}
+                {row.workers
+                    ? Math.ceil(row.workers).toLocaleString(i18n.language)
+                    : ""}
             </NumberColumnCell>
         </tr>
     );

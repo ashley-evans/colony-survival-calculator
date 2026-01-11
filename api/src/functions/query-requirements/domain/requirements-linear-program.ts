@@ -1,13 +1,15 @@
 import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 
 import { DefaultToolset, TranslatedItem } from "../../../types";
-import { INTERNAL_SERVER_ERROR, UNKNOWN_ITEM_ERROR } from "./errors";
 import { calculateCreateTime } from "./item-utils";
 import {
     OutputUnit,
     OutputUnitSecondMappings,
     isAvailableToolSufficient,
     groupItemsByID,
+    ErrorCode,
+    UserError,
+    ERROR_MESSAGE_MAPPING,
 } from "../../../common";
 
 export const WORKERS_PROPERTY = "workers";
@@ -142,7 +144,9 @@ function createDemandVariables(
             for (const requirement of recipe.requires) {
                 // Throw an error if no recipes exist for provided item
                 if (!recipeMap.get(requirement.id)) {
-                    throw new Error(INTERNAL_SERVER_ERROR);
+                    throw new Error(
+                        ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+                    );
                 }
 
                 const specificRecipeRequirementVariable: VariableProperties =
@@ -306,7 +310,7 @@ function computeRequirementVertices({
     const availableItems = convertRequirementsToMap(requirements);
     const input = availableItems.get(inputItemID);
     if (!input) {
-        throw new Error(UNKNOWN_ITEM_ERROR);
+        throw new UserError(ErrorCode.UNKNOWN_ITEM);
     }
 
     const createAbleItems = filterCreatable(

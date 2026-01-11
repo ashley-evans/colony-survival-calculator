@@ -1,6 +1,7 @@
 import { AvailableTools } from "../../../../graphql/__generated__/graphql";
-import { ToolSelectorMappings } from "../../utils";
+import { ToolSelectorI18NKeyMapping } from "../../utils";
 import { Selector } from "../../../../common/components";
+import { useTranslation } from "react-i18next";
 
 type ToolSelectorProps = {
     onToolChange: (unit: AvailableTools) => void;
@@ -24,6 +25,8 @@ function ToolSelector({
     defaultTool,
     className,
 }: ToolSelectorProps) {
+    const { t } = useTranslation();
+
     const handleToolChange = (selectedTool?: AvailableTools) => {
         if (selectedTool) onToolChange(selectedTool);
     };
@@ -32,8 +35,12 @@ function ToolSelector({
         <Selector
             items={tools}
             itemToKey={(tool) => tool}
-            itemToDisplayText={(tool) => ToolSelectorMappings[tool]}
-            labelText="Tools:"
+            itemToDisplayText={(tool) =>
+                t(
+                    `calculator.tools.mapping.${ToolSelectorI18NKeyMapping[tool]}`,
+                )
+            }
+            labelText={t("calculator.tools.label")}
             defaultSelectedItem={defaultTool ?? tools[0]}
             onSelectedItemChange={handleToolChange}
             palette="secondary"
