@@ -18,32 +18,33 @@ vi.mock("../domain/output-calculator", () => ({
 const mockCalculateOutput = calculateOutput as Mock;
 
 function createMockEvent(
-    name: string,
+    id: string,
     workers: number,
     unit: OutputUnit,
     maxAvailableTool?: AvailableTools,
     hasMachineTools?: boolean,
-    creator?: string,
+    creatorID?: string,
 ): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
-        name,
+        id,
         workers,
         unit,
         maxAvailableTool: maxAvailableTool ?? null,
         hasMachineTools: hasMachineTools ?? null,
-        creator: creator ?? null,
+        creatorID: creatorID ?? null,
     };
 
     return mockEvent;
 }
 
-const expectedItemName = "test item name";
+const expectedItemID = "testitem";
+const expectedCreatorID = "testitemcreator";
 const expectedWorkers = 5;
 const expectedUnit = "GAME_DAYS";
 
 const validEvent = createMockEvent(
-    expectedItemName,
+    expectedItemID,
     expectedWorkers,
     expectedUnit,
 );
@@ -57,7 +58,7 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
 
     expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
     expect(mockCalculateOutput).toHaveBeenCalledWith({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
         unit: expectedUnit,
     });
@@ -73,11 +74,11 @@ test.each<[AvailableTools, SchemaTools]>([
 ])(
     "calls the domain to calculate output given a valid event w/ %s tool",
     async (provided: AvailableTools, expectedTool: SchemaTools) => {
-        const expectedItemName = "another test item";
+        const expectedItemID = "anothertestitem";
         const expectedWorkers = 2;
         const expectedUnit = "MINUTES";
         const event = createMockEvent(
-            expectedItemName,
+            expectedItemID,
             expectedWorkers,
             expectedUnit,
             provided,
@@ -87,7 +88,7 @@ test.each<[AvailableTools, SchemaTools]>([
 
         expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
         expect(mockCalculateOutput).toHaveBeenCalledWith({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             unit: expectedUnit,
             maxAvailableTool: expectedTool,
@@ -96,24 +97,23 @@ test.each<[AvailableTools, SchemaTools]>([
 );
 
 test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
-    const expectedCreator = "test item creator";
     const event = createMockEvent(
-        expectedItemName,
+        expectedItemID,
         expectedWorkers,
         expectedUnit,
         undefined,
         undefined,
-        expectedCreator,
+        expectedCreatorID,
     );
 
     await handler(event);
 
     expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
     expect(mockCalculateOutput).toHaveBeenCalledWith({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
         unit: expectedUnit,
-        creator: expectedCreator,
+        creatorID: expectedCreatorID,
     });
 });
 
@@ -123,24 +123,23 @@ test.each([
 ])(
     "calls the domain to calculate output given machine tool %s",
     async (_: string, hasMachineTools: boolean) => {
-        const expectedCreator = "test item creator";
         const event = createMockEvent(
-            expectedItemName,
+            expectedItemID,
             expectedWorkers,
             expectedUnit,
             undefined,
             hasMachineTools,
-            expectedCreator,
+            expectedCreatorID,
         );
 
         await handler(event);
 
         expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
         expect(mockCalculateOutput).toHaveBeenCalledWith({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             unit: expectedUnit,
-            creator: expectedCreator,
+            creatorID: expectedCreatorID,
             hasMachineTools,
         });
     },
@@ -156,7 +155,7 @@ test("returns the calculated output", async () => {
 });
 
 test.each([
-    ["Invalid item", "Invalid item name provided, must be a non-empty string"],
+    ["Invalid item", "Invalid item ID provided, must be a non-empty string"],
     [
         "Invalid workers",
         "Invalid number of workers provided, must be a positive number",

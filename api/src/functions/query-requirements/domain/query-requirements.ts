@@ -6,12 +6,17 @@ import type {
     RequirementRecipe,
 } from "../interfaces/query-requirements-primary-port";
 import { queryRequirements as queryRequirementsDB } from "../adapters/mongodb-requirements-adapter";
-import { Items, DefaultToolset } from "../../../types";
-import { hasMinimumRequiredTools, OutputUnit } from "../../../common";
+import { DefaultToolset, TranslatedItem } from "../../../types";
+import {
+    DEFAULT_LOCALE,
+    hasMinimumRequiredTools,
+    OutputUnit,
+} from "../../../common";
 import { Requirement } from "../interfaces/query-requirements-primary-port";
 import {
     VertexOutput,
     computeRequirementVertices,
+    createVariableName,
     isOutputVariable,
     isProductionVariable,
     isRequirementVariable,
@@ -19,7 +24,7 @@ import {
 } from "./requirements-linear-program";
 import {
     INTERNAL_SERVER_ERROR,
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
     INVALID_TARGET_ERROR,
     INVALID_WORKERS_ERROR,
@@ -38,36 +43,42 @@ function findMultipleOverrides(
 
     const knownOverrides = new Set<string>();
     for (const override of overrides) {
-        if (knownOverrides.has(override.itemName)) {
-            return override.itemName;
+        if (knownOverrides.has(override.itemID)) {
+            return override.itemID;
         }
 
-        knownOverrides.add(override.itemName);
+        knownOverrides.add(override.itemID);
     }
 
     return undefined;
 }
 
 function getOverriddenRequirements(
-    inputItemName: string,
-    items: Items,
+    inputItemID: string,
+    items: TranslatedItem[],
     overrides?: CreatorOverride[],
-) {
+): TranslatedItem[] {
     if (!overrides) {
         return items;
     }
 
-    const filtered = filterByCreatorOverrides(inputItemName, items, overrides);
-    if (canCreateItem(inputItemName, filtered)) {
+    const filtered = filterByCreatorOverrides(inputItemID, items, overrides);
+    if (canCreateItem(inputItemID, filtered)) {
         return filtered;
     }
 
     throw new Error(INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR);
 }
 
-async function getRequiredItemDetails(name: string): Promise<Items> {
+async function getRequiredItemDetails(
+    id: string,
+    locale?: string,
+): Promise<TranslatedItem[]> {
     try {
-        return await queryRequirementsDB(name);
+        return await queryRequirementsDB({
+            id,
+            locale: locale ?? DEFAULT_LOCALE,
+        });
     } catch {
         throw new Error(INTERNAL_SERVER_ERROR);
     }
@@ -83,6 +94,7 @@ function getRecipeKey(
 
 function createRecipeDemandMap(
     variables: [string, number][],
+    itemMap: Map<string, TranslatedItem>,
 ): Map<string, Demand[]> {
     const map = new Map<string, Demand[]>();
     const demandVariables = variables.filter(([key]) =>
@@ -91,16 +103,25 @@ function createRecipeDemandMap(
 
     for (const [key, amount] of demandVariables) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, itemName, creator, requirement] = key.split("-");
-        if (!itemName || !creator || !requirement) {
+        const [_, itemID, creatorID, requirementID] = key.split("-");
+        if (!itemID || !creatorID || !requirementID) {
             throw new Error(INTERNAL_SERVER_ERROR);
         }
 
-        const recipeDemandKey = getRecipeKey(itemName, creator);
+        const recipeDemandKey = getRecipeKey(itemID, creatorID);
         const currentDemands = map.get(recipeDemandKey) ?? [];
+
+        // Find any item with this ID to get the translated name
+        const requirementItem = [...itemMap.values()].find(
+            (item) => item.id === requirementID,
+        );
+        const translatedName = requirementItem?.name ?? requirementID;
+
         map.set(
             recipeDemandKey,
-            currentDemands.concat([{ name: requirement, amount }]),
+            currentDemands.concat([
+                { id: requirementID, name: translatedName, amount },
+            ]),
         );
     }
 
@@ -109,6 +130,7 @@ function createRecipeDemandMap(
 
 function createRecipeMap(
     variables: [string, number][],
+    itemMap: Map<string, TranslatedItem>,
 ): [Map<string, string[]>, Map<string, RequirementRecipe>] {
     const itemRecipeMap = new Map<string, string[]>();
     const recipeMap = new Map<string, RequirementRecipe>();
@@ -119,20 +141,26 @@ function createRecipeMap(
 
     for (const [key, value] of productionOutputVariables) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, recipeName, creator, outputItem] = key.split("-");
-        if (!recipeName || !creator || !outputItem) {
+        const [_, recipeID, creatorID, outputItemID] = key.split("-");
+        if (!recipeID || !creatorID || !outputItemID) {
             throw new Error(INTERNAL_SERVER_ERROR);
         }
 
-        const recipeKey = getRecipeKey(recipeName, creator, outputItem);
-        const itemRecipeKeys = itemRecipeMap.get(outputItem) ?? [];
+        const recipeKey = getRecipeKey(recipeID, creatorID, outputItemID);
+        const itemRecipeKeys = itemRecipeMap.get(outputItemID) ?? [];
         if (!itemRecipeKeys.includes(recipeKey)) {
-            itemRecipeMap.set(outputItem, itemRecipeKeys.concat([recipeKey]));
+            itemRecipeMap.set(outputItemID, itemRecipeKeys.concat([recipeKey]));
         }
 
+        const item = itemMap.get(`${recipeID}-${creatorID}`);
+        const translatedName = item?.name ?? recipeID;
+        const translatedCreator = item?.creator ?? creatorID;
+
         const currentRecipeDetails = recipeMap.get(recipeKey) ?? {
-            name: recipeName,
-            creator,
+            id: recipeID,
+            name: translatedName,
+            creatorID,
+            creator: translatedCreator,
             amount: 0,
             workers: 0,
             demands: [],
@@ -148,19 +176,27 @@ function createRecipeMap(
 }
 
 function mapResults(
-    inputItemName: string,
+    inputItemID: string,
+    items: TranslatedItem[],
     results?: VertexOutput,
 ): Requirement[] {
     if (!results) {
         return [];
     }
 
+    const itemMap = new Map<string, TranslatedItem>(
+        items.map((item) => [createVariableName(item), item]),
+    );
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { bounded, ...variables } = results;
     const variablesArray = Object.entries(variables);
 
-    const recipeDemandMap = createRecipeDemandMap(variablesArray);
-    const [itemRecipeMap, recipeCreatorMap] = createRecipeMap(variablesArray);
+    const recipeDemandMap = createRecipeDemandMap(variablesArray, itemMap);
+    const [itemRecipeMap, recipeCreatorMap] = createRecipeMap(
+        variablesArray,
+        itemMap,
+    );
 
     const totalOutputVariables = variablesArray.filter(([key]) =>
         isTotalVariable(key),
@@ -189,15 +225,21 @@ function mapResults(
             return { ...recipe, demands: demands ?? [] };
         });
 
+        const translatedItem = [...itemMap.values()].find(
+            (item) => item.id === totalKey,
+        );
+        const translatedName = translatedItem?.name ?? totalKey;
+
         const mapped = {
-            name: totalKey,
+            id: totalKey,
+            name: translatedName,
             amount,
             creators: creatorsWithDemands.filter(
                 (creator) => creator.workers > 0,
             ),
         };
 
-        if (totalKey === inputItemName) {
+        if (totalKey === inputItemID) {
             result.unshift(mapped);
         } else {
             result.push(mapped);
@@ -210,8 +252,8 @@ function mapResults(
 function validateInput(
     input: QueryRequirementsParams,
 ): QueryRequirementsParams {
-    if (input.name === "") {
-        throw new Error(INVALID_ITEM_NAME_ERROR);
+    if (input.id === "") {
+        throw new Error(INVALID_ITEM_ID_ERROR);
     }
 
     if ("workers" in input && input.workers <= 0) {
@@ -227,11 +269,12 @@ function validateInput(
 
 const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const {
-        name,
+        id,
         maxAvailableTool = "none" as DefaultToolset,
         hasMachineTools = false,
         unit = OutputUnit.SECONDS,
         creatorOverrides,
+        locale,
         ...target
     } = validateInput(input);
     console.log({
@@ -246,13 +289,13 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         );
     }
 
-    const requirements = await getRequiredItemDetails(name);
+    const requirements = await getRequiredItemDetails(id, locale);
     if (requirements.length == 0) {
         throw new Error(UNKNOWN_ITEM_ERROR);
     }
 
     const overriddenRequirements = getOverriddenRequirements(
-        name,
+        id,
         requirements,
         creatorOverrides,
     );
@@ -271,7 +314,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     }
 
     const result = computeRequirementVertices({
-        inputItemName: name,
+        inputItemID: id,
         target,
         requirements: overriddenRequirements,
         maxAvailableTool,
@@ -279,7 +322,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         unit,
     });
 
-    return mapResults(name, result);
+    return mapResults(id, overriddenRequirements, result);
 };
 
 export { queryRequirements };

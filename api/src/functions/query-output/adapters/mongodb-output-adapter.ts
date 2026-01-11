@@ -16,14 +16,14 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryOutputDetails: OutputDatabasePort = async ({ name, creator }) => {
+const queryOutputDetails: OutputDatabasePort = async ({ id, creatorID }) => {
     const db = (await client).db(databaseName);
     const collection = db.collection(itemCollectionName);
 
     return collection
         .find<Item>({
-            ...(name ? { name } : {}),
-            ...(creator ? { creator } : {}),
+            ...(id ? { id } : {}),
+            ...(creatorID ? { creatorID } : {}),
         })
         .project<ItemOutputDetails>({
             _id: 0,

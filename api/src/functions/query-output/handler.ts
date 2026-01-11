@@ -3,14 +3,14 @@ import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { calculateOutput } from "./domain/output-calculator";
 import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
 import {
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     TOOL_LEVEL_ERROR_PREFIX,
     UNKNOWN_ITEM_ERROR,
 } from "./domain/errors";
 
 const exactUserErrors = new Set([
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     UNKNOWN_ITEM_ERROR,
 ]);
@@ -25,12 +25,12 @@ const isUserError = ({ message }: Error): boolean => {
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
     event,
 ) => {
-    const { name, workers, unit, maxAvailableTool, creator, hasMachineTools } =
+    const { id, workers, unit, maxAvailableTool, creatorID, hasMachineTools } =
         event.arguments;
 
     try {
         const output = await calculateOutput({
-            name,
+            id,
             workers,
             unit: OutputUnit[unit],
             ...(maxAvailableTool
@@ -42,7 +42,7 @@ const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
             ...(hasMachineTools !== undefined && hasMachineTools !== null
                 ? { hasMachineTools }
                 : {}),
-            ...(creator ? { creator } : {}),
+            ...(creatorID ? { creatorID } : {}),
         });
 
         return { __typename: "OptimalOutput", amount: output };

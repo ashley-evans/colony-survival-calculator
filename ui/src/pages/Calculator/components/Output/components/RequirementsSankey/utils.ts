@@ -2,21 +2,26 @@ import { Requirement } from "../../../../../../graphql/__generated__/graphql";
 
 export type TreeNode<T> = T & { children: TreeNode<T>[]; depth: number };
 
-const UNKNOWN_ROOT_ITEM_ERROR = "Unknown item required with name: ";
+const UNKNOWN_ROOT_ITEM_ERROR = "Unknown item required with ID: ";
 
-type FlatRequirement = Omit<Requirement, "creators" | "__typename">;
+type FlatRequirement = Omit<Requirement, "creators" | "__typename" | "id">;
+type FlattenedDemand = FlatRequirement & { id: string };
 export type RequirementTreeNode = TreeNode<FlatRequirement>;
 
-const flattenDemands = (requirement: Requirement): FlatRequirement[] => {
-    const demandMap = new Map<string, number>();
+const flattenDemands = (requirement: Requirement): FlattenedDemand[] => {
+    const demandMap = new Map<string, [string, number]>();
     for (const creator of requirement.creators) {
         for (const demand of creator.demands) {
-            const existingDemand = demandMap.get(demand.name) ?? 0;
-            demandMap.set(demand.name, existingDemand + demand.amount);
+            const existingDemand = demandMap.get(demand.id) ?? [demand.name, 0];
+            demandMap.set(demand.id, [
+                demand.name,
+                existingDemand[1] + demand.amount,
+            ]);
         }
     }
 
-    return Array.from(demandMap.entries()).map(([name, amount]) => ({
+    return Array.from(demandMap.entries()).map(([id, [name, amount]]) => ({
+        id,
         name,
         amount,
     }));
@@ -30,38 +35,41 @@ const convertRequirementToNode = (
 
 const createRequirementMap = (requirements: Requirement[]) =>
     new Map<string, Requirement>(
-        requirements.map((requirement) => [requirement.name, requirement]),
+        requirements.map((requirement) => [requirement.id, requirement]),
     );
 
 const createTree = (
     requirements: Requirement[],
-    rootItemName: string,
+    rootItemID: string,
 ): RequirementTreeNode => {
     const map = createRequirementMap(requirements);
 
     const createNode = (
-        requirementName: string,
+        requirementID: string,
         depth: number,
         amount?: number,
     ): RequirementTreeNode => {
-        const requirement = map.get(requirementName);
+        const requirement = map.get(requirementID);
         if (!requirement) {
-            throw new Error(`${UNKNOWN_ROOT_ITEM_ERROR}${requirementName}`);
+            throw new Error(`${UNKNOWN_ROOT_ITEM_ERROR}${requirementID}`);
         }
 
         const demands = flattenDemands(requirement);
         const children = demands.map((demand) =>
-            createNode(demand.name, depth + 1, demand.amount),
+            createNode(demand.id, depth + 1, demand.amount),
         );
 
         return convertRequirementToNode(
-            { name: requirement.name, amount: amount ?? requirement.amount },
+            {
+                name: requirement.name,
+                amount: amount ?? requirement.amount,
+            },
             children,
             depth,
         );
     };
 
-    return createNode(rootItemName, 0);
+    return createNode(rootItemID, 0);
 };
 
 export { createTree };

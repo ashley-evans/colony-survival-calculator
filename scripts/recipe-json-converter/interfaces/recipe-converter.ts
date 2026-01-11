@@ -8,6 +8,10 @@ import {
 } from "./growable-converter";
 import { JSONWriter } from "./json-writer";
 import {
+    LocalisationConverter,
+    LocalisationConverterInputs,
+} from "./localisation-converter";
+import {
     MineableItemConverter,
     MineableItemConverterInputs,
 } from "./mineable-item-converter";
@@ -22,10 +26,14 @@ type RecipeConverterDependencies = {
     convertGrowables: (
         input: GrowableConverterInputs,
     ) => ReturnType<GrowableConverter>;
+    convertLocalisation: (
+        input: LocalisationConverterInputs,
+    ) => ReturnType<LocalisationConverter>;
     writeJSON: JSONWriter;
 };
 
-type RecipeConverterInputs = CraftableRecipeConverterInputs & {
+type RecipeConverterInputs = {
+    inputDirectoryPath: string;
     outputFilePath: string;
 };
 

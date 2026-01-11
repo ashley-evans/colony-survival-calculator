@@ -1,27 +1,38 @@
+import { useMemo } from "react";
+
 import { AutoCompleteSelector } from "../../../../common/components";
+import { ItemName } from "../../../../graphql/__generated__/graphql";
 
 type ItemSelectorProps = {
-    items: string[];
-    onItemChange: (item: string) => void;
-    defaultSelectedItem?: string;
+    items: ItemName[];
+    onItemChange: (itemID: string) => void;
+    defaultSelectedItemID?: string;
 };
 
 function ItemSelector({
     items,
-    defaultSelectedItem,
+    defaultSelectedItemID,
     onItemChange,
 }: ItemSelectorProps) {
-    const handleItemChange = (selectedItem: string | null) => {
-        if (selectedItem) onItemChange(selectedItem);
+    const handleItemChange = (selectedItem: ItemName | null) => {
+        if (selectedItem) onItemChange(selectedItem.id);
     };
 
     const getItemFilter = (input: string) => {
         const lowercased = input.toLowerCase();
 
-        return (item: string) => {
-            return item.toLowerCase().includes(lowercased);
+        return (item: ItemName) => {
+            return item.name.toLowerCase().includes(lowercased);
         };
     };
+
+    const defaultItem = useMemo(
+        () =>
+            defaultSelectedItemID
+                ? items.find((item) => item.id === defaultSelectedItemID)
+                : undefined,
+        [items, defaultSelectedItemID],
+    );
 
     return (
         <AutoCompleteSelector
@@ -30,9 +41,9 @@ function ItemSelector({
             toggleLabelText="Open item list"
             inputPlaceholder="Select an item to use in calculations"
             clearIconLabelText="Clear item input"
-            defaultSelectedItem={defaultSelectedItem}
-            itemToKey={(value) => value}
-            itemToDisplayText={(value) => value}
+            defaultSelectedItem={defaultItem}
+            itemToKey={(value) => value.id}
+            itemToDisplayText={(value) => value.name}
             getItemFilter={getItemFilter}
             onSelectedItemChange={handleItemChange}
         />

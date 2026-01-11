@@ -29,11 +29,11 @@ const isUserError = (
     return "message" in requirementResult;
 };
 
-const expectedItemName = "test name";
+const expectedItemID = "test id";
 const expectedWorkers = 10;
 
 type GraphQLEventInput = {
-    name: string;
+    id: string;
     maxAvailableTool?: AvailableTools;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
@@ -41,6 +41,7 @@ type GraphQLEventInput = {
     selectionSetList?: string[];
     workers?: number;
     amount?: number;
+    locale?: string;
 };
 
 function createMockEvent(
@@ -49,13 +50,14 @@ function createMockEvent(
     const mockEvent = mock<AppSyncResolverEvent<QueryRequirementArgs>>();
     mockEvent.info.selectionSetList = input.selectionSetList ?? ["name"];
     mockEvent.arguments = {
-        name: input.name,
+        id: input.id,
         workers: input.workers ?? null,
         amount: input.amount ?? null,
         maxAvailableTool: input.maxAvailableTool ?? null,
         creatorOverrides: input.creatorOverrides ?? null,
         hasMachineTools: input.hasMachineTools ?? null,
         unit: input.unit ?? null,
+        locale: input.locale ?? null,
     };
 
     return mockEvent;
@@ -67,7 +69,7 @@ beforeEach(() => {
 
 test("calls the domain to fetch requirements for provided event w/o tool modifier", async () => {
     const event = createMockEvent({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
     });
 
@@ -75,7 +77,7 @@ test("calls the domain to fetch requirements for provided event w/o tool modifie
 
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
     });
 });
@@ -83,7 +85,7 @@ test("calls the domain to fetch requirements for provided event w/o tool modifie
 test("calls the domain to fetch requirements to satisfy target output given event with target amount", async () => {
     const expectedAmount = 5;
     const event = createMockEvent({
-        name: expectedItemName,
+        id: expectedItemID,
         amount: expectedAmount,
     });
 
@@ -91,7 +93,7 @@ test("calls the domain to fetch requirements to satisfy target output given even
 
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith({
-        name: expectedItemName,
+        id: expectedItemID,
         amount: expectedAmount,
     });
 });
@@ -107,7 +109,7 @@ test.each<[AvailableTools, SchemaTools]>([
     "calls the domain to fetch requirements for provided event w/ %s tool modifier",
     async (provided: AvailableTools, expectedTool: SchemaTools) => {
         const event = createMockEvent({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             maxAvailableTool: provided,
         });
@@ -116,7 +118,7 @@ test.each<[AvailableTools, SchemaTools]>([
 
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             maxAvailableTool: expectedTool,
         });
@@ -130,7 +132,7 @@ test.each([
     "calls the domain to fetch requirements given machine tool %s",
     async (_: string, hasMachineTools: boolean) => {
         const event = createMockEvent({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             hasMachineTools,
         });
@@ -139,7 +141,7 @@ test.each([
 
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             hasMachineTools,
         });
@@ -149,16 +151,16 @@ test.each([
 test("provides specified creator overrides to domain if provided", async () => {
     const overrides: CreatorOverride[] = [
         {
-            itemName: "test name",
-            creator: "first creator",
+            itemID: "test id",
+            creatorID: "first creator",
         },
         {
-            itemName: "second item",
-            creator: "another creator",
+            itemID: "second item",
+            creatorID: "another creator",
         },
     ];
     const event = createMockEvent({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
         creatorOverrides: overrides,
     });
@@ -167,7 +169,7 @@ test("provides specified creator overrides to domain if provided", async () => {
 
     expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
     expect(mockQueryRequirements).toHaveBeenCalledWith({
-        name: expectedItemName,
+        id: expectedItemID,
         workers: expectedWorkers,
         creatorOverrides: overrides,
     });
@@ -181,7 +183,7 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
     "provides %s output unit to domain if provided",
     async (provided: GraphQLOutputUnit, expected: OutputUnit) => {
         const event = createMockEvent({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             unit: provided,
         });
@@ -190,12 +192,43 @@ test.each<[GraphQLOutputUnit, OutputUnit]>([
 
         expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
         expect(mockQueryRequirements).toHaveBeenCalledWith({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             unit: expected,
         });
     },
 );
+
+test("provides specified locale to domain if provided", async () => {
+    const expectedLocale = "en-US";
+    const event = createMockEvent({
+        id: expectedItemID,
+        workers: expectedWorkers,
+        locale: expectedLocale,
+    });
+
+    await handler(event);
+
+    expect(mockQueryRequirements).toHaveBeenCalledTimes(1);
+    expect(mockQueryRequirements).toHaveBeenCalledWith({
+        id: expectedItemID,
+        workers: expectedWorkers,
+        locale: expectedLocale,
+    });
+});
+
+test("does not pass locale to domain if not provided", async () => {
+    const event = createMockEvent({
+        id: expectedItemID,
+        workers: expectedWorkers,
+    });
+
+    await handler(event);
+
+    expect(mockQueryRequirements).toHaveBeenCalledWith(
+        expect.not.objectContaining({ locale: expect.anything() }),
+    );
+});
 
 test.each([
     ["overall output amount", ["amount"]],
@@ -208,7 +241,7 @@ test.each([
             "Invalid arguments: Must provide output unit when querying amounts",
         );
         const event = createMockEvent({
-            name: expectedItemName,
+            id: expectedItemID,
             workers: expectedWorkers,
             selectionSetList,
         });
@@ -228,7 +261,7 @@ test.each([
             "Invalid arguments: Must provide either amount or workers when querying requirements (not both)",
         );
         const event = createMockEvent({
-            name: expectedItemName,
+            id: expectedItemID,
             ...(amount ? { amount } : {}),
             ...(workers ? { workers } : {}),
         });
@@ -307,7 +340,7 @@ test.each([
         expected: GraphQLRequirement[],
     ) => {
         mockQueryRequirements.mockResolvedValue(returned);
-        const event = createMockEvent({ name: "test", workers: 1 });
+        const event = createMockEvent({ id: "test", workers: 1 });
 
         const actual = await handler(event);
         if (isUserError(actual)) {
@@ -321,7 +354,7 @@ test.each([
 );
 
 test.each([
-    ["Invalid item", "Invalid item name provided, must be a non-empty string"],
+    ["Invalid item", "Invalid item ID provided, must be a non-empty string"],
     [
         "Invalid workers",
         "Invalid number of workers provided, must be a positive number",
@@ -347,7 +380,7 @@ test.each([
     "returns a user if known error: %s occurs while fetching item requirements",
     async (_: string, error: string) => {
         mockQueryRequirements.mockRejectedValue(new Error(error));
-        const event = createMockEvent({ name: "test", workers: 1 });
+        const event = createMockEvent({ id: "test", workers: 1 });
 
         const actual = await handler(event);
         if (!isUserError(actual)) {
@@ -361,7 +394,7 @@ test.each([
 test("throws the exception if an unknown exception occurs while fetching item requirements", async () => {
     const expectedError = new Error("expected error");
     mockQueryRequirements.mockRejectedValue(expectedError);
-    const event = createMockEvent({ name: "test", workers: 1 });
+    const event = createMockEvent({ id: "test", workers: 1 });
 
     expect.assertions(1);
     await expect(handler(event)).rejects.toThrow(expectedError);

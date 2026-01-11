@@ -1,7 +1,9 @@
 import client from "@colony-survival-calculator/mongodb-client";
+import { Document } from "mongodb";
 
-import type { Item } from "../../../types";
+import type { Item, TranslatedItem } from "../../../types";
 import type { RequirementsDatabasePort } from "../interfaces/requirements-database-port";
+import { DEFAULT_LOCALE } from "../../../common";
 
 const databaseName = process.env["DATABASE_NAME"];
 if (!databaseName) {
@@ -13,22 +15,50 @@ if (!itemCollectionName) {
     throw new Error("Misconfigured: Item collection name not provided");
 }
 
-const queryRequirements: RequirementsDatabasePort = async (name: string) => {
+const getTranslationProjection = (locale: string): Document => {
+    return {
+        $project: {
+            _id: 0,
+            id: 1,
+            createTime: 1,
+            output: 1,
+            requires: 1,
+            toolset: 1,
+            creatorID: 1,
+            optionalOutputs: 1,
+            size: 1,
+            name: {
+                $ifNull: [
+                    `$i18n.name.${locale}`,
+                    `$i18n.name.${DEFAULT_LOCALE}`,
+                ],
+            },
+            creator: {
+                $ifNull: [
+                    `$i18n.creator.${locale}`,
+                    `$i18n.creator.${DEFAULT_LOCALE}`,
+                ],
+            },
+        },
+    };
+};
+
+const queryRequirements: RequirementsDatabasePort = async ({ id, locale }) => {
     const db = (await client).db(databaseName);
     const collection = db.collection<Item>(itemCollectionName);
 
-    const requirements = collection.aggregate<Item>([
+    const requirements = collection.aggregate<TranslatedItem>([
         {
             $match: {
-                name,
+                id,
             },
         },
         {
             $graphLookup: {
                 from: itemCollectionName,
-                startWith: "$name",
-                connectFromField: "requires.name",
-                connectToField: "name",
+                startWith: "$id",
+                connectFromField: "requires.id",
+                connectToField: "id",
                 as: "result",
                 depthField: "depth",
             },
@@ -46,8 +76,8 @@ const queryRequirements: RequirementsDatabasePort = async (name: string) => {
         {
             $group: {
                 _id: {
-                    name: "$name",
-                    creator: "$creator",
+                    id: "$id",
+                    creatorID: "$creatorID",
                 },
                 unique: {
                     $addToSet: "$$ROOT",
@@ -66,12 +96,7 @@ const queryRequirements: RequirementsDatabasePort = async (name: string) => {
                 depth: 1,
             },
         },
-        {
-            $project: {
-                _id: 0,
-                depth: 0,
-            },
-        },
+        getTranslationProjection(locale),
     ]);
 
     return requirements.toArray();

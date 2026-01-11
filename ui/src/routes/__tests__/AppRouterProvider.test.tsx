@@ -20,11 +20,11 @@ const EXPECTED_REPOSITORY_URL =
 const EXPECTED_DARK_THEME_BUTTON_LABEL = "Change to dark theme";
 const EXPECTED_LIGHT_THEME_BUTTON_LABEL = "Change to light theme";
 
-const item: ItemName = { name: "Item 1" };
+const item: ItemName = { id: "item1", name: "Item 1" };
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
-        return HttpResponse.json({ data: { distinctItemNames: [item.name] } });
+        return HttpResponse.json({ data: { distinctItemNames: [item] } });
     }),
     graphql.query(expectedItemDetailsQueryName, () => {
         return HttpResponse.json({ data: { item: [] } });

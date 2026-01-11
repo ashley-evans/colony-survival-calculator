@@ -29,6 +29,7 @@ import {
 import { expectedItemDetailsQueryName } from "./utils";
 import {
     CreatorOverride,
+    Item,
     OutputUnit,
     AvailableTools,
 } from "../../../graphql/__generated__/graphql";
@@ -42,38 +43,48 @@ const expectedItemSelectOverrideLabel = "Item:";
 const expectedCreatorSelectOverrideLabel = "Creator:";
 
 const items: ItemName[] = [
-    { name: "Item 1" },
-    { name: "Item 2" },
-    { name: "Item 3" },
+    { id: "item1", name: "Item 1" },
+    { id: "item2", name: "Item 2" },
+    { id: "item3", name: "Item 3" },
 ];
 
-const expectedFirstItemName = items[0].name;
-const expectedFirstItemOverrides = generateItemCreatorOverrides(
-    expectedFirstItemName,
+const expectedFirstItem = items[0];
+const expectedFirstItemName = expectedFirstItem.name;
+const expectedFirstItemCreatorOverrides = generateItemCreatorOverridesResponse(
+    expectedFirstItem,
     2,
 );
-const expectedSecondItemName = items[2].name;
-const expectedSecondItemOverrides = generateItemCreatorOverrides(
-    expectedSecondItemName,
+const expectedSecondItem = items[2];
+const expectedSecondItemName = expectedSecondItem.name;
+const expectedSecondItemCreatorOverrides = generateItemCreatorOverridesResponse(
+    expectedSecondItem,
     3,
     2,
 );
 
-const expectedCreatorOverrides: CreatorOverride[] = [
-    ...expectedFirstItemOverrides,
-    ...expectedSecondItemOverrides,
+const expectedCreatorOverrides = [
+    ...expectedFirstItemCreatorOverrides,
+    ...expectedSecondItemCreatorOverrides,
 ];
 
-function generateItemCreatorOverrides(
-    name: string,
+type CreatorOverrideResponse = Pick<
+    Item,
+    "id" | "name" | "creatorID" | "creator"
+>;
+
+function generateItemCreatorOverridesResponse(
+    item: ItemName,
     amount: number,
     creatorOffset = 0,
-): CreatorOverride[] {
-    const overrides: CreatorOverride[] = [];
+): CreatorOverrideResponse[] {
+    const overrides: CreatorOverrideResponse[] = [];
     for (let i = 0; i < amount; i++) {
+        const creatorNum = i + 1 + creatorOffset;
         overrides.push({
-            itemName: name,
-            creator: `${name} creator - ${i + 1 + creatorOffset}`,
+            id: item.id,
+            name: item.name,
+            creatorID: `${item.id}creator${creatorNum}`,
+            creator: `${item.name} creator - ${creatorNum}`,
         });
     }
 
@@ -84,7 +95,7 @@ const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: items.map((item) => item.name),
+                distinctItemNames: items,
             },
         });
     }),
@@ -97,11 +108,11 @@ const server = setupServer(
     }),
     createCalculatorOutputResponseHandler([
         createRequirement({
-            name: expectedFirstItemName,
+            name: expectedFirstItem.name,
             amount: 1,
             creators: [
                 createRequirementCreator({
-                    recipeName: expectedFirstItemName,
+                    recipeName: expectedFirstItem.name,
                     workers: 1,
                     amount: 1,
                     creator: "Creator",
@@ -110,11 +121,11 @@ const server = setupServer(
             ],
         }),
         createRequirement({
-            name: expectedSecondItemName,
+            name: expectedSecondItem.name,
             amount: 1,
             creators: [
                 createRequirementCreator({
-                    recipeName: expectedSecondItemName,
+                    recipeName: expectedSecondItem.name,
                     workers: 1,
                     amount: 1,
                     creator: "Creator",
@@ -126,10 +137,7 @@ const server = setupServer(
     graphql.query(expectedCreatorOverrideQueryName, () => {
         return HttpResponse.json({
             data: {
-                item: expectedCreatorOverrides.map(({ itemName, creator }) => ({
-                    name: itemName,
-                    creator,
-                })),
+                item: expectedCreatorOverrides,
             },
         });
     }),
@@ -277,9 +285,10 @@ describe("given items w/ multiple creators returned", () => {
     });
 
     describe("one item w/ multiple creator returned", () => {
-        const expectedItemName = "Test item";
-        const expectedOverrides = generateItemCreatorOverrides(
-            expectedItemName,
+        const expectedItem: ItemName = { id: "testitem", name: "Test item" };
+        const expectedItemName = expectedItem.name;
+        const expectedOverrides = generateItemCreatorOverridesResponse(
+            expectedItem,
             2,
         );
 
@@ -288,12 +297,7 @@ describe("given items w/ multiple creators returned", () => {
                 graphql.query(expectedCreatorOverrideQueryName, () => {
                     return HttpResponse.json({
                         data: {
-                            item: expectedOverrides.map(
-                                ({ itemName, creator }) => ({
-                                    name: itemName,
-                                    creator,
-                                }),
-                            ),
+                            item: expectedOverrides,
                         },
                     });
                 }),
@@ -525,9 +529,9 @@ describe("given items w/ multiple creators returned", () => {
 
             const creatorOptions = await screen.findAllByRole("option");
             expect(creatorOptions).toHaveLength(
-                expectedFirstItemOverrides.length,
+                expectedFirstItemCreatorOverrides.length,
             );
-            for (const { creator } of expectedFirstItemOverrides) {
+            for (const { creator } of expectedFirstItemCreatorOverrides) {
                 expect(
                     screen.getByRole("option", { name: creator }),
                 ).toBeVisible();
@@ -547,9 +551,9 @@ describe("given items w/ multiple creators returned", () => {
 
             const creatorOptions = await screen.findAllByRole("option");
             expect(creatorOptions).toHaveLength(
-                expectedSecondItemOverrides.length,
+                expectedSecondItemCreatorOverrides.length,
             );
-            for (const { creator } of expectedSecondItemOverrides) {
+            for (const { creator } of expectedSecondItemCreatorOverrides) {
                 expect(
                     screen.getByRole("option", { name: creator }),
                 ).toBeVisible();
@@ -557,7 +561,8 @@ describe("given items w/ multiple creators returned", () => {
         });
 
         test("changing the selected overridden item sets the default selected creator as the first creator for that item", async () => {
-            const expectedCreator = expectedSecondItemOverrides[0].creator;
+            const expectedCreator =
+                expectedSecondItemCreatorOverrides[0].creator;
 
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
@@ -748,10 +753,10 @@ describe("given items w/ multiple creators returned", () => {
                 name: expectedCreatorSelectOverrideLabel,
             });
             expect(creatorOverrideSelects[0]).toHaveTextContent(
-                expectedFirstItemOverrides[0].creator,
+                expectedFirstItemCreatorOverrides[0].creator,
             );
             expect(creatorOverrideSelects[1]).toHaveTextContent(
-                expectedSecondItemOverrides[0].creator,
+                expectedSecondItemCreatorOverrides[0].creator,
             );
         });
 
@@ -781,7 +786,7 @@ describe("given items w/ multiple creators returned", () => {
         });
 
         test("does not reset the currently selected creator override if non-default creator selected", async () => {
-            const expected = expectedFirstItemOverrides[1].creator;
+            const expected = expectedFirstItemCreatorOverrides[1].creator;
 
             await renderSettingsTab();
             await clickByName(expectedAddCreatorOverrideButtonText, "button");
@@ -809,7 +814,8 @@ describe("given items w/ multiple creators returned", () => {
 
         test("queries item details with specified creator if applicable override enabled", async () => {
             const expectedItem = expectedSecondItemName;
-            const expectedCreator = expectedSecondItemOverrides[1].creator;
+            const expectedCreator =
+                expectedSecondItemCreatorOverrides[1].creatorID;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -817,8 +823,8 @@ describe("given items w/ multiple creators returned", () => {
                 expectedItemDetailsQueryName,
                 {
                     filters: {
-                        name: expectedItem,
-                        creator: expectedCreator,
+                        id: expectedSecondItem.id,
+                        creatorID: expectedCreator,
                     },
                 },
             );
@@ -831,7 +837,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await selectOption({
                 label: expectedCreatorSelectOverrideLabel,
-                optionName: expectedCreator,
+                optionName: expectedSecondItemCreatorOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");
             await selectItemAndTarget({ itemName: expectedItem });
@@ -849,7 +855,7 @@ describe("given items w/ multiple creators returned", () => {
                 expectedItemDetailsQueryName,
                 {
                     filters: {
-                        name: expectedItem,
+                        id: expectedSecondItem.id,
                         optimal: {
                             maxAvailableTool: expectedTool,
                             hasMachineTools: false,
@@ -866,7 +872,7 @@ describe("given items w/ multiple creators returned", () => {
             });
             await selectOption({
                 label: expectedCreatorSelectOverrideLabel,
-                optionName: expectedSecondItemOverrides[1].creator,
+                optionName: expectedSecondItemCreatorOverrides[1].creator,
             });
             await clickByName(expectedCalculatorTab, "tab");
             await selectItemAndTarget({ itemName: expectedItem });
@@ -883,16 +889,15 @@ describe("given items w/ multiple creators returned", () => {
         test("provides all creator overrides when querying calculator output", async () => {
             const user = userEvent.setup();
             const expectedItem = expectedSecondItemName;
-            const expectedCreator = expectedSecondItemOverrides[1].creator;
             const expectedWorkers = 5;
             const expectedOverrides: CreatorOverride[] = [
                 {
-                    itemName: expectedFirstItemName,
-                    creator: expectedFirstItemOverrides[1].creator,
+                    itemID: expectedFirstItem.id,
+                    creatorID: expectedFirstItemCreatorOverrides[1].creatorID,
                 },
                 {
-                    itemName: expectedSecondItemName,
-                    creator: expectedCreator,
+                    itemID: expectedSecondItem.id,
+                    creatorID: expectedSecondItemCreatorOverrides[1].creatorID,
                 },
             ];
             const expectedTool = AvailableTools.None;
@@ -912,12 +917,12 @@ describe("given items w/ multiple creators returned", () => {
             );
             await user.click(creatorOverrideSelects[0]);
             const firstItemCreatorOption = await screen.findByRole("option", {
-                name: expectedFirstItemOverrides[1].creator,
+                name: expectedFirstItemCreatorOverrides[1].creator,
             });
             await user.click(firstItemCreatorOption);
             await user.click(creatorOverrideSelects[1]);
             const secondItemCreatorOption = await screen.findByRole("option", {
-                name: expectedSecondItemOverrides[1].creator,
+                name: expectedSecondItemCreatorOverrides[1].creator,
             });
             await user.click(secondItemCreatorOption);
             await clickByName(expectedCalculatorTab, "tab");
@@ -931,7 +936,7 @@ describe("given items w/ multiple creators returned", () => {
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({
-                name: expectedItem,
+                id: expectedSecondItem.id,
                 amount: null,
                 workers: expectedWorkers,
                 unit: OutputUnit.Minutes,
@@ -951,7 +956,7 @@ describe("given items w/ multiple creators returned", () => {
                 expectedGraphQLAPIURL,
                 expectedCalculatorOutputQueryName,
                 {
-                    name: expectedItem,
+                    id: expectedSecondItem.id,
                     amount: null,
                     workers: expectedWorkers,
                     unit: OutputUnit.Minutes,
@@ -979,14 +984,15 @@ describe("given items w/ multiple creators returned", () => {
 
         test("queries output with specified creator if applicable override enabled", async () => {
             const expectedItem = expectedSecondItemName;
-            const expectedCreator = expectedSecondItemOverrides[1].creator;
+            const expectedCreator =
+                expectedSecondItemCreatorOverrides[1].creator;
             const expectedWorkers = 5;
             const expectedTool = AvailableTools.None;
             const expectedOutputUnit = OutputUnit.Minutes;
             const expectedOverrides: CreatorOverride[] = [
                 {
-                    itemName: expectedSecondItemName,
-                    creator: expectedCreator,
+                    itemID: expectedSecondItem.id,
+                    creatorID: expectedSecondItemCreatorOverrides[1].creatorID,
                 },
             ];
             const expectedRequest = waitForRequest(
@@ -1017,7 +1023,7 @@ describe("given items w/ multiple creators returned", () => {
             const { matchedRequestDetails } = await expectedRequest;
 
             expect(matchedRequestDetails.variables).toEqual({
-                name: expectedItem,
+                id: expectedSecondItem.id,
                 workers: expectedWorkers,
                 amount: null,
                 unit: expectedOutputUnit,

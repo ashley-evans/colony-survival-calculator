@@ -1,5 +1,7 @@
+import { ItemName } from "../../../graphql/schema";
+
 interface ItemDatabasePort {
-    (): Promise<string[]>;
+    (locale: string): Promise<ItemName[]>;
 }
 
 export { ItemDatabasePort };

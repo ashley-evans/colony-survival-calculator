@@ -6,6 +6,7 @@ import {
 
 function createCreatorDemands(name: string, amount: number): CreatorDemand {
     return {
+        id: name.toLowerCase().replace(" ", ""),
         name,
         amount,
     };
@@ -25,8 +26,10 @@ function createRequirementCreator({
     demands?: CreatorDemand[];
 }): RequirementCreator {
     return {
+        id: recipeName.toLowerCase().replace(" ", ""),
         name: recipeName,
         creator,
+        creatorID: creator.toLowerCase().replace(" ", ""),
         amount,
         workers,
         demands,
@@ -43,6 +46,7 @@ function createRequirement({
     creators: RequirementCreator[];
 }): Requirement {
     return {
+        id: name.toLowerCase().replace(" ", ""),
         name,
         amount,
         creators,

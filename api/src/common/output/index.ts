@@ -1,5 +1,5 @@
 import { ToolModifierValues, getMaxToolModifier } from "..";
-import { DefaultToolset, Item } from "../../types";
+import { DefaultToolset, TranslatedItem } from "../../types";
 
 enum OutputUnit {
     SECONDS = "SECONDS",
@@ -14,7 +14,7 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
 };
 
 function calculateOutput(
-    item: Pick<Item, "toolset" | "createTime" | "output">,
+    item: Pick<TranslatedItem, "toolset" | "createTime" | "output">,
     maxAvailableTool: DefaultToolset,
 ): number {
     const modifier =

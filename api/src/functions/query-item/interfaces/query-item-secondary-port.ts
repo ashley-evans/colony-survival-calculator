@@ -1,11 +1,19 @@
-import type { Items } from "../../../types";
+import type { TranslatedItem } from "../../../types";
 
 interface QueryItemByFieldSecondaryPort {
-    (name?: string, creator?: string): Promise<Items>;
+    (
+        locale: string,
+        id?: string,
+        creatorID?: string,
+    ): Promise<TranslatedItem[]>;
 }
 
 interface QueryItemByCreatorCountSecondaryPort {
-    (minimumCreators: number, name?: string): Promise<Items>;
+    (
+        locale: string,
+        minimumCreators: number,
+        id?: string,
+    ): Promise<TranslatedItem[]>;
 }
 
 export type {

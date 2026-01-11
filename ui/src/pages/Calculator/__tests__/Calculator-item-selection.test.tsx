@@ -31,13 +31,16 @@ const expectedMissingItemsError = "Unable to fetch known items";
 const expectedNetworkExceptionError =
     "An error occurred fetching item details, please refresh the page and try again.";
 
-const items: ItemName[] = [{ name: "Item 1" }, { name: "Item 2" }];
+const items: ItemName[] = [
+    { id: "item1", name: "Item 1" },
+    { id: "item2", name: "Item 2" },
+];
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: items.map((item) => item.name),
+                distinctItemNames: items,
             },
         });
     }),
@@ -69,7 +72,7 @@ beforeEach(() => {
         graphql.query(expectedItemNameQueryName, () => {
             return HttpResponse.json({
                 data: {
-                    distinctItemNames: items.map((item) => item.name),
+                    distinctItemNames: items,
                 },
             });
         }),
@@ -313,7 +316,7 @@ test("renders a clear button if an item is selected", async () => {
 });
 
 test("requests item details for newly selected item if selection is changed", async () => {
-    const expectedItemName = items[1].name;
+    const expectedItem = items[1];
     const expectedRequest = waitForRequest(
         server,
         "POST",
@@ -321,7 +324,7 @@ test("requests item details for newly selected item if selection is changed", as
         expectedItemDetailsQueryName,
         {
             filters: {
-                name: expectedItemName,
+                id: expectedItem.id,
                 optimal: { maxAvailableTool: "NONE", hasMachineTools: false },
             },
         },
@@ -330,7 +333,7 @@ test("requests item details for newly selected item if selection is changed", as
     render(<Calculator />, expectedGraphQLAPIURL);
     await selectOption({
         label: expectedItemSelectLabel,
-        optionName: expectedItemName,
+        optionName: expectedItem.name,
     });
 
     await expect(expectedRequest).resolves.not.toThrow();

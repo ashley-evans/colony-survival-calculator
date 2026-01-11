@@ -9,8 +9,8 @@
         "description": "A item that can be constructed in Colony Survival",
         "type": "object",
         "properties": {
-            "name": {
-                "description": "The name of the item",
+            "id": {
+                "description": "The ID of the item",
                 "type": "string"
             },
             "createTime": {
@@ -31,8 +31,8 @@
                     "title": "Requirement",
                     "type": "object",
                     "properties": {
-                        "name": {
-                            "description": "The name of the required item",
+                        "id": {
+                            "description": "The ID of the required item",
                             "type": "string"
                         },
                         "amount": {
@@ -41,15 +41,15 @@
                             "minimum": 1
                         }
                     },
-                    "required": ["name", "amount"],
+                    "required": ["id", "amount"],
                     "additionalProperties": false
                 }
             },
             "toolset": {
                 "$ref": "toolset.json"
             },
-            "creator": {
-                "description": "The name of the individual that produces this item",
+            "creatorID": {
+                "description": "The ID of the profession that creates this item",
                 "type": "string"
             },
             "optionalOutputs": {
@@ -59,8 +59,8 @@
                     "title": "OptionalOutput",
                     "type": "object",
                     "properties": {
-                        "name": {
-                            "description": "The name of the optional output item",
+                        "id": {
+                            "description": "The ID of the optional output item",
                             "type": "string"
                         },
                         "amount": {
@@ -75,7 +75,7 @@
                             "maximum": 1
                         }
                     },
-                    "required": ["name", "amount", "likelihood"],
+                    "required": ["id", "amount", "likelihood"],
                     "additionalProperties": false
                 }
             },
@@ -96,15 +96,38 @@
                 },
                 "required": ["width", "height"],
                 "additionalProperties": false
+            },
+            "i18n": {
+                "description": "Translations for this item, keyed by language code",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The translated names for this item",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    },
+                    "creator": {
+                        "description": "The translated creator names for this item",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["name", "creator"],
+                "additionalProperties": false
             }
         },
         "required": [
-            "name",
+            "id",
             "createTime",
             "output",
             "requires",
             "toolset",
-            "creator"
+            "creatorID",
+            "i18n"
         ],
         "additionalProperties": false
     }

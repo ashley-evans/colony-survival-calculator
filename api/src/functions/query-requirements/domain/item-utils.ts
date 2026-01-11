@@ -1,18 +1,18 @@
 import { Graph, depthFirstSearch } from "graph-data-structure";
 
-import { DefaultToolset, Item, Items } from "../../../types";
+import { DefaultToolset, TranslatedItem } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
 import { INTERNAL_SERVER_ERROR } from "./errors";
 import {
     ToolModifierValues,
     getMaxToolModifier,
-    groupItemsByName,
+    groupItemsByID,
 } from "../../../common";
 
 const ROOT_GRAPH_KEY = "root";
 
 function calculateCreateTime(
-    { toolset, createTime }: Pick<Item, "toolset" | "createTime">,
+    { toolset, createTime }: Pick<TranslatedItem, "toolset" | "createTime">,
     availableTool: DefaultToolset,
 ) {
     if (toolset.type === "machine") {
@@ -23,16 +23,18 @@ function calculateCreateTime(
     return createTime / toolModifier;
 }
 
-function getUniqueItemKey(item: Pick<Item, "name" | "creator">): string {
-    return `${item.name}#${item.creator}`;
+function getUniqueItemKey(
+    item: Pick<TranslatedItem, "id" | "creatorID">,
+): string {
+    return `${item.id}#${item.creatorID}`;
 }
 
 function splitItems(
-    items: Items,
-    predicate: (item: Item) => boolean,
-): [Items, Items] {
-    const matching: Items = [];
-    const nonMatching: Items = [];
+    items: TranslatedItem[],
+    predicate: (item: TranslatedItem) => boolean,
+): [TranslatedItem[], TranslatedItem[]] {
+    const matching: TranslatedItem[] = [];
+    const nonMatching: TranslatedItem[] = [];
     for (const item of items) {
         if (predicate(item)) {
             matching.push(item);
@@ -45,22 +47,22 @@ function splitItems(
 }
 
 function createItemGraph(
-    items: Items,
-    recipesMap: Map<string, Items>,
-    rootItemName?: string,
+    items: TranslatedItem[],
+    recipesMap: Map<string, TranslatedItem[]>,
+    rootItemID?: string,
 ) {
     const graph = new Graph();
     for (const item of items) {
         const itemRecipeKey = getUniqueItemKey(item);
         graph.addNode(itemRecipeKey);
 
-        if (rootItemName === item.name) {
+        if (rootItemID === item.id) {
             graph.addNode(ROOT_GRAPH_KEY);
             graph.addEdge(ROOT_GRAPH_KEY, itemRecipeKey);
         }
 
         for (const requirement of item.requires) {
-            const recipes = recipesMap.get(requirement.name);
+            const recipes = recipesMap.get(requirement.id);
             if (!recipes) {
                 throw new Error(INTERNAL_SERVER_ERROR);
             }
@@ -78,15 +80,15 @@ function createItemGraph(
 }
 
 function filterByCreatorOverrides(
-    rootItemName: string,
-    items: Items,
+    rootItemID: string,
+    items: TranslatedItem[],
     overrides: CreatorOverride[],
-): Items {
-    const itemMap = new Map<string, Item>(
+): TranslatedItem[] {
+    const itemMap = new Map<string, TranslatedItem>(
         items.map((item) => [getUniqueItemKey(item), item]),
     );
-    const recipesMap = groupItemsByName(items);
-    const graph = createItemGraph(items, recipesMap, rootItemName);
+    const recipesMap = groupItemsByID(items);
+    const graph = createItemGraph(items, recipesMap, rootItemID);
 
     const removeUncreatableNodes = (current: string) => {
         const item = itemMap.get(current);
@@ -98,8 +100,8 @@ function filterByCreatorOverrides(
         const adjacentItems = new Set(
             adjacent.map((node) => node.split("#")[0] as string),
         );
-        const creatable = item.requires.every(({ name }) =>
-            adjacentItems.has(name),
+        const creatable = item.requires.every(({ id }) =>
+            adjacentItems.has(id),
         );
         if (!creatable) {
             graph.removeNode(current);
@@ -107,10 +109,10 @@ function filterByCreatorOverrides(
         }
     };
 
-    for (const { itemName, creator } of overrides) {
+    for (const { itemID, creatorID } of overrides) {
         const [, recipesToIgnore] = splitItems(
-            recipesMap.get(itemName) ?? [],
-            (item) => item.creator === creator,
+            recipesMap.get(itemID) ?? [],
+            (item) => item.creatorID === creatorID,
         );
 
         for (const ignore of recipesToIgnore) {
@@ -131,28 +133,23 @@ function filterByCreatorOverrides(
     return items.filter((item) => creatableItemSet.has(getUniqueItemKey(item)));
 }
 
-function canCreateItem(name: string, items: Items): boolean {
-    const recipesMap = groupItemsByName(items);
+function canCreateItem(id: string, items: TranslatedItem[]): boolean {
+    const recipesMap = groupItemsByID(items);
 
-    const canCreateItem = (name: string): boolean => {
-        const recipes = recipesMap.get(name);
+    const canCreateItem = (id: string): boolean => {
+        const recipes = recipesMap.get(id);
         if (!recipes || recipes.length === 0) {
             return false;
         }
 
         return recipes.some((recipe) => {
             return recipe.requires.every((requirement) =>
-                canCreateItem(requirement.name),
+                canCreateItem(requirement.id),
             );
         });
     };
 
-    return canCreateItem(name);
+    return canCreateItem(id);
 }
 
-export {
-    calculateCreateTime,
-    canCreateItem,
-    filterByCreatorOverrides,
-    groupItemsByName,
-};
+export { calculateCreateTime, canCreateItem, filterByCreatorOverrides };

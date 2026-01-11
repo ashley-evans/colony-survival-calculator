@@ -22,9 +22,11 @@ enum Tools {
 }
 
 type Item {
-    name: ID!
+    id: ID!
+    name: String!
     createTime: Float!
     output: Float!
+    creatorID: String!
     creator: String!
     minimumTool: Tools!
     maximumTool: Tools!
@@ -32,17 +34,20 @@ type Item {
 }
 
 input CreatorOverride {
-    itemName: String!
-    creator: String!
+    itemID: String!
+    creatorID: String!
 }
 
 type CreatorDemand {
-    name: ID!
+    id: ID!
+    name: String!
     amount: Float!
 }
 
 type RequirementCreator {
-    name: ID!
+    id: ID!
+    name: String!
+    creatorID: String!
     creator: String!
     amount: Float!
     workers: Float!
@@ -50,7 +55,8 @@ type RequirementCreator {
 }
 
 type Requirement {
-    name: ID!
+    id: ID!
+    name: String!
     amount: Float!
     creators: [RequirementCreator!]!
 }
@@ -88,31 +94,37 @@ input OptimalFilter {
 }
 
 input ItemsFilters {
-    name: ID
+    id: ID
     minimumCreators: Int
-    creator: String
+    creatorID: String
     optimal: OptimalFilter
 }
 
+type ItemName {
+    id: ID!
+    name: String!
+}
+
 type Query {
-    distinctItemNames: [String!]!
-    item(filters: ItemsFilters): [Item!]!
+    distinctItemNames(locale: String): [ItemName!]!
+    item(filters: ItemsFilters, locale: String): [Item!]!
     requirement(
-        name: ID!
+        id: ID!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
         workers: Int
         amount: Float
+        locale: String
     ): RequirementResult!
     output(
-        name: ID!
+        id: ID!
         workers: Int!
         unit: OutputUnit!
         maxAvailableTool: AvailableTools
         hasMachineTools: Boolean
-        creator: String
+        creatorID: String
     ): OutputResult!
 }
 

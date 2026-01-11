@@ -1,5 +1,9 @@
-import { calculateOutput, isAvailableToolSufficient } from "../../../common";
-import { Item, Items, DefaultToolset } from "../../../types";
+import {
+    calculateOutput,
+    DEFAULT_LOCALE,
+    isAvailableToolSufficient,
+} from "../../../common";
+import { DefaultToolset, TranslatedItem } from "../../../types";
 import {
     queryItemByCreatorCount,
     queryItemByField,
@@ -11,10 +15,13 @@ import type {
 } from "../interfaces/query-item-primary-port";
 
 const INVALID_FILTER_ERROR =
-    "Invalid filter combination provided: Cannot filter by minimum creator and creator name";
+    "Invalid filter combination provided: Cannot filter by minimum creator and creator ID";
 
-function filterByOptimal(items: Items, filters: OptimalFilter): Items {
-    const itemMap = new Map<string, Item>();
+function filterByOptimal(
+    items: TranslatedItem[],
+    filters: OptimalFilter,
+): TranslatedItem[] {
+    const itemMap = new Map<string, TranslatedItem>();
     const maxAvailableTool =
         filters.maxAvailableTool ?? ("steel" as DefaultToolset);
     const hasMachineTools = filters.hasMachineTools ?? true;
@@ -26,9 +33,9 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
             continue;
         }
 
-        const currentOptimalItem = itemMap.get(item.name);
+        const currentOptimalItem = itemMap.get(item.id);
         if (!currentOptimalItem) {
-            itemMap.set(item.name, item);
+            itemMap.set(item.id, item);
             continue;
         }
 
@@ -51,16 +58,22 @@ function filterByOptimal(items: Items, filters: OptimalFilter): Items {
 
 const queryItem: QueryItemPrimaryPort = async (
     filters: QueryFilters | undefined,
+    locale?: string,
 ) => {
-    if (filters?.minimumCreators && filters.creator) {
+    const finalLocale = locale ?? DEFAULT_LOCALE;
+    if (filters?.minimumCreators && filters.creatorID) {
         console.error(INVALID_FILTER_ERROR);
         throw new Error(INVALID_FILTER_ERROR);
     }
 
     try {
         const items = await (filters?.minimumCreators
-            ? queryItemByCreatorCount(filters.minimumCreators, filters.name)
-            : queryItemByField(filters?.name, filters?.creator));
+            ? queryItemByCreatorCount(
+                  finalLocale,
+                  filters.minimumCreators,
+                  filters.id,
+              )
+            : queryItemByField(finalLocale, filters?.id, filters?.creatorID));
 
         if (filters?.optimal) {
             return filterByOptimal(items, filters.optimal);

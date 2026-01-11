@@ -1,7 +1,7 @@
-import type { Items } from "../../../types";
+import type { TranslatedItem } from "../../../types";
 
 interface RequirementsDatabasePort {
-    (name: string): Promise<Items>;
+    ({ id, locale }: { id: string; locale: string }): Promise<TranslatedItem[]>;
 }
 
 export type { RequirementsDatabasePort };

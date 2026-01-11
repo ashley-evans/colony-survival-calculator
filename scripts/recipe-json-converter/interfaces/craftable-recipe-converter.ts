@@ -1,4 +1,9 @@
-import { BlockBehaviours, Recipes, PiplizToolsets, Items } from "../types";
+import {
+    BlockBehaviours,
+    Recipes,
+    PiplizToolsets,
+    UntranslatedItem,
+} from "../types";
 import { FileFinder } from "./file-finder";
 import { JSONFileReader } from "./json-file-reader";
 
@@ -17,7 +22,7 @@ type CraftableRecipeConverterParameters = CraftableRecipeConverterInputs &
     CraftableRecipeConverterDependencies;
 
 interface CraftableRecipeConverter {
-    (params: CraftableRecipeConverterParameters): Promise<Items>;
+    (params: CraftableRecipeConverterParameters): Promise<UntranslatedItem[]>;
 }
 
 export type {

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { faRemove } from "@fortawesome/free-solid-svg-icons";
 
 import { Selector } from "../../../../common";
-import { CreatorOverride } from "../../../../graphql/__generated__/graphql";
 import {
     Icon,
     OverrideContainer,
@@ -10,65 +9,69 @@ import {
     RemoveButtonContainer,
 } from "./styles";
 
+type NamedEntity = { id: string; name: string };
+
 type CreatorOverrideSelectorProps = {
-    defaultOverride: CreatorOverride;
-    items: string[];
-    creators: string[];
-    onSelectedItemChange: (newItem: string, oldItem: string) => void;
-    onSelectedCreatorChange: (item: string, newCreator: string) => void;
-    onRemove: (selectedItem: string) => void;
+    defaultItem: NamedEntity;
+    defaultCreator: NamedEntity;
+    items: NamedEntity[];
+    creators: NamedEntity[];
+    onSelectedItemChange: (newItemID: string, oldItemID: string) => void;
+    onSelectedCreatorChange: (itemID: string, newCreatorID: string) => void;
+    onRemove: (selectedItemID: string) => void;
 };
 
 function CreatorOverrideSelector({
-    defaultOverride,
+    defaultItem,
+    defaultCreator,
     items,
     creators,
     onSelectedItemChange,
     onSelectedCreatorChange,
     onRemove,
 }: CreatorOverrideSelectorProps) {
-    const [selectedItem, setSelectedItem] = useState<string>(
-        defaultOverride.itemName,
+    const [selectedItemID, setSelectedItemID] = useState<string>(
+        defaultItem.id,
     );
 
-    const handleSelectedItemChange = (value?: string) => {
+    const handleSelectedItemChange = (value?: NamedEntity) => {
         if (!value) {
             return;
         }
 
-        const oldItem = selectedItem;
-        setSelectedItem(value);
-        onSelectedItemChange(value, oldItem);
+        const oldItemID = selectedItemID;
+        setSelectedItemID(value.id);
+        onSelectedItemChange(value.id, oldItemID);
     };
 
-    const handleSelectedCreatorChange = (value?: string) => {
+    const handleSelectedCreatorChange = (value?: NamedEntity) => {
         if (!value) {
             return;
         }
 
-        onSelectedCreatorChange(selectedItem, value);
+        onSelectedCreatorChange(selectedItemID, value.id);
     };
 
     const handleRemove = () => {
-        onRemove(selectedItem);
+        onRemove(selectedItemID);
     };
 
     return (
         <OverrideContainer>
             <Selector
                 items={items}
-                itemToKey={(name) => name}
-                itemToDisplayText={(name) => name}
+                itemToKey={(item) => item.id}
+                itemToDisplayText={(item) => item.name}
                 labelText="Item:"
-                defaultSelectedItem={defaultOverride.itemName}
+                defaultSelectedItem={defaultItem}
                 onSelectedItemChange={handleSelectedItemChange}
             />
             <Selector
                 items={creators}
-                itemToKey={(creator) => creator}
-                itemToDisplayText={(creator) => creator}
+                itemToKey={(creator) => creator.id}
+                itemToDisplayText={(creator) => creator.name}
                 labelText="Creator:"
-                defaultSelectedItem={defaultOverride.creator}
+                defaultSelectedItem={defaultCreator}
                 onSelectedItemChange={handleSelectedCreatorChange}
             />
             <RemoveButtonContainer>

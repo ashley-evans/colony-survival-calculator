@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "sentences": {
+            "type": "object",
+            "properties": {
+                "npcs": {
+                    "type": "object",
+                    "properties": {
+                        "pipliz": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": ["pipliz"]
+                }
+            },
+            "required": ["npcs"]
+        },
+        "types": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        }
+    },
+    "required": ["sentences", "types"]
+}

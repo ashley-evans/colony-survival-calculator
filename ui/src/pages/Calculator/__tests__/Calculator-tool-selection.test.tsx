@@ -34,13 +34,13 @@ import {
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";
-const item: ItemName = { name: "Item 1" };
+const item: ItemName = { id: "item1", name: "Item 1" };
 
 const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: [item.name],
+                distinctItemNames: [item],
             },
         });
     }),
@@ -166,7 +166,7 @@ test("queries calculator with provided tool if non default selected", async () =
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         amount: null,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
@@ -184,7 +184,7 @@ test("queries optimal output again if tool is changed after first query", async 
         expectedGraphQLAPIURL,
         expectedCalculatorOutputQueryName,
         {
-            name: item.name,
+            id: item.id,
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
@@ -229,7 +229,7 @@ test("queries requirements with provided tool if non default selected", async ()
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         amount: null,
         workers: expectedWorkers,
         maxAvailableTool: expectedTool,
@@ -247,7 +247,7 @@ test("queries requirements again if tool is changed after first query", async ()
         expectedGraphQLAPIURL,
         expectedCalculatorOutputQueryName,
         {
-            name: item.name,
+            id: item.id,
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
@@ -280,7 +280,7 @@ test("queries item details with provided tool if non default selected", async ()
         expectedItemDetailsQueryName,
         {
             filters: {
-                name: item.name,
+                id: item.id,
                 optimal: {
                     maxAvailableTool: expectedTool,
                     hasMachineTools: false,
@@ -309,7 +309,7 @@ test("queries item details again if tool is changed after first query", async ()
         expectedItemDetailsQueryName,
         {
             filters: {
-                name: item.name,
+                id: item.id,
                 optimal: {
                     maxAvailableTool: expectedTool,
                     hasMachineTools: false,
@@ -400,7 +400,7 @@ describe("machine tool selection", () => {
             expectedItemDetailsQueryName,
             {
                 filters: {
-                    name: item.name,
+                    id: item.id,
                     optimal: {
                         maxAvailableTool: AvailableTools.None,
                         hasMachineTools: true,

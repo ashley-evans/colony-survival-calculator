@@ -3,12 +3,12 @@ import { DefaultToolset } from "../../../types";
 
 interface QueryOutputPrimaryPort {
     (input: {
-        name: string;
+        id: string;
         workers: number;
         unit: OutputUnit;
         maxAvailableTool?: DefaultToolset;
         hasMachineTools?: boolean;
-        creator?: string;
+        creatorID?: string;
     }): Promise<number>;
 }
 

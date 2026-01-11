@@ -1,5 +1,5 @@
-const INVALID_ITEM_NAME_ERROR =
-    "Invalid item name provided, must be a non-empty string";
+const INVALID_ITEM_ID_ERROR =
+    "Invalid item ID provided, must be a non-empty string";
 const INVALID_WORKERS_ERROR =
     "Invalid number of workers provided, must be a positive number";
 const INVALID_TARGET_ERROR =
@@ -13,7 +13,7 @@ const INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR =
 const INTERNAL_SERVER_ERROR = "Internal server error";
 
 export {
-    INVALID_ITEM_NAME_ERROR,
+    INVALID_ITEM_ID_ERROR,
     INVALID_WORKERS_ERROR,
     INVALID_TARGET_ERROR,
     UNKNOWN_ITEM_ERROR,

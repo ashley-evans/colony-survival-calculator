@@ -65,7 +65,7 @@ const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: [item.name],
+                distinctItemNames: [{ id: item.id, name: item.name }],
             },
         });
     }),
@@ -175,7 +175,7 @@ test("queries calculator output if item and workers inputted with default unit s
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.Minutes,
@@ -203,7 +203,7 @@ test("queries calculator output if item and workers inputted with non-default un
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.GameDays,
@@ -231,7 +231,7 @@ test("queries calculator output if item and target amount inputted with default 
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.GameDays,
@@ -258,7 +258,7 @@ test("queries calculator output if item and target amount inputted with non-defa
     const { matchedRequestDetails } = await expectedRequest;
 
     expect(matchedRequestDetails.variables).toEqual({
-        name: item.name,
+        id: item.id,
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.Minutes,
@@ -343,7 +343,7 @@ test("queries optimal output and requirements with machine tool availability onc
         expectedGraphQLAPIURL,
         expectedCalculatorOutputQueryName,
         {
-            name: item.name,
+            id: item.id,
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
@@ -459,7 +459,7 @@ describe("debounces output requests", () => {
     });
 
     test("only requests optimal output every 500ms on worker change", async () => {
-        const expectedItemName = "test item";
+        const expectedItemID = "testitem";
         const expectedOutputUnit = OutputUnit.GameDays;
         const expectedLastRequest = waitForRequest(
             server,
@@ -467,7 +467,7 @@ describe("debounces output requests", () => {
             expectedGraphQLAPIURL,
             expectedCalculatorOutputQueryName,
             {
-                name: expectedItemName,
+                id: expectedItemID,
                 amount: null,
                 workers: 3,
                 unit: expectedOutputUnit,
@@ -477,7 +477,7 @@ describe("debounces output requests", () => {
         const { rerender } = rtlRender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ workers: 1 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
@@ -490,7 +490,7 @@ describe("debounces output requests", () => {
         rerender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ workers: 2 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
@@ -503,7 +503,7 @@ describe("debounces output requests", () => {
         rerender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ workers: 3 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
@@ -524,7 +524,7 @@ describe("debounces output requests", () => {
     });
 
     test("only requests optimal output every 500ms on target amount change", async () => {
-        const expectedItemName = "test item";
+        const expectedItemID = "testitem";
         const expectedOutputUnit = OutputUnit.GameDays;
         const expectedLastRequest = waitForRequest(
             server,
@@ -532,7 +532,7 @@ describe("debounces output requests", () => {
             expectedGraphQLAPIURL,
             expectedCalculatorOutputQueryName,
             {
-                name: expectedItemName,
+                id: expectedItemID,
                 amount: 3,
                 workers: null,
                 unit: expectedOutputUnit,
@@ -542,7 +542,7 @@ describe("debounces output requests", () => {
         const { rerender } = rtlRender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ amount: 1 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
@@ -555,7 +555,7 @@ describe("debounces output requests", () => {
         rerender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ amount: 2 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
@@ -568,7 +568,7 @@ describe("debounces output requests", () => {
         rerender(
             wrapWithTestProviders(
                 <Output
-                    itemName={expectedItemName}
+                    itemID={expectedItemID}
                     target={{ amount: 3 }}
                     outputUnit={expectedOutputUnit}
                     onSelectedItemTotalChange={() => {
