@@ -8,7 +8,7 @@ export type WorkerInputProps = {
 };
 
 function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const parseValue = (value: unknown): number => {
         const input = Number(value);
@@ -29,7 +29,7 @@ function WorkerInput({ onWorkerChange, defaultWorkers }: WorkerInputProps) {
             clearIconLabel={t("calculator.target.workers.clear")}
             defaultValue={
                 defaultWorkers
-                    ? Math.ceil(defaultWorkers).toString()
+                    ? Math.ceil(defaultWorkers).toLocaleString(i18n.language)
                     : undefined
             }
         />

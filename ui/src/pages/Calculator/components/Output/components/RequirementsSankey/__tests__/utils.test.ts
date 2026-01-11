@@ -26,6 +26,7 @@ describe("requirements tree creation", () => {
         );
 
         expect(actual).toEqual({
+            id: requirementWithSingleCreatorNoDemands.id,
             name: requirementWithSingleCreatorNoDemands.name,
             amount: requirementWithSingleCreatorNoDemands.amount,
             depth: 0,
@@ -65,10 +66,12 @@ describe("requirements tree creation", () => {
         );
 
         expect(actual).toEqual({
+            id: requirementsSingleDemand[0].id,
             name: requirementsSingleDemand[0].name,
             amount: requirementsSingleDemand[0].amount,
             children: expect.arrayContaining([
                 {
+                    id: requirementsSingleDemand[1].id,
                     name: requirementsSingleDemand[1].name,
                     amount: requirementsSingleDemand[1].amount,
                     children: [],
@@ -125,10 +128,12 @@ describe("requirements tree creation", () => {
         );
 
         expect(actual).toEqual({
+            id: requirementsSingleDemand[0].id,
             name: requirementsSingleDemand[0].name,
             amount: requirementsSingleDemand[0].amount,
             children: expect.arrayContaining([
                 {
+                    id: requirementsSingleDemand[1].id,
                     name: requirementsSingleDemand[1].name,
                     amount: requirementsSingleDemand[1].amount,
                     children: [],
@@ -183,14 +188,17 @@ describe("requirements tree creation", () => {
         );
 
         expect(actual).toEqual({
+            id: requirementsNestedDemand[0].id,
             name: requirementsNestedDemand[0].name,
             amount: requirementsNestedDemand[0].amount,
             children: expect.arrayContaining([
                 {
+                    id: requirementsNestedDemand[1].id,
                     name: requirementsNestedDemand[1].name,
                     amount: requirementsNestedDemand[1].amount,
                     children: expect.arrayContaining([
                         {
+                            id: requirementsNestedDemand[2].id,
                             name: requirementsNestedDemand[2].name,
                             amount: requirementsNestedDemand[2].amount,
                             children: [],
@@ -291,14 +299,17 @@ describe("requirements tree creation", () => {
         );
 
         expect(actual).toEqual({
+            id: requirementsNestedSplitDemand[0].id,
             name: requirementsNestedSplitDemand[0].name,
             amount: requirementsNestedSplitDemand[0].amount,
             children: expect.arrayContaining([
                 {
+                    id: requirementsNestedSplitDemand[1].id,
                     name: requirementsNestedSplitDemand[1].name,
                     amount: requirementsNestedSplitDemand[1].amount,
                     children: expect.arrayContaining([
                         {
+                            id: requirementsNestedSplitDemand[2].id,
                             name: requirementsNestedSplitDemand[2].name,
                             amount: 25,
                             children: [],
@@ -308,6 +319,7 @@ describe("requirements tree creation", () => {
                     depth: 1,
                 },
                 {
+                    id: requirementsNestedSplitDemand[2].id,
                     name: requirementsNestedSplitDemand[2].name,
                     amount: 6,
                     children: [],

@@ -8,7 +8,7 @@ export type AmountInputProps = {
 };
 
 function AmountInput({ onAmountChange, defaultAmount }: AmountInputProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const parseValue = (value: unknown): number => {
         const input = Number(value);
@@ -27,7 +27,7 @@ function AmountInput({ onAmountChange, defaultAmount }: AmountInputProps) {
             errorMessage={t("calculator.target.amount.error")}
             inputMode="numeric"
             clearIconLabel={t("calculator.target.amount.clear")}
-            defaultValue={defaultAmount?.toString()}
+            defaultValue={defaultAmount?.toLocaleString(i18n.language)}
         />
     );
 }

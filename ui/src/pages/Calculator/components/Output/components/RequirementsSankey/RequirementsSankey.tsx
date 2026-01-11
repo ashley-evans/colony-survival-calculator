@@ -1,4 +1,5 @@
 import { ResponsiveSankey, DefaultLink, DefaultNode } from "@nivo/sankey";
+import { useTranslation } from "react-i18next";
 
 import { SankeyContainer } from "./styles";
 import { Requirement } from "../../../../../../graphql/__generated__/graphql";
@@ -11,8 +12,12 @@ type RequirementsSankeyProps = {
     selectedItemID: string;
 };
 
+type SankeyNode = DefaultNode & {
+    label: string;
+};
+
 type ChartData = {
-    nodes: DefaultNode[];
+    nodes: SankeyNode[];
     links: DefaultLink[];
 };
 
@@ -27,16 +32,15 @@ const createSankeyChartData = ({
     }
 
     const tree = createTree(requirements, selectedItemID);
-
-    const uniqueNodes = new Set<string>();
+    const uniqueNodes = new Map<string, string>(); // id -> label (translated name)
     const links: DefaultLink[] = [];
-    const traverse = (node: RequirementTreeNode) => {
-        uniqueNodes.add(node.name);
 
-        node.children.map((child) => {
+    const traverse = (node: RequirementTreeNode) => {
+        uniqueNodes.set(node.id, node.name);
+        node.children.forEach((child) => {
             links.push({
-                source: node.name,
-                target: child.name,
+                source: node.id,
+                target: child.id,
                 value: child.amount,
             });
             traverse(child);
@@ -45,8 +49,9 @@ const createSankeyChartData = ({
 
     traverse(tree);
 
-    const nodes = Array.from(uniqueNodes.values()).map((name) => ({
-        id: name,
+    const nodes = Array.from(uniqueNodes.entries()).map(([id, label]) => ({
+        id,
+        label,
     }));
 
     return { nodes, links };
@@ -57,6 +62,7 @@ function RequirementsSankey({
     selectedItemID,
 }: RequirementsSankeyProps) {
     const theme = useTheme();
+    const { i18n } = useTranslation();
     const data = createSankeyChartData({ requirements, selectedItemID });
 
     if (data.links.length === 0) {
@@ -65,14 +71,15 @@ function RequirementsSankey({
 
     return (
         <SankeyContainer height={data.nodes.length * 2}>
-            <ResponsiveSankey
+            <ResponsiveSankey<SankeyNode, DefaultLink>
                 data={data}
                 colors={{ scheme: "pastel1" }}
-                valueFormat={roundOutput}
+                valueFormat={(value) => roundOutput(i18n.language, value)}
                 enableLinkGradient={true}
                 margin={{ top: 16, bottom: 16, right: 16, left: 16 }}
                 linkOpacity={theme.type === "dark" ? 0.25 : 1}
                 linkBlendMode="normal"
+                label="label"
             />
         </SankeyContainer>
     );

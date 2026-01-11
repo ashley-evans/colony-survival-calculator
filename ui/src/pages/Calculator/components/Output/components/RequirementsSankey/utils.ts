@@ -4,11 +4,11 @@ export type TreeNode<T> = T & { children: TreeNode<T>[]; depth: number };
 
 const UNKNOWN_ROOT_ITEM_ERROR = "Unknown item required with ID: ";
 
-type FlatRequirement = Omit<Requirement, "creators" | "__typename" | "id">;
-type FlattenedDemand = FlatRequirement & { id: string };
+type FlatRequirement = Omit<Requirement, "creators" | "__typename">;
+
 export type RequirementTreeNode = TreeNode<FlatRequirement>;
 
-const flattenDemands = (requirement: Requirement): FlattenedDemand[] => {
+const flattenDemands = (requirement: Requirement): FlatRequirement[] => {
     const demandMap = new Map<string, [string, number]>();
     for (const creator of requirement.creators) {
         for (const demand of creator.demands) {
@@ -19,7 +19,6 @@ const flattenDemands = (requirement: Requirement): FlattenedDemand[] => {
             ]);
         }
     }
-
     return Array.from(demandMap.entries()).map(([id, [name, amount]]) => ({
         id,
         name,
@@ -28,10 +27,10 @@ const flattenDemands = (requirement: Requirement): FlattenedDemand[] => {
 };
 
 const convertRequirementToNode = (
-    { name, amount }: Pick<Requirement, "name" | "amount">,
+    { id, name, amount }: Pick<Requirement, "id" | "name" | "amount">,
     children: RequirementTreeNode[] = [],
     depth = 0,
-): RequirementTreeNode => ({ name, amount, children, depth });
+): RequirementTreeNode => ({ id, name, amount, children, depth });
 
 const createRequirementMap = (requirements: Requirement[]) =>
     new Map<string, Requirement>(
@@ -61,6 +60,7 @@ const createTree = (
 
         return convertRequirementToNode(
             {
+                id: requirement.id,
                 name: requirement.name,
                 amount: amount ?? requirement.amount,
             },

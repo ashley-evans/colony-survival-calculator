@@ -11,7 +11,7 @@ function countDigitsAfterDecimal(output: number): number {
     return split ? split.length : 0;
 }
 
-function roundOutput(output: number): string {
+function roundOutput(language: string, output: number): string {
     const decimalDigits = countDigitsAfterDecimal(output);
     const approx = output + Number.EPSILON;
     if (approx < 0.1) {
@@ -28,7 +28,7 @@ function roundOutput(output: number): string {
         return `≈${Math.round(approx * 10) / 10}`;
     }
 
-    return output.toString();
+    return output.toLocaleString(language);
 }
 
 export { roundOutput };
