@@ -102,5 +102,16 @@
     "about": {
         "version": "Výpočty jsou správné pro verzi: {{version}} ({{date}})",
         "source": "Výpočty používají veřejné herní datové soubory z <repoLink>repozitáře Colony Survival</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Došlo k chybě, zkuste to prosím znovu.",
+        "INVALID_ITEM_ID": "Neplatné ID položky, musí být neprázdný řetězec",
+        "INVALID_WORKERS": "Neplatný počet pracovníků, musí být kladné číslo",
+        "INVALID_TARGET": "Neplatný cílový výstup, musí být kladné číslo",
+        "UNKNOWN_ITEM": "Neznámá položka",
+        "TOOL_LEVEL": "Položku nelze vytvořit s dostupnými nástroji, minimální nástroj je: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Položku nelze vytvořit s dostupnými nástroji, vyžaduje strojní nástroje",
+        "MULTIPLE_OVERRIDE": "Pro položku bylo zadáno více než jedno přepsání výrobce: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Položku nelze vytvořit s aktuálním přepsáním"
     }
 }

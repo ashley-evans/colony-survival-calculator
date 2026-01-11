@@ -102,5 +102,16 @@
     "about": {
         "version": "计算适用于版本：{{version}}（{{date}}）",
         "source": "计算使用<repoLink>Colony Survival仓库</repoLink>中的公开游戏数据文件。"
+    },
+    "errors": {
+        "UNKNOWN": "发生错误，请重试。",
+        "INVALID_ITEM_ID": "无效的物品ID，必须为非空字符串",
+        "INVALID_WORKERS": "无效的工人数量，必须为正整数",
+        "INVALID_TARGET": "无效的目标数量，必须为正整数",
+        "UNKNOWN_ITEM": "未知物品",
+        "TOOL_LEVEL": "无法使用现有工具制作该物品，最低工具要求：{{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "无法使用现有工具制作该物品，需要机械工具",
+        "MULTIPLE_OVERRIDE": "为同一物品指定了多个生产者覆盖：{{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "使用当前覆盖设置无法制作该物品"
     }
 }

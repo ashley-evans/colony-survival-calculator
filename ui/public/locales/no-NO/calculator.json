@@ -102,5 +102,16 @@
     "about": {
         "version": "Beregningene er korrekte for versjon: {{version}} ({{date}})",
         "source": "Beregningene bruker offentlige spilldatafiler fra <repoLink>Colony Survival-repositoriet</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Det oppstod en feil, vennligst prøv igjen.",
+        "INVALID_ITEM_ID": "Ugyldig gjenstand-ID, må være en ikke-tom tekststreng",
+        "INVALID_WORKERS": "Ugyldig antall arbeidere, må være et positivt tall",
+        "INVALID_TARGET": "Ugyldig målmengde, må være et positivt tall",
+        "UNKNOWN_ITEM": "Ukjent gjenstand",
+        "TOOL_LEVEL": "Kan ikke lage gjenstanden med tilgjengelige verktøy, minimumsverktøy er: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Kan ikke lage gjenstanden med tilgjengelige verktøy, krever maskinverktøy",
+        "MULTIPLE_OVERRIDE": "Mer enn én produsentoverstyring angitt for: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Gjenstanden kan ikke lages med gjeldende overstyringer"
     }
 }

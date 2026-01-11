@@ -102,5 +102,16 @@
     "about": {
         "version": "Obliczenia są poprawne dla wersji: {{version}} ({{date}})",
         "source": "Obliczenia wykorzystują publiczne pliki danych gry z <repoLink>repozytorium Colony Survival</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Wystąpił błąd, spróbuj ponownie.",
+        "INVALID_ITEM_ID": "Nieprawidłowy ID przedmiotu, musi być niepustym ciągiem znaków",
+        "INVALID_WORKERS": "Nieprawidłowa liczba pracowników, musi być liczbą dodatnią",
+        "INVALID_TARGET": "Nieprawidłowa docelowa ilość, musi być liczbą dodatnią",
+        "UNKNOWN_ITEM": "Nieznany przedmiot",
+        "TOOL_LEVEL": "Nie można utworzyć przedmiotu z dostępnymi narzędziami, minimalne narzędzie to: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Nie można utworzyć przedmiotu z dostępnymi narzędziami, wymagane są narzędzia maszynowe",
+        "MULTIPLE_OVERRIDE": "Podano więcej niż jedno nadpisanie producenta dla: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Przedmiotu nie można utworzyć z aktualnymi nadpisaniami"
     }
 }

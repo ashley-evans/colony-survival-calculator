@@ -102,5 +102,16 @@
     "about": {
         "version": "計算はバージョン {{version}} ({{date}}) に対応しています",
         "source": "計算は<repoLink>Colony Survivalリポジトリ</repoLink>の公開ゲームデータファイルを使用しています。"
+    },
+    "errors": {
+        "UNKNOWN": "エラーが発生しました。もう一度お試しください。",
+        "INVALID_ITEM_ID": "無効なアイテムIDです。空でない文字列を入力してください",
+        "INVALID_WORKERS": "無効な労働者数です。正の整数を入力してください",
+        "INVALID_TARGET": "無効な目標数量です。正の整数を入力してください",
+        "UNKNOWN_ITEM": "不明なアイテムです",
+        "TOOL_LEVEL": "利用可能なツールではアイテムを作成できません。最低限必要なツール: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "利用可能なツールではアイテムを作成できません。機械ツールが必要です",
+        "MULTIPLE_OVERRIDE": "生産者の上書きが複数指定されています: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "現在の上書き設定ではアイテムを作成できません"
     }
 }

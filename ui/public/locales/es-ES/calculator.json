@@ -102,5 +102,16 @@
     "about": {
         "version": "Los cálculos son correctos para la versión: {{version}} ({{date}})",
         "source": "Los cálculos usan archivos de datos públicos del <repoLink>repositorio de Colony Survival</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Se produjo un error, por favor inténtalo de nuevo.",
+        "INVALID_ITEM_ID": "ID de objeto no válido, debe ser una cadena no vacía",
+        "INVALID_WORKERS": "Número de trabajadores no válido, debe ser un número positivo",
+        "INVALID_TARGET": "Producción objetivo no válida, debe ser un número positivo",
+        "UNKNOWN_ITEM": "Objeto desconocido",
+        "TOOL_LEVEL": "No se puede crear el objeto con las herramientas disponibles, herramienta mínima requerida: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "No se puede crear el objeto con las herramientas disponibles, requiere herramientas mecánicas",
+        "MULTIPLE_OVERRIDE": "Se ha proporcionado más de una sobrescritura de productor para: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "El objeto no se puede crear con las sobrescrituras actuales"
     }
 }

@@ -102,5 +102,16 @@
     "about": {
         "version": "Berechnungen sind korrekt für Version: {{version}} ({{date}})",
         "source": "Berechnungen verwenden öffentliche Spieldateien aus dem <repoLink>Colony Survival Repository</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "Ein Fehler ist aufgetreten, bitte versuchen Sie es erneut.",
+        "INVALID_ITEM_ID": "Ungültige Gegenstands-ID, muss eine nicht-leere Zeichenkette sein",
+        "INVALID_WORKERS": "Ungültige Arbeiteranzahl, muss eine positive Zahl sein",
+        "INVALID_TARGET": "Ungültiger Zielwert, muss eine positive Zahl sein",
+        "UNKNOWN_ITEM": "Unbekannter Gegenstand",
+        "TOOL_LEVEL": "Gegenstand kann mit verfügbaren Werkzeugen nicht hergestellt werden, Mindestwerkzeug ist: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Gegenstand kann mit verfügbaren Werkzeugen nicht hergestellt werden, Maschinenwerkzeuge erforderlich",
+        "MULTIPLE_OVERRIDE": "Mehr als eine Herstellerüberschreibung für: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Gegenstand kann mit aktuellen Überschreibungen nicht hergestellt werden"
     }
 }
