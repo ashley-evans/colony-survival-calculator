@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client/react";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { gql } from "../../../../graphql/__generated__";
 import { Icon, LargeAddButton, OverrideListContainer } from "./styles";
@@ -62,6 +63,8 @@ function CreatorOverrides({
     onOverridesUpdate,
 }: CreatorOverridesProps) {
     const { loading, data } = useQuery(GET_ITEMS_WITH_MULTIPLE_CREATORS);
+    const { t } = useTranslation();
+
     const [creatorMap, setCreatorMap] = useState<CreatorMap>(new Map());
     const [itemMap, setItemMap] = useState<ItemMap>(new Map());
     const [allItems, setAllItems] = useState<NamedEntity[]>([]);
@@ -157,13 +160,10 @@ function CreatorOverrides({
 
     return (
         <>
-            <span>
-                By default, the calculator will use the recipe with the highest
-                output per second unless an override is applied.
-            </span>
-            {loading ? <span>Loading overrides...</span> : null}
+            <span>{t("settings.description")}</span>
+            {loading ? <span>{t("settings.loading")}</span> : null}
             {!loading && data?.item.length === 0 ? (
-                <span role="alert">No overrides available</span>
+                <span role="alert">{t("settings.none")}</span>
             ) : null}
             {data && data.item.length > 0 ? (
                 <OverrideListContainer>
@@ -192,7 +192,7 @@ function CreatorOverrides({
                                 setOverride(item.id, creators[0].id);
                             }}
                         >
-                            <span>Add creator override</span>
+                            <span>{t("settings.selector.add")}</span>
                             <Icon icon={faAdd} />
                         </LargeAddButton>
                     ) : null}

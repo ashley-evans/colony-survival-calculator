@@ -1,5 +1,6 @@
 import { useState, Suspense, lazy } from "react";
 import { useQuery } from "@apollo/client/react";
+import { Trans, useTranslation } from "react-i18next";
 
 import ItemSelector from "./components/ItemSelector";
 import OutputUnitSelector from "./components/OutputUnitSelector";
@@ -103,6 +104,7 @@ function CalculatorTab({
             skip: !selectedItemID,
         },
     );
+    const { t } = useTranslation();
 
     const handleSelectedItemTotalChange = (total: Target) => {
         if ("amount" in total) {
@@ -122,7 +124,7 @@ function CalculatorTab({
     if (itemNamesLoading) {
         return (
             <PageContainer>
-                <span>Loading items...</span>
+                <span>{t("calculator.items.loading")}</span>
             </PageContainer>
         );
     }
@@ -131,7 +133,7 @@ function CalculatorTab({
 
     return (
         <>
-            <TabHeader>Desired output:</TabHeader>
+            <TabHeader>{t("calculator.header")}</TabHeader>
             {itemNameData?.distinctItemNames &&
             itemNameData.distinctItemNames.length > 0 ? (
                 <>
@@ -151,7 +153,7 @@ function CalculatorTab({
                     />
                     <MachineToolCheckbox
                         onChange={setHasMachineTools}
-                        label="Machine tools available?"
+                        label={t("calculator.tools.machineTools.label")}
                         checked={hasMachineTools}
                     />
                     <OutputUnitSelector
@@ -164,13 +166,14 @@ function CalculatorTab({
                 <>
                     {itemDetailsData?.item[0]?.size ? (
                         <span>
-                            Calculations use optimal farm size:{" "}
-                            {itemDetailsData?.item[0].size.width} x{" "}
-                            {itemDetailsData?.item[0].size.height}
+                            {t("calculator.items.optimalFarmSize", {
+                                width: itemDetailsData?.item[0].size.width,
+                                height: itemDetailsData?.item[0].size.height,
+                            })}
                         </span>
                     ) : null}
                     {target && selectedItemID ? (
-                        <Suspense fallback={<span>Loading...</span>}>
+                        <Suspense fallback={<span>{t("loading")}</span>}>
                             <Output
                                 itemID={selectedItemID}
                                 target={target}
@@ -188,13 +191,10 @@ function CalculatorTab({
             </ErrorBoundary>
             {itemNameData?.distinctItemNames &&
             itemNameData.distinctItemNames.length < 1 ? (
-                <span role="alert">Unable to fetch known items</span>
+                <span role="alert">{t("calculator.items.errors.known")}</span>
             ) : null}
             {networkError ? (
-                <span role="alert">
-                    An error occurred fetching item details, please refresh the
-                    page and try again.
-                </span>
+                <span role="alert">{t("calculator.items.errors.network")}</span>
             ) : null}
         </>
     );
@@ -210,9 +210,11 @@ function SettingsTab({
         setSelectedCreatorOverrides,
     ],
 }: SettingsTabProps) {
+    const { t } = useTranslation();
+
     return (
         <>
-            <TabHeader>Overrides:</TabHeader>
+            <TabHeader>{t("settings.header")}</TabHeader>
             <CreatorOverrides
                 defaultOverrides={selectedCreatorOverrides}
                 onOverridesUpdate={setSelectedCreatorOverrides}
@@ -222,17 +224,25 @@ function SettingsTab({
 }
 
 function AboutTab() {
+    const { t } = useTranslation();
+
     return (
         <>
             <span>
-                Calculations are correct for version: 0.12.0.1 (2024-11-29)
+                {t("about.version", {
+                    version: "0.12.0.1",
+                    date: "2024-11-29",
+                })}
             </span>
             <span>
-                Calculations use public game data files from the{" "}
-                <a href="https://github.com/pipliz/ColonySurvival">
-                    Colony Survival repository
-                </a>
-                .
+                <Trans
+                    i18nKey="about.source"
+                    components={{
+                        repoLink: (
+                            <a href="https://github.com/pipliz/ColonySurvival" />
+                        ),
+                    }}
+                />
             </span>
         </>
     );

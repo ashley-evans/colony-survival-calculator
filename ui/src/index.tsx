@@ -5,6 +5,7 @@ import { Amplify } from "aws-amplify";
 import { ApolloProvider } from "@apollo/client/react";
 
 import RouterProvider from "./routes/AppRouterProvider";
+import "./i18n";
 
 const region = import.meta.env.VITE_AWS_REGION;
 

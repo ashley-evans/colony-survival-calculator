@@ -1,12 +1,12 @@
 import { AvailableTools } from "../../../graphql/__generated__/graphql";
 
-const ToolSelectorMappings: Readonly<Record<AvailableTools, string>> = {
-    [AvailableTools.None]: "None",
-    [AvailableTools.Stone]: "Stone",
-    [AvailableTools.Copper]: "Copper",
-    [AvailableTools.Iron]: "Iron",
-    [AvailableTools.Bronze]: "Bronze",
-    [AvailableTools.Steel]: "Steel",
+const ToolSelectorI18NKeyMapping: Readonly<Record<AvailableTools, string>> = {
+    [AvailableTools.None]: "none",
+    [AvailableTools.Stone]: "stone",
+    [AvailableTools.Copper]: "copper",
+    [AvailableTools.Iron]: "iron",
+    [AvailableTools.Bronze]: "bronze",
+    [AvailableTools.Steel]: "steel",
 };
 
-export { ToolSelectorMappings };
+export { ToolSelectorI18NKeyMapping };

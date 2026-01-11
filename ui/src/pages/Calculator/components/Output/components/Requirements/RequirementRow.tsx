@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { BreakdownRow } from "./styles";
 import {
     MultipleCreatorRequirementsTableRow,
@@ -13,12 +15,14 @@ type CreatorRowProps = {
 } & Pick<RequirementsRowProps, "toggleBreakdown">;
 
 function CreatorRow({ row, toggleBreakdown }: CreatorRowProps) {
+    const { t } = useTranslation();
+
     const expansionProperties =
         row.demands.length > 0
             ? {
                   isExpanded: row.isExpanded,
-                  expandLabel: "Expand demand breakdown",
-                  collapseLabel: "Collapse demand breakdown",
+                  expandLabel: t("calculator.output.demand.expand"),
+                  collapseLabel: t("calculator.output.demand.collapse"),
                   toggleExpansion: () => toggleBreakdown(row.key),
               }
             : {};
@@ -43,13 +47,15 @@ type MultipleCreatorProps = Pick<RequirementsRowProps, "toggleBreakdown"> & {
 };
 
 function MultipleCreatorRow({ row, toggleBreakdown }: MultipleCreatorProps) {
+    const { t } = useTranslation();
+
     return (
         <>
             <Row
                 row={row}
                 isExpanded={row.isExpanded}
-                expandLabel="Expand creator breakdown"
-                collapseLabel="Collapse creator breakdown"
+                expandLabel={t("calculator.output.creator.expand")}
+                collapseLabel={t("calculator.output.creator.collapse")}
                 toggleExpansion={() => toggleBreakdown(row.key)}
             />
             {row.isExpanded

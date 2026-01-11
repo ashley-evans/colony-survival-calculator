@@ -4,6 +4,7 @@ import { ThemeProvider } from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { darkTheme, lightTheme } from "./theme";
 import {
@@ -20,6 +21,7 @@ const LIGHT_THEME_MEDIA_MATCH = "(prefers-color-scheme: light)";
 
 function SiteLayout() {
     const [isDarkTheme, setDarkTheme] = useState<boolean>(true);
+    const { t } = useTranslation();
 
     useEffect(() => {
         function handleColourSchemePreference(
@@ -66,9 +68,11 @@ function SiteLayout() {
                     <Icons>
                         <span
                             role="button"
-                            aria-label={`Change to ${
-                                isDarkTheme ? "light" : "dark"
-                            } theme`}
+                            aria-label={t(
+                                isDarkTheme
+                                    ? "layout.icons.changeToLight"
+                                    : "layout.icons.changeToDark",
+                            )}
                             onClick={() => setDarkTheme(!isDarkTheme)}
                             tabIndex={0}
                         >
@@ -82,7 +86,7 @@ function SiteLayout() {
                             to={
                                 "https://github.com/ashley-evans/colony-survival-calculator"
                             }
-                            aria-label="View the source code on GitHub"
+                            aria-label={t("layout.icons.viewSource")}
                         >
                             <FontAwesomeIcon icon={faGithub} size="2x" />
                         </Link>

@@ -12,8 +12,22 @@ import {
     AvailableTools,
     OutputUnit,
 } from "../../../../graphql/__generated__/graphql";
-import { OutputUnitSelectorMappings, ToolSelectorMappings } from "../../utils";
 import { selectOption } from "../../../../test";
+
+const ToolSelectorMappings: Readonly<Record<AvailableTools, string>> = {
+    [AvailableTools.None]: "None",
+    [AvailableTools.Stone]: "Stone",
+    [AvailableTools.Copper]: "Copper",
+    [AvailableTools.Iron]: "Iron",
+    [AvailableTools.Bronze]: "Bronze",
+    [AvailableTools.Steel]: "Steel",
+};
+
+const OutputUnitSelectorMappings: Readonly<Record<OutputUnit, string>> = {
+    [OutputUnit.Seconds]: "Seconds",
+    [OutputUnit.Minutes]: "Minutes",
+    [OutputUnit.GameDays]: "Game days",
+};
 
 type SelectItemAndTargetBaseParams = {
     itemName?: string;

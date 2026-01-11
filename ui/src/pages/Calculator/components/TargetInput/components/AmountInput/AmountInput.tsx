@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Input } from "../../../../../../common/components";
 
 export type AmountInputProps = {
@@ -6,6 +8,8 @@ export type AmountInputProps = {
 };
 
 function AmountInput({ onAmountChange, defaultAmount }: AmountInputProps) {
+    const { t } = useTranslation();
+
     const parseValue = (value: unknown): number => {
         const input = Number(value);
         if (!isNaN(input) && input > 0) {
@@ -17,12 +21,12 @@ function AmountInput({ onAmountChange, defaultAmount }: AmountInputProps) {
 
     return (
         <Input
-            label="Output item target:"
+            label={t("calculator.target.amount.label")}
             parseValue={parseValue}
             onChange={onAmountChange}
-            errorMessage="Invalid output item target, must be a positive non-zero whole number"
+            errorMessage={t("calculator.target.amount.error")}
             inputMode="numeric"
-            clearIconLabel="Clear output item target"
+            clearIconLabel={t("calculator.target.amount.clear")}
             defaultValue={defaultAmount?.toString()}
         />
     );

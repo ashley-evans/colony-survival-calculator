@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import SiteLayout from "./components/SiteLayout/SiteLayout";
+import { useTranslation } from "react-i18next";
 
 const Calculator = lazy(() => import("../pages/Calculator/Calculator"));
 const MissingRoute = lazy(
@@ -17,8 +18,12 @@ type LazyLoadingWrapperProps = {
 };
 
 function LazyLoadingWrapper(props: LazyLoadingWrapperProps) {
+    const { t } = useTranslation();
+
     return (
-        <Suspense fallback={<div>Loading...</div>}>{props.children}</Suspense>
+        <Suspense fallback={<div>{t("loading")}</div>}>
+            {props.children}
+        </Suspense>
     );
 }
 

@@ -1,0 +1,106 @@
+{
+    "loading": "Loading...",
+    "missing": {
+        "content": "Oh no! You have gotten lost!",
+        "return": "Return to calculator"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Change to light theme",
+            "changeToDark": "Change to dark theme",
+            "viewSource": "View the source code on GitHub"
+        }
+    },
+    "calculator": {
+        "header": "Desired output:",
+        "items": {
+            "loading": "Loading items...",
+            "optimalFarmSize": "Calculations use optimal farm size: {{width}} x {{height}}",
+            "errors": {
+                "known": "Unable to fetch known items",
+                "network": "An error occurred fetching item details, please refresh the page and try again."
+            },
+            "selector": {
+                "label": "Item:",
+                "toggle": "Open item list",
+                "placeholder": "Select an item to use in calculations",
+                "clear": "Clear item input"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Output item workers:",
+                "error": "Invalid output item workers, must be a positive non-zero whole number",
+                "clear": "Clear output item workers"
+            },
+            "amount": {
+                "label": "Output item target:",
+                "error": "Invalid output item target, must be a positive non-zero whole number",
+                "clear": "Clear output item target"
+            }
+        },
+        "tools": {
+            "label": "Tools:",
+            "machineTools": {
+                "label": "Machine tools available?"
+            },
+            "mapping": {
+                "none": "None",
+                "stone": "Stone",
+                "copper": "Copper",
+                "iron": "Iron",
+                "bronze": "Bronze",
+                "steel": "Steel"
+            }
+        },
+        "output": {
+            "label": "Desired output units:",
+            "error": {
+                "unhandled": "An error occurred while calculating output, please change inputs and try again."
+            },
+            "units": {
+                "seconds": "Seconds",
+                "minutes": "Minutes",
+                "gameDays": "Game days"
+            },
+            "loading": "Calculating output...",
+            "header": "Requirements:",
+            "table": {
+                "item": "Item",
+                "creator": "Creator",
+                "demand": "Demand",
+                "amount": "Amount",
+                "workers": "Workers",
+                "total": "Total:"
+            },
+            "creator": {
+                "collapse": "Collapse creator breakdown",
+                "expand": "Expand creator breakdown"
+            },
+            "demand": {
+                "collapse": "Collapse demand breakdown",
+                "expand": "Expand demand breakdown"
+            }
+        }
+    },
+    "settings": {
+        "header": "Overrides:",
+        "description": "By default, the calculator will use the recipe with the highest output per second unless an override is applied.",
+        "loading": "Loading overrides...",
+        "none": "No overrides available",
+        "selector": {
+            "item": {
+                "label": "Item:"
+            },
+            "creator": {
+                "label": "Creator:"
+            },
+            "remove": "Remove",
+            "add": "Add creator override"
+        }
+    },
+    "about": {
+        "version": "Calculations are correct for version: {{version}} ({{date}})",
+        "source": "Calculations use public game data files from the <repoLink>Colony Survival repository</repoLink>."
+    }
+}

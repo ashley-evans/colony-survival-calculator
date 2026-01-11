@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 import { AutoCompleteSelector } from "../../../../common/components";
 import { ItemName } from "../../../../graphql/__generated__/graphql";
@@ -14,6 +15,7 @@ function ItemSelector({
     defaultSelectedItemID,
     onItemChange,
 }: ItemSelectorProps) {
+    const { t } = useTranslation();
     const handleItemChange = (selectedItem: ItemName | null) => {
         if (selectedItem) onItemChange(selectedItem.id);
     };
@@ -37,10 +39,10 @@ function ItemSelector({
     return (
         <AutoCompleteSelector
             items={items}
-            labelText="Item:"
-            toggleLabelText="Open item list"
-            inputPlaceholder="Select an item to use in calculations"
-            clearIconLabelText="Clear item input"
+            labelText={t("calculator.items.selector.label")}
+            toggleLabelText={t("calculator.items.selector.toggle")}
+            inputPlaceholder={t("calculator.items.selector.placeholder")}
+            clearIconLabelText={t("calculator.items.selector.clear")}
             defaultSelectedItem={defaultItem}
             itemToKey={(value) => value.id}
             itemToDisplayText={(value) => value.name}
