@@ -563,14 +563,17 @@ describe("requirements rendering given requirements", () => {
                 workers: 5,
             });
             await screen.findByText(expected.creators[0].creator);
-
             server.use(
                 createCalculatorOutputResponseHandler(
                     createRequirements([requirementsWithSingleCreator[0]]),
                 ),
             );
-
             await selectTool(AvailableTools.Steel);
+            server.use(
+                createCalculatorOutputResponseHandler(
+                    createRequirements([expected]),
+                ),
+            );
             await selectTool(AvailableTools.None);
             await screen.findByText(expected.creators[0].creator);
 
