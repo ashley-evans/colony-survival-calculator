@@ -62,8 +62,10 @@ function CreatorOverrides({
     defaultOverrides,
     onOverridesUpdate,
 }: CreatorOverridesProps) {
-    const { loading, data } = useQuery(GET_ITEMS_WITH_MULTIPLE_CREATORS);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { loading, data } = useQuery(GET_ITEMS_WITH_MULTIPLE_CREATORS, {
+        variables: { locale: i18n.language },
+    });
 
     const [creatorMap, setCreatorMap] = useState<CreatorMap>(new Map());
     const [itemMap, setItemMap] = useState<ItemMap>(new Map());

@@ -181,6 +181,7 @@ test("queries calculator output if item and workers inputted with default unit s
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -209,6 +210,7 @@ test("queries calculator output if item and workers inputted with non-default un
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -237,6 +239,7 @@ test("queries calculator output if item and target amount inputted with default 
         unit: OutputUnit.GameDays,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -264,6 +267,7 @@ test("queries calculator output if item and target amount inputted with non-defa
         unit: OutputUnit.Minutes,
         maxAvailableTool: "NONE",
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -349,6 +353,7 @@ test("queries optimal output and requirements with machine tool availability onc
             unit: OutputUnit.Minutes,
             maxAvailableTool: "NONE",
             hasMachineTools: true,
+            locale: "en-US",
         },
     );
 
@@ -471,6 +476,7 @@ describe("debounces output requests", () => {
                 amount: null,
                 workers: 3,
                 unit: expectedOutputUnit,
+                locale: "en-US",
             },
         );
 
@@ -536,6 +542,7 @@ describe("debounces output requests", () => {
                 amount: 3,
                 workers: null,
                 unit: expectedOutputUnit,
+                locale: "en-US",
             },
         );
 

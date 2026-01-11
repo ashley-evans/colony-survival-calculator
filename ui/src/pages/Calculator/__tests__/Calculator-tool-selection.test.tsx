@@ -172,6 +172,7 @@ test("queries calculator with provided tool if non default selected", async () =
         unit: OutputUnit.Minutes,
         maxAvailableTool: expectedTool,
         hasMachineTools: false,
+        locale: "en-US",
     });
 });
 
@@ -190,6 +191,7 @@ test("queries optimal output again if tool is changed after first query", async 
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
             hasMachineTools: false,
+            locale: "en-US",
         },
     );
 
@@ -235,6 +237,7 @@ test("queries requirements with provided tool if non default selected", async ()
         maxAvailableTool: expectedTool,
         hasMachineTools: false,
         unit: OutputUnit.Minutes,
+        locale: "en-US",
     });
 });
 
@@ -253,6 +256,7 @@ test("queries requirements again if tool is changed after first query", async ()
             unit: OutputUnit.Minutes,
             maxAvailableTool: expectedTool,
             hasMachineTools: false,
+            locale: "en-US",
         },
     );
 
@@ -286,6 +290,7 @@ test("queries item details with provided tool if non default selected", async ()
                     hasMachineTools: false,
                 },
             },
+            locale: "en-US",
         },
     );
 
@@ -315,6 +320,7 @@ test("queries item details again if tool is changed after first query", async ()
                     hasMachineTools: false,
                 },
             },
+            locale: "en-US",
         },
     );
 
@@ -406,6 +412,7 @@ describe("machine tool selection", () => {
                         hasMachineTools: true,
                     },
                 },
+                locale: "en-US",
             },
         );
 

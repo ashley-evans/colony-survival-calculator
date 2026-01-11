@@ -79,12 +79,12 @@ function Output({
     creatorOverrides,
     onSelectedItemTotalChange,
 }: OutputProps) {
+    const { t, i18n } = useTranslation();
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
         GET_CALCULATOR_OUTPUT,
         { fetchPolicy: "no-cache" },
     );
     const [debouncedTarget] = useDebounce(target, DEFAULT_DEBOUNCE);
-    const { t } = useTranslation();
     const [hasInvalidResponse, setHasInvalidResponse] = useState<boolean>();
 
     useEffect(() => {
@@ -106,6 +106,7 @@ function Output({
                 maxAvailableTool,
                 hasMachineTools,
                 creatorOverrides: creatorOverridesFilter,
+                locale: i18n.language,
             },
         });
     }, [
@@ -115,6 +116,7 @@ function Output({
         maxAvailableTool,
         hasMachineTools,
         creatorOverrides,
+        i18n.language,
     ]);
 
     useEffect(() => {

@@ -85,11 +85,14 @@ function CalculatorTab({
     outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
     selectedCreatorOverrides,
 }: CalculatorTabProps) {
+    const { t, i18n } = useTranslation();
     const {
         loading: itemNamesLoading,
         data: itemNameData,
         error: itemNameError,
-    } = useQuery(GET_ITEM_NAMES_QUERY);
+    } = useQuery(GET_ITEM_NAMES_QUERY, {
+        variables: { locale: i18n.language },
+    });
     const { data: itemDetailsData, error: itemDetailsError } = useQuery(
         GET_ITEM_DETAILS_QUERY,
         {
@@ -100,11 +103,11 @@ function CalculatorTab({
                     hasMachineTools,
                     selectedCreatorOverrides,
                 ),
+                locale: i18n.language,
             },
             skip: !selectedItemID,
         },
     );
-    const { t } = useTranslation();
 
     const handleSelectedItemTotalChange = (total: Target) => {
         if ("amount" in total) {

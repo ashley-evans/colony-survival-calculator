@@ -90,7 +90,9 @@ test("queries all known item names", async () => {
     render(<Calculator />, expectedGraphQLAPIURL);
     const { matchedRequestDetails } = await expectedRequest;
 
-    expect(matchedRequestDetails.variables).toEqual({});
+    expect(matchedRequestDetails.variables).toEqual({
+        locale: "en-US",
+    });
 });
 
 test("renders desired output header", async () => {
@@ -327,6 +329,7 @@ test("requests item details for newly selected item if selection is changed", as
                 id: expectedItem.id,
                 optimal: { maxAvailableTool: "NONE", hasMachineTools: false },
             },
+            locale: "en-US",
         },
     );
 
