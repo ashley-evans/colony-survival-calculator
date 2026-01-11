@@ -2,11 +2,12 @@ import { Graph, depthFirstSearch } from "graph-data-structure";
 
 import { DefaultToolset, TranslatedItem } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
-import { INTERNAL_SERVER_ERROR } from "./errors";
 import {
     ToolModifierValues,
     getMaxToolModifier,
     groupItemsByID,
+    ERROR_MESSAGE_MAPPING,
+    ErrorCode,
 } from "../../../common";
 
 const ROOT_GRAPH_KEY = "root";
@@ -64,7 +65,9 @@ function createItemGraph(
         for (const requirement of item.requires) {
             const recipes = recipesMap.get(requirement.id);
             if (!recipes) {
-                throw new Error(INTERNAL_SERVER_ERROR);
+                throw new Error(
+                    ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+                );
             }
 
             for (const recipe of recipes) {
@@ -93,7 +96,9 @@ function filterByCreatorOverrides(
     const removeUncreatableNodes = (current: string) => {
         const item = itemMap.get(current);
         if (!item) {
-            throw new Error(INTERNAL_SERVER_ERROR);
+            throw new Error(
+                ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+            );
         }
 
         const adjacent = [...(graph.adjacent(current) || new Set())];

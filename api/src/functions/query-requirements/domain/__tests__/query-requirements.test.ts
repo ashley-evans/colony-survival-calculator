@@ -11,7 +11,7 @@ import {
     QueryRequirementsParams,
     Requirement,
 } from "../../interfaces/query-requirements-primary-port";
-import { OutputUnit } from "../../../../common";
+import { OutputUnit, ErrorCode, UserError } from "../../../../common";
 
 vi.mock("../../adapters/mongodb-requirements-adapter", () => ({
     queryRequirements: vi.fn(),
@@ -38,9 +38,7 @@ beforeEach(() => {
 });
 
 test("throws an error given an empty string as an item ID", async () => {
-    const expectedError = new Error(
-        "Invalid item ID provided, must be a non-empty string",
-    );
+    const expectedError = new UserError(ErrorCode.INVALID_ITEM_ID);
 
     expect.assertions(1);
     await expect(
@@ -54,9 +52,7 @@ test.each([
 ])(
     "throws an error given number of workers that is %s",
     async (_: string, workers: number) => {
-        const expectedError = new Error(
-            "Invalid number of workers provided, must be a positive number",
-        );
+        const expectedError = new UserError(ErrorCode.INVALID_WORKERS);
 
         expect.assertions(1);
         await expect(
@@ -95,7 +91,7 @@ test.each([
 
 test("throws an error if no requirements are returned at all (item does not exist)", async () => {
     mockMongoDBQueryRequirements.mockResolvedValue([]);
-    const expectedError = new Error("Unknown item provided");
+    const expectedError = new UserError(ErrorCode.UNKNOWN_ITEM);
 
     expect.assertions(1);
     await expect(
@@ -111,7 +107,7 @@ test("throws an error if the provided item details are not returned from DB", as
         requirements: [],
     });
     mockMongoDBQueryRequirements.mockResolvedValue([item]);
-    const expectedError = new Error("Unknown item provided");
+    const expectedError = new UserError(ErrorCode.UNKNOWN_ITEM);
 
     expect.assertions(1);
     await expect(
@@ -732,7 +728,9 @@ describe("handles tool modifiers", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([item]);
-            const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+                requiredTool: minimum,
+            });
 
             expect.assertions(1);
             await expect(
@@ -798,7 +796,9 @@ describe("handles tool modifiers", () => {
                 item,
                 requiredItem,
             ]);
-            const expectedError = `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`;
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+                requiredTool: minimum,
+            });
 
             expect.assertions(1);
             await expect(
@@ -830,7 +830,9 @@ describe("handles tool modifiers", () => {
             maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([requiredItem, item]);
-        const expectedError = `Unable to create item with available tools, minimum tool is: ${expectedMinimumTool}`;
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: expectedMinimumTool,
+        });
 
         expect.assertions(1);
         await expect(
@@ -1596,7 +1598,9 @@ describe("multiple recipe handling", () => {
             moreOptimalItemRecipe,
             requiredItem,
         ]);
-        const expectedError = `Unable to create item with available tools, minimum tool is: stone`;
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: "stone" as DefaultToolset,
+        });
 
         expect.assertions(1);
         await expect(
@@ -1787,7 +1791,9 @@ describe("creator override handling", () => {
             creatorID: overrideCreator,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
-        const expectedError = `Invalid input: More than one creator override provided for: ${recipe.id}`;
+        const expectedError = new UserError(ErrorCode.MULTIPLE_OVERRIDE_ERROR, {
+            itemID: recipe.id,
+        });
 
         expect.assertions(1);
         await expect(
@@ -2361,8 +2367,11 @@ describe("handles machine tools", () => {
         output: 6,
         requirements: [{ id: machineToolsItem.id, amount: 5 }],
     });
-    const expectedRequiredToolsError = new Error(
-        "Unable to create item with available tools, requires machine tools",
+    const expectedRequiredToolsError = new UserError(
+        ErrorCode.TOOL_LEVEL_ERROR,
+        {
+            requiredTool: "machine",
+        },
     );
 
     beforeEach(() => {
@@ -2407,7 +2416,9 @@ describe("handles machine tools", () => {
     );
 
     test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
-        const expectedError = `Unable to create item with available tools, minimum tool is: steel`;
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: "steel",
+        });
         const baseItemSteelMin = createTranslatedItem({
             name: "base item",
             createTime: 3,
@@ -2527,9 +2538,7 @@ describe("handles calculating requirements for target output", () => {
     ])(
         "throws an error given target amount that is %s",
         async (_: string, amount: number) => {
-            const expectedError = new Error(
-                "Invalid target output provided, must be a positive number",
-            );
+            const expectedError = new UserError(ErrorCode.INVALID_TARGET);
 
             expect.assertions(1);
             await expect(

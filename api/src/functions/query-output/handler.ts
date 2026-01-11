@@ -2,25 +2,7 @@ import type { OutputResult, QueryOutputArgs } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { calculateOutput } from "./domain/output-calculator";
 import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
-import {
-    INVALID_ITEM_ID_ERROR,
-    INVALID_WORKERS_ERROR,
-    TOOL_LEVEL_ERROR_PREFIX,
-    UNKNOWN_ITEM_ERROR,
-} from "./domain/errors";
-
-const exactUserErrors = new Set([
-    INVALID_ITEM_ID_ERROR,
-    INVALID_WORKERS_ERROR,
-    UNKNOWN_ITEM_ERROR,
-]);
-
-const isUserError = ({ message }: Error): boolean => {
-    return (
-        exactUserErrors.has(message) ||
-        message.startsWith(TOOL_LEVEL_ERROR_PREFIX)
-    );
-};
+import { UserError } from "../../common";
 
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
     event,
@@ -47,8 +29,12 @@ const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
 
         return { __typename: "OptimalOutput", amount: output };
     } catch (ex) {
-        if (ex instanceof Error && isUserError(ex)) {
-            return { __typename: "UserError", message: ex.message };
+        if (ex instanceof UserError) {
+            return {
+                __typename: "UserError",
+                code: ex.code,
+                details: ex.details ? JSON.stringify(ex.details) : null,
+            };
         }
 
         throw ex;

@@ -4,7 +4,7 @@ import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
 import { DefaultToolset, MachineToolset, Toolset } from "../../../../types";
-import { OutputUnit } from "../../../../common";
+import { ErrorCode, OutputUnit, UserError } from "../../../../common";
 
 vi.mock("../../adapters/mongodb-output-adapter", () => ({
     queryOutputDetails: vi.fn(),
@@ -36,9 +36,7 @@ beforeEach(() => {
 });
 
 test("throws an error given an empty string as an item ID", async () => {
-    const expectedError = new Error(
-        "Invalid item ID provided, must be a non-empty string",
-    );
+    const expectedError = new UserError(ErrorCode.INVALID_ITEM_ID);
 
     expect.assertions(1);
     await expect(
@@ -56,9 +54,7 @@ test.each([
 ])(
     "throws an error given number of workers that is %s",
     async (_: string, amount: number) => {
-        const expectedError = new Error(
-            "Invalid number of workers provided, must be a positive number",
-        );
+        const expectedError = new UserError(ErrorCode.INVALID_WORKERS);
 
         expect.assertions(1);
         await expect(
@@ -108,7 +104,7 @@ test("provides the creator name to database adapter if provided", async () => {
 
 test("throws an error if no item output details are returned from DB", async () => {
     mockQueryOutputDetails.mockResolvedValue([]);
-    const expectedError = new Error("Unknown item provided");
+    const expectedError = new UserError(ErrorCode.UNKNOWN_ITEM);
 
     expect.assertions(1);
     await expect(
@@ -202,9 +198,9 @@ describe("handles tool modifiers", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             mockQueryOutputDetails.mockResolvedValue([details]);
-            const expectedError = new Error(
-                `Unable to create item with available tools, minimum tool is: ${minimum.toLowerCase()}`,
-            );
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+                requiredTool: minimum.toLowerCase(),
+            });
 
             expect.assertions(1);
             await expect(
@@ -272,8 +268,12 @@ describe("handles machine tool recipes", () => {
         minimumTool: "machine" as MachineToolset,
         maximumTool: "machine" as MachineToolset,
     });
-    const expectedRequiredToolsError = new Error(
-        "Unable to create item with available tools, requires machine tools",
+
+    const expectedRequiredToolsError = new UserError(
+        ErrorCode.TOOL_LEVEL_ERROR,
+        {
+            requiredTool: "machine",
+        },
     );
 
     beforeEach(() => {
@@ -448,8 +448,9 @@ describe("multiple recipe handling", () => {
             }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
-        const expectedError =
-            "Unable to create item with available tools, minimum tool is: stone";
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: "stone",
+        });
 
         expect.assertions(1);
         await expect(

@@ -4,18 +4,14 @@ import {
     OutputUnitSecondMappings,
     calculateOutput as calculateItemOutput,
     getMinimumToolRequired,
+    ErrorCode,
+    UserError,
+    ERROR_MESSAGE_MAPPING,
 } from "../../../common";
 import { DefaultToolset } from "../../../types";
 import { queryOutputDetails } from "../adapters/mongodb-output-adapter";
 import { ItemOutputDetails } from "../interfaces/output-database-port";
 import type { QueryOutputPrimaryPort } from "../interfaces/query-output-primary-port";
-import {
-    INTERNAL_SERVER_ERROR,
-    INVALID_ITEM_ID_ERROR,
-    INVALID_WORKERS_ERROR,
-    UNKNOWN_ITEM_ERROR,
-    TOOL_LEVEL_ERROR_PREFIX,
-} from "./errors";
 
 async function getItemOutputDetails(
     id: string,
@@ -27,7 +23,7 @@ async function getItemOutputDetails(
             ...(creatorID ? { creatorID } : {}),
         });
     } catch {
-        throw new Error(INTERNAL_SERVER_ERROR);
+        throw new Error(ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR]);
     }
 }
 
@@ -69,16 +65,16 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
     creatorID,
 }) => {
     if (id === "") {
-        throw new Error(INVALID_ITEM_ID_ERROR);
+        throw new UserError(ErrorCode.INVALID_ITEM_ID);
     }
 
     if (workers <= 0) {
-        throw new Error(INVALID_WORKERS_ERROR);
+        throw new UserError(ErrorCode.INVALID_WORKERS);
     }
 
     const outputDetails = await getItemOutputDetails(id, creatorID);
     if (outputDetails.length === 0) {
-        throw new Error(UNKNOWN_ITEM_ERROR);
+        throw new UserError(ErrorCode.UNKNOWN_ITEM);
     }
 
     const creatableRecipes = filterCreatableItems(
@@ -91,11 +87,9 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
             outputDetails.map((details) => ({ ...details, id })),
         );
 
-        const errorSuffix = needsMachineTools
-            ? "requires machine tools"
-            : `minimum tool is: ${minimumDefault}`;
-
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
+        throw new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: needsMachineTools ? "machine" : minimumDefault,
+        });
     }
 
     return getMaxOutput(creatableRecipes, workers, unit, maxAvailableTool);

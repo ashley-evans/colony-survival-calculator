@@ -1,9 +1,10 @@
 interface BaseError {
-    message: String!
+    code: String!
 }
 
 type UserError implements BaseError {
-    message: String!
+    code: String!
+    details: String
 }
 
 type FarmSize {

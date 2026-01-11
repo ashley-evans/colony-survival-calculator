@@ -1,18 +1,9 @@
-import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
+import { AvailableToolsSchemaMap, OutputUnit, UserError } from "../../common";
 import type {
     QueryRequirementArgs,
     RequirementResult,
 } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
-import {
-    INVALID_ITEM_ID_ERROR,
-    INVALID_WORKERS_ERROR,
-    UNKNOWN_ITEM_ERROR,
-    TOOL_LEVEL_ERROR_PREFIX,
-    MULTIPLE_OVERRIDE_ERROR_PREFIX,
-    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
-    INVALID_TARGET_ERROR,
-} from "./domain/errors";
 import { queryRequirements } from "./domain/query-requirements";
 
 const INVALID_OUTPUT_UNIT_ARGUMENT_ERROR =
@@ -25,22 +16,6 @@ const amountFields = new Set([
     "creators/amount",
     "creators/demands/amount",
 ]);
-
-const exactUserErrors = new Set([
-    INVALID_ITEM_ID_ERROR,
-    INVALID_WORKERS_ERROR,
-    INVALID_TARGET_ERROR,
-    UNKNOWN_ITEM_ERROR,
-    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
-]);
-
-const isUserError = ({ message }: Error): boolean => {
-    return (
-        exactUserErrors.has(message) ||
-        message.startsWith(MULTIPLE_OVERRIDE_ERROR_PREFIX) ||
-        message.startsWith(TOOL_LEVEL_ERROR_PREFIX)
-    );
-};
 
 const isDefined = <T>(input: T | undefined | null): input is T => {
     return input !== undefined && input !== null;
@@ -117,8 +92,12 @@ const handler: GraphQLEventHandler<
             requirements,
         };
     } catch (ex) {
-        if (ex instanceof Error && isUserError(ex)) {
-            return { __typename: "UserError", message: ex.message };
+        if (ex instanceof UserError) {
+            return {
+                __typename: "UserError",
+                code: ex.code,
+                details: ex.details ? JSON.stringify(ex.details) : null,
+            };
         }
 
         throw ex;

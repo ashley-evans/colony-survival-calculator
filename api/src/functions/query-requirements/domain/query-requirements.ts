@@ -11,6 +11,9 @@ import {
     DEFAULT_LOCALE,
     hasMinimumRequiredTools,
     OutputUnit,
+    ErrorCode,
+    UserError,
+    ERROR_MESSAGE_MAPPING,
 } from "../../../common";
 import { Requirement } from "../interfaces/query-requirements-primary-port";
 import {
@@ -22,16 +25,6 @@ import {
     isRequirementVariable,
     isTotalVariable,
 } from "./requirements-linear-program";
-import {
-    INTERNAL_SERVER_ERROR,
-    INVALID_ITEM_ID_ERROR,
-    INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR,
-    INVALID_TARGET_ERROR,
-    INVALID_WORKERS_ERROR,
-    MULTIPLE_OVERRIDE_ERROR_PREFIX,
-    TOOL_LEVEL_ERROR_PREFIX,
-    UNKNOWN_ITEM_ERROR,
-} from "./errors";
 import { canCreateItem, filterByCreatorOverrides } from "./item-utils";
 
 function findMultipleOverrides(
@@ -67,7 +60,7 @@ function getOverriddenRequirements(
         return filtered;
     }
 
-    throw new Error(INVALID_OVERRIDE_ITEM_NOT_CREATABLE_ERROR);
+    throw new UserError(ErrorCode.INVALID_OVERRIDE_ITEM_NOT_CREATABLE);
 }
 
 async function getRequiredItemDetails(
@@ -80,7 +73,7 @@ async function getRequiredItemDetails(
             locale: locale ?? DEFAULT_LOCALE,
         });
     } catch {
-        throw new Error(INTERNAL_SERVER_ERROR);
+        throw new Error(ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR]);
     }
 }
 
@@ -105,7 +98,9 @@ function createRecipeDemandMap(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, itemID, creatorID, requirementID] = key.split("-");
         if (!itemID || !creatorID || !requirementID) {
-            throw new Error(INTERNAL_SERVER_ERROR);
+            throw new Error(
+                ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+            );
         }
 
         const recipeDemandKey = getRecipeKey(itemID, creatorID);
@@ -143,7 +138,9 @@ function createRecipeMap(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, recipeID, creatorID, outputItemID] = key.split("-");
         if (!recipeID || !creatorID || !outputItemID) {
-            throw new Error(INTERNAL_SERVER_ERROR);
+            throw new Error(
+                ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+            );
         }
 
         const recipeKey = getRecipeKey(recipeID, creatorID, outputItemID);
@@ -211,13 +208,17 @@ function mapResults(
 
         const creators = itemRecipeMap.get(totalKey);
         if (!creators) {
-            throw new Error(INTERNAL_SERVER_ERROR);
+            throw new Error(
+                ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+            );
         }
 
         const creatorsWithDemands = creators.map((creator) => {
             const recipe = recipeCreatorMap.get(creator);
             if (!recipe) {
-                throw new Error(INTERNAL_SERVER_ERROR);
+                throw new Error(
+                    ERROR_MESSAGE_MAPPING[ErrorCode.INTERNAL_SERVER_ERROR],
+                );
             }
 
             const demands = recipeDemandMap.get(creator);
@@ -253,15 +254,15 @@ function validateInput(
     input: QueryRequirementsParams,
 ): QueryRequirementsParams {
     if (input.id === "") {
-        throw new Error(INVALID_ITEM_ID_ERROR);
+        throw new UserError(ErrorCode.INVALID_ITEM_ID);
     }
 
     if ("workers" in input && input.workers <= 0) {
-        throw new Error(INVALID_WORKERS_ERROR);
+        throw new UserError(ErrorCode.INVALID_WORKERS);
     }
 
     if ("amount" in input && input.amount <= 0) {
-        throw new Error(INVALID_TARGET_ERROR);
+        throw new UserError(ErrorCode.INVALID_TARGET);
     }
 
     return input;
@@ -284,14 +285,14 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
 
     const multipleOverride = findMultipleOverrides(creatorOverrides);
     if (multipleOverride) {
-        throw new Error(
-            `${MULTIPLE_OVERRIDE_ERROR_PREFIX} ${multipleOverride}`,
-        );
+        throw new UserError(ErrorCode.MULTIPLE_OVERRIDE_ERROR, {
+            itemID: multipleOverride,
+        });
     }
 
     const requirements = await getRequiredItemDetails(id, locale);
     if (requirements.length == 0) {
-        throw new Error(UNKNOWN_ITEM_ERROR);
+        throw new UserError(ErrorCode.UNKNOWN_ITEM);
     }
 
     const overriddenRequirements = getOverriddenRequirements(
@@ -306,11 +307,9 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         hasMachineTools,
     );
     if (!required.hasRequired) {
-        const errorSuffix =
-            required.requiredTool === "machine"
-                ? "requires machine tools"
-                : `minimum tool is: ${required.requiredTool}`;
-        throw new Error(`${TOOL_LEVEL_ERROR_PREFIX} ${errorSuffix}`);
+        throw new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            requiredTool: required.requiredTool,
+        });
     }
 
     const result = computeRequirementVertices({
