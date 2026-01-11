@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "更改语言",
             "changeToLight": "切换到浅色主题",
             "changeToDark": "切换到深色主题",
             "viewSource": "在GitHub上查看源代码"
         }
+    },
+    "tabs": {
+        "calculator": "计算器",
+        "settings": "设置",
+        "about": "关于"
     },
     "calculator": {
         "header": "目标产量：",

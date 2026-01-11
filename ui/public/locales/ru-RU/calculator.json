@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Изменить язык",
             "changeToLight": "Переключить на светлую тему",
             "changeToDark": "Переключить на тёмную тему",
             "viewSource": "Посмотреть исходный код на GitHub"
         }
+    },
+    "tabs": {
+        "calculator": "Калькулятор",
+        "settings": "Настройки",
+        "about": "О приложении"
     },
     "calculator": {
         "header": "Желаемое производство:",

@@ -5,6 +5,8 @@ export const Banner = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 
     ${(props) => css`
         background: ${props.theme.color.surface_variant.main};
@@ -45,6 +47,7 @@ export const Icons = styled.div`
     display: flex;
 
     a,
+    button,
     *[role="button"] {
         transition: color 0.2s ease-in-out;
     }
@@ -56,12 +59,13 @@ export const Icons = styled.div`
         }
 
         a:hover,
+        button:hover,
         *[role="button"]:hover {
             color: ${props.theme.color.surface_variant.on_main};
         }
     `}
 
-    *:not(:last-child) {
+    > *:not(:last-child) {
         margin-right: 1rem;
     }
 `;

@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Bytt språk",
             "changeToLight": "Bytt til lyst tema",
             "changeToDark": "Bytt til mørkt tema",
             "viewSource": "Se kildekoden på GitHub"
         }
+    },
+    "tabs": {
+        "calculator": "Kalkulator",
+        "settings": "Innstillinger",
+        "about": "Om"
     },
     "calculator": {
         "header": "Ønsket produksjon:",

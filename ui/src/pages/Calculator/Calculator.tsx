@@ -233,8 +233,8 @@ function AboutTab() {
         <>
             <span>
                 {t("about.version", {
-                    version: "0.12.0.1",
-                    date: "2024-11-29",
+                    version: "0.15.0.11",
+                    date: "2025-11-28",
                 })}
             </span>
             <span>
@@ -258,6 +258,7 @@ enum PageTabs {
 }
 
 function Calculator() {
+    const { t } = useTranslation();
     const [selectedTab, setSelectedTab] = useState<PageTabs>(
         PageTabs.CALCULATOR,
     );
@@ -278,7 +279,7 @@ function Calculator() {
                     tabIndex={selectedTab === PageTabs.CALCULATOR ? 0 : -1}
                     onClick={() => setSelectedTab(PageTabs.CALCULATOR)}
                 >
-                    Calculator
+                    {t("tabs.calculator")}
                 </button>
                 <button
                     role="tab"
@@ -286,7 +287,7 @@ function Calculator() {
                     tabIndex={selectedTab === PageTabs.SETTINGS ? 0 : -1}
                     onClick={() => setSelectedTab(PageTabs.SETTINGS)}
                 >
-                    Settings
+                    {t("tabs.settings")}
                 </button>
                 <button
                     role="tab"
@@ -294,7 +295,7 @@ function Calculator() {
                     tabIndex={selectedTab === PageTabs.ABOUT ? 0 : -1}
                     onClick={() => setSelectedTab(PageTabs.ABOUT)}
                 >
-                    About
+                    {t("tabs.about")}
                 </button>
             </Tabs>
             <TabContainer role="tabpanel">

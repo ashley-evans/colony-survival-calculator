@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Змінити мову",
             "changeToLight": "Перемкнути на світлу тему",
             "changeToDark": "Перемкнути на темну тему",
             "viewSource": "Переглянути вихідний код на GitHub"
         }
+    },
+    "tabs": {
+        "calculator": "Калькулятор",
+        "settings": "Налаштування",
+        "about": "Про додаток"
     },
     "calculator": {
         "header": "Бажане виробництво:",

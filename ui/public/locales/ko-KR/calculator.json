@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "언어 변경",
             "changeToLight": "라이트 테마로 전환",
             "changeToDark": "다크 테마로 전환",
             "viewSource": "GitHub에서 소스 코드 보기"
         }
+    },
+    "tabs": {
+        "calculator": "계산기",
+        "settings": "설정",
+        "about": "정보"
     },
     "calculator": {
         "header": "목표 생산량:",
