@@ -144,6 +144,7 @@ const createRequirements = (requirements: Requirement[]): Requirement[] => {
                 amount: selectedItemAmount,
                 workers: selectedItemWorkers,
                 demands: requirements.map((requirement) => ({
+                    id: requirement.id,
                     name: requirement.name,
                     amount: requirement.amount,
                 })),
@@ -160,7 +161,10 @@ const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: items.map((item) => item.name),
+                distinctItemNames: items.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                })),
             },
         });
     }),
@@ -1685,9 +1689,10 @@ describe("requirements rendering given requirements", () => {
                     graphql.query(expectedItemNameQueryName, () => {
                         return HttpResponse.json({
                             data: {
-                                distinctItemNames: unsorted.map(
-                                    (item) => item.name,
-                                ),
+                                distinctItemNames: unsorted.map((item) => ({
+                                    id: item.id,
+                                    name: item.name,
+                                })),
                             },
                         });
                     }),
@@ -2078,9 +2083,10 @@ describe("requirements rendering given requirements", () => {
                     graphql.query(expectedItemNameQueryName, () => {
                         return HttpResponse.json({
                             data: {
-                                distinctItemNames: unsorted.map(
-                                    (item) => item.name,
-                                ),
+                                distinctItemNames: unsorted.map((item) => ({
+                                    id: item.id,
+                                    name: item.name,
+                                })),
                             },
                         });
                     }),

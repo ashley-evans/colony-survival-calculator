@@ -36,6 +36,8 @@ const GET_ITEM_NAMES_QUERY = gql(`
 const GET_ITEM_DETAILS_QUERY = gql(`
     query GetItemDetails($filters: ItemsFilters!, $locale: String) {
         item(filters: $filters, locale: $locale) {
+            id
+            creatorID
             size {
                 width
                 height

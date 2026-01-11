@@ -25,9 +25,17 @@ import {
 import { expectedItemDetailsQueryName } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
-const itemWithoutFarmSize: ItemName = { name: "item w/o farm" };
-const itemWithFarmSize: ItemName = { name: "item with farm" };
+const itemWithoutFarmSize: ItemName = {
+    id: "itemwofarm",
+    name: "item w/o farm",
+};
+const itemWithFarmSize: ItemName = {
+    id: "itemwithfarm",
+    name: "item with farm",
+};
 const expectedFarmSizeDetails = {
+    id: itemWithFarmSize.id,
+    creatorID: "creator1",
     size: { width: 20, height: 4 },
 };
 const items = [itemWithFarmSize, itemWithoutFarmSize];
@@ -36,14 +44,14 @@ const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: items.map((item) => item.name),
+                distinctItemNames: items,
             },
         });
     }),
     graphql.query(expectedItemDetailsQueryName, ({ variables }) => {
         const { filters } = variables;
-        const { name } = filters;
-        if (name === itemWithFarmSize.name) {
+        const { id } = filters;
+        if (id === itemWithFarmSize.id) {
             return HttpResponse.json({
                 data: { item: [expectedFarmSizeDetails] },
             });

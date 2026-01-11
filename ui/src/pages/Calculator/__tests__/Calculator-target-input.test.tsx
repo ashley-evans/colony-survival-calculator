@@ -37,7 +37,7 @@ const server = setupServer(
     graphql.query(expectedItemNameQueryName, () => {
         return HttpResponse.json({
             data: {
-                distinctItemNames: [item.name],
+                distinctItemNames: [{ id: item.id, name: item.name }],
             },
         });
     }),
