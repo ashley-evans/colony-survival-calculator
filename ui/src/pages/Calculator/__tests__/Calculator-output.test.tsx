@@ -288,6 +288,16 @@ describe.each([
         "user error message (known)",
     ],
     [
+        "requirements query user errors (stone tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "stone" },
+            }),
+        "Unable to create item with available tools, minimum tool is: Stone",
+        "user error message (tool level - stone)",
+    ],
+    [
         "requirements query user errors (machine tool level)",
         () =>
             createCalculatorOutputUserErrorHandler({
@@ -295,7 +305,17 @@ describe.each([
                 details: { requiredTool: "machine" },
             }),
         "Unable to create item with available tools, requires machine tools",
-        "user error message (tool level)",
+        "user error message (tool level - machine)",
+    ],
+    [
+        "requirements query user errors (unknown tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "unknown_tool" },
+            }),
+        "An error occurred, please try again.",
+        "user error message (tool level - unknown tool)",
     ],
     [
         "requirements query user errors (unknown)",

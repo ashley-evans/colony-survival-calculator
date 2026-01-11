@@ -269,12 +269,9 @@ describe("handles machine tool recipes", () => {
         maximumTool: "machine" as MachineToolset,
     });
 
-    const expectedRequiredToolsError = new UserError(
-        ErrorCode.TOOL_LEVEL,
-        {
-            requiredTool: "machine",
-        },
-    );
+    const expectedRequiredToolsError = new UserError(ErrorCode.TOOL_LEVEL, {
+        requiredTool: "machine",
+    });
 
     beforeEach(() => {
         mockQueryOutputDetails.mockResolvedValue([machineToolDetails]);
