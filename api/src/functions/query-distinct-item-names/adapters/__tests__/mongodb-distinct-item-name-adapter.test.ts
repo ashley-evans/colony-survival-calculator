@@ -316,6 +316,101 @@ test.each<[string, string, Items, string, ItemNamePair[]]>([
     },
 );
 
+describe("alphabetical ordering", () => {
+    test("returns items in alphabetical order for en-US locale", async () => {
+        const items = [
+            createItem({
+                id: "zebra",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "Zebra" },
+                    creator: { "en-US": "creator" },
+                },
+            }),
+            createItem({
+                id: "apple",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "Apple" },
+                    creator: { "en-US": "creator" },
+                },
+            }),
+            createItem({
+                id: "banana",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "en-US": "Banana" },
+                    creator: { "en-US": "creator" },
+                },
+            }),
+        ];
+        await storeItems(items);
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
+
+        const actual = await queryDistinctItemNames("en-US");
+
+        expect(actual).toEqual([
+            { id: "apple", name: "Apple" },
+            { id: "banana", name: "Banana" },
+            { id: "zebra", name: "Zebra" },
+        ]);
+    });
+
+    test("returns items in locale-correct alphabetical order for German (ä after a)", async () => {
+        const items = [
+            createItem({
+                id: "apfel",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "de-DE": "Apfel" },
+                    creator: { "de-DE": "creator" },
+                },
+            }),
+            createItem({
+                id: "apfelsine",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "de-DE": "Äpfelsine" },
+                    creator: { "de-DE": "creator" },
+                },
+            }),
+            createItem({
+                id: "banane",
+                createTime: 5,
+                output: 3,
+                requirements: [],
+                i18n: {
+                    name: { "de-DE": "Banane" },
+                    creator: { "de-DE": "creator" },
+                },
+            }),
+        ];
+        await storeItems(items);
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
+
+        const actual = await queryDistinctItemNames("de-DE");
+
+        // In German locale, ä is sorted near a (not after z as in some other locales)
+        expect(actual).toEqual([
+            { id: "apfel", name: "Apfel" },
+            { id: "apfelsine", name: "Äpfelsine" },
+            { id: "banane", name: "Banane" },
+        ]);
+    });
+});
+
 afterAll(async () => {
     const client = await (
         await import("@colony-survival-calculator/mongodb-client")

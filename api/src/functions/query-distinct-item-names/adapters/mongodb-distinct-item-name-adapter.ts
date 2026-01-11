@@ -30,7 +30,9 @@ const queryDistinctItemNames: ItemDatabasePort = async (locale) => {
         ])
         .toArray();
 
-    return results;
+    return results.sort((a, b) =>
+        a.name.localeCompare(b.name, locale, { sensitivity: "base" }),
+    );
 };
 
 export { queryDistinctItemNames };
