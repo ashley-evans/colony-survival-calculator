@@ -1,0 +1,106 @@
+{
+    "loading": "Chargement...",
+    "missing": {
+        "content": "Oh non ! Tu t'es perdu !",
+        "return": "Retour au calculateur"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Passer au thème clair",
+            "changeToDark": "Passer au thème sombre",
+            "viewSource": "Voir le code source sur GitHub"
+        }
+    },
+    "calculator": {
+        "header": "Production souhaitée :",
+        "items": {
+            "loading": "Chargement des objets...",
+            "optimalFarmSize": "Les calculs utilisent la taille de ferme optimale : {{width}} x {{height}}",
+            "errors": {
+                "known": "Impossible de charger les objets connus",
+                "network": "Une erreur s'est produite lors du chargement des détails de l'objet. Veuillez actualiser la page et réessayer."
+            },
+            "selector": {
+                "label": "Objet :",
+                "toggle": "Ouvrir la liste des objets",
+                "placeholder": "Sélectionner un objet pour les calculs",
+                "clear": "Effacer l'objet"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Nombre de travailleurs :",
+                "error": "Nombre de travailleurs invalide, doit être un nombre entier positif",
+                "clear": "Effacer le nombre de travailleurs"
+            },
+            "amount": {
+                "label": "Quantité cible :",
+                "error": "Quantité cible invalide, doit être un nombre entier positif",
+                "clear": "Effacer la quantité cible"
+            }
+        },
+        "tools": {
+            "label": "Outils :",
+            "machineTools": {
+                "label": "Outils mécaniques disponibles ?"
+            },
+            "mapping": {
+                "none": "Aucun",
+                "stone": "Pierre",
+                "copper": "Cuivre",
+                "iron": "Fer",
+                "bronze": "Bronze",
+                "steel": "Acier"
+            }
+        },
+        "output": {
+            "label": "Unités de production :",
+            "error": {
+                "unhandled": "Une erreur s'est produite lors du calcul. Veuillez modifier les valeurs et réessayer."
+            },
+            "units": {
+                "seconds": "Secondes",
+                "minutes": "Minutes",
+                "gameDays": "Jours de jeu"
+            },
+            "loading": "Calcul en cours...",
+            "header": "Besoins :",
+            "table": {
+                "item": "Objet",
+                "creator": "Producteur",
+                "demand": "Demande",
+                "amount": "Quantité",
+                "workers": "Travailleurs",
+                "total": "Total :"
+            },
+            "creator": {
+                "collapse": "Réduire le détail des producteurs",
+                "expand": "Développer le détail des producteurs"
+            },
+            "demand": {
+                "collapse": "Réduire le détail de la demande",
+                "expand": "Développer le détail de la demande"
+            }
+        }
+    },
+    "settings": {
+        "header": "Substitutions :",
+        "description": "Par défaut, le calculateur utilise la recette avec la production par seconde la plus élevée, sauf si une substitution est appliquée.",
+        "loading": "Chargement des substitutions...",
+        "none": "Aucune substitution disponible",
+        "selector": {
+            "item": {
+                "label": "Objet :"
+            },
+            "creator": {
+                "label": "Producteur :"
+            },
+            "remove": "Supprimer",
+            "add": "Ajouter une substitution de producteur"
+        }
+    },
+    "about": {
+        "version": "Les calculs sont corrects pour la version : {{version}} ({{date}})",
+        "source": "Les calculs utilisent les fichiers de données publics du <repoLink>dépôt Colony Survival</repoLink>."
+    }
+}

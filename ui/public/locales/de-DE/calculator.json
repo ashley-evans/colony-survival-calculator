@@ -1,0 +1,106 @@
+{
+    "loading": "Wird geladen...",
+    "missing": {
+        "content": "Oh nein! Du hast dich verlaufen!",
+        "return": "Zurück zum Rechner"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Zum hellen Design wechseln",
+            "changeToDark": "Zum dunklen Design wechseln",
+            "viewSource": "Quellcode auf GitHub ansehen"
+        }
+    },
+    "calculator": {
+        "header": "Gewünschte Ausgabe:",
+        "items": {
+            "loading": "Gegenstände werden geladen...",
+            "optimalFarmSize": "Berechnungen verwenden optimale Farmgröße: {{width}} x {{height}}",
+            "errors": {
+                "known": "Bekannte Gegenstände konnten nicht geladen werden",
+                "network": "Beim Laden der Gegenstandsdetails ist ein Fehler aufgetreten. Bitte aktualisiere die Seite und versuche es erneut."
+            },
+            "selector": {
+                "label": "Gegenstand:",
+                "toggle": "Gegenstandsliste öffnen",
+                "placeholder": "Gegenstand für Berechnungen auswählen",
+                "clear": "Gegenstand löschen"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Anzahl der Arbeiter:",
+                "error": "Ungültige Arbeiteranzahl, muss eine positive ganze Zahl sein",
+                "clear": "Arbeiteranzahl löschen"
+            },
+            "amount": {
+                "label": "Zielmenge:",
+                "error": "Ungültige Zielmenge, muss eine positive ganze Zahl sein",
+                "clear": "Zielmenge löschen"
+            }
+        },
+        "tools": {
+            "label": "Werkzeuge:",
+            "machineTools": {
+                "label": "Maschinenwerkzeuge verfügbar?"
+            },
+            "mapping": {
+                "none": "Keine",
+                "stone": "Stein",
+                "copper": "Kupfer",
+                "iron": "Eisen",
+                "bronze": "Bronze",
+                "steel": "Stahl"
+            }
+        },
+        "output": {
+            "label": "Ausgabeeinheiten:",
+            "error": {
+                "unhandled": "Bei der Berechnung ist ein Fehler aufgetreten. Bitte ändere die Eingaben und versuche es erneut."
+            },
+            "units": {
+                "seconds": "Sekunden",
+                "minutes": "Minuten",
+                "gameDays": "Spieltage"
+            },
+            "loading": "Ausgabe wird berechnet...",
+            "header": "Anforderungen:",
+            "table": {
+                "item": "Gegenstand",
+                "creator": "Hersteller",
+                "demand": "Bedarf",
+                "amount": "Menge",
+                "workers": "Arbeiter",
+                "total": "Gesamt:"
+            },
+            "creator": {
+                "collapse": "Herstelleraufschlüsselung einklappen",
+                "expand": "Herstelleraufschlüsselung ausklappen"
+            },
+            "demand": {
+                "collapse": "Bedarfsaufschlüsselung einklappen",
+                "expand": "Bedarfsaufschlüsselung ausklappen"
+            }
+        }
+    },
+    "settings": {
+        "header": "Überschreibungen:",
+        "description": "Standardmäßig verwendet der Rechner das Rezept mit der höchsten Ausgabe pro Sekunde, sofern keine Überschreibung festgelegt ist.",
+        "loading": "Überschreibungen werden geladen...",
+        "none": "Keine Überschreibungen verfügbar",
+        "selector": {
+            "item": {
+                "label": "Gegenstand:"
+            },
+            "creator": {
+                "label": "Hersteller:"
+            },
+            "remove": "Entfernen",
+            "add": "Herstellerüberschreibung hinzufügen"
+        }
+    },
+    "about": {
+        "version": "Berechnungen sind korrekt für Version: {{version}} ({{date}})",
+        "source": "Berechnungen verwenden öffentliche Spieldateien aus dem <repoLink>Colony Survival Repository</repoLink>."
+    }
+}

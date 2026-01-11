@@ -1,0 +1,106 @@
+{
+    "loading": "Ładowanie...",
+    "missing": {
+        "content": "O nie! Zabłądziłeś!",
+        "return": "Powrót do kalkulatora"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Przełącz na jasny motyw",
+            "changeToDark": "Przełącz na ciemny motyw",
+            "viewSource": "Zobacz kod źródłowy na GitHubie"
+        }
+    },
+    "calculator": {
+        "header": "Pożądana produkcja:",
+        "items": {
+            "loading": "Ładowanie przedmiotów...",
+            "optimalFarmSize": "Obliczenia używają optymalnego rozmiaru farmy: {{width}} x {{height}}",
+            "errors": {
+                "known": "Nie udało się załadować znanych przedmiotów",
+                "network": "Wystąpił błąd podczas ładowania szczegółów przedmiotu. Odśwież stronę i spróbuj ponownie."
+            },
+            "selector": {
+                "label": "Przedmiot:",
+                "toggle": "Otwórz listę przedmiotów",
+                "placeholder": "Wybierz przedmiot do obliczeń",
+                "clear": "Wyczyść przedmiot"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Liczba pracowników:",
+                "error": "Nieprawidłowa liczba pracowników, musi być dodatnią liczbą całkowitą",
+                "clear": "Wyczyść liczbę pracowników"
+            },
+            "amount": {
+                "label": "Docelowa ilość:",
+                "error": "Nieprawidłowa docelowa ilość, musi być dodatnią liczbą całkowitą",
+                "clear": "Wyczyść docelową ilość"
+            }
+        },
+        "tools": {
+            "label": "Narzędzia:",
+            "machineTools": {
+                "label": "Narzędzia maszynowe dostępne?"
+            },
+            "mapping": {
+                "none": "Brak",
+                "stone": "Kamienne",
+                "copper": "Miedziane",
+                "iron": "Żelazne",
+                "bronze": "Brązowe",
+                "steel": "Stalowe"
+            }
+        },
+        "output": {
+            "label": "Jednostki produkcji:",
+            "error": {
+                "unhandled": "Wystąpił błąd podczas obliczania. Zmień wartości i spróbuj ponownie."
+            },
+            "units": {
+                "seconds": "Sekundy",
+                "minutes": "Minuty",
+                "gameDays": "Dni w grze"
+            },
+            "loading": "Obliczanie...",
+            "header": "Wymagania:",
+            "table": {
+                "item": "Przedmiot",
+                "creator": "Producent",
+                "demand": "Zapotrzebowanie",
+                "amount": "Ilość",
+                "workers": "Pracownicy",
+                "total": "Razem:"
+            },
+            "creator": {
+                "collapse": "Zwiń szczegóły producenta",
+                "expand": "Rozwiń szczegóły producenta"
+            },
+            "demand": {
+                "collapse": "Zwiń szczegóły zapotrzebowania",
+                "expand": "Rozwiń szczegóły zapotrzebowania"
+            }
+        }
+    },
+    "settings": {
+        "header": "Nadpisania:",
+        "description": "Domyślnie kalkulator używa receptury z najwyższą produkcją na sekundę, chyba że zastosowano nadpisanie.",
+        "loading": "Ładowanie nadpisań...",
+        "none": "Brak dostępnych nadpisań",
+        "selector": {
+            "item": {
+                "label": "Przedmiot:"
+            },
+            "creator": {
+                "label": "Producent:"
+            },
+            "remove": "Usuń",
+            "add": "Dodaj nadpisanie producenta"
+        }
+    },
+    "about": {
+        "version": "Obliczenia są poprawne dla wersji: {{version}} ({{date}})",
+        "source": "Obliczenia wykorzystują publiczne pliki danych gry z <repoLink>repozytorium Colony Survival</repoLink>."
+    }
+}

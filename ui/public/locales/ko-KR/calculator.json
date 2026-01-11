@@ -1,0 +1,106 @@
+{
+    "loading": "로딩 중...",
+    "missing": {
+        "content": "페이지를 찾을 수 없습니다!",
+        "return": "계산기로 돌아가기"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "라이트 테마로 전환",
+            "changeToDark": "다크 테마로 전환",
+            "viewSource": "GitHub에서 소스 코드 보기"
+        }
+    },
+    "calculator": {
+        "header": "목표 생산량:",
+        "items": {
+            "loading": "아이템 로딩 중...",
+            "optimalFarmSize": "계산은 최적의 농장 크기를 사용합니다: {{width}} x {{height}}",
+            "errors": {
+                "known": "알려진 아이템을 불러올 수 없습니다",
+                "network": "아이템 세부 정보를 불러오는 중 오류가 발생했습니다. 페이지를 새로고침하고 다시 시도해 주세요."
+            },
+            "selector": {
+                "label": "아이템:",
+                "toggle": "아이템 목록 열기",
+                "placeholder": "계산에 사용할 아이템을 선택하세요",
+                "clear": "아이템 지우기"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "작업자 수:",
+                "error": "잘못된 작업자 수입니다. 양의 정수를 입력해 주세요",
+                "clear": "작업자 수 지우기"
+            },
+            "amount": {
+                "label": "목표 수량:",
+                "error": "잘못된 목표 수량입니다. 양의 정수를 입력해 주세요",
+                "clear": "목표 수량 지우기"
+            }
+        },
+        "tools": {
+            "label": "도구:",
+            "machineTools": {
+                "label": "기계 도구 사용 가능?"
+            },
+            "mapping": {
+                "none": "없음",
+                "stone": "돌",
+                "copper": "구리",
+                "iron": "철",
+                "bronze": "청동",
+                "steel": "강철"
+            }
+        },
+        "output": {
+            "label": "생산 단위:",
+            "error": {
+                "unhandled": "계산 중 오류가 발생했습니다. 입력값을 변경하고 다시 시도해 주세요."
+            },
+            "units": {
+                "seconds": "초",
+                "minutes": "분",
+                "gameDays": "게임 내 일수"
+            },
+            "loading": "계산 중...",
+            "header": "필요 조건:",
+            "table": {
+                "item": "아이템",
+                "creator": "생산자",
+                "demand": "수요",
+                "amount": "수량",
+                "workers": "작업자",
+                "total": "합계:"
+            },
+            "creator": {
+                "collapse": "생산자 상세 접기",
+                "expand": "생산자 상세 펼치기"
+            },
+            "demand": {
+                "collapse": "수요 상세 접기",
+                "expand": "수요 상세 펼치기"
+            }
+        }
+    },
+    "settings": {
+        "header": "재정의:",
+        "description": "기본적으로 계산기는 초당 생산량이 가장 높은 레시피를 사용합니다. 재정의가 적용된 경우는 예외입니다.",
+        "loading": "재정의 로딩 중...",
+        "none": "사용 가능한 재정의가 없습니다",
+        "selector": {
+            "item": {
+                "label": "아이템:"
+            },
+            "creator": {
+                "label": "생산자:"
+            },
+            "remove": "삭제",
+            "add": "생산자 재정의 추가"
+        }
+    },
+    "about": {
+        "version": "계산은 버전 {{version}} ({{date}})에 맞게 작성되었습니다",
+        "source": "계산은 <repoLink>Colony Survival 저장소</repoLink>의 공개 게임 데이터 파일을 사용합니다."
+    }
+}

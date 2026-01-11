@@ -1,0 +1,106 @@
+{
+    "loading": "Cargando...",
+    "missing": {
+        "content": "¡Oh no! ¡Te has perdido!",
+        "return": "Volver a la calculadora"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Cambiar al tema claro",
+            "changeToDark": "Cambiar al tema oscuro",
+            "viewSource": "Ver el código fuente en GitHub"
+        }
+    },
+    "calculator": {
+        "header": "Producción deseada:",
+        "items": {
+            "loading": "Cargando objetos...",
+            "optimalFarmSize": "Los cálculos usan el tamaño óptimo de granja: {{width}} x {{height}}",
+            "errors": {
+                "known": "No se pudieron cargar los objetos conocidos",
+                "network": "Se produjo un error al cargar los detalles del objeto. Por favor, actualiza la página e inténtalo de nuevo."
+            },
+            "selector": {
+                "label": "Objeto:",
+                "toggle": "Abrir lista de objetos",
+                "placeholder": "Selecciona un objeto para los cálculos",
+                "clear": "Borrar objeto"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Número de trabajadores:",
+                "error": "Número de trabajadores no válido, debe ser un número entero positivo",
+                "clear": "Borrar número de trabajadores"
+            },
+            "amount": {
+                "label": "Cantidad objetivo:",
+                "error": "Cantidad objetivo no válida, debe ser un número entero positivo",
+                "clear": "Borrar cantidad objetivo"
+            }
+        },
+        "tools": {
+            "label": "Herramientas:",
+            "machineTools": {
+                "label": "¿Herramientas mecánicas disponibles?"
+            },
+            "mapping": {
+                "none": "Ninguna",
+                "stone": "Piedra",
+                "copper": "Cobre",
+                "iron": "Hierro",
+                "bronze": "Bronce",
+                "steel": "Acero"
+            }
+        },
+        "output": {
+            "label": "Unidades de producción:",
+            "error": {
+                "unhandled": "Se produjo un error durante el cálculo. Por favor, cambia los valores e inténtalo de nuevo."
+            },
+            "units": {
+                "seconds": "Segundos",
+                "minutes": "Minutos",
+                "gameDays": "Días de juego"
+            },
+            "loading": "Calculando producción...",
+            "header": "Requisitos:",
+            "table": {
+                "item": "Objeto",
+                "creator": "Productor",
+                "demand": "Demanda",
+                "amount": "Cantidad",
+                "workers": "Trabajadores",
+                "total": "Total:"
+            },
+            "creator": {
+                "collapse": "Contraer desglose de productores",
+                "expand": "Expandir desglose de productores"
+            },
+            "demand": {
+                "collapse": "Contraer desglose de demanda",
+                "expand": "Expandir desglose de demanda"
+            }
+        }
+    },
+    "settings": {
+        "header": "Sobrescrituras:",
+        "description": "Por defecto, la calculadora usará la receta con mayor producción por segundo, salvo que se aplique una sobrescritura.",
+        "loading": "Cargando sobrescrituras...",
+        "none": "No hay sobrescrituras disponibles",
+        "selector": {
+            "item": {
+                "label": "Objeto:"
+            },
+            "creator": {
+                "label": "Productor:"
+            },
+            "remove": "Eliminar",
+            "add": "Añadir sobrescritura de productor"
+        }
+    },
+    "about": {
+        "version": "Los cálculos son correctos para la versión: {{version}} ({{date}})",
+        "source": "Los cálculos usan archivos de datos públicos del <repoLink>repositorio de Colony Survival</repoLink>."
+    }
+}

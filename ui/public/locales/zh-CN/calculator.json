@@ -1,0 +1,106 @@
+{
+    "loading": "加载中...",
+    "missing": {
+        "content": "糟糕！您迷路了！",
+        "return": "返回计算器"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "切换到浅色主题",
+            "changeToDark": "切换到深色主题",
+            "viewSource": "在GitHub上查看源代码"
+        }
+    },
+    "calculator": {
+        "header": "目标产量：",
+        "items": {
+            "loading": "正在加载物品...",
+            "optimalFarmSize": "计算使用最佳农场尺寸：{{width}} x {{height}}",
+            "errors": {
+                "known": "无法加载已知物品",
+                "network": "加载物品详情时出错，请刷新页面重试。"
+            },
+            "selector": {
+                "label": "物品：",
+                "toggle": "打开物品列表",
+                "placeholder": "选择用于计算的物品",
+                "clear": "清除物品"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "工人数量：",
+                "error": "工人数量无效，必须为正整数",
+                "clear": "清除工人数量"
+            },
+            "amount": {
+                "label": "目标数量：",
+                "error": "目标数量无效，必须为正整数",
+                "clear": "清除目标数量"
+            }
+        },
+        "tools": {
+            "label": "工具：",
+            "machineTools": {
+                "label": "机械工具可用？"
+            },
+            "mapping": {
+                "none": "无",
+                "stone": "石制",
+                "copper": "铜制",
+                "iron": "铁制",
+                "bronze": "青铜",
+                "steel": "钢制"
+            }
+        },
+        "output": {
+            "label": "产量单位：",
+            "error": {
+                "unhandled": "计算时出错，请更改输入值重试。"
+            },
+            "units": {
+                "seconds": "秒",
+                "minutes": "分钟",
+                "gameDays": "游戏天数"
+            },
+            "loading": "正在计算...",
+            "header": "需求：",
+            "table": {
+                "item": "物品",
+                "creator": "生产者",
+                "demand": "需求量",
+                "amount": "数量",
+                "workers": "工人",
+                "total": "合计："
+            },
+            "creator": {
+                "collapse": "收起生产者详情",
+                "expand": "展开生产者详情"
+            },
+            "demand": {
+                "collapse": "收起需求详情",
+                "expand": "展开需求详情"
+            }
+        }
+    },
+    "settings": {
+        "header": "覆盖设置：",
+        "description": "默认情况下，计算器使用每秒产量最高的配方，除非应用了覆盖设置。",
+        "loading": "正在加载覆盖设置...",
+        "none": "没有可用的覆盖设置",
+        "selector": {
+            "item": {
+                "label": "物品："
+            },
+            "creator": {
+                "label": "生产者："
+            },
+            "remove": "删除",
+            "add": "添加生产者覆盖"
+        }
+    },
+    "about": {
+        "version": "计算适用于版本：{{version}}（{{date}}）",
+        "source": "计算使用<repoLink>Colony Survival仓库</repoLink>中的公开游戏数据文件。"
+    }
+}

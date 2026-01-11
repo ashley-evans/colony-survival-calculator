@@ -1,0 +1,106 @@
+{
+    "loading": "Načítání...",
+    "missing": {
+        "content": "Jejda! Zabloudil jsi!",
+        "return": "Zpět na kalkulačku"
+    },
+    "layout": {
+        "icons": {
+            "changeToLight": "Přepnout na světlý motiv",
+            "changeToDark": "Přepnout na tmavý motiv",
+            "viewSource": "Zobrazit zdrojový kód na GitHubu"
+        }
+    },
+    "calculator": {
+        "header": "Požadovaný výstup:",
+        "items": {
+            "loading": "Načítání položek...",
+            "optimalFarmSize": "Výpočty používají optimální velikost farmy: {{width}} x {{height}}",
+            "errors": {
+                "known": "Nepodařilo se načíst známé položky",
+                "network": "Při načítání detailů položky došlo k chybě, obnovte prosím stránku a zkuste to znovu."
+            },
+            "selector": {
+                "label": "Položka:",
+                "toggle": "Otevřít seznam položek",
+                "placeholder": "Vyberte položku pro výpočty",
+                "clear": "Vymazat položku"
+            }
+        },
+        "target": {
+            "workers": {
+                "label": "Počet pracovníků:",
+                "error": "Neplatný počet pracovníků, musí být kladné celé číslo",
+                "clear": "Vymazat počet pracovníků"
+            },
+            "amount": {
+                "label": "Cílové množství:",
+                "error": "Neplatné cílové množství, musí být kladné celé číslo",
+                "clear": "Vymazat cílové množství"
+            }
+        },
+        "tools": {
+            "label": "Nástroje:",
+            "machineTools": {
+                "label": "Strojní nástroje k dispozici?"
+            },
+            "mapping": {
+                "none": "Žádné",
+                "stone": "Kamenné",
+                "copper": "Měděné",
+                "iron": "Železné",
+                "bronze": "Bronzové",
+                "steel": "Ocelové"
+            }
+        },
+        "output": {
+            "label": "Jednotky výstupu:",
+            "error": {
+                "unhandled": "Při výpočtu došlo k chybě, změňte prosím vstupy a zkuste to znovu."
+            },
+            "units": {
+                "seconds": "Sekundy",
+                "minutes": "Minuty",
+                "gameDays": "Herní dny"
+            },
+            "loading": "Probíhá výpočet...",
+            "header": "Požadavky:",
+            "table": {
+                "item": "Položka",
+                "creator": "Výrobce",
+                "demand": "Spotřeba",
+                "amount": "Množství",
+                "workers": "Pracovníci",
+                "total": "Celkem:"
+            },
+            "creator": {
+                "collapse": "Sbalit rozpis výrobců",
+                "expand": "Rozbalit rozpis výrobců"
+            },
+            "demand": {
+                "collapse": "Sbalit rozpis spotřeby",
+                "expand": "Rozbalit rozpis spotřeby"
+            }
+        }
+    },
+    "settings": {
+        "header": "Přepsání:",
+        "description": "Ve výchozím nastavení kalkulačka použije recept s nejvyšším výstupem za sekundu, pokud není nastaveno přepsání.",
+        "loading": "Načítání přepsání...",
+        "none": "Žádná přepsání nejsou k dispozici",
+        "selector": {
+            "item": {
+                "label": "Položka:"
+            },
+            "creator": {
+                "label": "Výrobce:"
+            },
+            "remove": "Odebrat",
+            "add": "Přidat přepsání výrobce"
+        }
+    },
+    "about": {
+        "version": "Výpočty jsou správné pro verzi: {{version}} ({{date}})",
+        "source": "Výpočty používají veřejné herní datové soubory z <repoLink>repozitáře Colony Survival</repoLink>."
+    }
+}
