@@ -80,6 +80,7 @@ function Output({
 }: OutputProps) {
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
         GET_CALCULATOR_OUTPUT,
+        { fetchPolicy: "no-cache" },
     );
     const [debouncedTarget] = useDebounce(target, DEFAULT_DEBOUNCE);
     const [hasInvalidResponse, setHasInvalidResponse] = useState<boolean>();

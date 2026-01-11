@@ -15,6 +15,9 @@ function createClient(url: string, region: string): ApolloClient {
                 Item: {
                     keyFields: ["id", "creatorID"],
                 },
+                Requirement: {
+                    keyFields: false,
+                },
                 RequirementCreator: {
                     keyFields: false,
                 },
