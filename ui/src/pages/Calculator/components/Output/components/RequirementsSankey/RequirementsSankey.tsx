@@ -8,7 +8,7 @@ import { useTheme } from "styled-components";
 
 type RequirementsSankeyProps = {
     requirements: Requirement[];
-    selectedItemName: string;
+    selectedItemID: string;
 };
 
 type ChartData = {
@@ -18,17 +18,15 @@ type ChartData = {
 
 const createSankeyChartData = ({
     requirements,
-    selectedItemName,
+    selectedItemID,
 }: RequirementsSankeyProps): ChartData => {
     if (
-        !requirements.find(
-            (requirement) => requirement.name === selectedItemName,
-        )
+        !requirements.find((requirement) => requirement.id === selectedItemID)
     ) {
         return { nodes: [], links: [] };
     }
 
-    const tree = createTree(requirements, selectedItemName);
+    const tree = createTree(requirements, selectedItemID);
 
     const uniqueNodes = new Set<string>();
     const links: DefaultLink[] = [];
@@ -56,10 +54,10 @@ const createSankeyChartData = ({
 
 function RequirementsSankey({
     requirements,
-    selectedItemName,
+    selectedItemID,
 }: RequirementsSankeyProps) {
     const theme = useTheme();
-    const data = createSankeyChartData({ requirements, selectedItemName });
+    const data = createSankeyChartData({ requirements, selectedItemID });
 
     if (data.links.length === 0) {
         return <></>;

@@ -10,7 +10,13 @@ function createClient(url: string, region: string): ApolloClient {
 
     return new ApolloClient({
         link: httpLink,
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache({
+            typePolicies: {
+                Item: {
+                    keyFields: ["id", "creatorID"],
+                },
+            },
+        }),
     });
 }
 

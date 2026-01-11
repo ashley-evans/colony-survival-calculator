@@ -25,14 +25,17 @@ import TargetInput, { Target } from "./components/TargetInput";
 const Output = lazy(() => import("./components/Output"));
 
 const GET_ITEM_NAMES_QUERY = gql(`
-    query GetItemNames {
-        distinctItemNames
+    query GetItemNames($locale: String) {
+        distinctItemNames(locale: $locale) {
+            id
+            name
+        }
     }
 `);
 
 const GET_ITEM_DETAILS_QUERY = gql(`
-    query GetItemDetails($filters: ItemsFilters!) {
-        item(filters: $filters) {
+    query GetItemDetails($filters: ItemsFilters!, $locale: String) {
+        item(filters: $filters, locale: $locale) {
             size {
                 width
                 height
@@ -44,7 +47,7 @@ const GET_ITEM_DETAILS_QUERY = gql(`
 type StateProp<S> = [S, (value: S) => void];
 
 type CalculatorTabProps = {
-    itemState: StateProp<string | undefined>;
+    itemIDState: StateProp<string | undefined>;
     currentTarget: StateProp<Target | undefined>;
     toolState: StateProp<AvailableTools>;
     machineToolState: StateProp<boolean>;
@@ -53,21 +56,26 @@ type CalculatorTabProps = {
 };
 
 function getItemDetailsFilters(
-    item?: string,
+    itemID?: string,
     tool?: AvailableTools,
     hasMachineTools?: boolean,
     overrides?: CreatorOverride[],
 ): ItemsFilters {
-    const creator = overrides
-        ? overrides.find(({ itemName }) => item == itemName)?.creator
+    const creatorID = overrides
+        ? overrides.find(({ itemID: currentID }) => itemID === currentID)
+              ?.creatorID
         : undefined;
-    return creator
-        ? { name: item, creator }
-        : { name: item, optimal: { maxAvailableTool: tool, hasMachineTools } };
+
+    return creatorID
+        ? { id: itemID, creatorID }
+        : {
+              id: itemID,
+              optimal: { maxAvailableTool: tool, hasMachineTools },
+          };
 }
 
 function CalculatorTab({
-    itemState: [selectedItem, setSelectedItem],
+    itemIDState: [selectedItemID, setSelectedItemID],
     currentTarget: [target, setTarget],
     toolState: [selectedTool, setSelectedTool],
     machineToolState: [hasMachineTools, setHasMachineTools],
@@ -84,13 +92,13 @@ function CalculatorTab({
         {
             variables: {
                 filters: getItemDetailsFilters(
-                    selectedItem,
+                    selectedItemID,
                     selectedTool,
                     hasMachineTools,
                     selectedCreatorOverrides,
                 ),
             },
-            skip: !selectedItem,
+            skip: !selectedItemID,
         },
     );
 
@@ -127,8 +135,8 @@ function CalculatorTab({
                 <>
                     <ItemSelector
                         items={itemNameData.distinctItemNames}
-                        onItemChange={setSelectedItem}
-                        defaultSelectedItem={selectedItem}
+                        onItemChange={setSelectedItemID}
+                        defaultSelectedItemID={selectedItemID}
                     />
                     <TargetInput
                         onTargetChange={setTarget}
@@ -159,10 +167,10 @@ function CalculatorTab({
                             {itemDetailsData?.item[0].size.height}
                         </span>
                     ) : null}
-                    {target && selectedItem ? (
+                    {target && selectedItemID ? (
                         <Suspense fallback={<span>Loading...</span>}>
                             <Output
-                                itemName={selectedItem}
+                                itemID={selectedItemID}
                                 target={target}
                                 outputUnit={selectedOutputUnit}
                                 maxAvailableTool={selectedTool}
@@ -239,7 +247,7 @@ function Calculator() {
         PageTabs.CALCULATOR,
     );
 
-    const selectedItemState = useState<string>();
+    const selectedItemIDState = useState<string>();
     const targetState = useState<Target>();
     const selectedToolState = useState<AvailableTools>(AvailableTools.None);
     const hasMachineToolState = useState<boolean>(false);
@@ -277,7 +285,7 @@ function Calculator() {
             <TabContainer role="tabpanel">
                 {selectedTab === PageTabs.CALCULATOR ? (
                     <CalculatorTab
-                        itemState={selectedItemState}
+                        itemIDState={selectedItemIDState}
                         currentTarget={targetState}
                         toolState={selectedToolState}
                         machineToolState={hasMachineToolState}

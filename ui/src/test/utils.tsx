@@ -17,7 +17,13 @@ function createApolloClient(apiURL: string): ApolloClient {
     const httpLink = new HttpLink({ uri: apiURL });
     return new ApolloClient({
         link: httpLink,
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache({
+            typePolicies: {
+                Item: {
+                    keyFields: ["id", "creatorID"],
+                },
+            },
+        }),
     });
 }
 

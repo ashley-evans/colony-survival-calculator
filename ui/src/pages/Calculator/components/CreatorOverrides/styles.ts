@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled, { css } from "styled-components";
 
 export const OverrideListContainer = styled.div`
-    max-width: 50rem;
+    max-width: 55rem;
     width: 100%;
 
     display: flex;
@@ -35,6 +35,7 @@ export const LargeAddButton = styled.button`
 export const RemoveButtonContainer = styled.div`
     display: flex;
     align-items: flex-end;
+    flex: 1 0 8rem;
 `;
 
 export const RemoveButton = styled.button`
@@ -67,7 +68,7 @@ export const OverrideContainer = styled.div`
     column-gap: 0.5rem;
     row-gap: 0.5rem;
 
-    > div {
-        flex: 1 0 16rem;
+    > div:not(:last-child) {
+        flex: 2 0 16rem;
     }
 `;

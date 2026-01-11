@@ -13,7 +13,7 @@ import { LoadingMessage } from "./styles";
 import { Target } from "../TargetInput";
 
 type OutputProps = {
-    itemName: string;
+    itemID: string;
     target: Target;
     outputUnit: OutputUnit;
     onSelectedItemTotalChange: (target: Target) => void;
@@ -27,18 +27,22 @@ type ErrorMessageProps = {
 };
 
 const GET_CALCULATOR_OUTPUT = gql(`
-    query GetCalculatorOutput($name: ID!, $workers: Int, $amount: Float, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $creatorOverrides: [CreatorOverride!]) {
-        requirement(name: $name, workers: $workers, amount: $amount, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit) {
+    query GetCalculatorOutput($id: ID!, $workers: Int, $amount: Float, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $creatorOverrides: [CreatorOverride!], $locale: String) {
+        requirement(id: $id, workers: $workers, amount: $amount, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit, locale: $locale) {
             ... on Requirements {
                 requirements {
+                    id
                     name
                     amount
                     creators {
+                        id
                         name
+                        creatorID
                         creator
                         workers
                         amount
                         demands {
+                            id
                             name
                             amount
                         }
@@ -66,7 +70,7 @@ function UnhandledErrorMessage() {
 }
 
 function Output({
-    itemName,
+    itemID,
     target,
     outputUnit,
     maxAvailableTool,
@@ -88,7 +92,7 @@ function Output({
 
         getCalculatorOutput({
             variables: {
-                name: itemName,
+                id: itemID,
                 amount:
                     "amount" in debouncedTarget ? debouncedTarget.amount : null,
                 workers:
@@ -102,7 +106,7 @@ function Output({
             },
         });
     }, [
-        itemName,
+        itemID,
         debouncedTarget,
         outputUnit,
         maxAvailableTool,
@@ -116,7 +120,7 @@ function Output({
         }
 
         const selectedItemRequirements = data.requirement.requirements.find(
-            ({ name }) => name === itemName,
+            ({ id }) => id === itemID,
         );
 
         if (!selectedItemRequirements) {
@@ -157,7 +161,7 @@ function Output({
             <Requirements requirements={data.requirement.requirements} />
             <RequirementsSankey
                 requirements={data.requirement.requirements}
-                selectedItemName={itemName}
+                selectedItemID={itemID}
             />
         </>
     );
