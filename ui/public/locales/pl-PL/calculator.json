@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Zmień język",
             "changeToLight": "Przełącz na jasny motyw",
             "changeToDark": "Przełącz na ciemny motyw",
             "viewSource": "Zobacz kod źródłowy na GitHubie"
         }
+    },
+    "tabs": {
+        "calculator": "Kalkulator",
+        "settings": "Ustawienia",
+        "about": "O aplikacji"
     },
     "calculator": {
         "header": "Pożądana produkcja:",

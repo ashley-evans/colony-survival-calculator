@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Change language",
             "changeToLight": "Change to light theme",
             "changeToDark": "Change to dark theme",
             "viewSource": "View the source code on GitHub"
         }
+    },
+    "tabs": {
+        "calculator": "Calculator",
+        "settings": "Settings",
+        "about": "About"
     },
     "calculator": {
         "header": "Desired output:",

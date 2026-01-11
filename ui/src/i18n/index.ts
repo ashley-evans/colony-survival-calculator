@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from "./constants";
+import { SUPPORTED_LANGUAGES, DEFAULT_LOCALE } from "./constants";
 
 i18n.use(Backend)
     .use(LanguageDetector)
@@ -12,7 +12,7 @@ i18n.use(Backend)
         ns: ["calculator"],
         defaultNS: "calculator",
         fallbackLng: DEFAULT_LOCALE,
-        supportedLngs: SUPPORTED_LOCALES,
+        supportedLngs: SUPPORTED_LANGUAGES.map((language) => language.code),
         detection: {
             order: [
                 "cookie",

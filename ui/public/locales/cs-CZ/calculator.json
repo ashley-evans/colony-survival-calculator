@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Změnit jazyk",
             "changeToLight": "Přepnout na světlý motiv",
             "changeToDark": "Přepnout na tmavý motiv",
             "viewSource": "Zobrazit zdrojový kód na GitHubu"
         }
+    },
+    "tabs": {
+        "calculator": "Kalkulačka",
+        "settings": "Nastavení",
+        "about": "O aplikaci"
     },
     "calculator": {
         "header": "Požadovaný výstup:",

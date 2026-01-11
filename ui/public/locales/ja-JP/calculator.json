@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "言語を変更",
             "changeToLight": "ライトテーマに切り替え",
             "changeToDark": "ダークテーマに切り替え",
             "viewSource": "GitHubでソースコードを見る"
         }
+    },
+    "tabs": {
+        "calculator": "計算機",
+        "settings": "設定",
+        "about": "概要"
     },
     "calculator": {
         "header": "目標生産:",

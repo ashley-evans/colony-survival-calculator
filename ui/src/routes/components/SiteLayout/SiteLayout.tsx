@@ -15,6 +15,7 @@ import {
     Icons,
     ThemeButton,
 } from "./styles";
+import { LanguageSelector } from "./components";
 
 const DARK_THEME_MEDIA_MATCH = "(prefers-color-scheme: dark)";
 const LIGHT_THEME_MEDIA_MATCH = "(prefers-color-scheme: light)";
@@ -66,6 +67,7 @@ function SiteLayout() {
                 <Banner>
                     <SiteHeader>Colony Survival Calculator</SiteHeader>
                     <Icons>
+                        <LanguageSelector />
                         <span
                             role="button"
                             aria-label={t(

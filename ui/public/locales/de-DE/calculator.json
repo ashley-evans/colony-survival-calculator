@@ -6,10 +6,16 @@
     },
     "layout": {
         "icons": {
+            "changeLanguage": "Sprache ändern",
             "changeToLight": "Zum hellen Design wechseln",
             "changeToDark": "Zum dunklen Design wechseln",
             "viewSource": "Quellcode auf GitHub ansehen"
         }
+    },
+    "tabs": {
+        "calculator": "Rechner",
+        "settings": "Einstellungen",
+        "about": "Über"
     },
     "calculator": {
         "header": "Gewünschte Ausgabe:",
