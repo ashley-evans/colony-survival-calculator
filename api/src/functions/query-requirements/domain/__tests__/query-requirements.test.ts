@@ -135,11 +135,14 @@ test("returns only output details fo provided item given provided item has no re
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
@@ -188,24 +191,36 @@ test("returns requirements given item with a single requirement and no nested re
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
-                    demands: [{ name: requiredItem.name, amount: 10 }],
+                    demands: [
+                        {
+                            id: requiredItem.id,
+                            name: requiredItem.name,
+                            amount: 10,
+                        },
+                    ],
                 },
             ],
         },
         {
+            id: requiredItem.id,
             name: requiredItem.name,
             amount: 10,
             creators: [
                 {
+                    id: requiredItem.id,
                     name: requiredItem.name,
+                    creatorID: requiredItem.creatorID,
                     creator: requiredItem.creator,
                     amount: 10,
                     workers: 7.5,
@@ -251,27 +266,41 @@ test("returns requirements given item with multiple requirements and no nested r
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
                     demands: [
-                        { name: requiredItem1.name, amount: 10 },
-                        { name: requiredItem2.name, amount: 15 },
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            amount: 10,
+                        },
+                        {
+                            id: requiredItem2.id,
+                            name: requiredItem2.name,
+                            amount: 15,
+                        },
                     ],
                 },
             ],
         },
         {
+            id: requiredItem1.id,
             name: requiredItem1.name,
             amount: 10,
             creators: [
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
+                    creatorID: requiredItem1.creatorID,
                     creator: requiredItem1.creator,
                     amount: 10,
                     workers: 7.5,
@@ -280,11 +309,14 @@ test("returns requirements given item with multiple requirements and no nested r
             ],
         },
         {
+            id: requiredItem2.id,
             name: requiredItem2.name,
             amount: 15,
             creators: [
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
+                    creatorID: requiredItem2.creatorID,
                     creator: requiredItem2.creator,
                     amount: 15,
                     workers: 30,
@@ -327,37 +359,58 @@ test("returns requirements given item with single nested requirement", async () 
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
-                    demands: [{ name: requiredItem1.name, amount: 10 }],
+                    demands: [
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            amount: 10,
+                        },
+                    ],
                 },
             ],
         },
         {
+            id: requiredItem1.id,
             name: requiredItem1.name,
             amount: 10,
             creators: [
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
+                    creatorID: requiredItem1.creatorID,
                     creator: requiredItem1.creator,
                     amount: 10,
                     workers: 7.5,
-                    demands: [{ name: requiredItem2.name, amount: 15 }],
+                    demands: [
+                        {
+                            id: requiredItem2.id,
+                            name: requiredItem2.name,
+                            amount: 15,
+                        },
+                    ],
                 },
             ],
         },
         {
+            id: requiredItem2.id,
             name: requiredItem2.name,
             amount: 15,
             creators: [
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
+                    creatorID: requiredItem2.creatorID,
                     creator: requiredItem2.creator,
                     amount: 15,
                     workers: 30,
@@ -410,40 +463,63 @@ test("returns requirements given item with multiple different nested requirement
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
-                    demands: [{ name: requiredItem1.name, amount: 10 }],
-                },
-            ],
-        },
-        {
-            name: requiredItem1.name,
-            amount: 10,
-            creators: [
-                {
-                    name: requiredItem1.name,
-                    creator: requiredItem1.creator,
-                    amount: 10,
-                    workers: 7.5,
                     demands: [
-                        { name: requiredItem2.name, amount: 15 },
-                        { name: requiredItem3.name, amount: 10 },
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            amount: 10,
+                        },
                     ],
                 },
             ],
         },
         {
+            id: requiredItem1.id,
+            name: requiredItem1.name,
+            amount: 10,
+            creators: [
+                {
+                    id: requiredItem1.id,
+                    name: requiredItem1.name,
+                    creatorID: requiredItem1.creatorID,
+                    creator: requiredItem1.creator,
+                    amount: 10,
+                    workers: 7.5,
+                    demands: [
+                        {
+                            id: requiredItem2.id,
+                            name: requiredItem2.name,
+                            amount: 15,
+                        },
+                        {
+                            id: requiredItem3.id,
+                            name: requiredItem3.name,
+                            amount: 10,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            id: requiredItem2.id,
             name: requiredItem2.name,
             amount: 15,
             creators: [
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
+                    creatorID: requiredItem2.creatorID,
                     creator: requiredItem2.creator,
                     amount: 15,
                     workers: 30,
@@ -452,11 +528,14 @@ test("returns requirements given item with multiple different nested requirement
             ],
         },
         {
+            id: requiredItem3.id,
             name: requiredItem3.name,
             amount: 10,
             creators: [
                 {
+                    id: requiredItem3.id,
                     name: requiredItem3.name,
+                    creatorID: requiredItem3.creatorID,
                     creator: requiredItem3.creator,
                     amount: 10,
                     workers: 20,
@@ -512,43 +591,68 @@ test("returns combined requirements given item with multiple nested requirements
 
     expect(actual).toEqual([
         {
+            id: item.id,
             name: item.name,
             amount: 7.5,
             creators: [
                 {
+                    id: item.id,
                     name: item.name,
+                    creatorID: item.creatorID,
                     creator: item.creator,
                     amount: 7.5,
                     workers: 5,
                     demands: [
-                        { name: requiredItem1.name, amount: 10 },
-                        { name: requiredItem3.name, amount: 5 },
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            amount: 10,
+                        },
+                        {
+                            id: requiredItem3.id,
+                            name: requiredItem3.name,
+                            amount: 5,
+                        },
                     ],
                 },
             ],
         },
         {
+            id: requiredItem1.id,
             name: requiredItem1.name,
             amount: 10,
             creators: [
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
+                    creatorID: requiredItem1.creatorID,
                     creator: requiredItem1.creator,
                     amount: 10,
                     workers: 7.5,
                     demands: [
-                        { name: requiredItem2.name, amount: 15 },
-                        { name: requiredItem3.name, amount: 10 },
+                        {
+                            id: requiredItem2.id,
+                            name: requiredItem2.name,
+                            amount: 15,
+                        },
+                        {
+                            id: requiredItem3.id,
+                            name: requiredItem3.name,
+                            amount: 10,
+                        },
                     ],
                 },
             ],
         },
         {
+            id: requiredItem3.id,
             name: requiredItem3.name,
             amount: 15,
             creators: [
                 {
+                    id: requiredItem3.id,
                     name: requiredItem3.name,
+                    creatorID: requiredItem3.creatorID,
                     creator: requiredItem3.creator,
                     amount: 15,
                     workers: 30,
@@ -557,11 +661,14 @@ test("returns combined requirements given item with multiple nested requirements
             ],
         },
         {
+            id: requiredItem2.id,
             name: requiredItem2.name,
             amount: 15,
             creators: [
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
+                    creatorID: requiredItem2.creatorID,
                     creator: requiredItem2.creator,
                     amount: 15,
                     workers: 30,
@@ -914,31 +1021,45 @@ describe("optional output requirement impact", () => {
 
         expect(actual).toEqual([
             {
+                id: item.id,
                 name: item.name,
                 amount: 7.5,
                 creators: [
                     {
+                        id: item.id,
                         name: item.name,
+                        creatorID: item.creatorID,
                         creator: item.creator,
                         amount: 7.5,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 5 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 5,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 5,
                 creators: [
                     {
+                        id: item.id,
                         name: item.name,
+                        creatorID: item.creatorID,
                         creator: item.creator,
                         amount: 1.25,
                         workers: 5,
                         demands: [],
                     },
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 3.75,
                         workers: 2.8125,
@@ -984,44 +1105,67 @@ describe("optional output requirement impact", () => {
 
         expect(actual).toEqual([
             {
+                id: item.id,
                 name: item.name,
                 amount: 7.5,
                 creators: [
                     {
+                        id: item.id,
                         name: item.name,
+                        creatorID: item.creatorID,
                         creator: item.creator,
                         amount: 7.5,
                         workers: 5,
-                        demands: [{ name: requiredItem1.name, amount: 10 }],
+                        demands: [
+                            {
+                                id: requiredItem1.id,
+                                name: requiredItem1.name,
+                                amount: 10,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem1.id,
                 name: requiredItem1.name,
                 amount: 10,
                 creators: [
                     {
+                        id: requiredItem1.id,
                         name: requiredItem1.name,
+                        creatorID: requiredItem1.creatorID,
                         creator: requiredItem1.creator,
                         amount: 10,
                         workers: 7.5,
-                        demands: [{ name: requiredItem2.name, amount: 15 }],
+                        demands: [
+                            {
+                                id: requiredItem2.id,
+                                name: requiredItem2.name,
+                                amount: 15,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem2.id,
                 name: requiredItem2.name,
                 amount: 15,
                 creators: [
                     {
+                        id: item.id,
                         name: item.name,
+                        creatorID: item.creatorID,
                         creator: item.creator,
                         amount: 2.5,
                         workers: 5,
                         demands: [],
                     },
                     {
+                        id: requiredItem2.id,
                         name: requiredItem2.name,
+                        creatorID: requiredItem2.creatorID,
                         creator: requiredItem2.creator,
                         amount: 12.5,
                         workers: 25,
@@ -1071,24 +1215,36 @@ describe("optional output requirement impact", () => {
 
         expect(actual).toEqual([
             {
+                id: item.id,
                 name: item.name,
                 amount: 7.5,
                 creators: [
                     {
+                        id: item.id,
                         name: item.name,
+                        creatorID: item.creatorID,
                         creator: item.creator,
                         amount: 7.5,
                         workers: 5,
-                        demands: [{ name: requirementName, amount: 5 }],
+                        demands: [
+                            {
+                                id: higherBaseRecipe.id,
+                                name: requirementName,
+                                amount: 5,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: higherBaseRecipe.id,
                 name: requirementName,
                 amount: 5,
                 creators: [
                     {
+                        id: higherOptionalOutputRecipe.id,
                         name: requirementName,
+                        creatorID: higherOptionalOutputRecipe.creatorID,
                         creator: higherOptionalOutputRecipe.creator,
                         amount: 5,
                         workers: 3,
@@ -1135,24 +1291,36 @@ describe("multiple recipe handling", () => {
 
         expect(actual).toEqual([
             {
+                id: moreOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 15,
                 creators: [
                     {
+                        id: moreOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: moreOptimalItemRecipe.creatorID,
                         creator: moreOptimalItemRecipe.creator,
                         amount: 15,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 20,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 20,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 20,
                         workers: 15,
@@ -1200,24 +1368,36 @@ describe("multiple recipe handling", () => {
 
         expect(actual).toEqual([
             {
+                id: moreOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 60,
                 creators: [
                     {
+                        id: moreOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: moreOptimalItemRecipe.creatorID,
                         creator: moreOptimalItemRecipe.creator,
                         amount: 60,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 80 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 80,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 80,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 80,
                         workers: 60,
@@ -1265,24 +1445,36 @@ describe("multiple recipe handling", () => {
 
         expect(actual).toEqual([
             {
+                id: lessOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 7.5,
                 creators: [
                     {
+                        id: lessOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: lessOptimalItemRecipe.creatorID,
                         creator: lessOptimalItemRecipe.creator,
                         amount: 7.5,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 10 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 10,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 10,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 10,
                         workers: 7.5,
@@ -1334,26 +1526,36 @@ describe("multiple recipe handling", () => {
 
         expect(actual).toEqual([
             {
+                id: moreOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 30,
                 creators: [
                     {
+                        id: moreOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: moreOptimalItemRecipe.creatorID,
                         creator: moreOptimalItemRecipe.creator,
                         amount: 30,
                         workers: 5,
                         demands: [
-                            { name: moreOptimalRequiredItem.name, amount: 20 },
+                            {
+                                id: moreOptimalRequiredItem.id,
+                                name: moreOptimalRequiredItem.name,
+                                amount: 20,
+                            },
                         ],
                     },
                 ],
             },
             {
+                id: moreOptimalRequiredItem.id,
                 name: moreOptimalRequiredItem.name,
                 amount: 20,
                 creators: [
                     {
+                        id: moreOptimalRequiredItem.id,
                         name: moreOptimalRequiredItem.name,
+                        creatorID: moreOptimalRequiredItem.creatorID,
                         creator: moreOptimalRequiredItem.creator,
                         amount: 20,
                         workers: 15,
@@ -1448,24 +1650,36 @@ describe("creator override handling", () => {
 
         expect(actual).toEqual([
             {
+                id: lessOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 7.5,
                 creators: [
                     {
+                        id: lessOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: lessOptimalItemRecipe.creatorID,
                         creator: lessOptimalItemRecipe.creator,
                         amount: 7.5,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 10 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 10,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 10,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 10,
                         workers: 7.5,
@@ -1517,24 +1731,36 @@ describe("creator override handling", () => {
 
         expect(actual).toEqual([
             {
+                id: recipe.id,
                 name: validItemName,
                 amount: 15,
                 creators: [
                     {
+                        id: recipe.id,
                         name: validItemName,
+                        creatorID: recipe.creatorID,
                         creator: recipe.creator,
                         amount: 15,
                         workers: 5,
-                        demands: [{ name: requiredItemName, amount: 20 }],
+                        demands: [
+                            {
+                                id: moreOptimalRequirementRecipe.id,
+                                name: requiredItemName,
+                                amount: 20,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: moreOptimalRequirementRecipe.id,
                 name: requiredItemName,
                 amount: 20,
                 creators: [
                     {
+                        id: lessOptimalRequirementRecipe.id,
                         name: requiredItemName,
+                        creatorID: lessOptimalRequirementRecipe.creatorID,
                         creator: lessOptimalRequirementRecipe.creator,
                         amount: 20,
                         workers: 15,
@@ -1614,24 +1840,36 @@ describe("creator override handling", () => {
 
         expect(actual).toEqual([
             {
+                id: moreOptimalItemRecipe.id,
                 name: validItemName,
                 amount: 15,
                 creators: [
                     {
+                        id: moreOptimalItemRecipe.id,
                         name: validItemName,
+                        creatorID: moreOptimalItemRecipe.creatorID,
                         creator: moreOptimalItemRecipe.creator,
                         amount: 15,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 20,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 20,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 20,
                         workers: 15,
@@ -1684,24 +1922,36 @@ describe("creator override handling", () => {
 
         expect(actual).toEqual([
             {
+                id: usedRecipe.id,
                 name: validItemName,
                 amount: 15,
                 creators: [
                     {
+                        id: usedRecipe.id,
                         name: validItemName,
+                        creatorID: usedRecipe.creatorID,
                         creator: usedRecipe.creator,
                         amount: 15,
                         workers: 5,
-                        demands: [{ name: requiredItem.name, amount: 20 }],
+                        demands: [
+                            {
+                                id: requiredItem.id,
+                                name: requiredItem.name,
+                                amount: 20,
+                            },
+                        ],
                     },
                 ],
             },
             {
+                id: requiredItem.id,
                 name: requiredItem.name,
                 amount: 20,
                 creators: [
                     {
+                        id: requiredItem.id,
                         name: requiredItem.name,
+                        creatorID: requiredItem.creatorID,
                         creator: requiredItem.creator,
                         amount: 20,
                         workers: 15,
@@ -1819,16 +2069,20 @@ describe("creator override handling", () => {
 
         expect(actual).toEqual([
             {
+                id: lessOptimalRecipe.id,
                 name: validItemName,
                 amount: 7.5,
                 creators: [
                     {
+                        id: lessOptimalRecipe.id,
                         name: validItemName,
+                        creatorID: lessOptimalRecipe.creatorID,
                         creator: lessOptimalRecipe.creator,
                         amount: 7.5,
                         workers: 5,
                         demands: [
                             {
+                                id: lessOptimalRecipeRequirement.id,
                                 name: lessOptimalRecipeRequirement.name,
                                 amount: 10,
                             },
@@ -1837,11 +2091,14 @@ describe("creator override handling", () => {
                 ],
             },
             {
+                id: lessOptimalRecipeRequirement.id,
                 name: lessOptimalRecipeRequirement.name,
                 amount: 10,
                 creators: [
                     {
+                        id: lessOptimalRecipeRequirement.id,
                         name: lessOptimalRecipeRequirement.name,
+                        creatorID: lessOptimalRecipeRequirement.creatorID,
                         creator: lessOptimalRecipeRequirement.creator,
                         amount: 10,
                         workers: 7.5,
@@ -1889,26 +2146,40 @@ describe("handles multiple output units", () => {
             OutputUnit.SECONDS,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: 7.5,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: 7.5,
                             workers: 5,
                             demands: [
-                                { name: requiredItem1.name, amount: 10 },
-                                { name: requiredItem2.name, amount: 15 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 10,
+                                },
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 15,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
                     amount: 10,
                     creators: [
                         {
+                            id: requiredItem1.id,
+                            creatorID: requiredItem1.creatorID,
                             name: requiredItem1.name,
                             creator: requiredItem1.creator,
                             amount: 10,
@@ -1918,11 +2189,14 @@ describe("handles multiple output units", () => {
                     ],
                 },
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 15,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 15,
                             workers: 30,
@@ -1936,27 +2210,41 @@ describe("handles multiple output units", () => {
             OutputUnit.MINUTES,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: 450,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: 450,
                             workers: 5,
                             demands: [
-                                { name: requiredItem1.name, amount: 600 },
-                                { name: requiredItem2.name, amount: 900 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 600,
+                                },
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 900,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
                     amount: 600,
                     creators: [
                         {
+                            id: requiredItem1.id,
                             name: requiredItem1.name,
+                            creatorID: requiredItem1.creatorID,
                             creator: requiredItem1.creator,
                             amount: 600,
                             workers: 7.5,
@@ -1965,11 +2253,14 @@ describe("handles multiple output units", () => {
                     ],
                 },
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 900,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 900,
                             workers: 30,
@@ -1983,27 +2274,41 @@ describe("handles multiple output units", () => {
             OutputUnit.GAME_DAYS,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: 3262.5,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: 3262.5,
                             workers: 5,
                             demands: [
-                                { name: requiredItem1.name, amount: 4350 },
-                                { name: requiredItem2.name, amount: 6525 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 4350,
+                                },
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 6525,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
                     name: requiredItem1.name,
                     amount: 4350,
                     creators: [
                         {
+                            id: requiredItem1.id,
                             name: requiredItem1.name,
+                            creatorID: requiredItem1.creatorID,
                             creator: requiredItem1.creator,
                             amount: 4350,
                             workers: 7.5,
@@ -2012,11 +2317,14 @@ describe("handles multiple output units", () => {
                     ],
                 },
                 {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 6525,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 6525,
                             workers: 30,
@@ -2133,26 +2441,36 @@ describe("handles machine tools", () => {
 
         expect(actual).toEqual([
             {
+                id: baseItem.id,
                 name: baseItem.name,
                 amount: 15,
                 creators: [
                     {
+                        id: baseItem.id,
                         name: baseItem.name,
+                        creatorID: baseItem.creatorID,
                         creator: baseItem.creator,
                         amount: 15,
                         workers: 5,
                         demands: [
-                            { name: machineToolsItem.name, amount: 12.5 },
+                            {
+                                id: machineToolsItem.id,
+                                name: machineToolsItem.name,
+                                amount: 12.5,
+                            },
                         ],
                     },
                 ],
             },
             {
+                id: machineToolsItem.id,
                 name: machineToolsItem.name,
                 amount: 12.5,
                 creators: [
                     {
+                        id: machineToolsItem.id,
                         name: machineToolsItem.name,
+                        creatorID: machineToolsItem.creatorID,
                         creator: machineToolsItem.creator,
                         amount: 12.5,
                         workers: 25,
@@ -2225,40 +2543,63 @@ describe("handles calculating requirements for target output", () => {
             OutputUnit.SECONDS,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: targetAmount,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: targetAmount,
                             workers: 5,
-                            demands: [{ name: requiredItem1.name, amount: 10 }],
-                        },
-                    ],
-                },
-                {
-                    name: requiredItem1.name,
-                    amount: 10,
-                    creators: [
-                        {
-                            name: requiredItem1.name,
-                            creator: requiredItem1.creator,
-                            amount: 10,
-                            workers: 7.5,
                             demands: [
-                                { name: requiredItem2.name, amount: 15 },
-                                { name: requiredItem3.name, amount: 10 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 10,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            creatorID: requiredItem1.creatorID,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 7.5,
+                            demands: [
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 15,
+                                },
+                                {
+                                    id: requiredItem3.id,
+                                    name: requiredItem3.name,
+                                    amount: 10,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 15,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 15,
                             workers: 30,
@@ -2267,11 +2608,14 @@ describe("handles calculating requirements for target output", () => {
                     ],
                 },
                 {
+                    id: requiredItem3.id,
                     name: requiredItem3.name,
                     amount: 10,
                     creators: [
                         {
+                            id: requiredItem3.id,
                             name: requiredItem3.name,
+                            creatorID: requiredItem3.creatorID,
                             creator: requiredItem3.creator,
                             amount: 10,
                             workers: 20,
@@ -2285,40 +2629,63 @@ describe("handles calculating requirements for target output", () => {
             OutputUnit.MINUTES,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: targetAmount,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: targetAmount,
                             workers: 0.08333333,
-                            demands: [{ name: requiredItem1.name, amount: 10 }],
-                        },
-                    ],
-                },
-                {
-                    name: requiredItem1.name,
-                    amount: 10,
-                    creators: [
-                        {
-                            name: requiredItem1.name,
-                            creator: requiredItem1.creator,
-                            amount: 10,
-                            workers: 0.125,
                             demands: [
-                                { name: requiredItem2.name, amount: 15 },
-                                { name: requiredItem3.name, amount: 10 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 10,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            creatorID: requiredItem1.creatorID,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 0.125,
+                            demands: [
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 15,
+                                },
+                                {
+                                    id: requiredItem3.id,
+                                    name: requiredItem3.name,
+                                    amount: 10,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 15,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 15,
                             workers: 0.5,
@@ -2327,11 +2694,14 @@ describe("handles calculating requirements for target output", () => {
                     ],
                 },
                 {
+                    id: requiredItem3.id,
                     name: requiredItem3.name,
                     amount: 10,
                     creators: [
                         {
+                            id: requiredItem3.id,
                             name: requiredItem3.name,
+                            creatorID: requiredItem3.creatorID,
                             creator: requiredItem3.creator,
                             amount: 10,
                             workers: 0.33333333,
@@ -2345,40 +2715,63 @@ describe("handles calculating requirements for target output", () => {
             OutputUnit.GAME_DAYS,
             [
                 {
+                    id: item.id,
                     name: item.name,
                     amount: targetAmount,
                     creators: [
                         {
+                            id: item.id,
                             name: item.name,
+                            creatorID: item.creatorID,
                             creator: item.creator,
                             amount: targetAmount,
                             workers: 0.01149425,
-                            demands: [{ name: requiredItem1.name, amount: 10 }],
-                        },
-                    ],
-                },
-                {
-                    name: requiredItem1.name,
-                    amount: 10,
-                    creators: [
-                        {
-                            name: requiredItem1.name,
-                            creator: requiredItem1.creator,
-                            amount: 10,
-                            workers: 0.01724138,
                             demands: [
-                                { name: requiredItem2.name, amount: 15 },
-                                { name: requiredItem3.name, amount: 10 },
+                                {
+                                    id: requiredItem1.id,
+                                    name: requiredItem1.name,
+                                    amount: 10,
+                                },
                             ],
                         },
                     ],
                 },
                 {
+                    id: requiredItem1.id,
+                    name: requiredItem1.name,
+                    amount: 10,
+                    creators: [
+                        {
+                            id: requiredItem1.id,
+                            name: requiredItem1.name,
+                            creatorID: requiredItem1.creatorID,
+                            creator: requiredItem1.creator,
+                            amount: 10,
+                            workers: 0.01724138,
+                            demands: [
+                                {
+                                    id: requiredItem2.id,
+                                    name: requiredItem2.name,
+                                    amount: 15,
+                                },
+                                {
+                                    id: requiredItem3.id,
+                                    name: requiredItem3.name,
+                                    amount: 10,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: requiredItem2.id,
                     name: requiredItem2.name,
                     amount: 15,
                     creators: [
                         {
+                            id: requiredItem2.id,
                             name: requiredItem2.name,
+                            creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 15,
                             workers: 0.06896552,
@@ -2387,11 +2780,14 @@ describe("handles calculating requirements for target output", () => {
                     ],
                 },
                 {
+                    id: requiredItem3.id,
                     name: requiredItem3.name,
                     amount: 10,
                     creators: [
                         {
+                            id: requiredItem3.id,
                             name: requiredItem3.name,
+                            creatorID: requiredItem3.creatorID,
                             creator: requiredItem3.creator,
                             amount: 10,
                             workers: 0.04597701,

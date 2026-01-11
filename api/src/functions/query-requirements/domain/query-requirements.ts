@@ -119,7 +119,9 @@ function createRecipeDemandMap(
 
         map.set(
             recipeDemandKey,
-            currentDemands.concat([{ name: translatedName, amount }]),
+            currentDemands.concat([
+                { id: requirementID, name: translatedName, amount },
+            ]),
         );
     }
 
@@ -155,7 +157,9 @@ function createRecipeMap(
         const translatedCreator = item?.creator ?? creatorID;
 
         const currentRecipeDetails = recipeMap.get(recipeKey) ?? {
+            id: recipeID,
             name: translatedName,
+            creatorID,
             creator: translatedCreator,
             amount: 0,
             workers: 0,
@@ -227,6 +231,7 @@ function mapResults(
         const translatedName = translatedItem?.name ?? totalKey;
 
         const mapped = {
+            id: totalKey,
             name: translatedName,
             amount,
             creators: creatorsWithDemands.filter(

@@ -7,12 +7,15 @@ type CreatorOverride = {
 };
 
 type Demand = {
+    id: string;
     name: string;
     amount: number;
 };
 
 type RequirementRecipe = {
+    id: string;
     name: string;
+    creatorID: string;
     creator: string;
     amount: number;
     workers: number;
@@ -20,6 +23,7 @@ type RequirementRecipe = {
 };
 
 type Requirement = {
+    id: string;
     name: string;
     amount: number;
     creators: RequirementRecipe[];

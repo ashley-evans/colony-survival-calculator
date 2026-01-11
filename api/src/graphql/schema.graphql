@@ -39,12 +39,15 @@ input CreatorOverride {
 }
 
 type CreatorDemand {
-    name: ID!
+    id: ID!
+    name: String!
     amount: Float!
 }
 
 type RequirementCreator {
-    name: ID!
+    id: ID!
+    name: String!
+    creatorID: String!
     creator: String!
     amount: Float!
     workers: Float!
@@ -52,7 +55,8 @@ type RequirementCreator {
 }
 
 type Requirement {
-    name: ID!
+    id: ID!
+    name: String!
     amount: Float!
     creators: [RequirementCreator!]!
 }
