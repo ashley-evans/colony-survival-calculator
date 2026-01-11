@@ -198,7 +198,7 @@ describe("handles tool modifiers", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             mockQueryOutputDetails.mockResolvedValue([details]);
-            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
                 requiredTool: minimum.toLowerCase(),
             });
 
@@ -270,7 +270,7 @@ describe("handles machine tool recipes", () => {
     });
 
     const expectedRequiredToolsError = new UserError(
-        ErrorCode.TOOL_LEVEL_ERROR,
+        ErrorCode.TOOL_LEVEL,
         {
             requiredTool: "machine",
         },
@@ -448,7 +448,7 @@ describe("multiple recipe handling", () => {
             }),
         ];
         mockQueryOutputDetails.mockResolvedValue(recipes);
-        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: "stone",
         });
 

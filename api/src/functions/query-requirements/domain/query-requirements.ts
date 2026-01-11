@@ -285,7 +285,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
 
     const multipleOverride = findMultipleOverrides(creatorOverrides);
     if (multipleOverride) {
-        throw new UserError(ErrorCode.MULTIPLE_OVERRIDE_ERROR, {
+        throw new UserError(ErrorCode.MULTIPLE_OVERRIDE, {
             itemID: multipleOverride,
         });
     }
@@ -307,7 +307,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         hasMachineTools,
     );
     if (!required.hasRequired) {
-        throw new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        throw new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: required.requiredTool,
         });
     }

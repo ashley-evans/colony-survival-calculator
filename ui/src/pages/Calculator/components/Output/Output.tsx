@@ -13,6 +13,7 @@ import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { Requirements, RequirementsSankey } from "./components";
 import { LoadingMessage } from "./styles";
 import { Target } from "../TargetInput";
+import { useErrorTranslation } from "../../../../hooks";
 
 type OutputProps = {
     itemID: string;
@@ -52,7 +53,8 @@ const GET_CALCULATOR_OUTPUT = gql(`
                 }
             }
             ... on UserError {
-                message
+                code
+                details
             }
         }
     }
@@ -80,6 +82,7 @@ function Output({
     onSelectedItemTotalChange,
 }: OutputProps) {
     const { t, i18n } = useTranslation();
+    const translateError = useErrorTranslation();
     const [getCalculatorOutput, { loading, data, error }] = useLazyQuery(
         GET_CALCULATOR_OUTPUT,
         { fetchPolicy: "no-cache" },
@@ -160,7 +163,7 @@ function Output({
     }
 
     if (isUserError(data.requirement)) {
-        return <ErrorMessage>{data.requirement.message}</ErrorMessage>;
+        return <ErrorMessage>{translateError(data.requirement)}</ErrorMessage>;
     }
 
     return (

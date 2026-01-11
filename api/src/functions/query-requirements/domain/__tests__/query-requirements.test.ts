@@ -728,7 +728,7 @@ describe("handles tool modifiers", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             mockMongoDBQueryRequirements.mockResolvedValue([item]);
-            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
                 requiredTool: minimum,
             });
 
@@ -796,7 +796,7 @@ describe("handles tool modifiers", () => {
                 item,
                 requiredItem,
             ]);
-            const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+            const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
                 requiredTool: minimum,
             });
 
@@ -830,7 +830,7 @@ describe("handles tool modifiers", () => {
             maximumTool: "steel" as DefaultToolset,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([requiredItem, item]);
-        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: expectedMinimumTool,
         });
 
@@ -1598,7 +1598,7 @@ describe("multiple recipe handling", () => {
             moreOptimalItemRecipe,
             requiredItem,
         ]);
-        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: "stone" as DefaultToolset,
         });
 
@@ -1791,7 +1791,7 @@ describe("creator override handling", () => {
             creatorID: overrideCreator,
         });
         mockMongoDBQueryRequirements.mockResolvedValue([recipe, requiredItem]);
-        const expectedError = new UserError(ErrorCode.MULTIPLE_OVERRIDE_ERROR, {
+        const expectedError = new UserError(ErrorCode.MULTIPLE_OVERRIDE, {
             itemID: recipe.id,
         });
 
@@ -2367,12 +2367,9 @@ describe("handles machine tools", () => {
         output: 6,
         requirements: [{ id: machineToolsItem.id, amount: 5 }],
     });
-    const expectedRequiredToolsError = new UserError(
-        ErrorCode.TOOL_LEVEL_ERROR,
-        {
-            requiredTool: "machine",
-        },
-    );
+    const expectedRequiredToolsError = new UserError(ErrorCode.TOOL_LEVEL, {
+        requiredTool: "machine",
+    });
 
     beforeEach(() => {
         mockMongoDBQueryRequirements.mockResolvedValue([
@@ -2416,7 +2413,7 @@ describe("handles machine tools", () => {
     );
 
     test("throws an error when machine tools are required and available but default toolset is not sufficient", async () => {
-        const expectedError = new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: "steel",
         });
         const baseItemSteelMin = createTranslatedItem({

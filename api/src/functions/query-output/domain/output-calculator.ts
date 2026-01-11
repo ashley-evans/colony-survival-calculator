@@ -87,7 +87,7 @@ const calculateOutput: QueryOutputPrimaryPort = async ({
             outputDetails.map((details) => ({ ...details, id })),
         );
 
-        throw new UserError(ErrorCode.TOOL_LEVEL_ERROR, {
+        throw new UserError(ErrorCode.TOOL_LEVEL, {
             requiredTool: needsMachineTools ? "machine" : minimumDefault,
         });
     }

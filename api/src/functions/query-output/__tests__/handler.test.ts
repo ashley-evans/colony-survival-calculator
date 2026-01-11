@@ -159,7 +159,7 @@ test.each([
     ["Invalid item", ErrorCode.INVALID_ITEM_ID],
     ["Invalid workers", ErrorCode.INVALID_WORKERS],
     ["Unknown item", ErrorCode.UNKNOWN_ITEM],
-    ["Minimum tool", ErrorCode.TOOL_LEVEL_ERROR, { requiredTool: "steel" }],
+    ["Minimum tool", ErrorCode.TOOL_LEVEL, { requiredTool: "steel" }],
 ])(
     "returns a user error if known error: %s occurs while fetching item requirements",
     async (

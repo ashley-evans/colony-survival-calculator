@@ -102,5 +102,16 @@
     "about": {
         "version": "Calculations are correct for version: {{version}} ({{date}})",
         "source": "Calculations use public game data files from the <repoLink>Colony Survival repository</repoLink>."
+    },
+    "errors": {
+        "UNKNOWN": "An error occurred, please try again.",
+        "INVALID_ITEM_ID": "Invalid item ID provided, must be a non-empty string",
+        "INVALID_WORKERS": "Invalid number of workers provided, must be a positive number",
+        "INVALID_TARGET": "Invalid target output provided, must be a positive number",
+        "UNKNOWN_ITEM": "Unknown item provided",
+        "TOOL_LEVEL": "Unable to create item with available tools, minimum tool is: {{requiredTool}}",
+        "TOOL_LEVEL_MACHINE": "Unable to create item with available tools, requires machine tools",
+        "MULTIPLE_OVERRIDE": "More than one creator override provided for: {{itemId}}",
+        "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Item is not creatable with current overrides"
     }
 }

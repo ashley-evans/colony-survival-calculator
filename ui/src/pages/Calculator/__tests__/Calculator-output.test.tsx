@@ -279,13 +279,32 @@ describe.each([
         "error message",
     ],
     [
-        "requirements query user errors",
+        "requirements query user errors (known)",
         () =>
             createCalculatorOutputUserErrorHandler({
-                requirementsUserError: "Requirements user error",
+                errorCode: "INVALID_WORKERS",
             }),
-        "Requirements user error",
-        "the error message from requirements query",
+        "Invalid number of workers provided, must be a positive number",
+        "user error message (known)",
+    ],
+    [
+        "requirements query user errors (machine tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "machine" },
+            }),
+        "Unable to create item with available tools, requires machine tools",
+        "user error message (tool level)",
+    ],
+    [
+        "requirements query user errors (unknown)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "UNKNOWN_ERROR_CODE",
+            }),
+        "An error occurred, please try again.",
+        "user error message (unknown)",
     ],
 ])(
     "handles %s errors while fetching output",

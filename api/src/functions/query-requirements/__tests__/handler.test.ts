@@ -386,12 +386,8 @@ test.each([
     ["Invalid workers", ErrorCode.INVALID_WORKERS],
     ["Invalid target amount", ErrorCode.INVALID_TARGET],
     ["Unknown item", ErrorCode.UNKNOWN_ITEM],
-    ["Minimum tool", ErrorCode.TOOL_LEVEL_ERROR, { requiredTool: "steel" }],
-    [
-        "Duplicate override",
-        ErrorCode.MULTIPLE_OVERRIDE_ERROR,
-        { itemId: "test" },
-    ],
+    ["Minimum tool", ErrorCode.TOOL_LEVEL, { requiredTool: "steel" }],
+    ["Duplicate override", ErrorCode.MULTIPLE_OVERRIDE, { itemId: "test" }],
     [
         "Not craft-able due to override",
         ErrorCode.INVALID_OVERRIDE_ITEM_NOT_CREATABLE,
