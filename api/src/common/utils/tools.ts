@@ -82,13 +82,27 @@ function isAvailableDefaultToolSufficient(
     return availableToolModifier >= minimumToolModifier;
 }
 
-function isAvailableToolSufficient(
-    available: DefaultToolset,
-    hasMachineTools: boolean,
-    item: Pick<Item, "toolset">,
-) {
+function isAvailableToolSufficient({
+    available,
+    hasMachineTools,
+    hasEyeglasses,
+    item,
+}: {
+    available: DefaultToolset;
+    hasMachineTools: boolean;
+    hasEyeglasses: boolean;
+    item: Pick<Item, "toolset">;
+}) {
     if (item.toolset.type === "machine") {
         return hasMachineTools;
+    }
+
+    if (item.toolset.type === "eyeglasses") {
+        if (item.toolset.minimumTool === "eyeglasses" && !hasEyeglasses) {
+            return false;
+        }
+
+        return true;
     }
 
     return isAvailableDefaultToolSufficient(

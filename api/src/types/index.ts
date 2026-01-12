@@ -2,7 +2,7 @@ import type {
     DefaultToolset,
     MachineToolset,
     EyeglassesToolset,
-} from "./__generated__/toolset";
+} from "./__generated__/items";
 
 export type {
     Item,
@@ -10,6 +10,7 @@ export type {
     Requirement,
     Requirements,
     OptionalOutput,
+    Toolset,
 } from "./__generated__/items";
 export * from "./item";
 export type { DefaultToolset, MachineToolset, EyeglassesToolset };

@@ -25,10 +25,16 @@ function filterByOptimal(
     const maxAvailableTool =
         filters.maxAvailableTool ?? ("steel" as DefaultToolset);
     const hasMachineTools = filters.hasMachineTools ?? true;
+    const hasEyeglasses = filters.hasEyeglasses ?? true;
 
     for (const item of items) {
         if (
-            !isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
+            !isAvailableToolSufficient({
+                available: maxAvailableTool,
+                hasMachineTools,
+                hasEyeglasses,
+                item,
+            })
         ) {
             continue;
         }

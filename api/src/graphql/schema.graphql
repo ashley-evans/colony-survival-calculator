@@ -94,6 +94,7 @@ enum AvailableTools {
 input OptimalFilter {
     maxAvailableTool: AvailableTools
     hasMachineTools: Boolean
+    hasEyeglasses: Boolean
 }
 
 input ItemsFilters {

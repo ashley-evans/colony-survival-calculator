@@ -28,10 +28,12 @@ const mockQueryItem = queryItem as Mock;
 function createOptimalFilter(
     maxAvailableTool?: AvailableTools,
     hasMachineTools?: boolean,
+    hasEyeglasses?: boolean,
 ): OptimalFilter {
     return {
         maxAvailableTool: maxAvailableTool ?? null,
         hasMachineTools: hasMachineTools ?? null,
+        hasEyeglasses: hasEyeglasses ?? null,
     };
 }
 
@@ -174,6 +176,30 @@ test.each([
         ),
         {
             optimal: { hasMachineTools: false },
+        },
+        undefined,
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses indication (true)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, undefined, true),
+            }),
+        ),
+        {
+            optimal: { hasEyeglasses: true },
+        },
+        undefined,
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses indication (false)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, undefined, false),
+            }),
+        ),
+        {
+            optimal: { hasEyeglasses: false },
         },
         undefined,
     ],

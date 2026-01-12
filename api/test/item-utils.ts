@@ -1,5 +1,6 @@
 import {
     DefaultToolset,
+    EyeglassesToolset,
     Item,
     MachineToolset,
     OptionalOutput,
@@ -107,6 +108,23 @@ function createItemWithMachineTools(
     });
 }
 
+function createItemWithEyeglasses(
+    input: Omit<ItemFactoryInputs, "toolset"> & {
+        minimumTool?: EyeglassesToolset;
+        maximumTool?: EyeglassesToolset;
+    },
+): Item {
+    const { minimumTool, maximumTool, ...rest } = input;
+    return baseCreateItem({
+        ...rest,
+        toolset: {
+            type: "eyeglasses",
+            minimumTool: minimumTool ?? ("noglasses" as EyeglassesToolset),
+            maximumTool: maximumTool ?? ("noglasses" as EyeglassesToolset),
+        },
+    });
+}
+
 type TranslatedItemFactoryInputs = Omit<ItemFactoryInputs, "i18n" | "id"> & {
     name: string;
     id?: string;
@@ -182,11 +200,30 @@ function createTranslatedItemWithMachineTools(
     });
 }
 
+function createTranslatedItemWithEyeglasses(
+    params: Omit<TranslatedItemFactoryInputs, "toolset"> & {
+        minimumTool?: EyeglassesToolset;
+        maximumTool?: EyeglassesToolset;
+    },
+): TranslatedItem {
+    const { minimumTool, maximumTool, ...rest } = params;
+    return baseCreateTranslatedItem({
+        ...rest,
+        toolset: {
+            type: "eyeglasses",
+            minimumTool: minimumTool ?? ("noglasses" as EyeglassesToolset),
+            maximumTool: maximumTool ?? ("noglasses" as EyeglassesToolset),
+        },
+    });
+}
+
 export {
     createItem,
     createItemWithMachineTools,
+    createItemWithEyeglasses,
     createRequirements,
     createOptionalOutput,
     createTranslatedItem,
     createTranslatedItemWithMachineTools,
+    createTranslatedItemWithEyeglasses,
 };
