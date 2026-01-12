@@ -1,4 +1,10 @@
-import { Items, Item, DefaultToolset, MachineToolset } from "../../../../types";
+import {
+    Items,
+    Item,
+    DefaultToolset,
+    MachineToolset,
+    EyeglassesToolset,
+} from "../../../../types";
 import {
     createItem,
     createItemWithMachineTools,
@@ -1172,6 +1178,69 @@ describe.each([
                     type: "default",
                     minimumTool: "none" as DefaultToolset,
                     maximumTool: "machine" as MachineToolset,
+                },
+                creatorID: "testcreator",
+                i18n: {
+                    name: { "en-US": "test" },
+                    creator: { "en-US": "test creator" },
+                },
+            },
+        ]),
+    ],
+    [
+        "an item with specified eyeglasses tools but invalid minimum tool",
+        JSON.stringify([
+            {
+                id: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "eyeglasses",
+                    minimumTool: "machine" as MachineToolset,
+                    maximumTool: "eyeglasses" as EyeglassesToolset,
+                },
+                creatorID: "testcreator",
+                i18n: {
+                    name: { "en-US": "test" },
+                    creator: { "en-US": "test creator" },
+                },
+            },
+        ]),
+    ],
+    [
+        "an item with specified eyeglasses tools but invalid maximum tool",
+        JSON.stringify([
+            {
+                id: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "eyeglasses",
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "machine" as MachineToolset,
+                },
+                creatorID: "testcreator",
+                i18n: {
+                    name: { "en-US": "test" },
+                    creator: { "en-US": "test creator" },
+                },
+            },
+        ]),
+    ],
+    [
+        "an item with specified eyeglasses tools but minimum greater than maximum",
+        JSON.stringify([
+            {
+                id: "test",
+                createTime: 2,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "eyeglasses",
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "noglasses" as EyeglassesToolset,
                 },
                 creatorID: "testcreator",
                 i18n: {

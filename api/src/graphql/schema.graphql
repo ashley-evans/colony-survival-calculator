@@ -20,6 +20,8 @@ enum Tools {
     BRONZE
     STEEL
     MACHINE
+    NOGLASSES
+    EYEGLASSES
 }
 
 type Item {

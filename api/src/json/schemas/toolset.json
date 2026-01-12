@@ -74,8 +74,8 @@
             "title": "EyeglassesToolset",
             "description": "",
             "type": "string",
-            "tsEnumNames": ["none", "eyeglasses"],
-            "enum": ["none", "eyeglasses"]
+            "tsEnumNames": ["noglasses", "eyeglasses"],
+            "enum": ["noglasses", "eyeglasses"]
         }
     }
 }

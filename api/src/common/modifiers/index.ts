@@ -12,6 +12,8 @@ const ToolModifierValues: Readonly<Record<AllToolsets, number>> = {
     bronze: 6.15,
     steel: 8,
     machine: 1,
+    noglasses: 1,
+    eyeglasses: 1.2,
 };
 
 const AvailableToolsSchemaMap: Record<AvailableTools, DefaultToolset> = {
@@ -31,6 +33,8 @@ const GraphQLToolsSchemaMap: Record<AllToolsets, GraphQLSchemaTools> = {
     bronze: "BRONZE",
     steel: "STEEL",
     machine: "MACHINE",
+    noglasses: "NOGLASSES",
+    eyeglasses: "EYEGLASSES",
 };
 
 function getMaxToolModifier(
