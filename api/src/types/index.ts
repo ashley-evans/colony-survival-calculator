@@ -1,14 +1,16 @@
-import type { DefaultToolset, MachineToolset } from "./__generated__/items";
+import type {
+    DefaultToolset,
+    MachineToolset,
+    EyeglassesToolset,
+} from "./__generated__/toolset";
+
 export type {
     Item,
     Items,
     Requirement,
     Requirements,
     OptionalOutput,
-    Toolset,
-    DefaultToolset,
-    MachineToolset,
 } from "./__generated__/items";
 export * from "./item";
-
-export type AllToolsets = DefaultToolset | MachineToolset;
+export type { DefaultToolset, MachineToolset, EyeglassesToolset };
+export type AllToolsets = DefaultToolset | MachineToolset | EyeglassesToolset;

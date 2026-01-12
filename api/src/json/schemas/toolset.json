@@ -32,6 +32,20 @@
             },
             "additionalProperties": false,
             "required": ["type", "minimumTool", "maximumTool"]
+        },
+        {
+            "type": "object",
+            "properties": {
+                "type": { "const": "eyeglasses" },
+                "minimumTool": {
+                    "$ref": "#/definitions/eyeglassesToolset"
+                },
+                "maximumTool": {
+                    "$ref": "#/definitions/eyeglassesToolset"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["type", "minimumTool", "maximumTool"]
         }
     ],
     "definitions": {
@@ -55,6 +69,13 @@
             "type": "string",
             "tsEnumNames": ["machine"],
             "enum": ["machine"]
+        },
+        "eyeglassesToolset": {
+            "title": "EyeglassesToolset",
+            "description": "",
+            "type": "string",
+            "tsEnumNames": ["none", "eyeglasses"],
+            "enum": ["none", "eyeglasses"]
         }
     }
 }
