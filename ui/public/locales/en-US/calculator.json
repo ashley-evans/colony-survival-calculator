@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Machine tools available?"
             },
+            "eyeglasses": {
+                "label": "Eyeglasses available?"
+            },
             "mapping": {
                 "none": "None",
                 "stone": "Stone",

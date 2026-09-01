@@ -29,6 +29,7 @@ import {
     expectedCalculatorOutputQueryName,
     expectedRequirementsHeading,
     expectedMachineToolCheckboxLabel,
+    expectedEyeglassesCheckboxLabel,
     createRequirement,
     createRequirementCreator,
     expectedWorkerInputLabel,
@@ -179,7 +180,7 @@ test("queries calculator output if item and workers inputted with default unit s
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.Minutes,
-        availableTools: { default: "NONE", machine: false },
+        availableTools: { default: "NONE", machine: false, eyeglasses: false },
         locale: "en-US",
     });
 });
@@ -207,7 +208,7 @@ test("queries calculator output if item and workers inputted with non-default un
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.GameDays,
-        availableTools: { default: "NONE", machine: false },
+        availableTools: { default: "NONE", machine: false, eyeglasses: false },
         locale: "en-US",
     });
 });
@@ -235,7 +236,7 @@ test("queries calculator output if item and target amount inputted with default 
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.GameDays,
-        availableTools: { default: "NONE", machine: false },
+        availableTools: { default: "NONE", machine: false, eyeglasses: false },
         locale: "en-US",
     });
 });
@@ -262,7 +263,7 @@ test("queries calculator output if item and target amount inputted with non-defa
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.Minutes,
-        availableTools: { default: "NONE", machine: false },
+        availableTools: { default: "NONE", machine: false, eyeglasses: false },
         locale: "en-US",
     });
 });
@@ -386,7 +387,11 @@ test("queries optimal output and requirements with machine tool availability onc
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            availableTools: { default: "NONE", machine: true },
+            availableTools: {
+                default: "NONE",
+                machine: true,
+                eyeglasses: false,
+            },
             locale: "en-US",
         },
     );
@@ -398,6 +403,41 @@ test("queries optimal output and requirements with machine tool availability onc
     });
     await click({
         label: expectedMachineToolCheckboxLabel,
+        role: "checkbox",
+    });
+    await screen.findByRole("heading", { name: expectedRequirementsHeading });
+
+    await expect(expectedRequest).resolves.not.toThrow();
+});
+
+test("queries optimal output and requirements with eyeglasses availability once checked", async () => {
+    const expectedWorkers = 5;
+    const expectedRequest = waitForRequest(
+        server,
+        "POST",
+        expectedGraphQLAPIURL,
+        expectedCalculatorOutputQueryName,
+        {
+            id: item.id,
+            amount: null,
+            workers: expectedWorkers,
+            unit: OutputUnit.Minutes,
+            availableTools: {
+                default: "NONE",
+                machine: false,
+                eyeglasses: true,
+            },
+            locale: "en-US",
+        },
+    );
+
+    render(<Calculator />, expectedGraphQLAPIURL);
+    await selectItemAndTarget({
+        itemName: item.name,
+        workers: expectedWorkers,
+    });
+    await click({
+        label: expectedEyeglassesCheckboxLabel,
         role: "checkbox",
     });
     await screen.findByRole("heading", { name: expectedRequirementsHeading });

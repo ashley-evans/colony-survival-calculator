@@ -16,6 +16,7 @@ import {
     expectedCreatorOverrideQueryName,
     expectedCalculatorOutputQueryName,
     expectedMachineToolCheckboxLabel,
+    expectedEyeglassesCheckboxLabel,
     createRequirement,
     createRequirementCreator,
     expectedRequirementsHeading,
@@ -170,7 +171,11 @@ test("queries calculator with provided tool if non default selected", async () =
         amount: null,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
-        availableTools: { default: expectedTool, machine: false },
+        availableTools: {
+            default: expectedTool,
+            machine: false,
+            eyeglasses: false,
+        },
         locale: "en-US",
     });
 });
@@ -188,7 +193,11 @@ test("queries optimal output again if tool is changed after first query", async 
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            availableTools: { default: expectedTool, machine: false },
+            availableTools: {
+                default: expectedTool,
+                machine: false,
+                eyeglasses: false,
+            },
             locale: "en-US",
         },
     );
@@ -232,7 +241,11 @@ test("queries requirements with provided tool if non default selected", async ()
         id: item.id,
         amount: null,
         workers: expectedWorkers,
-        availableTools: { default: expectedTool, machine: false },
+        availableTools: {
+            default: expectedTool,
+            machine: false,
+            eyeglasses: false,
+        },
         unit: OutputUnit.Minutes,
         locale: "en-US",
     });
@@ -251,7 +264,11 @@ test("queries requirements again if tool is changed after first query", async ()
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            availableTools: { default: expectedTool, machine: false },
+            availableTools: {
+                default: expectedTool,
+                machine: false,
+                eyeglasses: false,
+            },
             locale: "en-US",
         },
     );
@@ -284,6 +301,7 @@ test("queries item details with provided tool if non default selected", async ()
                 optimal: {
                     default: expectedTool,
                     machine: false,
+                    eyeglasses: false,
                 },
             },
             locale: "en-US",
@@ -314,6 +332,7 @@ test("queries item details again if tool is changed after first query", async ()
                 optimal: {
                     default: expectedTool,
                     machine: false,
+                    eyeglasses: false,
                 },
             },
             locale: "en-US",
@@ -406,6 +425,7 @@ describe("machine tool selection", () => {
                     optimal: {
                         default: AvailableDefaultTools.None,
                         machine: true,
+                        eyeglasses: false,
                     },
                 },
                 locale: "en-US",
@@ -419,6 +439,85 @@ describe("machine tool selection", () => {
         });
         await click({
             label: expectedMachineToolCheckboxLabel,
+            role: "checkbox",
+        });
+
+        await expect(expectedRequest).resolves.not.toThrow();
+    });
+});
+
+describe("eyeglasses selection", () => {
+    test("displays an unchecked checkbox to allow eyeglasses availability indication", async () => {
+        render(<Calculator />);
+
+        const checkbox = await screen.findByRole("checkbox", {
+            name: expectedEyeglassesCheckboxLabel,
+        });
+        expect(checkbox).toBeVisible();
+        expect(checkbox).not.toBeChecked();
+    });
+
+    test("eyeglasses checkbox changes to checked when clicked", async () => {
+        render(<Calculator />);
+        await click({
+            label: expectedEyeglassesCheckboxLabel,
+            role: "checkbox",
+        });
+
+        expect(
+            screen.getByRole("checkbox", {
+                name: expectedEyeglassesCheckboxLabel,
+            }),
+        ).toBeChecked();
+    });
+
+    test("does not reset the eyeglasses checkbox after changing tabs", async () => {
+        render(<Calculator />);
+        await click({
+            label: expectedEyeglassesCheckboxLabel,
+            role: "checkbox",
+        });
+        await clickByName(expectedSettingsTab, "tab");
+        await screen.findByRole("heading", {
+            name: expectedSettingsTabHeader,
+            level: 2,
+        });
+        await clickByName(expectedCalculatorTab, "tab");
+
+        expect(
+            await screen.findByRole("checkbox", {
+                name: expectedEyeglassesCheckboxLabel,
+            }),
+        ).toBeChecked();
+    });
+
+    test("queries item details with eyeglasses availability once checked", async () => {
+        const expectedWorkers = 5;
+        const expectedRequest = waitForRequest(
+            server,
+            "POST",
+            expectedGraphQLAPIURL,
+            expectedItemDetailsQueryName,
+            {
+                filters: {
+                    id: item.id,
+                    optimal: {
+                        default: AvailableDefaultTools.None,
+                        machine: false,
+                        eyeglasses: true,
+                    },
+                },
+                locale: "en-US",
+            },
+        );
+
+        render(<Calculator />, expectedGraphQLAPIURL);
+        await selectItemAndTarget({
+            itemName: item.name,
+            workers: expectedWorkers,
+        });
+        await click({
+            label: expectedEyeglassesCheckboxLabel,
             role: "checkbox",
         });
 

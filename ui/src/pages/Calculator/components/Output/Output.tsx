@@ -22,6 +22,7 @@ type OutputProps = {
     onSelectedItemTotalChange: (target: Target) => void;
     maxAvailableTool?: AvailableDefaultTools;
     hasMachineTools?: boolean;
+    hasEyeglasses?: boolean;
     creatorOverrides?: CreatorOverride[];
 };
 
@@ -78,6 +79,7 @@ function Output({
     outputUnit,
     maxAvailableTool,
     hasMachineTools,
+    hasEyeglasses,
     creatorOverrides,
     onSelectedItemTotalChange,
 }: OutputProps) {
@@ -96,8 +98,14 @@ function Output({
                 ? creatorOverrides
                 : undefined;
         const availableTools =
-            maxAvailableTool !== undefined || hasMachineTools !== undefined
-                ? { default: maxAvailableTool, machine: hasMachineTools }
+            maxAvailableTool !== undefined ||
+            hasMachineTools !== undefined ||
+            hasEyeglasses !== undefined
+                ? {
+                      default: maxAvailableTool,
+                      machine: hasMachineTools,
+                      eyeglasses: hasEyeglasses,
+                  }
                 : undefined;
 
         getCalculatorOutput({
@@ -121,6 +129,7 @@ function Output({
         outputUnit,
         maxAvailableTool,
         hasMachineTools,
+        hasEyeglasses,
         creatorOverrides,
         i18n.language,
     ]);

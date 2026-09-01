@@ -10,6 +10,7 @@ export const expectedTargetAmountInputLabel = "Output item target:";
 export const expectedOutputUnitLabel = "Desired output units:";
 export const expectedToolSelectLabel = "Tools:";
 export const expectedMachineToolCheckboxLabel = "Machine tools available?";
+export const expectedEyeglassesCheckboxLabel = "Eyeglasses available?";
 export const expectedFarmSizeNotePrefix = "Calculations use optimal farm size:";
 export const expectedLoadingOutputMessage = "Calculating output...";
 export const expectedRequirementsHeading = "Requirements:";

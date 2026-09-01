@@ -860,6 +860,7 @@ describe("given items w/ multiple creators returned", () => {
                         optimal: {
                             default: expectedTool,
                             machine: false,
+                            eyeglasses: false,
                         },
                     },
                     locale: "en-US",
@@ -942,7 +943,11 @@ describe("given items w/ multiple creators returned", () => {
                 amount: null,
                 workers: expectedWorkers,
                 unit: OutputUnit.Minutes,
-                availableTools: { default: expectedTool, machine: false },
+                availableTools: {
+                    default: expectedTool,
+                    machine: false,
+                    eyeglasses: false,
+                },
                 creatorOverrides: expectedOverrides,
                 locale: "en-US",
             });
@@ -962,7 +967,11 @@ describe("given items w/ multiple creators returned", () => {
                     amount: null,
                     workers: expectedWorkers,
                     unit: OutputUnit.Minutes,
-                    availableTools: { default: expectedTool, machine: false },
+                    availableTools: {
+                        default: expectedTool,
+                        machine: false,
+                        eyeglasses: false,
+                    },
                     locale: "en-US",
                 },
             );
@@ -1029,7 +1038,11 @@ describe("given items w/ multiple creators returned", () => {
                 workers: expectedWorkers,
                 amount: null,
                 unit: expectedOutputUnit,
-                availableTools: { default: expectedTool, machine: false },
+                availableTools: {
+                    default: expectedTool,
+                    machine: false,
+                    eyeglasses: false,
+                },
                 creatorOverrides: expectedOverrides,
                 locale: "en-US",
             });

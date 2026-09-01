@@ -54,3 +54,5 @@ export const TabHeader = styled.h2`
 export const DefaultToolSelector = styled(ToolSelector)``;
 
 export const MachineToolCheckbox = styled(Checkbox)``;
+
+export const EyeglassesCheckbox = styled(Checkbox)``;
