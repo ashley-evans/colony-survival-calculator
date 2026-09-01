@@ -179,8 +179,7 @@ test("queries calculator output if item and workers inputted with default unit s
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.Minutes,
-        maxAvailableTool: "NONE",
-        hasMachineTools: false,
+        availableTools: { default: "NONE", machine: false },
         locale: "en-US",
     });
 });
@@ -208,8 +207,7 @@ test("queries calculator output if item and workers inputted with non-default un
         workers: expectedWorkers,
         amount: null,
         unit: OutputUnit.GameDays,
-        maxAvailableTool: "NONE",
-        hasMachineTools: false,
+        availableTools: { default: "NONE", machine: false },
         locale: "en-US",
     });
 });
@@ -237,8 +235,7 @@ test("queries calculator output if item and target amount inputted with default 
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.GameDays,
-        maxAvailableTool: "NONE",
-        hasMachineTools: false,
+        availableTools: { default: "NONE", machine: false },
         locale: "en-US",
     });
 });
@@ -265,8 +262,7 @@ test("queries calculator output if item and target amount inputted with non-defa
         workers: null,
         amount: expectedAmount,
         unit: OutputUnit.Minutes,
-        maxAvailableTool: "NONE",
-        hasMachineTools: false,
+        availableTools: { default: "NONE", machine: false },
         locale: "en-US",
     });
 });
@@ -390,8 +386,7 @@ test("queries optimal output and requirements with machine tool availability onc
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            maxAvailableTool: "NONE",
-            hasMachineTools: true,
+            availableTools: { default: "NONE", machine: true },
             locale: "en-US",
         },
     );

@@ -9,18 +9,18 @@ import {
     expectedWorkerInputLabel,
 } from "./constants";
 import {
-    AvailableTools,
+    AvailableDefaultTools,
     OutputUnit,
 } from "../../../../graphql/__generated__/graphql";
 import { selectOption } from "../../../../test";
 
-const ToolSelectorMappings: Readonly<Record<AvailableTools, string>> = {
-    [AvailableTools.None]: "None",
-    [AvailableTools.Stone]: "Stone",
-    [AvailableTools.Copper]: "Copper",
-    [AvailableTools.Iron]: "Iron",
-    [AvailableTools.Bronze]: "Bronze",
-    [AvailableTools.Steel]: "Steel",
+const ToolSelectorMappings: Readonly<Record<AvailableDefaultTools, string>> = {
+    [AvailableDefaultTools.None]: "None",
+    [AvailableDefaultTools.Stone]: "Stone",
+    [AvailableDefaultTools.Copper]: "Copper",
+    [AvailableDefaultTools.Iron]: "Iron",
+    [AvailableDefaultTools.Bronze]: "Bronze",
+    [AvailableDefaultTools.Steel]: "Steel",
 };
 
 const OutputUnitSelectorMappings: Readonly<Record<OutputUnit, string>> = {
@@ -81,7 +81,7 @@ async function selectOutputUnit(unit: OutputUnit) {
     });
 }
 
-async function selectTool(tool: AvailableTools) {
+async function selectTool(tool: AvailableDefaultTools) {
     return selectOption({
         label: expectedToolSelectLabel,
         optionName: ToolSelectorMappings[tool],

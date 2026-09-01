@@ -5,7 +5,7 @@ import { useDebounce } from "use-debounce";
 
 import {
     OutputUnit,
-    AvailableTools,
+    AvailableDefaultTools,
     CreatorOverride,
 } from "../../../../graphql/__generated__/graphql";
 import { gql } from "../../../../graphql/__generated__";
@@ -20,7 +20,7 @@ type OutputProps = {
     target: Target;
     outputUnit: OutputUnit;
     onSelectedItemTotalChange: (target: Target) => void;
-    maxAvailableTool?: AvailableTools;
+    maxAvailableTool?: AvailableDefaultTools;
     hasMachineTools?: boolean;
     creatorOverrides?: CreatorOverride[];
 };
@@ -30,8 +30,8 @@ type ErrorMessageProps = {
 };
 
 const GET_CALCULATOR_OUTPUT = gql(`
-    query GetCalculatorOutput($id: ID!, $workers: Int, $amount: Float, $unit: OutputUnit!, $maxAvailableTool: AvailableTools, $hasMachineTools: Boolean, $creatorOverrides: [CreatorOverride!], $locale: String) {
-        requirement(id: $id, workers: $workers, amount: $amount, maxAvailableTool: $maxAvailableTool, hasMachineTools: $hasMachineTools, creatorOverrides: $creatorOverrides, unit: $unit, locale: $locale) {
+    query GetCalculatorOutput($id: ID!, $workers: Int, $amount: Float, $unit: OutputUnit!, $availableTools: AvailableTools, $creatorOverrides: [CreatorOverride!], $locale: String) {
+        requirement(id: $id, workers: $workers, amount: $amount, availableTools: $availableTools, creatorOverrides: $creatorOverrides, unit: $unit, locale: $locale) {
             ... on Requirements {
                 requirements {
                     id
@@ -95,6 +95,10 @@ function Output({
             creatorOverrides && creatorOverrides.length > 0
                 ? creatorOverrides
                 : undefined;
+        const availableTools =
+            maxAvailableTool !== undefined || hasMachineTools !== undefined
+                ? { default: maxAvailableTool, machine: hasMachineTools }
+                : undefined;
 
         getCalculatorOutput({
             variables: {
@@ -106,8 +110,7 @@ function Output({
                         ? debouncedTarget.workers
                         : null,
                 unit: outputUnit,
-                maxAvailableTool,
-                hasMachineTools,
+                availableTools,
                 creatorOverrides: creatorOverridesFilter,
                 locale: i18n.language,
             },

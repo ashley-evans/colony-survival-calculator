@@ -1,24 +1,24 @@
-import { AvailableTools } from "../../../../graphql/__generated__/graphql";
+import { AvailableDefaultTools } from "../../../../graphql/__generated__/graphql";
 import { ToolSelectorI18NKeyMapping } from "../../utils";
 import { Selector } from "../../../../common/components";
 import { useTranslation } from "react-i18next";
 
 type ToolSelectorProps = {
-    onToolChange: (unit: AvailableTools) => void;
-    defaultTool?: AvailableTools;
+    onToolChange: (unit: AvailableDefaultTools) => void;
+    defaultTool?: AvailableDefaultTools;
     className?: string;
 };
 
-const orderedTools: Record<AvailableTools, number> = {
-    [AvailableTools.None]: 0,
-    [AvailableTools.Stone]: 1,
-    [AvailableTools.Copper]: 2,
-    [AvailableTools.Iron]: 3,
-    [AvailableTools.Bronze]: 4,
-    [AvailableTools.Steel]: 5,
+const orderedTools: Record<AvailableDefaultTools, number> = {
+    [AvailableDefaultTools.None]: 0,
+    [AvailableDefaultTools.Stone]: 1,
+    [AvailableDefaultTools.Copper]: 2,
+    [AvailableDefaultTools.Iron]: 3,
+    [AvailableDefaultTools.Bronze]: 4,
+    [AvailableDefaultTools.Steel]: 5,
 };
 
-const tools = Object.keys(orderedTools) as AvailableTools[];
+const tools = Object.keys(orderedTools) as AvailableDefaultTools[];
 
 function ToolSelector({
     onToolChange,
@@ -27,7 +27,7 @@ function ToolSelector({
 }: ToolSelectorProps) {
     const { t } = useTranslation();
 
-    const handleToolChange = (selectedTool?: AvailableTools) => {
+    const handleToolChange = (selectedTool?: AvailableDefaultTools) => {
         if (selectedTool) onToolChange(selectedTool);
     };
 

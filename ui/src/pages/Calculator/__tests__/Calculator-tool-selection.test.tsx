@@ -29,7 +29,7 @@ import Calculator from "../Calculator";
 import { waitForRequest } from "../../../helpers/utils";
 import {
     OutputUnit,
-    AvailableTools,
+    AvailableDefaultTools,
 } from "../../../graphql/__generated__/graphql";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
@@ -130,7 +130,7 @@ test("updates the selected tool if selected is changed", async () => {
     const expected = "Iron";
 
     render(<Calculator />);
-    await selectTool(AvailableTools.Iron);
+    await selectTool(AvailableDefaultTools.Iron);
     await openSelectMenu({ label: expectedToolSelectLabel });
 
     expect(
@@ -145,7 +145,7 @@ test("updates the selected tool if selected is changed", async () => {
 });
 
 test("queries calculator with provided tool if non default selected", async () => {
-    const expectedTool = AvailableTools.Steel;
+    const expectedTool = AvailableDefaultTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -170,14 +170,13 @@ test("queries calculator with provided tool if non default selected", async () =
         amount: null,
         workers: expectedWorkers,
         unit: OutputUnit.Minutes,
-        maxAvailableTool: expectedTool,
-        hasMachineTools: false,
+        availableTools: { default: expectedTool, machine: false },
         locale: "en-US",
     });
 });
 
 test("queries optimal output again if tool is changed after first query", async () => {
-    const expectedTool = AvailableTools.Copper;
+    const expectedTool = AvailableDefaultTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -189,14 +188,13 @@ test("queries optimal output again if tool is changed after first query", async 
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            maxAvailableTool: expectedTool,
-            hasMachineTools: false,
+            availableTools: { default: expectedTool, machine: false },
             locale: "en-US",
         },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(AvailableTools.Steel);
+    await selectTool(AvailableDefaultTools.Steel);
     await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
@@ -210,7 +208,7 @@ test("queries optimal output again if tool is changed after first query", async 
 });
 
 test("queries requirements with provided tool if non default selected", async () => {
-    const expectedTool = AvailableTools.Steel;
+    const expectedTool = AvailableDefaultTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -234,15 +232,14 @@ test("queries requirements with provided tool if non default selected", async ()
         id: item.id,
         amount: null,
         workers: expectedWorkers,
-        maxAvailableTool: expectedTool,
-        hasMachineTools: false,
+        availableTools: { default: expectedTool, machine: false },
         unit: OutputUnit.Minutes,
         locale: "en-US",
     });
 });
 
 test("queries requirements again if tool is changed after first query", async () => {
-    const expectedTool = AvailableTools.Copper;
+    const expectedTool = AvailableDefaultTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -254,14 +251,13 @@ test("queries requirements again if tool is changed after first query", async ()
             amount: null,
             workers: expectedWorkers,
             unit: OutputUnit.Minutes,
-            maxAvailableTool: expectedTool,
-            hasMachineTools: false,
+            availableTools: { default: expectedTool, machine: false },
             locale: "en-US",
         },
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(AvailableTools.Steel);
+    await selectTool(AvailableDefaultTools.Steel);
     await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
@@ -275,7 +271,7 @@ test("queries requirements again if tool is changed after first query", async ()
 });
 
 test("queries item details with provided tool if non default selected", async () => {
-    const expectedTool = AvailableTools.Steel;
+    const expectedTool = AvailableDefaultTools.Steel;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -286,8 +282,8 @@ test("queries item details with provided tool if non default selected", async ()
             filters: {
                 id: item.id,
                 optimal: {
-                    maxAvailableTool: expectedTool,
-                    hasMachineTools: false,
+                    default: expectedTool,
+                    machine: false,
                 },
             },
             locale: "en-US",
@@ -305,7 +301,7 @@ test("queries item details with provided tool if non default selected", async ()
 });
 
 test("queries item details again if tool is changed after first query", async () => {
-    const expectedTool = AvailableTools.Copper;
+    const expectedTool = AvailableDefaultTools.Copper;
     const expectedWorkers = 5;
     const expectedRequest = waitForRequest(
         server,
@@ -316,8 +312,8 @@ test("queries item details again if tool is changed after first query", async ()
             filters: {
                 id: item.id,
                 optimal: {
-                    maxAvailableTool: expectedTool,
-                    hasMachineTools: false,
+                    default: expectedTool,
+                    machine: false,
                 },
             },
             locale: "en-US",
@@ -325,7 +321,7 @@ test("queries item details again if tool is changed after first query", async ()
     );
 
     render(<Calculator />, expectedGraphQLAPIURL);
-    await selectTool(AvailableTools.Steel);
+    await selectTool(AvailableDefaultTools.Steel);
     await selectItemAndTarget({
         itemName: item.name,
         workers: expectedWorkers,
@@ -339,7 +335,7 @@ test("does not reset the currently selected tool after changing tabs", async () 
     const expected = "Iron";
 
     render(<Calculator />);
-    await selectTool(AvailableTools.Iron);
+    await selectTool(AvailableDefaultTools.Iron);
     await clickByName(expectedSettingsTab, "tab");
     await screen.findByRole("heading", {
         name: expectedSettingsTabHeader,
@@ -408,8 +404,8 @@ describe("machine tool selection", () => {
                 filters: {
                     id: item.id,
                     optimal: {
-                        maxAvailableTool: AvailableTools.None,
-                        hasMachineTools: true,
+                        default: AvailableDefaultTools.None,
+                        machine: true,
                     },
                 },
                 locale: "en-US",
