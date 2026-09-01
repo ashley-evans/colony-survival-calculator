@@ -41,7 +41,10 @@ function getMinimumToolWithinGroup(group: RequiredToolFields[]): MinimumTools {
         }
 
         if (toolset.type === "eyeglasses") {
-            needsEyeglasses = true;
+            if (toolset.minimumTool === "eyeglasses") {
+                needsEyeglasses = true;
+            }
+
             continue;
         }
 
