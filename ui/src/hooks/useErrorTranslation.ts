@@ -13,6 +13,10 @@ export function useErrorTranslation() {
                 return t("errors.TOOL_LEVEL_MACHINE");
             }
 
+            if (details.requiredTool === "eyeglasses") {
+                return t("errors.TOOL_LEVEL_EYEGLASSES");
+            }
+
             const toolKey = `calculator.tools.mapping.${details.requiredTool}`;
             const toolExists = i18n.exists(toolKey);
             if (!toolExists) {

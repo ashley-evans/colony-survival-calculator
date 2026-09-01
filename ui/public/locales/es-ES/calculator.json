@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "¿Herramientas mecánicas disponibles?"
             },
+            "eyeglasses": {
+                "label": "¿Gafas disponibles?"
+            },
             "mapping": {
                 "none": "Ninguna",
                 "stone": "Piedra",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Los cálculos son correctos para la versión: {{version}} ({{date}})",
-        "source": "Los cálculos usan archivos de datos públicos del <repoLink>repositorio de Colony Survival</repoLink>."
+        "source": "Los cálculos usan archivos de datos públicos del <repoLink>repositorio de Colony Survival</repoLink>.",
+        "movementDisclaimer": "Los cálculos actualmente no tienen en cuenta el movimiento de los trabajadores ni el tiempo de giro entre acciones, por lo que las recetas asumen un desplazamiento instantáneo. En la práctica, es de esperar que se necesiten algunos trabajadores más para alcanzar la producción objetivo, aunque las proporciones entre recetas deberían mantenerse aproximadamente. Se trata de una limitación conocida que se abordará en una futura actualización.",
+        "merchantGoodsDisclaimer": "Los siguientes objetos no son compatibles actualmente, ya que dependen de bienes comerciados con mercaderes: Kit de colonia, Cosechador de glicina."
     },
     "errors": {
         "UNKNOWN": "Se produjo un error, por favor inténtalo de nuevo.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Objeto desconocido",
         "TOOL_LEVEL": "No se puede crear el objeto con las herramientas disponibles, herramienta mínima requerida: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "No se puede crear el objeto con las herramientas disponibles, requiere herramientas mecánicas",
-        "MULTIPLE_OVERRIDE": "Se ha proporcionado más de una sobrescritura de productor para: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "No se puede crear el objeto con las herramientas disponibles, requiere gafas",
+        "MULTIPLE_OVERRIDE": "Se ha proporcionado más de una sobrescritura de productor para: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "El objeto no se puede crear con las sobrescrituras actuales"
     }
 }

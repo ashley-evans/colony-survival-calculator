@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "机械工具可用？"
             },
+            "eyeglasses": {
+                "label": "眼镜可用？"
+            },
             "mapping": {
                 "none": "无",
                 "stone": "石制",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "计算适用于版本：{{version}}（{{date}}）",
-        "source": "计算使用<repoLink>Colony Survival仓库</repoLink>中的公开游戏数据文件。"
+        "source": "计算使用<repoLink>Colony Survival仓库</repoLink>中的公开游戏数据文件。",
+        "movementDisclaimer": "目前的计算未考虑工人在各操作之间的移动或转身时间，因此配方假定为瞬间移动。实际使用时，预计需要略多的工人才能达到目标产量，但配方之间的比例应大致保持不变。这是一个已知的限制，将在未来的更新中得到改进。",
+        "merchantGoodsDisclaimer": "以下物品因依赖商人交易的商品，目前尚不支持：殖民地工具包、紫藤采集者。"
     },
     "errors": {
         "UNKNOWN": "发生错误，请重试。",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "未知物品",
         "TOOL_LEVEL": "无法使用现有工具制作该物品，最低工具要求：{{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "无法使用现有工具制作该物品，需要机械工具",
-        "MULTIPLE_OVERRIDE": "为同一物品指定了多个生产者覆盖：{{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "无法使用现有工具制作该物品，需要眼镜",
+        "MULTIPLE_OVERRIDE": "为同一物品指定了多个生产者覆盖：{{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "使用当前覆盖设置无法制作该物品"
     }
 }

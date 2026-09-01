@@ -285,6 +285,16 @@ describe.each([
         "user error message (known)",
     ],
     [
+        "requirements query user errors (multiple override)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "MULTIPLE_OVERRIDE",
+                details: { itemID: "conflicting-item" },
+            }),
+        "More than one creator override provided for: conflicting-item",
+        "user error message (multiple override)",
+    ],
+    [
         "requirements query user errors (stone tool level)",
         () =>
             createCalculatorOutputUserErrorHandler({
@@ -303,6 +313,16 @@ describe.each([
             }),
         "Unable to create item with available tools, requires machine tools",
         "user error message (tool level - machine)",
+    ],
+    [
+        "requirements query user errors (eyeglasses tool level)",
+        () =>
+            createCalculatorOutputUserErrorHandler({
+                errorCode: "TOOL_LEVEL",
+                details: { requiredTool: "eyeglasses" },
+            }),
+        "Unable to create item with available tools, requires eyeglasses",
+        "user error message (tool level - eyeglasses)",
     ],
     [
         "requirements query user errors (unknown tool level)",

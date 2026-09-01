@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "기계 도구 사용 가능?"
             },
+            "eyeglasses": {
+                "label": "안경 사용 가능?"
+            },
             "mapping": {
                 "none": "없음",
                 "stone": "돌",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "계산은 버전 {{version}} ({{date}})에 맞게 작성되었습니다",
-        "source": "계산은 <repoLink>Colony Survival 저장소</repoLink>의 공개 게임 데이터 파일을 사용합니다."
+        "source": "계산은 <repoLink>Colony Survival 저장소</repoLink>의 공개 게임 데이터 파일을 사용합니다.",
+        "movementDisclaimer": "현재 계산에서는 작업 간 작업자의 이동이나 방향 전환 시간을 고려하지 않으며, 레시피는 즉시 이동을 가정합니다. 실제로는 목표 생산량을 달성하기 위해 약간 더 많은 작업자가 필요할 수 있지만, 레시피 간의 비율은 대체로 유지될 것입니다. 이는 알려진 제한 사항이며 향후 업데이트에서 개선될 예정입니다.",
+        "merchantGoodsDisclaimer": "다음 아이템은 상인 거래 물품에 의존하기 때문에 현재 지원되지 않습니다: 정착지 키트, 등나무 수확자."
     },
     "errors": {
         "UNKNOWN": "오류가 발생했습니다. 다시 시도해 주세요.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "알 수 없는 아이템입니다",
         "TOOL_LEVEL": "사용 가능한 도구로 아이템을 생산할 수 없습니다. 최소 필요 도구: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "사용 가능한 도구로 아이템을 생산할 수 없습니다. 기계 도구가 필요합니다",
-        "MULTIPLE_OVERRIDE": "생산자 재정의가 두 개 이상 지정되었습니다: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "사용 가능한 도구로 아이템을 생산할 수 없습니다. 안경이 필요합니다",
+        "MULTIPLE_OVERRIDE": "생산자 재정의가 두 개 이상 지정되었습니다: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "현재 재정의 설정으로는 아이템을 생산할 수 없습니다"
     }
 }

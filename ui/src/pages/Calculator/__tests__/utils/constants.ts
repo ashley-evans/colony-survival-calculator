@@ -33,3 +33,7 @@ export const expectedGameDataReferenceRepositoryLinkText =
     "Colony Survival repository";
 export const expectedGameDataReferenceRepositoryLink =
     "https://github.com/pipliz/ColonySurvival";
+export const expectedMovementDisclaimerExplanation =
+    "Calculations do not currently account for worker movement or turning time between actions, so recipes assume instant travel. Expect to need slightly more workers in practice to hit your target output, though the ratios between recipes should still roughly hold. This is a known limitation that will be addressed in a future update.";
+export const expectedMerchantGoodsDisclaimerExplanation =
+    "The following items are not currently supported, as they rely on merchant-traded goods: Colony Kit, Wisteria Harvester.";

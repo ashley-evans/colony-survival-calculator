@@ -262,6 +262,8 @@ function AboutTab() {
                     }}
                 />
             </span>
+            <span>{t("about.movementDisclaimer")}</span>
+            <span>{t("about.merchantGoodsDisclaimer")}</span>
         </>
     );
 }
