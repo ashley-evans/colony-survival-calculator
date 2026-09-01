@@ -12,8 +12,8 @@ import {
 import type {
     Item,
     ItemsFilters,
-    OptimalFilter,
     QueryItemArgs,
+    AvailableDefaultTools,
     AvailableTools,
     Tools,
 } from "../../../graphql/schema";
@@ -26,14 +26,14 @@ vi.mock("../domain/query-item", () => ({
 const mockQueryItem = queryItem as Mock;
 
 function createOptimalFilter(
-    maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean,
-    hasEyeglasses?: boolean,
-): OptimalFilter {
+    defaultTool?: AvailableDefaultTools,
+    machine?: boolean,
+    eyeglasses?: boolean,
+): AvailableTools {
     return {
-        maxAvailableTool: maxAvailableTool ?? null,
-        hasMachineTools: hasMachineTools ?? null,
-        hasEyeglasses: hasEyeglasses ?? null,
+        default: defaultTool ?? null,
+        machine: machine ?? null,
+        eyeglasses: eyeglasses ?? null,
     };
 }
 
@@ -46,7 +46,7 @@ function createFilters({
     itemID?: string;
     minimumCreators?: number;
     creatorID?: string;
-    optimal?: OptimalFilter;
+    optimal?: AvailableTools;
 }): ItemsFilters {
     return {
         id: itemID ?? null,
@@ -141,7 +141,7 @@ test.each([
     [
         "an optimal filter specified w/ max tool",
         mockEventWithOptimalFilterAndMaxTool,
-        { optimal: { maxAvailableTool: "copper" as DomainTools } },
+        { optimal: { default: "copper" as DomainTools } },
         undefined,
     ],
     [
@@ -151,7 +151,7 @@ test.each([
             id: expectedItemID,
             minimumCreators: expectedMinimumCreators,
             creatorID: expectedCreatorID,
-            optimal: { maxAvailableTool: "steel" as DomainTools },
+            optimal: { default: "steel" as DomainTools },
         },
         undefined,
     ],
@@ -163,7 +163,7 @@ test.each([
             }),
         ),
         {
-            optimal: { hasMachineTools: true },
+            optimal: { machine: true },
         },
         undefined,
     ],
@@ -175,7 +175,7 @@ test.each([
             }),
         ),
         {
-            optimal: { hasMachineTools: false },
+            optimal: { machine: false },
         },
         undefined,
     ],
@@ -187,7 +187,7 @@ test.each([
             }),
         ),
         {
-            optimal: { hasEyeglasses: true },
+            optimal: { eyeglasses: true },
         },
         undefined,
     ],
@@ -199,7 +199,7 @@ test.each([
             }),
         ),
         {
-            optimal: { hasEyeglasses: false },
+            optimal: { eyeglasses: false },
         },
         undefined,
     ],

@@ -1,30 +1,22 @@
 import type { OutputResult, QueryOutputArgs } from "../../graphql/schema";
 import type { GraphQLEventHandler } from "../../interfaces/GraphQLEventHandler";
 import { calculateOutput } from "./domain/output-calculator";
-import { AvailableToolsSchemaMap, OutputUnit } from "../../common";
-import { UserError } from "../../common";
+import { mapAvailableTools, OutputUnit, UserError } from "../../common";
 
 const handler: GraphQLEventHandler<QueryOutputArgs, OutputResult> = async (
     event,
 ) => {
-    const { id, workers, unit, maxAvailableTool, creatorID, hasMachineTools } =
-        event.arguments;
+    const { input } = event.arguments;
 
     try {
         const output = await calculateOutput({
-            id,
-            workers,
-            unit: OutputUnit[unit],
-            ...(maxAvailableTool
-                ? {
-                      maxAvailableTool:
-                          AvailableToolsSchemaMap[maxAvailableTool],
-                  }
+            id: input.id,
+            workers: input.workers,
+            unit: OutputUnit[input.unit],
+            ...(input.availableTools
+                ? { availableTools: mapAvailableTools(input.availableTools) }
                 : {}),
-            ...(hasMachineTools !== undefined && hasMachineTools !== null
-                ? { hasMachineTools }
-                : {}),
-            ...(creatorID ? { creatorID } : {}),
+            ...(input.creatorID ? { creatorID: input.creatorID } : {}),
         });
 
         return { __typename: "OptimalOutput", amount: output };

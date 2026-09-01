@@ -283,7 +283,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: "steel" as DefaultToolset },
+                optimal: { default: "steel" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -314,7 +314,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: "none" as DefaultToolset },
+                optimal: { default: "none" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -343,7 +343,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { hasMachineTools: false },
+                optimal: { machine: false },
             });
 
             expect(actual).toHaveLength(1);
@@ -375,7 +375,7 @@ describe("field queries", () => {
                 mockQueryItemByField.mockResolvedValue(received);
 
                 const actual = await queryItem({
-                    optimal: { hasMachineTools },
+                    optimal: { machine: hasMachineTools },
                 });
 
                 expect(actual).toHaveLength(1);
@@ -406,8 +406,8 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasMachineTools: true,
-                    maxAvailableTool: "steel" as DefaultToolset,
+                    machine: true,
+                    default: "steel" as DefaultToolset,
                 },
             });
 
@@ -428,7 +428,7 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasMachineTools: false,
+                    machine: false,
                 },
             });
 
@@ -459,7 +459,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { hasEyeglasses: false },
+                optimal: { eyeglasses: false },
             });
 
             expect(actual).toHaveLength(1);
@@ -493,7 +493,7 @@ describe("field queries", () => {
                 mockQueryItemByField.mockResolvedValue(received);
 
                 const actual = await queryItem({
-                    optimal: { hasEyeglasses },
+                    optimal: { eyeglasses: hasEyeglasses },
                 });
 
                 expect(actual).toHaveLength(1);
@@ -526,8 +526,8 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasEyeglasses: true,
-                    maxAvailableTool: "steel" as DefaultToolset,
+                    eyeglasses: true,
+                    default: "steel" as DefaultToolset,
                 },
             });
 
@@ -550,7 +550,7 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasEyeglasses: false,
+                    eyeglasses: false,
                 },
             });
 
@@ -822,7 +822,7 @@ describe("creator count queries", () => {
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: "steel" as DefaultToolset },
+                optimal: { default: "steel" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -854,7 +854,7 @@ describe("creator count queries", () => {
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: "none" as DefaultToolset },
+                optimal: { default: "none" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);

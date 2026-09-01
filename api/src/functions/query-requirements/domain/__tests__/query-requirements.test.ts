@@ -737,7 +737,7 @@ describe("handles tool modifiers", () => {
                 queryRequirements({
                     id: item.id,
                     workers: validWorkers,
-                    maxAvailableTool: provided,
+                    availableTools: { default: provided },
                 }),
             ).rejects.toThrow(expectedError);
         },
@@ -805,7 +805,7 @@ describe("handles tool modifiers", () => {
                 queryRequirements({
                     id: item.id,
                     workers: validWorkers,
-                    maxAvailableTool: provided,
+                    availableTools: { default: provided },
                 }),
             ).rejects.toThrow(expectedError);
         },
@@ -879,7 +879,7 @@ describe("handles tool modifiers", () => {
             const actual = await queryRequirements({
                 id: item.id,
                 workers: validWorkers,
-                maxAvailableTool: provided,
+                availableTools: { default: provided },
             });
 
             const requirement = findRequirement(
@@ -918,7 +918,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -953,7 +953,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -986,7 +986,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -1365,7 +1365,7 @@ describe("multiple recipe handling", () => {
         const actual = await queryRequirements({
             id: moreOptimalItemRecipe.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
 
         expect(actual).toEqual([
@@ -2394,7 +2394,9 @@ describe("handles machine tools", () => {
                     queryRequirements({
                         id: machineToolsItem.id,
                         workers: validWorkers,
-                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                        ...(hasMachineTools
+                            ? { availableTools: { machine: hasMachineTools } }
+                            : {}),
                     }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
@@ -2405,7 +2407,9 @@ describe("handles machine tools", () => {
                     queryRequirements({
                         id: baseItem.id,
                         workers: validWorkers,
-                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                        ...(hasMachineTools
+                            ? { availableTools: { machine: hasMachineTools } }
+                            : {}),
                     }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
@@ -2434,8 +2438,10 @@ describe("handles machine tools", () => {
             queryRequirements({
                 id: baseItem.id,
                 workers: validWorkers,
-                hasMachineTools: true,
-                maxAvailableTool: "iron" as DefaultToolset,
+                availableTools: {
+                    machine: true,
+                    default: "iron" as DefaultToolset,
+                },
             }),
         ).rejects.toThrow(expectedError);
     });
@@ -2444,7 +2450,7 @@ describe("handles machine tools", () => {
         const actual = await queryRequirements({
             id: baseItem.id,
             workers: validWorkers,
-            hasMachineTools: true,
+            availableTools: { machine: true },
         });
 
         expect(actual).toEqual([
@@ -2826,8 +2832,10 @@ test("logs out requirements query to console", async () => {
     });
     const expectedParams: QueryRequirementsParams = {
         id: storedItem.id,
-        maxAvailableTool: "copper" as DefaultToolset,
-        hasMachineTools: true,
+        availableTools: {
+            default: "copper" as DefaultToolset,
+            machine: true,
+        },
         unit: OutputUnit.GAME_DAYS,
         creatorOverrides: [
             { itemID: storedItem.id, creatorID: storedItem.creatorID },

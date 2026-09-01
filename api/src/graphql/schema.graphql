@@ -82,7 +82,7 @@ enum OutputUnit {
     GAME_DAYS
 }
 
-enum AvailableTools {
+enum AvailableDefaultTools {
     NONE
     STONE
     COPPER
@@ -91,17 +91,17 @@ enum AvailableTools {
     STEEL
 }
 
-input OptimalFilter {
-    maxAvailableTool: AvailableTools
-    hasMachineTools: Boolean
-    hasEyeglasses: Boolean
+input AvailableTools {
+    default: AvailableDefaultTools
+    machine: Boolean
+    eyeglasses: Boolean
 }
 
 input ItemsFilters {
     id: ID
     minimumCreators: Int
     creatorID: String
-    optimal: OptimalFilter
+    optimal: AvailableTools
 }
 
 type ItemName {
@@ -109,27 +109,27 @@ type ItemName {
     name: String!
 }
 
+input CalculateOutputInput {
+    id: ID!
+    workers: Int!
+    unit: OutputUnit!
+    availableTools: AvailableTools
+    creatorID: String
+}
+
 type Query {
     distinctItemNames(locale: String): [ItemName!]!
     item(filters: ItemsFilters, locale: String): [Item!]!
     requirement(
         id: ID!
-        maxAvailableTool: AvailableTools
-        hasMachineTools: Boolean
+        availableTools: AvailableTools
         creatorOverrides: [CreatorOverride!]
         unit: OutputUnit
         workers: Int
         amount: Float
         locale: String
     ): RequirementResult!
-    output(
-        id: ID!
-        workers: Int!
-        unit: OutputUnit!
-        maxAvailableTool: AvailableTools
-        hasMachineTools: Boolean
-        creatorID: String
-    ): OutputResult!
+    output(input: CalculateOutputInput!): OutputResult!
 }
 
 schema {

@@ -1,5 +1,5 @@
-import { ToolModifierValues, getMaxToolModifier } from "..";
-import { DefaultToolset, TranslatedItem } from "../../types";
+import { getMaxToolModifier } from "..";
+import { AvailableTools, TranslatedItem } from "../../types";
 
 enum OutputUnit {
     SECONDS = "SECONDS",
@@ -12,15 +12,11 @@ const OutputUnitSecondMappings: Readonly<Record<OutputUnit, number>> = {
     [OutputUnit.MINUTES]: 60,
     [OutputUnit.GAME_DAYS]: 435,
 };
-
 function calculateOutput(
     item: Pick<TranslatedItem, "toolset" | "createTime" | "output">,
-    maxAvailableTool: DefaultToolset,
+    availableTools: AvailableTools,
 ): number {
-    const modifier =
-        item.toolset.type === "machine"
-            ? ToolModifierValues["machine"]
-            : getMaxToolModifier(item.toolset.maximumTool, maxAvailableTool);
+    const modifier = getMaxToolModifier(item, availableTools);
 
     return item.output / (item.createTime / modifier);
 }

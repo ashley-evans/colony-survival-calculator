@@ -1,6 +1,6 @@
 import solver, { IMultiObjectiveModel, IModelBase } from "javascript-lp-solver";
 
-import { DefaultToolset, TranslatedItem } from "../../../types";
+import { AvailableTools, TranslatedItem } from "../../../types";
 import { calculateCreateTime } from "./item-utils";
 import {
     OutputUnit,
@@ -27,8 +27,7 @@ type ProgramInput = {
     inputItemID: string;
     target: ProgramTarget;
     requirements: TranslatedItem[];
-    maxAvailableTool: DefaultToolset;
-    hasMachineTools: boolean;
+    availableTools: AvailableTools;
     unit: OutputUnit;
 };
 
@@ -63,11 +62,10 @@ function createVariableName({
 
 function filterCreatable(
     items: Readonly<TranslatedItem[]>,
-    maxAvailableTool: DefaultToolset,
-    hasMachineTools: boolean,
+    availableTools: AvailableTools,
 ): TranslatedItem[] {
     return items.filter((item) =>
-        isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item),
+        isAvailableToolSufficient({ available: availableTools, item }),
     );
 }
 
@@ -98,7 +96,7 @@ function createRecipeOutputVariableName(
 
 function createDemandVariables(
     items: Readonly<TranslatedItem[]>,
-    maxAvailableTool: DefaultToolset,
+    availableTools: AvailableTools,
     inputItemID: string,
     unit: OutputUnit,
 ): Variables {
@@ -124,7 +122,7 @@ function createDemandVariables(
             );
 
             // Set recipe output properties
-            const createTime = calculateCreateTime(recipe, maxAvailableTool);
+            const createTime = calculateCreateTime(recipe, availableTools);
             recipeVariable[baseRecipeOutputPropertyName] =
                 (recipe.output / createTime) * OutputUnitSecondMappings[unit];
 
@@ -302,8 +300,7 @@ function createTargetConstraint(
 function computeRequirementVertices({
     inputItemID,
     requirements,
-    maxAvailableTool,
-    hasMachineTools,
+    availableTools,
     target,
     unit,
 }: ProgramInput): VertexOutput | undefined {
@@ -313,14 +310,10 @@ function computeRequirementVertices({
         throw new UserError(ErrorCode.UNKNOWN_ITEM);
     }
 
-    const createAbleItems = filterCreatable(
-        requirements,
-        maxAvailableTool,
-        hasMachineTools,
-    );
+    const createAbleItems = filterCreatable(requirements, availableTools);
     const variables = createDemandVariables(
         createAbleItems,
-        maxAvailableTool,
+        availableTools,
         inputItemID,
         unit,
     );

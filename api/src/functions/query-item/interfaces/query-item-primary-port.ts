@@ -1,20 +1,14 @@
-import type { DefaultToolset, TranslatedItem } from "../../../types";
-
-type OptimalFilter = {
-    maxAvailableTool?: DefaultToolset | undefined;
-    hasMachineTools?: boolean | undefined;
-    hasEyeglasses?: boolean | undefined;
-};
+import type { AvailableToolsInput, TranslatedItem } from "../../../types";
 
 type QueryFilters = {
     id?: string | undefined;
     minimumCreators?: number | undefined;
     creatorID?: string | undefined;
-    optimal?: OptimalFilter | undefined;
+    optimal?: AvailableToolsInput | undefined;
 };
 
 interface QueryItemPrimaryPort {
     (filters?: QueryFilters, locale?: string): Promise<TranslatedItem[]>;
 }
 
-export type { QueryItemPrimaryPort, QueryFilters, OptimalFilter };
+export type { QueryItemPrimaryPort, QueryFilters };

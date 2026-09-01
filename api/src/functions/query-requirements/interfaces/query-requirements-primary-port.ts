@@ -1,5 +1,5 @@
 import { OutputUnit } from "../../../common";
-import { DefaultToolset } from "../../../types";
+import { AvailableToolsInput } from "../../../types";
 
 type CreatorOverride = {
     itemID: string;
@@ -32,8 +32,7 @@ type Requirement = {
 type QueryRequirementsBaseParams = {
     id: string;
     unit?: OutputUnit;
-    maxAvailableTool?: DefaultToolset;
-    hasMachineTools?: boolean;
+    availableTools?: AvailableToolsInput;
     creatorOverrides?: CreatorOverride[];
     locale?: string;
 };

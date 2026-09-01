@@ -1,4 +1,4 @@
-import { AvailableToolsSchemaMap, OutputUnit, UserError } from "../../common";
+import { mapAvailableTools, OutputUnit, UserError } from "../../common";
 import type {
     QueryRequirementArgs,
     RequirementResult,
@@ -51,9 +51,8 @@ const handler: GraphQLEventHandler<
     const {
         id,
         unit,
-        maxAvailableTool,
+        availableTools,
         creatorOverrides,
-        hasMachineTools,
         locale,
         ...targetInputs
     } = event.arguments;
@@ -74,14 +73,8 @@ const handler: GraphQLEventHandler<
             id,
             ...validatedTarget,
             ...(unit ? { unit: OutputUnit[unit] } : {}),
-            ...(maxAvailableTool
-                ? {
-                      maxAvailableTool:
-                          AvailableToolsSchemaMap[maxAvailableTool],
-                  }
-                : {}),
-            ...(hasMachineTools !== null && hasMachineTools !== undefined
-                ? { hasMachineTools }
+            ...(availableTools
+                ? { availableTools: mapAvailableTools(availableTools) }
                 : {}),
             ...(creatorOverrides ? { creatorOverrides } : {}),
             ...(locale ? { locale } : {}),
