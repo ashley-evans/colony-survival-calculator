@@ -13,6 +13,7 @@ import {
     TabContainer,
     TabHeader,
     Tabs,
+    ToolAvailabilityRow,
 } from "./styles";
 import {
     AvailableDefaultTools,
@@ -163,16 +164,18 @@ function CalculatorTab({
                         onToolChange={setSelectedTool}
                         defaultTool={selectedTool}
                     />
-                    <MachineToolCheckbox
-                        onChange={setHasMachineTools}
-                        label={t("calculator.tools.machineTools.label")}
-                        checked={hasMachineTools}
-                    />
-                    <EyeglassesCheckbox
-                        onChange={setHasEyeglasses}
-                        label={t("calculator.tools.eyeglasses.label")}
-                        checked={hasEyeglasses}
-                    />
+                    <ToolAvailabilityRow>
+                        <MachineToolCheckbox
+                            onChange={setHasMachineTools}
+                            label={t("calculator.tools.machineTools.label")}
+                            checked={hasMachineTools}
+                        />
+                        <EyeglassesCheckbox
+                            onChange={setHasEyeglasses}
+                            label={t("calculator.tools.eyeglasses.label")}
+                            checked={hasEyeglasses}
+                        />
+                    </ToolAvailabilityRow>
                     <OutputUnitSelector
                         onUnitChange={setSelectedOutputUnit}
                         defaultUnit={selectedOutputUnit}

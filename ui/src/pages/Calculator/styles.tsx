@@ -53,6 +53,13 @@ export const TabHeader = styled.h2`
 
 export const DefaultToolSelector = styled(ToolSelector)``;
 
+export const ToolAvailabilityRow = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+    row-gap: 0.75rem;
+`;
+
 export const MachineToolCheckbox = styled(Checkbox)``;
 
 export const EyeglassesCheckbox = styled(Checkbox)``;
