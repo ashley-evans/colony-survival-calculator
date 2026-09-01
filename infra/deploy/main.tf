@@ -2,6 +2,7 @@ terraform {
   backend "s3" {
     key                  = "deployment/colony-survival-calculator/terraform.tfstate"
     workspace_key_prefix = ""
+    use_lockfile         = true
   }
 
   required_providers {
