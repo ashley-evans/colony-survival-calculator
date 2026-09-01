@@ -1,4 +1,4 @@
-import { Requirement } from "../../../../../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../../../../../graphql/__generated__/schema-types";
 import {
     createCreatorDemands,
     createRequirement,

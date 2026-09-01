@@ -46,8 +46,7 @@ type QueryRequirementsTargetAmount = QueryRequirementsBaseParams & {
 };
 
 type QueryRequirementsParams =
-    | QueryRequirementsTargetWorkers
-    | QueryRequirementsTargetAmount;
+    QueryRequirementsTargetWorkers | QueryRequirementsTargetAmount;
 
 interface QueryRequirementsPrimaryPort {
     (input: QueryRequirementsParams): Promise<Requirement[]>;

@@ -2,7 +2,7 @@ import {
     CreatorDemand,
     RequirementCreator,
     Requirement,
-} from "../../../../graphql/__generated__/graphql";
+} from "../../../../graphql/__generated__/schema-types";
 
 function createCreatorDemands(name: string, amount: number): CreatorDemand {
     return {

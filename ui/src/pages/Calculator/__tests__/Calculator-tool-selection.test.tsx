@@ -31,7 +31,7 @@ import { waitForRequest } from "../../../helpers/utils";
 import {
     OutputUnit,
     AvailableDefaultTools,
-} from "../../../graphql/__generated__/graphql";
+} from "../../../graphql/__generated__/schema-types";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 
 const expectedGraphQLAPIURL = "http://localhost:3000/graphql";

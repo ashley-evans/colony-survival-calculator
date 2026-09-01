@@ -1,4 +1,4 @@
-import { AvailableDefaultTools } from "../../../graphql/__generated__/graphql";
+import { AvailableDefaultTools } from "../../../graphql/__generated__/schema-types";
 
 const ToolSelectorI18NKeyMapping: Readonly<
     Record<AvailableDefaultTools, string>

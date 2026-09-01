@@ -1,4 +1,4 @@
-import { AvailableDefaultTools } from "../../../../graphql/__generated__/graphql";
+import { AvailableDefaultTools } from "../../../../graphql/__generated__/schema-types";
 import { ToolSelectorI18NKeyMapping } from "../../utils";
 import { Selector } from "../../../../common/components";
 import { useTranslation } from "react-i18next";

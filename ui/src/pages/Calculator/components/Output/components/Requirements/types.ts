@@ -46,5 +46,4 @@ export type MultipleCreatorRequirementsTableRow = Omit<
 };
 
 export type RequirementsTableRow =
-    | SingleCreatorRequirementsTableRow
-    | MultipleCreatorRequirementsTableRow;
+    SingleCreatorRequirementsTableRow | MultipleCreatorRequirementsTableRow;

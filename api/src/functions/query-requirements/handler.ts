@@ -25,8 +25,7 @@ const validateTargetInput = ({
     workers,
     amount,
 }: Pick<QueryRequirementArgs, "workers" | "amount">):
-    | { amount: number }
-    | { workers: number } => {
+    { amount: number } | { workers: number } => {
     const isTargetWorkersDefined = isDefined(workers);
     const isTargetAmountDefined = isDefined(amount);
     if (isTargetWorkersDefined && isTargetAmountDefined) {

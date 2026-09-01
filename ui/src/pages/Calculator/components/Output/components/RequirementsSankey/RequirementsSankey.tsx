@@ -2,7 +2,7 @@ import { ResponsiveSankey, DefaultLink, DefaultNode } from "@nivo/sankey";
 import { useTranslation } from "react-i18next";
 
 import { SankeyContainer } from "./styles";
-import { Requirement } from "../../../../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../../../../graphql/__generated__/schema-types";
 import { RequirementTreeNode, createTree } from "./utils";
 import { roundOutput } from "../../../../utils";
 import { useTheme } from "styled-components";

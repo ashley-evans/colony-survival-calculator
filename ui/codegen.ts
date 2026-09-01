@@ -12,6 +12,15 @@ const config: CodegenConfig = {
             presetConfig: {
                 gqlTagName: "gql",
             },
+            config: {
+                nonOptionalTypename: true,
+            },
+        },
+        "src/graphql/__generated__/schema-types.ts": {
+            plugins: [
+                { add: { content: "/* eslint-disable */" } },
+                "typescript",
+            ],
         },
     },
 };

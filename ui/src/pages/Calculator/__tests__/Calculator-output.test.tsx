@@ -39,7 +39,7 @@ import {
 import {
     OutputUnit,
     Requirement,
-} from "../../../graphql/__generated__/graphql";
+} from "../../../graphql/__generated__/schema-types";
 
 import Calculator from "../Calculator";
 import {

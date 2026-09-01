@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { UserError } from "../graphql/__generated__/graphql";
+import { UserError } from "../graphql/__generated__/schema-types";
 
 export function useErrorTranslation() {
     const { t, i18n } = useTranslation();

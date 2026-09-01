@@ -20,7 +20,7 @@ import {
     CreatorOverride,
     ItemsFilters,
     OutputUnit,
-} from "../../graphql/__generated__/graphql";
+} from "../../graphql/__generated__/schema-types";
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
 import TargetInput, { Target } from "./components/TargetInput";

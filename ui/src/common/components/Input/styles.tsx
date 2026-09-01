@@ -37,15 +37,17 @@ export const Input = styled.input<InputProps>`
             border-color: ${theme.color[$palette].on_container};
         }
 
-        ${invalid &&
-        css`
-            border-color: ${theme.color.error.main};
-
-            &:hover,
-            &:focus {
+        ${
+            invalid &&
+            css`
                 border-color: ${theme.color.error.main};
-            }
-        `}
+
+                &:hover,
+                &:focus {
+                    border-color: ${theme.color.error.main};
+                }
+            `
+        }
     `}
 
     padding: 0.5rem;

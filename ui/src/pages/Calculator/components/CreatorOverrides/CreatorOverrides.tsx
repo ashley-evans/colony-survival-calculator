@@ -8,7 +8,7 @@ import { Icon, LargeAddButton, OverrideListContainer } from "./styles";
 import {
     CreatorOverride,
     Item,
-} from "../../../../graphql/__generated__/graphql";
+} from "../../../../graphql/__generated__/schema-types";
 import { CreatorOverrideSelector } from "./CreatorOverrideSelector";
 
 const UNHANDLED_EXCEPTION =

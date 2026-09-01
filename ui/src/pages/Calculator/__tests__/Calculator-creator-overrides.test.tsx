@@ -32,7 +32,7 @@ import {
     Item,
     OutputUnit,
     AvailableDefaultTools,
-} from "../../../graphql/__generated__/graphql";
+} from "../../../graphql/__generated__/schema-types";
 import userEvent from "@testing-library/user-event";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
 

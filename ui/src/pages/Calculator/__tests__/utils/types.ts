@@ -1,4 +1,4 @@
-import { Item } from "../../../../graphql/__generated__/graphql";
+import { Item } from "../../../../graphql/__generated__/schema-types";
 
 type ItemName = Pick<Item, "id" | "name">;
 

@@ -1,4 +1,4 @@
-import { OutputUnit } from "../../../graphql/__generated__/graphql";
+import { OutputUnit } from "../../../graphql/__generated__/schema-types";
 
 const OutputUnitI18NKeyMapping: Readonly<Record<OutputUnit, string>> = {
     [OutputUnit.Seconds]: "seconds",
