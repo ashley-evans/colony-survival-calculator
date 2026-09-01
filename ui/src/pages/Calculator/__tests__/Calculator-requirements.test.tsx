@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 import { click, renderWithTestProviders as render } from "../../../test";
 import {
-    AvailableTools,
+    AvailableDefaultTools,
     Requirement,
 } from "../../../graphql/__generated__/graphql";
 import Calculator from "../Calculator";
@@ -568,13 +568,13 @@ describe("requirements rendering given requirements", () => {
                     createRequirements([requirementsWithSingleCreator[0]]),
                 ),
             );
-            await selectTool(AvailableTools.Steel);
+            await selectTool(AvailableDefaultTools.Steel);
             server.use(
                 createCalculatorOutputResponseHandler(
                     createRequirements([expected]),
                 ),
             );
-            await selectTool(AvailableTools.None);
+            await selectTool(AvailableDefaultTools.None);
             await screen.findByText(expected.creators[0].creator);
 
             const requirementsTable = await screen.findByRole("table");

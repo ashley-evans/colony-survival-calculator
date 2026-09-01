@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Narzędzia maszynowe dostępne?"
             },
+            "eyeglasses": {
+                "label": "Okulary dostępne?"
+            },
             "mapping": {
                 "none": "Brak",
                 "stone": "Kamienne",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Obliczenia są poprawne dla wersji: {{version}} ({{date}})",
-        "source": "Obliczenia wykorzystują publiczne pliki danych gry z <repoLink>repozytorium Colony Survival</repoLink>."
+        "source": "Obliczenia wykorzystują publiczne pliki danych gry z <repoLink>repozytorium Colony Survival</repoLink>.",
+        "movementDisclaimer": "Obliczenia nie uwzględniają obecnie ruchu pracowników ani czasu obrotu między czynnościami, więc receptury zakładają natychmiastowe przemieszczanie się. W praktyce należy spodziewać się, że do osiągnięcia docelowej produkcji potrzeba nieco więcej pracowników, choć proporcje między recepturami powinny pozostać w przybliżeniu takie same. Jest to znane ograniczenie, które zostanie rozwiązane w przyszłej aktualizacji.",
+        "merchantGoodsDisclaimer": "Następujące przedmioty nie są obecnie obsługiwane, ponieważ zależą od towarów handlowanych z kupcem: Zestaw do kolonizacji, Zbieracz glicynii."
     },
     "errors": {
         "UNKNOWN": "Wystąpił błąd, spróbuj ponownie.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Nieznany przedmiot",
         "TOOL_LEVEL": "Nie można utworzyć przedmiotu z dostępnymi narzędziami, minimalne narzędzie to: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "Nie można utworzyć przedmiotu z dostępnymi narzędziami, wymagane są narzędzia maszynowe",
-        "MULTIPLE_OVERRIDE": "Podano więcej niż jedno nadpisanie producenta dla: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "Nie można utworzyć przedmiotu z dostępnymi narzędziami, wymagane są okulary",
+        "MULTIPLE_OVERRIDE": "Podano więcej niż jedno nadpisanie producenta dla: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Przedmiotu nie można utworzyć z aktualnymi nadpisaniami"
     }
 }

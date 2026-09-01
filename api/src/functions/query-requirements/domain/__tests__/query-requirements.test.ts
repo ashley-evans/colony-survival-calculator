@@ -4,9 +4,10 @@ import { queryRequirements } from "../query-requirements";
 import { queryRequirements as mongoDBQueryRequirements } from "../../adapters/mongodb-requirements-adapter";
 import {
     createTranslatedItem,
+    createTranslatedItemWithEyeglasses,
     createTranslatedItemWithMachineTools,
 } from "../../../../../test";
-import { DefaultToolset } from "../../../../types";
+import { DefaultToolset, EyeglassesToolset } from "../../../../types";
 import {
     QueryRequirementsParams,
     Requirement,
@@ -737,7 +738,7 @@ describe("handles tool modifiers", () => {
                 queryRequirements({
                     id: item.id,
                     workers: validWorkers,
-                    maxAvailableTool: provided,
+                    availableTools: { default: provided },
                 }),
             ).rejects.toThrow(expectedError);
         },
@@ -805,7 +806,7 @@ describe("handles tool modifiers", () => {
                 queryRequirements({
                     id: item.id,
                     workers: validWorkers,
-                    maxAvailableTool: provided,
+                    availableTools: { default: provided },
                 }),
             ).rejects.toThrow(expectedError);
         },
@@ -879,7 +880,7 @@ describe("handles tool modifiers", () => {
             const actual = await queryRequirements({
                 id: item.id,
                 workers: validWorkers,
-                maxAvailableTool: provided,
+                availableTools: { default: provided },
             });
 
             const requirement = findRequirement(
@@ -918,7 +919,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -953,7 +954,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -986,7 +987,7 @@ describe("handles tool modifiers", () => {
         const actual = await queryRequirements({
             id: item.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
         const requirement = findRequirement(
             actual,
@@ -1365,7 +1366,7 @@ describe("multiple recipe handling", () => {
         const actual = await queryRequirements({
             id: moreOptimalItemRecipe.id,
             workers: validWorkers,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
 
         expect(actual).toEqual([
@@ -2394,7 +2395,9 @@ describe("handles machine tools", () => {
                     queryRequirements({
                         id: machineToolsItem.id,
                         workers: validWorkers,
-                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                        ...(hasMachineTools
+                            ? { availableTools: { machine: hasMachineTools } }
+                            : {}),
                     }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
@@ -2405,7 +2408,9 @@ describe("handles machine tools", () => {
                     queryRequirements({
                         id: baseItem.id,
                         workers: validWorkers,
-                        ...(hasMachineTools ? { hasMachineTools } : {}),
+                        ...(hasMachineTools
+                            ? { availableTools: { machine: hasMachineTools } }
+                            : {}),
                     }),
                 ).rejects.toThrow(expectedRequiredToolsError);
             });
@@ -2434,8 +2439,10 @@ describe("handles machine tools", () => {
             queryRequirements({
                 id: baseItem.id,
                 workers: validWorkers,
-                hasMachineTools: true,
-                maxAvailableTool: "iron" as DefaultToolset,
+                availableTools: {
+                    machine: true,
+                    default: "iron" as DefaultToolset,
+                },
             }),
         ).rejects.toThrow(expectedError);
     });
@@ -2444,7 +2451,7 @@ describe("handles machine tools", () => {
         const actual = await queryRequirements({
             id: baseItem.id,
             workers: validWorkers,
-            hasMachineTools: true,
+            availableTools: { machine: true },
         });
 
         expect(actual).toEqual([
@@ -2487,6 +2494,287 @@ describe("handles machine tools", () => {
                 ],
             },
         ]);
+    });
+});
+
+describe("handles eyeglasses", () => {
+    const eyeglassesItem = createTranslatedItemWithEyeglasses({
+        name: "eyeglasses item",
+        createTime: 4,
+        output: 2,
+        requirements: [],
+        minimumTool: "eyeglasses" as EyeglassesToolset,
+        maximumTool: "eyeglasses" as EyeglassesToolset,
+    });
+    const baseItem = createTranslatedItem({
+        name: "base item",
+        createTime: 2,
+        output: 6,
+        requirements: [{ id: eyeglassesItem.id, amount: 5 }],
+    });
+    const expectedRequiredToolsError = new UserError(ErrorCode.TOOL_LEVEL, {
+        requiredTool: "eyeglasses",
+    });
+
+    beforeEach(() => {
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            baseItem,
+            eyeglassesItem,
+        ]);
+    });
+
+    test("does not apply eyeglasses modifier to required item given eyeglasses are not available", async () => {
+        const eyeglassesCapableItem = createTranslatedItemWithEyeglasses({
+            name: "eyeglasses item",
+            createTime: 4,
+            output: 2,
+            requirements: [],
+            minimumTool: "noglasses" as EyeglassesToolset,
+            maximumTool: "eyeglasses" as EyeglassesToolset,
+        });
+        const localBaseItem = createTranslatedItem({
+            name: "base item",
+            createTime: 2,
+            output: 6,
+            requirements: [{ id: eyeglassesCapableItem.id, amount: 6 }],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            localBaseItem,
+            eyeglassesCapableItem,
+        ]);
+
+        const actual = await queryRequirements({
+            id: localBaseItem.id,
+            workers: validWorkers,
+        });
+
+        expect(actual).toEqual([
+            {
+                id: localBaseItem.id,
+                name: localBaseItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: localBaseItem.id,
+                        name: localBaseItem.name,
+                        creatorID: localBaseItem.creatorID,
+                        creator: localBaseItem.creator,
+                        amount: 15,
+                        workers: 5,
+                        demands: [
+                            {
+                                id: eyeglassesCapableItem.id,
+                                name: eyeglassesCapableItem.name,
+                                amount: 15,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: eyeglassesCapableItem.id,
+                name: eyeglassesCapableItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: eyeglassesCapableItem.id,
+                        name: eyeglassesCapableItem.name,
+                        creatorID: eyeglassesCapableItem.creatorID,
+                        creator: eyeglassesCapableItem.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+        ]);
+    });
+
+    test("applies eyeglasses modifier to required item given eyeglasses are available", async () => {
+        const eyeglassesCapableItem = createTranslatedItemWithEyeglasses({
+            name: "eyeglasses item",
+            createTime: 4,
+            output: 2,
+            requirements: [],
+            minimumTool: "noglasses" as EyeglassesToolset,
+            maximumTool: "eyeglasses" as EyeglassesToolset,
+        });
+        const localBaseItem = createTranslatedItem({
+            name: "base item",
+            createTime: 2,
+            output: 6,
+            requirements: [{ id: eyeglassesCapableItem.id, amount: 6 }],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            localBaseItem,
+            eyeglassesCapableItem,
+        ]);
+
+        const actual = await queryRequirements({
+            id: localBaseItem.id,
+            workers: validWorkers,
+            availableTools: { eyeglasses: true },
+        });
+
+        expect(actual).toEqual([
+            {
+                id: localBaseItem.id,
+                name: localBaseItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: localBaseItem.id,
+                        name: localBaseItem.name,
+                        creatorID: localBaseItem.creatorID,
+                        creator: localBaseItem.creator,
+                        amount: 15,
+                        workers: 5,
+                        demands: [
+                            {
+                                id: eyeglassesCapableItem.id,
+                                name: eyeglassesCapableItem.name,
+                                amount: 15,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: eyeglassesCapableItem.id,
+                name: eyeglassesCapableItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: eyeglassesCapableItem.id,
+                        name: eyeglassesCapableItem.name,
+                        creatorID: eyeglassesCapableItem.creatorID,
+                        creator: eyeglassesCapableItem.creator,
+                        amount: 15,
+                        workers: 25,
+                        demands: [],
+                    },
+                ],
+            },
+        ]);
+    });
+
+    test("returns expected requirements given required item does not require eyeglasses", async () => {
+        const noGlassesRequiredItem = createTranslatedItemWithEyeglasses({
+            name: "eyeglasses item",
+            createTime: 4,
+            output: 2,
+            requirements: [],
+            minimumTool: "noglasses" as EyeglassesToolset,
+            maximumTool: "noglasses" as EyeglassesToolset,
+        });
+        const localBaseItem = createTranslatedItem({
+            name: "base item",
+            createTime: 2,
+            output: 6,
+            requirements: [{ id: noGlassesRequiredItem.id, amount: 6 }],
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            localBaseItem,
+            noGlassesRequiredItem,
+        ]);
+
+        const actual = await queryRequirements({
+            id: localBaseItem.id,
+            workers: validWorkers,
+        });
+
+        expect(actual).toEqual([
+            {
+                id: localBaseItem.id,
+                name: localBaseItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: localBaseItem.id,
+                        name: localBaseItem.name,
+                        creatorID: localBaseItem.creatorID,
+                        creator: localBaseItem.creator,
+                        amount: 15,
+                        workers: 5,
+                        demands: [
+                            {
+                                id: noGlassesRequiredItem.id,
+                                name: noGlassesRequiredItem.name,
+                                amount: 15,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: noGlassesRequiredItem.id,
+                name: noGlassesRequiredItem.name,
+                amount: 15,
+                creators: [
+                    {
+                        id: noGlassesRequiredItem.id,
+                        name: noGlassesRequiredItem.name,
+                        creatorID: noGlassesRequiredItem.creatorID,
+                        creator: noGlassesRequiredItem.creator,
+                        amount: 15,
+                        workers: 30,
+                        demands: [],
+                    },
+                ],
+            },
+        ]);
+    });
+
+    test("throws an error when base item requires higher toolset even though required item requires eyeglasses and they are available", async () => {
+        const expectedError = new UserError(ErrorCode.TOOL_LEVEL, {
+            requiredTool: "steel",
+        });
+        const baseItemSteelMin = createTranslatedItem({
+            name: "base item",
+            createTime: 3,
+            output: 5,
+            requirements: [{ id: eyeglassesItem.id, amount: 5 }],
+            minimumTool: "steel" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
+        });
+        mockMongoDBQueryRequirements.mockResolvedValue([
+            baseItemSteelMin,
+            eyeglassesItem,
+        ]);
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                id: baseItem.id,
+                workers: validWorkers,
+                availableTools: {
+                    eyeglasses: true,
+                    default: "iron" as DefaultToolset,
+                },
+            }),
+        ).rejects.toThrow(expectedError);
+    });
+
+    test("throws an error when base item requires eyeglasses and they are not available", async () => {
+        mockMongoDBQueryRequirements.mockResolvedValue([eyeglassesItem]);
+
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                id: eyeglassesItem.id,
+                workers: validWorkers,
+            }),
+        ).rejects.toThrow(expectedRequiredToolsError);
+    });
+
+    test("throws an error when required item requires eyeglasses and they are not available", async () => {
+        expect.assertions(1);
+        await expect(
+            queryRequirements({
+                id: baseItem.id,
+                workers: validWorkers,
+            }),
+        ).rejects.toThrow(expectedRequiredToolsError);
     });
 });
 
@@ -2826,8 +3114,10 @@ test("logs out requirements query to console", async () => {
     });
     const expectedParams: QueryRequirementsParams = {
         id: storedItem.id,
-        maxAvailableTool: "copper" as DefaultToolset,
-        hasMachineTools: true,
+        availableTools: {
+            default: "copper" as DefaultToolset,
+            machine: true,
+        },
         unit: OutputUnit.GAME_DAYS,
         creatorOverrides: [
             { itemID: storedItem.id, creatorID: storedItem.creatorID },

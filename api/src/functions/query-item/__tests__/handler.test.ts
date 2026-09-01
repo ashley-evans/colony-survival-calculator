@@ -12,8 +12,8 @@ import {
 import type {
     Item,
     ItemsFilters,
-    OptimalFilter,
     QueryItemArgs,
+    AvailableDefaultTools,
     AvailableTools,
     Tools,
 } from "../../../graphql/schema";
@@ -26,12 +26,14 @@ vi.mock("../domain/query-item", () => ({
 const mockQueryItem = queryItem as Mock;
 
 function createOptimalFilter(
-    maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean,
-): OptimalFilter {
+    defaultTool?: AvailableDefaultTools,
+    machine?: boolean,
+    eyeglasses?: boolean,
+): AvailableTools {
     return {
-        maxAvailableTool: maxAvailableTool ?? null,
-        hasMachineTools: hasMachineTools ?? null,
+        default: defaultTool ?? null,
+        machine: machine ?? null,
+        eyeglasses: eyeglasses ?? null,
     };
 }
 
@@ -44,7 +46,7 @@ function createFilters({
     itemID?: string;
     minimumCreators?: number;
     creatorID?: string;
-    optimal?: OptimalFilter;
+    optimal?: AvailableTools;
 }): ItemsFilters {
     return {
         id: itemID ?? null,
@@ -139,7 +141,7 @@ test.each([
     [
         "an optimal filter specified w/ max tool",
         mockEventWithOptimalFilterAndMaxTool,
-        { optimal: { maxAvailableTool: "copper" as DomainTools } },
+        { optimal: { default: "copper" as DomainTools } },
         undefined,
     ],
     [
@@ -149,7 +151,7 @@ test.each([
             id: expectedItemID,
             minimumCreators: expectedMinimumCreators,
             creatorID: expectedCreatorID,
-            optimal: { maxAvailableTool: "steel" as DomainTools },
+            optimal: { default: "steel" as DomainTools },
         },
         undefined,
     ],
@@ -161,7 +163,7 @@ test.each([
             }),
         ),
         {
-            optimal: { hasMachineTools: true },
+            optimal: { machine: true },
         },
         undefined,
     ],
@@ -173,7 +175,31 @@ test.each([
             }),
         ),
         {
-            optimal: { hasMachineTools: false },
+            optimal: { machine: false },
+        },
+        undefined,
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses indication (true)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, undefined, true),
+            }),
+        ),
+        {
+            optimal: { eyeglasses: true },
+        },
+        undefined,
+    ],
+    [
+        "an optimal filter specified w/ eyeglasses indication (false)",
+        createMockEvent(
+            createFilters({
+                optimal: createOptimalFilter(undefined, undefined, false),
+            }),
+        ),
+        {
+            optimal: { eyeglasses: false },
         },
         undefined,
     ],

@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Outils mécaniques disponibles ?"
             },
+            "eyeglasses": {
+                "label": "Lunettes disponibles ?"
+            },
             "mapping": {
                 "none": "Aucun",
                 "stone": "Pierre",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Les calculs sont corrects pour la version : {{version}} ({{date}})",
-        "source": "Les calculs utilisent les fichiers de données publics du <repoLink>dépôt Colony Survival</repoLink>."
+        "source": "Les calculs utilisent les fichiers de données publics du <repoLink>dépôt Colony Survival</repoLink>.",
+        "movementDisclaimer": "Les calculs ne tiennent actuellement pas compte du déplacement des travailleurs ni du temps de rotation entre les actions ; les recettes supposent donc un déplacement instantané. En pratique, attendez-vous à avoir besoin d'un peu plus de travailleurs pour atteindre votre production cible, bien que les proportions entre les recettes devraient rester globalement valables. Il s'agit d'une limitation connue qui sera corrigée dans une future mise à jour.",
+        "merchantGoodsDisclaimer": "Les objets suivants ne sont pas encore pris en charge, car ils dépendent de biens échangés avec le marchand : Kit de colonie, Récolteur de glycines."
     },
     "errors": {
         "UNKNOWN": "Une erreur s'est produite, veuillez réessayer.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Objet inconnu",
         "TOOL_LEVEL": "Impossible de créer l'objet avec les outils disponibles, outil minimum requis : {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "Impossible de créer l'objet avec les outils disponibles, nécessite des outils mécaniques",
-        "MULTIPLE_OVERRIDE": "Plus d'une substitution de producteur fournie pour : {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "Impossible de créer l'objet avec les outils disponibles, nécessite des lunettes",
+        "MULTIPLE_OVERRIDE": "Plus d'une substitution de producteur fournie pour : {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "L'objet ne peut pas être créé avec les substitutions actuelles"
     }
 }

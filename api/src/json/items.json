@@ -1400,6 +1400,49 @@
         }
     },
     {
+        "id": "chestprestige",
+        "creatorID": "chestmaker",
+        "createTime": 720,
+        "requires": [
+            { "id": "tabulator", "amount": 1 },
+            { "id": "guntrap", "amount": 1 },
+            { "id": "nitro", "amount": 25 },
+            { "id": "steeltools", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Prestižní truhla",
+                "de-DE": "Prestigetruhe",
+                "en-US": "Prestige Chest",
+                "es-ES": "Cofre de prestigio",
+                "fr-FR": "Coffre de prestige",
+                "ja-JP": "名声チェスト",
+                "ko-KR": "프레스티지 상자",
+                "pl-PL": "Skrzynia prestiżu",
+                "ru-RU": "Престижный сундук",
+                "zh-CN": "威望箱子"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce truhel",
+                "de-DE": "Kistenmacher",
+                "en-US": "Chestmaker",
+                "es-ES": "Fabricante de cofres",
+                "fr-FR": "Coffretier",
+                "ja-JP": "チェスト製造者",
+                "ko-KR": "상자 제작자",
+                "pl-PL": "Stolarz",
+                "ru-RU": "Сундучник",
+                "zh-CN": "箱匠"
+            }
+        }
+    },
+    {
         "id": "chickenraw",
         "creatorID": "chickenfarmer",
         "createTime": 30,
@@ -2907,6 +2950,48 @@
         }
     },
     {
+        "id": "alarmbell",
+        "creatorID": "engineer",
+        "createTime": 480,
+        "requires": [
+            { "id": "brassingot", "amount": 2 },
+            { "id": "planks", "amount": 3 },
+            { "id": "scrollofknowledge", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Poplašný zvon",
+                "de-DE": "Alarmglocke",
+                "en-US": "Alarm Bell",
+                "es-ES": "Campana de alarma",
+                "fr-FR": "Sonnette d'alarme",
+                "ja-JP": "警報ベル",
+                "ko-KR": "경보기",
+                "pl-PL": "Dzwonek alarmowy",
+                "ru-RU": "Сигнальный колокол",
+                "zh-CN": "警铃"
+            },
+            "creator": {
+                "cs-CZ": "Technik",
+                "de-DE": "Ingenieur",
+                "en-US": "Engineer",
+                "es-ES": "Ingeniero",
+                "fr-FR": "Ingénieur",
+                "ja-JP": "技術者",
+                "ko-KR": "기술자",
+                "pl-PL": "Saper",
+                "ru-RU": "Инженер",
+                "zh-CN": "工程师"
+            }
+        }
+    },
+    {
         "id": "astrolabe",
         "creatorID": "engineer",
         "createTime": 240,
@@ -2932,6 +3017,48 @@
                 "pl-PL": "Astrolabium",
                 "ru-RU": "Астролябия",
                 "zh-CN": "星盘"
+            },
+            "creator": {
+                "cs-CZ": "Technik",
+                "de-DE": "Ingenieur",
+                "en-US": "Engineer",
+                "es-ES": "Ingeniero",
+                "fr-FR": "Ingénieur",
+                "ja-JP": "技術者",
+                "ko-KR": "기술자",
+                "pl-PL": "Saper",
+                "ru-RU": "Инженер",
+                "zh-CN": "工程师"
+            }
+        }
+    },
+    {
+        "id": "compass",
+        "creatorID": "engineer",
+        "createTime": 720,
+        "requires": [
+            { "id": "bronzeingot", "amount": 1 },
+            { "id": "copperingot", "amount": 5 },
+            { "id": "tabletwisdom", "amount": 25 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Kompas",
+                "de-DE": "Kompass",
+                "en-US": "Compass",
+                "es-ES": "Brújula",
+                "fr-FR": "Boussole",
+                "ja-JP": "コンパス",
+                "ko-KR": "나침반",
+                "pl-PL": "Kompas",
+                "ru-RU": "Компас",
+                "zh-CN": "罗盘"
             },
             "creator": {
                 "cs-CZ": "Technik",
@@ -3301,6 +3428,95 @@
                 "pl-PL": "Elementy metalowe",
                 "ru-RU": "Шестерня",
                 "zh-CN": "金属齿轮"
+            },
+            "creator": {
+                "cs-CZ": "Technik",
+                "de-DE": "Ingenieur",
+                "en-US": "Engineer",
+                "es-ES": "Ingeniero",
+                "fr-FR": "Ingénieur",
+                "ja-JP": "技術者",
+                "ko-KR": "기술자",
+                "pl-PL": "Saper",
+                "ru-RU": "Инженер",
+                "zh-CN": "工程师"
+            }
+        }
+    },
+    {
+        "id": "glider",
+        "creatorID": "engineer",
+        "createTime": 1200,
+        "requires": [
+            { "id": "linen", "amount": 25 },
+            { "id": "hempfibre", "amount": 25 },
+            { "id": "rope", "amount": 10 },
+            { "id": "metalgear", "amount": 5 },
+            { "id": "tabletwisdom", "amount": 20 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Katapult rogala",
+                "de-DE": "Gleiterwerfer",
+                "en-US": "Glider Launcher",
+                "es-ES": "Lanzador de planeadores",
+                "fr-FR": "Lance-planeurs",
+                "ja-JP": "グライダーランチャー",
+                "ko-KR": "글라이더 발사대",
+                "pl-PL": "Wyrzutnia szybowców",
+                "ru-RU": "Пусковая установка планера",
+                "zh-CN": "滑翔机发射器"
+            },
+            "creator": {
+                "cs-CZ": "Technik",
+                "de-DE": "Ingenieur",
+                "en-US": "Engineer",
+                "es-ES": "Ingeniero",
+                "fr-FR": "Ingénieur",
+                "ja-JP": "技術者",
+                "ko-KR": "기술자",
+                "pl-PL": "Saper",
+                "ru-RU": "Инженер",
+                "zh-CN": "工程师"
+            }
+        }
+    },
+    {
+        "id": "glidersteel",
+        "creatorID": "engineer",
+        "createTime": 720,
+        "requires": [
+            { "id": "steelingot", "amount": 6 },
+            { "id": "steelparts", "amount": 2 },
+            { "id": "brassparts", "amount": 4 },
+            { "id": "hempfibre", "amount": 10 },
+            { "id": "linen", "amount": 50 },
+            { "id": "bookofknowledge", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Katapultované ocelové rogalo",
+                "de-DE": "Raketengleiter",
+                "en-US": "Launched Steel Glider",
+                "es-ES": "Planeador de acero lanzado",
+                "fr-FR": "Lance-planeurs en acier",
+                "ja-JP": "鋼のグライダーランチャー",
+                "ko-KR": "발사식 강철 글라이더",
+                "pl-PL": "Stalowy szybowiec",
+                "ru-RU": "Запускаемый стальной планер",
+                "zh-CN": "钢制发射型滑翔机"
             },
             "creator": {
                 "cs-CZ": "Technik",
@@ -4416,6 +4632,49 @@
                 "pl-PL": "Młynarz",
                 "ru-RU": "Размольщик",
                 "zh-CN": "磨工"
+            }
+        }
+    },
+    {
+        "id": "gunpowdertrap",
+        "creatorID": "gunsmith",
+        "createTime": 1200,
+        "requires": [
+            { "id": "ironwrought", "amount": 4 },
+            { "id": "metalgear", "amount": 5 },
+            { "id": "bookofknowledge", "amount": 1 },
+            { "id": "rope", "amount": 2 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Past se střelným prachem",
+                "de-DE": "Schwarzpulverfalle",
+                "en-US": "Gunpowder Trap",
+                "es-ES": "Trampa de pólvora",
+                "fr-FR": "Piège à poudre à canon",
+                "ja-JP": "火薬罠",
+                "ko-KR": "화약 함정",
+                "pl-PL": "Pułapka z prochem strzelniczym",
+                "ru-RU": "Пороховая ловушка",
+                "zh-CN": "火药陷阱"
+            },
+            "creator": {
+                "cs-CZ": "Puškař",
+                "de-DE": "Waffenschmied",
+                "en-US": "Gunsmith",
+                "es-ES": "Armero",
+                "fr-FR": "Armurier",
+                "ja-JP": "鉄砲工",
+                "ko-KR": "총포 제작자",
+                "pl-PL": "Rusznikarz",
+                "ru-RU": "Оружейник",
+                "zh-CN": "枪匠"
             }
         }
     },
@@ -6040,6 +6299,49 @@
         }
     },
     {
+        "id": "topdownviewtrigger",
+        "creatorID": "jobblockcrafter",
+        "createTime": 120,
+        "requires": [
+            { "id": "planks", "amount": 3 },
+            { "id": "leather", "amount": 1 },
+            { "id": "parchment", "amount": 1 },
+            { "id": "scrollofknowledge", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Stůl dozorce",
+                "de-DE": "Pult des Aufsehers",
+                "en-US": "Overseer's Desk",
+                "es-ES": "Mesa de supervisor",
+                "fr-FR": "Bureau du superviseur",
+                "ja-JP": "監督官の机",
+                "ko-KR": "감독관의 책상",
+                "pl-PL": "Biurko nadzorcy",
+                "ru-RU": "Стол управляющего",
+                "zh-CN": "督察桌"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce pracovních bloků",
+                "de-DE": "Aufgabenblock-Hersteller",
+                "en-US": "Job-block Crafter",
+                "es-ES": "Artesano de bancos de trabajo",
+                "fr-FR": "Fabricant de blocs de métier",
+                "ja-JP": "職業ブロッククラフター",
+                "ko-KR": "직업 블록 제작자",
+                "pl-PL": "Specjalista (dodatkowe stanowiska pracy)",
+                "ru-RU": "Конструктор заданий",
+                "zh-CN": "工作块制作者"
+            }
+        }
+    },
+    {
         "id": "jewellerbench",
         "creatorID": "jobblockcrafter",
         "createTime": 480,
@@ -6108,6 +6410,48 @@
                 "pl-PL": "Stanowisko papiernika",
                 "ru-RU": "Форма для бумаги",
                 "zh-CN": "纸模"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce pracovních bloků",
+                "de-DE": "Aufgabenblock-Hersteller",
+                "en-US": "Job-block Crafter",
+                "es-ES": "Artesano de bancos de trabajo",
+                "fr-FR": "Fabricant de blocs de métier",
+                "ja-JP": "職業ブロッククラフター",
+                "ko-KR": "직업 블록 제작자",
+                "pl-PL": "Specjalista (dodatkowe stanowiska pracy)",
+                "ru-RU": "Конструктор заданий",
+                "zh-CN": "工作块制作者"
+            }
+        }
+    },
+    {
+        "id": "alchemisttable",
+        "creatorID": "jobblockcrafter",
+        "createTime": 480,
+        "requires": [
+            { "id": "tabletwisdom", "amount": 4 },
+            { "id": "wisteriaflower", "amount": 3 },
+            { "id": "irontools", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Alchymistův stůl",
+                "de-DE": "Alchemistentisch",
+                "en-US": "Alchemist's Table",
+                "es-ES": "Mesa de alquimista",
+                "fr-FR": "Table d'alchimiste",
+                "ja-JP": "錬金術師のテーブル",
+                "ko-KR": "연금술 작업대",
+                "pl-PL": "Stanowisko alchemika",
+                "ru-RU": "Стол алхимика",
+                "zh-CN": "炼金台"
             },
             "creator": {
                 "cs-CZ": "Výrobce pracovních bloků",
@@ -6232,6 +6576,47 @@
                 "pl-PL": "Stanowisko serwisanta pułapek",
                 "ru-RU": "Наладчик ловушек",
                 "zh-CN": "陷阱工"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce pracovních bloků",
+                "de-DE": "Aufgabenblock-Hersteller",
+                "en-US": "Job-block Crafter",
+                "es-ES": "Artesano de bancos de trabajo",
+                "fr-FR": "Fabricant de blocs de métier",
+                "ja-JP": "職業ブロッククラフター",
+                "ko-KR": "직업 블록 제작자",
+                "pl-PL": "Specjalista (dodatkowe stanowiska pracy)",
+                "ru-RU": "Конструктор заданий",
+                "zh-CN": "工作块制作者"
+            }
+        }
+    },
+    {
+        "id": "jobblockcrafteradvanced",
+        "creatorID": "jobblockcrafter",
+        "createTime": 480,
+        "requires": [
+            { "id": "tabletwisdom", "amount": 10 },
+            { "id": "bronzeingot", "amount": 2 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Stůl výrobce pokročilých pracovních bloků",
+                "de-DE": "Erweiterte Aufgabenblock-Herstellertische",
+                "en-US": "Advanced Job-block Crafter's Workbench",
+                "es-ES": "Mesa de artesano de bancos de trabajo avanzada",
+                "fr-FR": "Établi de fabricant de blocs de métier avancé",
+                "ja-JP": "高度な職業ブロッククラフターの作業台",
+                "ko-KR": "고급 직업 블록 제작대",
+                "pl-PL": "Stanowisko doświadczonego specjalisty (dodatkowe stanowiska pracy)",
+                "ru-RU": "Верстак продвинутого конструктора заданий",
+                "zh-CN": "高级工作块制作者工作台"
             },
             "creator": {
                 "cs-CZ": "Výrobce pracovních bloků",
@@ -6754,6 +7139,50 @@
         }
     },
     {
+        "id": "tabulator",
+        "creatorID": "jobblockcrafteradvanced",
+        "createTime": 720,
+        "requires": [
+            { "id": "brassparts", "amount": 25 },
+            { "id": "steelparts", "amount": 10 },
+            { "id": "steelingot", "amount": 4 },
+            { "id": "bookofknowledge", "amount": 1 },
+            { "id": "vialmineraloil", "amount": 3 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Děrnoštítkový stroj",
+                "de-DE": "Tabelliermaschine",
+                "en-US": "Tabulating Machine",
+                "es-ES": "Máquina tabuladora",
+                "fr-FR": "Tabulatrice",
+                "ja-JP": "作表機",
+                "ko-KR": "도표 작성기",
+                "pl-PL": "Zaawansowane liczydło",
+                "ru-RU": "Вычислительная машина",
+                "zh-CN": "制表机"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce pokročilých pracovních bloků",
+                "de-DE": "Erweiterter Aufgabenblock-Hersteller",
+                "en-US": "Advanced Job-block Crafter",
+                "es-ES": "Artesano de bancos de trabajo avanzado",
+                "fr-FR": "Fabricant de blocs de métier avancé",
+                "ja-JP": "高度な職業ブロッククラフター",
+                "ko-KR": "고급 직업 블록 제작자",
+                "pl-PL": "Doświadczony specjalista (dodatkowe stanowiska pracy)",
+                "ru-RU": "Продвинутый конструктор заданий",
+                "zh-CN": "高级工作块制作者"
+            }
+        }
+    },
+    {
         "id": "researcherdesk",
         "creatorID": "jobblockcrafteradvanced",
         "createTime": 480,
@@ -6780,6 +7209,49 @@
                 "pl-PL": "Stanowisko naukowca",
                 "ru-RU": "Стол ученого",
                 "zh-CN": "研究台"
+            },
+            "creator": {
+                "cs-CZ": "Výrobce pokročilých pracovních bloků",
+                "de-DE": "Erweiterter Aufgabenblock-Hersteller",
+                "en-US": "Advanced Job-block Crafter",
+                "es-ES": "Artesano de bancos de trabajo avanzado",
+                "fr-FR": "Fabricant de blocs de métier avancé",
+                "ja-JP": "高度な職業ブロッククラフター",
+                "ko-KR": "고급 직업 블록 제작자",
+                "pl-PL": "Doświadczony specjalista (dodatkowe stanowiska pracy)",
+                "ru-RU": "Продвинутый конструктор заданий",
+                "zh-CN": "高级工作块制作者"
+            }
+        }
+    },
+    {
+        "id": "bookcasefilled",
+        "creatorID": "jobblockcrafteradvanced",
+        "createTime": 120,
+        "requires": [
+            { "id": "planks", "amount": 5 },
+            { "id": "ironwrought", "amount": 2 },
+            { "id": "bookofknowledge", "amount": 2 },
+            { "id": "paper", "amount": 40 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "none",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Knihovna",
+                "de-DE": "Bücherregal",
+                "en-US": "Bookcase",
+                "es-ES": "Librería",
+                "fr-FR": "Bibliothèque",
+                "ja-JP": "本棚",
+                "ko-KR": "책장",
+                "pl-PL": "Regał na książki",
+                "ru-RU": "Книжный стеллаж",
+                "zh-CN": "书柜"
             },
             "creator": {
                 "cs-CZ": "Výrobce pokročilých pracovních bloků",
@@ -7247,6 +7719,86 @@
         }
     },
     {
+        "id": "bookofknowledge",
+        "creatorID": "printingpress",
+        "createTime": 180,
+        "requires": [
+            { "id": "movabletype", "amount": 5 },
+            { "id": "manuscript", "amount": 1 },
+            { "id": "paper", "amount": 30 }
+        ],
+        "output": 10,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Naučná kniha",
+                "de-DE": "Buch des Wissens",
+                "en-US": "Book Of Knowledge",
+                "es-ES": "Libro de conocimientos",
+                "fr-FR": "Livre de technologies",
+                "ja-JP": "知識の本",
+                "ko-KR": "지식의 서",
+                "pl-PL": "Księga wiedzy",
+                "ru-RU": "Книга знаний",
+                "zh-CN": "知识之书"
+            },
+            "creator": {
+                "cs-CZ": "Operátor tiskařského lisu",
+                "de-DE": "Druckpressen-Arbeiter",
+                "en-US": "Printing Press Operator",
+                "es-ES": "Operador de imprenta",
+                "fr-FR": "Imprimeur",
+                "ja-JP": "印刷機作業員",
+                "ko-KR": "인쇄기 작업자",
+                "pl-PL": "Operator prasy drukarskiej",
+                "ru-RU": "Оператор печатного станка",
+                "zh-CN": "印刷机操作员"
+            }
+        }
+    },
+    {
+        "id": "scientificnote",
+        "creatorID": "researcher",
+        "createTime": 85,
+        "requires": [{ "id": "paper", "amount": 1 }],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Vědecká poznámka",
+                "de-DE": "Wissenschaftliche Anmerkung",
+                "en-US": "Scientific Note",
+                "es-ES": "Nota tecnológica",
+                "fr-FR": "Note scientifique",
+                "ja-JP": "科学メモ",
+                "ko-KR": "연구 노트",
+                "pl-PL": "Notatki naukowca",
+                "ru-RU": "Научная заметка",
+                "zh-CN": "科研笔记"
+            },
+            "creator": {
+                "cs-CZ": "Výzkumník",
+                "de-DE": "Forscher",
+                "en-US": "Researcher",
+                "es-ES": "Investigador",
+                "fr-FR": "Chercheur",
+                "ja-JP": "研究者",
+                "ko-KR": "연구원",
+                "pl-PL": "Naukowiec",
+                "ru-RU": "Ученый",
+                "zh-CN": "研究员"
+            }
+        }
+    },
+    {
         "id": "rope",
         "creatorID": "roper",
         "createTime": 360,
@@ -7451,6 +8003,44 @@
                 "pl-PL": "Uświęciciel",
                 "ru-RU": "Священник",
                 "zh-CN": "圣化师"
+            }
+        }
+    },
+    {
+        "id": "tabletwisdom",
+        "creatorID": "scribe",
+        "createTime": 75,
+        "requires": [{ "id": "tabletclay", "amount": 1 }],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Starobylá naučná destička",
+                "de-DE": "Tafel der alten Weisheit",
+                "en-US": "Tablet Of Ancient Wisdom",
+                "es-ES": "Tableta de sabiduría antigua",
+                "fr-FR": "Tablette de sagesse antique",
+                "ja-JP": "古代の知恵の石版",
+                "ko-KR": "고대 지식의 서판",
+                "pl-PL": "Tablica ze starożytną wiedzą",
+                "ru-RU": "Табличка древней мудрости",
+                "zh-CN": "古代智慧书板"
+            },
+            "creator": {
+                "cs-CZ": "Písař",
+                "de-DE": "Schriftgelehrter",
+                "en-US": "Scribe",
+                "es-ES": "Escriba",
+                "fr-FR": "Scribe",
+                "ja-JP": "筆記者",
+                "ko-KR": "필경사",
+                "pl-PL": "Skryba",
+                "ru-RU": "Писец",
+                "zh-CN": "抄写员"
             }
         }
     },
@@ -8263,6 +8853,47 @@
                 "pl-PL": "Pusta karta perforowana",
                 "ru-RU": "Пустая перфокарта",
                 "zh-CN": "空打孔卡"
+            },
+            "creator": {
+                "cs-CZ": "Operátor děrnoštítkového stroje",
+                "de-DE": "Tabelliermaschinen-Arbeiter",
+                "en-US": "Tabulating Machine Operator",
+                "es-ES": "Operador de máquinas tabuladoras",
+                "fr-FR": "Opérateur de tabulatrice",
+                "ja-JP": "作表機作業員",
+                "ko-KR": "도표 작성기 작업자",
+                "pl-PL": "Operator maszyny liczącej",
+                "ru-RU": "Оператор вычислительной машины",
+                "zh-CN": "制表机操作员"
+            }
+        }
+    },
+    {
+        "id": "carddata",
+        "creatorID": "tabulator",
+        "createTime": 180,
+        "requires": [
+            { "id": "cardempty", "amount": 1 },
+            { "id": "bookofknowledge", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "machine",
+            "minimumTool": "machine",
+            "maximumTool": "machine"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Děrný štítek",
+                "de-DE": "Lochkarte",
+                "en-US": "Punched Card",
+                "es-ES": "Tarjeta perforada",
+                "fr-FR": "Carte perforée",
+                "ja-JP": "パンチカード",
+                "ko-KR": "천공 카드",
+                "pl-PL": "Karta perforowana",
+                "ru-RU": "Перфокарта",
+                "zh-CN": "打孔卡"
             },
             "creator": {
                 "cs-CZ": "Operátor děrnoštítkového stroje",
@@ -9660,6 +10291,208 @@
                 "pl-PL": "Drwal",
                 "ru-RU": "Дровосек",
                 "zh-CN": "伐木工"
+            }
+        }
+    },
+    {
+        "id": "scrollofknowledge",
+        "creatorID": "writer",
+        "createTime": 180,
+        "requires": [{ "id": "parchment", "amount": 1 }],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Naučný svitek",
+                "de-DE": "Schriftrolle des Wissens",
+                "en-US": "Scroll Of Knowledge",
+                "es-ES": "Pergamino del conocimiento",
+                "fr-FR": "Parchemin de technologie",
+                "ja-JP": "知識の巻物",
+                "ko-KR": "지식의 두루마리",
+                "pl-PL": "Zwój wiedzy",
+                "ru-RU": "Свиток знаний",
+                "zh-CN": "知识卷轴"
+            },
+            "creator": {
+                "cs-CZ": "Spisovatel",
+                "de-DE": "Schriftsteller",
+                "en-US": "Writer",
+                "es-ES": "Escritor",
+                "fr-FR": "Écrivain",
+                "ja-JP": "作家",
+                "ko-KR": "저술가",
+                "pl-PL": "Pisarz",
+                "ru-RU": "Писатель",
+                "zh-CN": "作家"
+            }
+        }
+    },
+    {
+        "id": "manuscript",
+        "creatorID": "writer",
+        "createTime": 100,
+        "requires": [
+            { "id": "scientificnote", "amount": 15 },
+            { "id": "tabletwisdom", "amount": 5 },
+            { "id": "scrollofknowledge", "amount": 1 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Rukopis",
+                "de-DE": "Manuskript",
+                "en-US": "Manuscript",
+                "es-ES": "Manuscrito",
+                "fr-FR": "Manuscrit",
+                "ja-JP": "原稿",
+                "ko-KR": "필사본",
+                "pl-PL": "Manuskrypt",
+                "ru-RU": "Рукопись",
+                "zh-CN": "手稿"
+            },
+            "creator": {
+                "cs-CZ": "Spisovatel",
+                "de-DE": "Schriftsteller",
+                "en-US": "Writer",
+                "es-ES": "Escritor",
+                "fr-FR": "Écrivain",
+                "ja-JP": "作家",
+                "ko-KR": "저술가",
+                "pl-PL": "Pisarz",
+                "ru-RU": "Писатель",
+                "zh-CN": "作家"
+            }
+        }
+    },
+    {
+        "id": "scrollshelf",
+        "creatorID": "writer",
+        "createTime": 120,
+        "requires": [
+            { "id": "planks", "amount": 3 },
+            { "id": "scrollofknowledge", "amount": 5 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Knihovna se svitky (prázdná)",
+                "de-DE": "Schriftrollenregal (leer)",
+                "en-US": "Scrolls Shelf (Empty)",
+                "es-ES": "Estantería de pergaminos (vacía)",
+                "fr-FR": "Étagère à parchemins (vide)",
+                "ja-JP": "巻物棚（空）",
+                "ko-KR": "두루마리 선반(비어 있음)",
+                "pl-PL": "Półka na zwoje (pusta)",
+                "ru-RU": "Стеллаж для свитков (пустой)",
+                "zh-CN": "卷轴架（全空）"
+            },
+            "creator": {
+                "cs-CZ": "Spisovatel",
+                "de-DE": "Schriftsteller",
+                "en-US": "Writer",
+                "es-ES": "Escritor",
+                "fr-FR": "Écrivain",
+                "ja-JP": "作家",
+                "ko-KR": "저술가",
+                "pl-PL": "Pisarz",
+                "ru-RU": "Писатель",
+                "zh-CN": "作家"
+            }
+        }
+    },
+    {
+        "id": "bookofknowledge",
+        "creatorID": "writer",
+        "createTime": 120,
+        "requires": [{ "id": "scientificnote", "amount": 12 }],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Naučná kniha",
+                "de-DE": "Buch des Wissens",
+                "en-US": "Book Of Knowledge",
+                "es-ES": "Libro de conocimientos",
+                "fr-FR": "Livre de technologies",
+                "ja-JP": "知識の本",
+                "ko-KR": "지식의 서",
+                "pl-PL": "Księga wiedzy",
+                "ru-RU": "Книга знаний",
+                "zh-CN": "知识之书"
+            },
+            "creator": {
+                "cs-CZ": "Spisovatel",
+                "de-DE": "Schriftsteller",
+                "en-US": "Writer",
+                "es-ES": "Escritor",
+                "fr-FR": "Écrivain",
+                "ja-JP": "作家",
+                "ko-KR": "저술가",
+                "pl-PL": "Pisarz",
+                "ru-RU": "Писатель",
+                "zh-CN": "作家"
+            }
+        }
+    },
+    {
+        "id": "bookcase",
+        "creatorID": "writer",
+        "createTime": 120,
+        "requires": [
+            { "id": "planks", "amount": 5 },
+            { "id": "ironwrought", "amount": 2 },
+            { "id": "tabletwisdom", "amount": 12 },
+            { "id": "paper", "amount": 40 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "eyeglasses",
+            "minimumTool": "noglasses",
+            "maximumTool": "eyeglasses"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Knihovna (prázdná)",
+                "de-DE": "Bücherregal (leer)",
+                "en-US": "Bookcase (Empty)",
+                "es-ES": "Librería (vacía)",
+                "fr-FR": "Bibliothèque (vide)",
+                "ja-JP": "本棚（空）",
+                "ko-KR": "책장(비어 있음)",
+                "pl-PL": "Regał na książki (pusty)",
+                "ru-RU": "Книжный стеллаж (пустой)",
+                "zh-CN": "书柜（全空）"
+            },
+            "creator": {
+                "cs-CZ": "Spisovatel",
+                "de-DE": "Schriftsteller",
+                "en-US": "Writer",
+                "es-ES": "Escritor",
+                "fr-FR": "Écrivain",
+                "ja-JP": "作家",
+                "ko-KR": "저술가",
+                "pl-PL": "Pisarz",
+                "ru-RU": "Писатель",
+                "zh-CN": "作家"
             }
         }
     },

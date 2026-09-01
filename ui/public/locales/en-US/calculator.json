@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Machine tools available?"
             },
+            "eyeglasses": {
+                "label": "Eyeglasses available?"
+            },
             "mapping": {
                 "none": "None",
                 "stone": "Stone",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Calculations are correct for version: {{version}} ({{date}})",
-        "source": "Calculations use public game data files from the <repoLink>Colony Survival repository</repoLink>."
+        "source": "Calculations use public game data files from the <repoLink>Colony Survival repository</repoLink>.",
+        "movementDisclaimer": "Calculations do not currently account for worker movement or turning time between actions, so recipes assume instant travel. Expect to need slightly more workers in practice to hit your target output, though the ratios between recipes should still roughly hold. This is a known limitation that will be addressed in a future update.",
+        "merchantGoodsDisclaimer": "The following items are not currently supported, as they rely on merchant-traded goods: Colony Kit, Wisteria Harvester."
     },
     "errors": {
         "UNKNOWN": "An error occurred, please try again.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Unknown item provided",
         "TOOL_LEVEL": "Unable to create item with available tools, minimum tool is: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "Unable to create item with available tools, requires machine tools",
-        "MULTIPLE_OVERRIDE": "More than one creator override provided for: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "Unable to create item with available tools, requires eyeglasses",
+        "MULTIPLE_OVERRIDE": "More than one creator override provided for: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Item is not creatable with current overrides"
     }
 }

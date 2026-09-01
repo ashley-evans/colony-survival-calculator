@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Maschinenwerkzeuge verfügbar?"
             },
+            "eyeglasses": {
+                "label": "Brillen verfügbar?"
+            },
             "mapping": {
                 "none": "Keine",
                 "stone": "Stein",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Berechnungen sind korrekt für Version: {{version}} ({{date}})",
-        "source": "Berechnungen verwenden öffentliche Spieldateien aus dem <repoLink>Colony Survival Repository</repoLink>."
+        "source": "Berechnungen verwenden öffentliche Spieldateien aus dem <repoLink>Colony Survival Repository</repoLink>.",
+        "movementDisclaimer": "Die Berechnungen berücksichtigen derzeit keine Bewegungs- oder Wendezeiten der Arbeiter zwischen den Aktionen, die Rezepte gehen also von sofortiger Fortbewegung aus. In der Praxis werden voraussichtlich etwas mehr Arbeiter benötigt, um die Zielausgabe zu erreichen, wobei die Verhältnisse zwischen den Rezepten weitgehend erhalten bleiben sollten. Dies ist eine bekannte Einschränkung, die in einem zukünftigen Update behoben wird.",
+        "merchantGoodsDisclaimer": "Die folgenden Gegenstände werden derzeit nicht unterstützt, da sie auf Händlerwaren angewiesen sind: Koloniekasten, Blauregenernter."
     },
     "errors": {
         "UNKNOWN": "Ein Fehler ist aufgetreten, bitte versuchen Sie es erneut.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Unbekannter Gegenstand",
         "TOOL_LEVEL": "Gegenstand kann mit verfügbaren Werkzeugen nicht hergestellt werden, Mindestwerkzeug ist: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "Gegenstand kann mit verfügbaren Werkzeugen nicht hergestellt werden, Maschinenwerkzeuge erforderlich",
-        "MULTIPLE_OVERRIDE": "Mehr als eine Herstellerüberschreibung für: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "Gegenstand kann mit verfügbaren Werkzeugen nicht hergestellt werden, Brillen erforderlich",
+        "MULTIPLE_OVERRIDE": "Mehr als eine Herstellerüberschreibung für: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Gegenstand kann mit aktuellen Überschreibungen nicht hergestellt werden"
     }
 }

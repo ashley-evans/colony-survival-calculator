@@ -3,7 +3,12 @@ import { vi, Mock } from "vitest";
 import { calculateOutput } from "../output-calculator";
 import { queryOutputDetails } from "../../adapters/mongodb-output-adapter";
 import type { ItemOutputDetails } from "../../interfaces/output-database-port";
-import { DefaultToolset, MachineToolset, Toolset } from "../../../../types";
+import {
+    DefaultToolset,
+    EyeglassesToolset,
+    MachineToolset,
+    Toolset,
+} from "../../../../types";
 import { ErrorCode, OutputUnit, UserError } from "../../../../common";
 
 vi.mock("../../adapters/mongodb-output-adapter", () => ({
@@ -208,7 +213,7 @@ describe("handles tool modifiers", () => {
                     id: validItemID,
                     workers: validWorkers,
                     unit: OutputUnit.MINUTES,
-                    maxAvailableTool: provided,
+                    availableTools: { default: provided },
                 }),
             ).rejects.toThrow(expectedError);
         },
@@ -235,7 +240,7 @@ describe("handles tool modifiers", () => {
                 id: validItemID,
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
-                maxAvailableTool: provided,
+                availableTools: { default: provided },
             });
 
             expect(actual).toBeCloseTo(expected);
@@ -255,7 +260,7 @@ describe("handles tool modifiers", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -290,7 +295,7 @@ describe("handles machine tool recipes", () => {
                     workers: validWorkers,
                     unit: OutputUnit.MINUTES,
                     ...(hasMachineTools !== undefined
-                        ? { hasMachineTools }
+                        ? { availableTools: { machine: hasMachineTools } }
                         : {}),
                 }),
             ).rejects.toThrow(expectedRequiredToolsError);
@@ -304,7 +309,7 @@ describe("handles machine tool recipes", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            hasMachineTools: true,
+            availableTools: { machine: true },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -322,7 +327,7 @@ describe("handles machine tool recipes", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            hasMachineTools: false,
+            availableTools: { machine: false },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -344,8 +349,121 @@ describe("handles machine tool recipes", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            hasMachineTools: true,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: {
+                machine: true,
+                default: "steel" as DefaultToolset,
+            },
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+});
+
+describe("handles eyeglasses tool recipes", () => {
+    const eyeglassesToolDetails = createItemOutputDetails(4, 8, {
+        type: "eyeglasses",
+        minimumTool: "eyeglasses" as EyeglassesToolset,
+        maximumTool: "eyeglasses" as EyeglassesToolset,
+    });
+
+    const expectedRequiredToolsError = new UserError(ErrorCode.TOOL_LEVEL, {
+        requiredTool: "eyeglasses",
+    });
+
+    beforeEach(() => {
+        mockQueryOutputDetails.mockResolvedValue([eyeglassesToolDetails]);
+    });
+
+    test.each([
+        ["default", undefined],
+        ["specified", false],
+    ])(
+        "throws an error if the item can only be produced by eyeglasses and they are not available (%s)",
+        async (_: string, hasEyeglasses: boolean | undefined) => {
+            expect.assertions(1);
+            await expect(
+                calculateOutput({
+                    id: validItemID,
+                    workers: validWorkers,
+                    unit: OutputUnit.MINUTES,
+                    ...(hasEyeglasses !== undefined
+                        ? { availableTools: { eyeglasses: hasEyeglasses } }
+                        : {}),
+                }),
+            ).rejects.toThrow(expectedRequiredToolsError);
+        },
+    );
+
+    test("returns expected output if eyeglasses are required and available", async () => {
+        const expected = 720;
+
+        const actual = await calculateOutput({
+            id: validItemID,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            availableTools: { eyeglasses: true },
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("ignores recipe with eyeglasses requirement if another available tool can be used", async () => {
+        const expected = 75;
+        const otherDetails = createItemOutputDetails(20, 5);
+        mockQueryOutputDetails.mockResolvedValue([
+            eyeglassesToolDetails,
+            otherDetails,
+        ]);
+
+        const actual = await calculateOutput({
+            id: validItemID,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            availableTools: { eyeglasses: false },
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("uses no eyeglasses modifier if no eyeglasses are available", async () => {
+        const expected = 600;
+        const noEyeglassesToolDetails = createItemOutputDetails(4, 8, {
+            type: "eyeglasses",
+            minimumTool: "noglasses" as EyeglassesToolset,
+            maximumTool: "eyeglasses" as EyeglassesToolset,
+        });
+        mockQueryOutputDetails.mockResolvedValue([noEyeglassesToolDetails]);
+
+        const actual = await calculateOutput({
+            id: validItemID,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            availableTools: { eyeglasses: false },
+        });
+
+        expect(actual).toBeCloseTo(expected);
+    });
+
+    test("returns optimal recipe even if one recipe uses eyeglasses", async () => {
+        const expected = 1200;
+        const otherDetails = createItemOutputDetails(10, 5, {
+            type: "default",
+            minimumTool: "none" as DefaultToolset,
+            maximumTool: "steel" as DefaultToolset,
+        });
+        mockQueryOutputDetails.mockResolvedValue([
+            eyeglassesToolDetails,
+            otherDetails,
+        ]);
+
+        const actual = await calculateOutput({
+            id: validItemID,
+            workers: validWorkers,
+            unit: OutputUnit.MINUTES,
+            availableTools: {
+                eyeglasses: true,
+                default: "steel" as DefaultToolset,
+            },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -373,7 +491,7 @@ describe("multiple recipe handling", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -399,7 +517,7 @@ describe("multiple recipe handling", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: "steel" as DefaultToolset,
+            availableTools: { default: "steel" as DefaultToolset },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -425,7 +543,7 @@ describe("multiple recipe handling", () => {
             id: validItemID,
             workers: validWorkers,
             unit: OutputUnit.MINUTES,
-            maxAvailableTool: "none" as DefaultToolset,
+            availableTools: { default: "none" as DefaultToolset },
         });
 
         expect(actual).toBeCloseTo(expected);
@@ -455,7 +573,7 @@ describe("multiple recipe handling", () => {
                 id: validItemID,
                 workers: validWorkers,
                 unit: OutputUnit.MINUTES,
-                maxAvailableTool: "none" as DefaultToolset,
+                availableTools: { default: "none" as DefaultToolset },
             }),
         ).rejects.toThrow(expectedError);
     });

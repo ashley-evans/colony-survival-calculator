@@ -10,6 +10,7 @@ import { DefaultToolset, TranslatedItem } from "../../../types";
 import {
     DEFAULT_LOCALE,
     hasMinimumRequiredTools,
+    resolveAvailableTools,
     OutputUnit,
     ErrorCode,
     UserError,
@@ -271,8 +272,7 @@ function validateInput(
 const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     const {
         id,
-        maxAvailableTool = "none" as DefaultToolset,
-        hasMachineTools = false,
+        availableTools: providedAvailableTools,
         unit = OutputUnit.SECONDS,
         creatorOverrides,
         locale,
@@ -281,6 +281,12 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
     console.log({
         key: "Requirements Input",
         parameters: JSON.stringify(input),
+    });
+
+    const availableTools = resolveAvailableTools(providedAvailableTools, {
+        default: "none" as DefaultToolset,
+        machine: false,
+        eyeglasses: false,
     });
 
     const multipleOverride = findMultipleOverrides(creatorOverrides);
@@ -303,8 +309,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
 
     const required = hasMinimumRequiredTools(
         overriddenRequirements,
-        maxAvailableTool,
-        hasMachineTools,
+        availableTools,
     );
     if (!required.hasRequired) {
         throw new UserError(ErrorCode.TOOL_LEVEL, {
@@ -316,8 +321,7 @@ const queryRequirements: QueryRequirementsPrimaryPort = async (input) => {
         inputItemID: id,
         target,
         requirements: overriddenRequirements,
-        maxAvailableTool,
-        hasMachineTools,
+        availableTools,
         unit,
     });
 

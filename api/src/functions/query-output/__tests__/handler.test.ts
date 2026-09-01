@@ -7,6 +7,7 @@ import { calculateOutput } from "../domain/output-calculator";
 import type {
     OutputUnit,
     QueryOutputArgs,
+    AvailableDefaultTools,
     AvailableTools,
 } from "../../../graphql/schema";
 import { DefaultToolset as SchemaTools } from "../../../types";
@@ -18,22 +19,30 @@ vi.mock("../domain/output-calculator", () => ({
 
 const mockCalculateOutput = calculateOutput as Mock;
 
-function createMockEvent(
-    id: string,
-    workers: number,
-    unit: OutputUnit,
-    maxAvailableTool?: AvailableTools,
-    hasMachineTools?: boolean,
-    creatorID?: string,
-): AppSyncResolverEvent<QueryOutputArgs> {
+type MockEventInput = {
+    id: string;
+    workers: number;
+    unit: OutputUnit;
+    availableTools?: AvailableTools;
+    creatorID?: string;
+};
+
+function createMockEvent({
+    id,
+    workers,
+    unit,
+    availableTools,
+    creatorID,
+}: MockEventInput): AppSyncResolverEvent<QueryOutputArgs> {
     const mockEvent = mock<AppSyncResolverEvent<QueryOutputArgs>>();
     mockEvent.arguments = {
-        id,
-        workers,
-        unit,
-        maxAvailableTool: maxAvailableTool ?? null,
-        hasMachineTools: hasMachineTools ?? null,
-        creatorID: creatorID ?? null,
+        input: {
+            id,
+            workers,
+            unit,
+            ...(availableTools ? { availableTools } : {}),
+            ...(creatorID ? { creatorID } : {}),
+        },
     };
 
     return mockEvent;
@@ -44,11 +53,11 @@ const expectedCreatorID = "testitemcreator";
 const expectedWorkers = 5;
 const expectedUnit = "GAME_DAYS";
 
-const validEvent = createMockEvent(
-    expectedItemID,
-    expectedWorkers,
-    expectedUnit,
-);
+const validEvent = createMockEvent({
+    id: expectedItemID,
+    workers: expectedWorkers,
+    unit: expectedUnit,
+});
 
 beforeEach(() => {
     mockCalculateOutput.mockReset();
@@ -65,7 +74,7 @@ test("calls the domain to calculate output given a valid event w/o tool", async 
     });
 });
 
-test.each<[AvailableTools, SchemaTools]>([
+test.each<[AvailableDefaultTools, SchemaTools]>([
     ["NONE", "none" as SchemaTools],
     ["STONE", "stone" as SchemaTools],
     ["COPPER", "copper" as SchemaTools],
@@ -74,16 +83,16 @@ test.each<[AvailableTools, SchemaTools]>([
     ["STEEL", "steel" as SchemaTools],
 ])(
     "calls the domain to calculate output given a valid event w/ %s tool",
-    async (provided: AvailableTools, expectedTool: SchemaTools) => {
+    async (provided: AvailableDefaultTools, expectedTool: SchemaTools) => {
         const expectedItemID = "anothertestitem";
         const expectedWorkers = 2;
         const expectedUnit = "MINUTES";
-        const event = createMockEvent(
-            expectedItemID,
-            expectedWorkers,
-            expectedUnit,
-            provided,
-        );
+        const event = createMockEvent({
+            id: expectedItemID,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            availableTools: { default: provided },
+        });
 
         await handler(event);
 
@@ -92,20 +101,18 @@ test.each<[AvailableTools, SchemaTools]>([
             id: expectedItemID,
             workers: expectedWorkers,
             unit: expectedUnit,
-            maxAvailableTool: expectedTool,
+            availableTools: { default: expectedTool },
         });
     },
 );
 
 test("calls the domain to calculate output given a valid event w/ specific creator specified", async () => {
-    const event = createMockEvent(
-        expectedItemID,
-        expectedWorkers,
-        expectedUnit,
-        undefined,
-        undefined,
-        expectedCreatorID,
-    );
+    const event = createMockEvent({
+        id: expectedItemID,
+        workers: expectedWorkers,
+        unit: expectedUnit,
+        creatorID: expectedCreatorID,
+    });
 
     await handler(event);
 
@@ -124,14 +131,13 @@ test.each([
 ])(
     "calls the domain to calculate output given machine tool %s",
     async (_: string, hasMachineTools: boolean) => {
-        const event = createMockEvent(
-            expectedItemID,
-            expectedWorkers,
-            expectedUnit,
-            undefined,
-            hasMachineTools,
-            expectedCreatorID,
-        );
+        const event = createMockEvent({
+            id: expectedItemID,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            availableTools: { machine: hasMachineTools },
+            creatorID: expectedCreatorID,
+        });
 
         await handler(event);
 
@@ -141,7 +147,34 @@ test.each([
             workers: expectedWorkers,
             unit: expectedUnit,
             creatorID: expectedCreatorID,
-            hasMachineTools,
+            availableTools: { machine: hasMachineTools },
+        });
+    },
+);
+
+test.each([
+    ["available", true],
+    ["unavailable", false],
+])(
+    "calls the domain to calculate output given eyeglasses %s",
+    async (_: string, hasEyeglasses: boolean) => {
+        const event = createMockEvent({
+            id: expectedItemID,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            availableTools: { eyeglasses: hasEyeglasses },
+            creatorID: expectedCreatorID,
+        });
+
+        await handler(event);
+
+        expect(mockCalculateOutput).toHaveBeenCalledTimes(1);
+        expect(mockCalculateOutput).toHaveBeenCalledWith({
+            id: expectedItemID,
+            workers: expectedWorkers,
+            unit: expectedUnit,
+            creatorID: expectedCreatorID,
+            availableTools: { eyeglasses: hasEyeglasses },
         });
     },
 );

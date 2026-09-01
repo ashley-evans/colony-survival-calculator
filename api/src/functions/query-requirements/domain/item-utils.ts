@@ -1,9 +1,8 @@
 import { Graph, depthFirstSearch } from "graph-data-structure";
 
-import { DefaultToolset, TranslatedItem } from "../../../types";
+import { AvailableTools, TranslatedItem } from "../../../types";
 import { CreatorOverride } from "../interfaces/query-requirements-primary-port";
 import {
-    ToolModifierValues,
     getMaxToolModifier,
     groupItemsByID,
     ERROR_MESSAGE_MAPPING,
@@ -13,15 +12,11 @@ import {
 const ROOT_GRAPH_KEY = "root";
 
 function calculateCreateTime(
-    { toolset, createTime }: Pick<TranslatedItem, "toolset" | "createTime">,
-    availableTool: DefaultToolset,
+    item: Pick<TranslatedItem, "toolset" | "createTime">,
+    availableTools: AvailableTools,
 ) {
-    if (toolset.type === "machine") {
-        return createTime / ToolModifierValues["machine"];
-    }
-
-    const toolModifier = getMaxToolModifier(toolset.maximumTool, availableTool);
-    return createTime / toolModifier;
+    const toolModifier = getMaxToolModifier(item, availableTools);
+    return item.createTime / toolModifier;
 }
 
 function getUniqueItemKey(

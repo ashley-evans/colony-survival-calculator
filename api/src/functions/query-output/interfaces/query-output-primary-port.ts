@@ -1,15 +1,16 @@
 import { OutputUnit } from "../../../common";
-import { DefaultToolset } from "../../../types";
+import { AvailableToolsInput } from "../../../types";
+
+type QueryOutputInput = {
+    id: string;
+    workers: number;
+    unit: OutputUnit;
+    availableTools?: AvailableToolsInput;
+    creatorID?: string;
+};
 
 interface QueryOutputPrimaryPort {
-    (input: {
-        id: string;
-        workers: number;
-        unit: OutputUnit;
-        maxAvailableTool?: DefaultToolset;
-        hasMachineTools?: boolean;
-        creatorID?: string;
-    }): Promise<number>;
+    (input: QueryOutputInput): Promise<number>;
 }
 
-export { QueryOutputPrimaryPort };
+export { QueryOutputPrimaryPort, QueryOutputInput };

@@ -21,6 +21,8 @@ import {
     expectedGameDataReferenceRepositoryLink,
     expectedGameDataReferenceRepositoryLinkText,
     expectedGameDataReferenceRepositoryExplanation,
+    expectedMovementDisclaimerExplanation,
+    expectedMerchantGoodsDisclaimerExplanation,
 } from "./utils";
 import { expectedItemDetailsQueryName } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
@@ -344,6 +346,30 @@ describe("about tab rendering", () => {
         expect(link.parentElement).toHaveTextContent(
             expectedGameDataReferenceRepositoryExplanation,
         );
+    });
+
+    test("renders a disclaimer that worker movement/turning time is not modelled", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+        const panel = await screen.findByRole("tabpanel");
+
+        expect(
+            await within(panel).findByText(
+                expectedMovementDisclaimerExplanation,
+            ),
+        ).toBeVisible();
+    });
+
+    test("renders a disclaimer that some merchant-dependent items are not supported", async () => {
+        render(<Calculator />);
+        await clickByName(expectedAboutTab, "tab");
+        const panel = await screen.findByRole("tabpanel");
+
+        expect(
+            await within(panel).findByText(
+                expectedMerchantGoodsDisclaimerExplanation,
+            ),
+        ).toBeVisible();
     });
 });
 

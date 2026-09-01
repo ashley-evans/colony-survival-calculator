@@ -9,6 +9,7 @@ import type {
     OutputUnit as GraphQLOutputUnit,
     RequirementResult,
     UserError,
+    AvailableDefaultTools,
     AvailableTools,
 } from "../../../graphql/schema";
 import type { Requirement } from "../interfaces/query-requirements-primary-port";
@@ -38,8 +39,7 @@ const expectedWorkers = 10;
 
 type GraphQLEventInput = {
     id: string;
-    maxAvailableTool?: AvailableTools;
-    hasMachineTools?: boolean;
+    availableTools?: AvailableTools;
     creatorOverrides?: CreatorOverride[];
     unit?: GraphQLOutputUnit;
     selectionSetList?: string[];
@@ -57,9 +57,8 @@ function createMockEvent(
         id: input.id,
         workers: input.workers ?? null,
         amount: input.amount ?? null,
-        maxAvailableTool: input.maxAvailableTool ?? null,
+        availableTools: input.availableTools ?? null,
         creatorOverrides: input.creatorOverrides ?? null,
-        hasMachineTools: input.hasMachineTools ?? null,
         unit: input.unit ?? null,
         locale: input.locale ?? null,
     };
@@ -102,7 +101,7 @@ test("calls the domain to fetch requirements to satisfy target output given even
     });
 });
 
-test.each<[AvailableTools, SchemaTools]>([
+test.each<[AvailableDefaultTools, SchemaTools]>([
     ["NONE", "none" as SchemaTools],
     ["STONE", "stone" as SchemaTools],
     ["COPPER", "copper" as SchemaTools],
@@ -111,11 +110,11 @@ test.each<[AvailableTools, SchemaTools]>([
     ["STEEL", "steel" as SchemaTools],
 ])(
     "calls the domain to fetch requirements for provided event w/ %s tool modifier",
-    async (provided: AvailableTools, expectedTool: SchemaTools) => {
+    async (provided: AvailableDefaultTools, expectedTool: SchemaTools) => {
         const event = createMockEvent({
             id: expectedItemID,
             workers: expectedWorkers,
-            maxAvailableTool: provided,
+            availableTools: { default: provided },
         });
 
         await handler(event);
@@ -124,7 +123,7 @@ test.each<[AvailableTools, SchemaTools]>([
         expect(mockQueryRequirements).toHaveBeenCalledWith({
             id: expectedItemID,
             workers: expectedWorkers,
-            maxAvailableTool: expectedTool,
+            availableTools: { default: expectedTool },
         });
     },
 );
@@ -138,7 +137,7 @@ test.each([
         const event = createMockEvent({
             id: expectedItemID,
             workers: expectedWorkers,
-            hasMachineTools,
+            availableTools: { machine: hasMachineTools },
         });
 
         await handler(event);
@@ -147,7 +146,7 @@ test.each([
         expect(mockQueryRequirements).toHaveBeenCalledWith({
             id: expectedItemID,
             workers: expectedWorkers,
-            hasMachineTools,
+            availableTools: { machine: hasMachineTools },
         });
     },
 );

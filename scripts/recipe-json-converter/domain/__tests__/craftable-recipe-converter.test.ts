@@ -12,6 +12,7 @@ import {
     DefaultToolset,
     UntranslatedItem,
     MachineToolset,
+    EyeglassesToolset,
 } from "../../types";
 
 const mockFindFiles = vi.fn();
@@ -653,10 +654,112 @@ describe("recipe to item mapping", () => {
     );
 
     describe("handles eyeglasses toolset", () => {
-        const tools = PiplizTools.eyeglasses;
+        const creator = "researcher";
+        const output = "scientificnote";
+        const recipes: Recipes = [
+            {
+                cooldown: 85,
+                name: `pipliz.${creator}.${output}`,
+                requires: [{ type: "paper" }],
+                results: [
+                    {
+                        type: output,
+                    },
+                ],
+            },
+        ];
+        const behaviours: BlockBehaviours = [
+            {
+                baseType: {
+                    attachBehaviour: [
+                        {
+                            npcType: `pipliz.${creator}`,
+                            toolset: glassesToolset.key,
+                        },
+                    ],
+                },
+            },
+        ];
+
+        beforeEach(() => {
+            mockReadToolFile.mockResolvedValue([glassesToolset]);
+            mockReadRecipeFile.mockResolvedValue(recipes);
+            mockReadBehaviourFile.mockResolvedValue(behaviours);
+        });
+
+        test("returns converted recipe for recipe that requires eyeglasses", async () => {
+            const expected: UntranslatedItem = {
+                id: output,
+                createTime: 85,
+                output: 1,
+                requires: [{ id: "paper", amount: 1 }],
+                toolset: {
+                    type: "eyeglasses",
+                    minimumTool: EyeglassesToolset.noglasses,
+                    maximumTool: EyeglassesToolset.eyeglasses,
+                },
+                creatorID: creator,
+            };
+
+            const actual = await convertRecipes(input);
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns converted recipe with no default fallback given toolset mandates eyeglasses", async () => {
+            const mandatoryGlassesToolset: PiplizToolsets[number] = {
+                key: "mandatoryglasses",
+                usable: [PiplizTools.eyeglasses],
+            };
+            const mandatoryCreator = "alchemist";
+            const mandatoryOutput = "poisondart";
+            mockReadToolFile.mockResolvedValue([mandatoryGlassesToolset]);
+            mockReadRecipeFile.mockResolvedValue([
+                {
+                    cooldown: 20,
+                    name: `pipliz.${mandatoryCreator}.${mandatoryOutput}`,
+                    requires: [],
+                    results: [{ type: mandatoryOutput }],
+                },
+            ]);
+            mockReadBehaviourFile.mockResolvedValue([
+                {
+                    baseType: {
+                        attachBehaviour: [
+                            {
+                                npcType: `pipliz.${mandatoryCreator}`,
+                                toolset: mandatoryGlassesToolset.key,
+                            },
+                        ],
+                    },
+                },
+            ]);
+            const expected: UntranslatedItem = {
+                id: mandatoryOutput,
+                createTime: 20,
+                output: 1,
+                requires: [],
+                toolset: {
+                    type: "eyeglasses",
+                    minimumTool: EyeglassesToolset.eyeglasses,
+                    maximumTool: EyeglassesToolset.eyeglasses,
+                },
+                creatorID: mandatoryCreator,
+            };
+
+            const actual = await convertRecipes(input);
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+    });
+
+    describe("handles unsupported toolset", () => {
+        const unsupportedTool = "futuretools" as PiplizTools;
         const toolset: PiplizToolsets[number] = {
-            key: tools,
-            usable: [tools],
+            key: "unsupported",
+            usable: [unsupportedTool],
         };
         const creator = "alchemist";
         const output = "poisondart";
@@ -678,7 +781,7 @@ describe("recipe to item mapping", () => {
                     attachBehaviour: [
                         {
                             npcType: `pipliz.${creator}`,
-                            toolset: tools,
+                            toolset: toolset.key,
                         },
                     ],
                 },
@@ -759,6 +862,9 @@ describe("recipe to item mapping", () => {
             expect(actual[0]).toEqual(expected);
         });
     });
+
+    // TODO: Add eyeglasses test cases (Creator: researcher, Result: scientificnote)
+    // Need to ensure handles attaching eyeglasses toolset
 
     test.each([
         [

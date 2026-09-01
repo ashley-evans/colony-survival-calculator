@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "Maskinverktøy tilgjengelig?"
             },
+            "eyeglasses": {
+                "label": "Briller tilgjengelig?"
+            },
             "mapping": {
                 "none": "Ingen",
                 "stone": "Stein",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "Beregningene er korrekte for versjon: {{version}} ({{date}})",
-        "source": "Beregningene bruker offentlige spilldatafiler fra <repoLink>Colony Survival-repositoriet</repoLink>."
+        "source": "Beregningene bruker offentlige spilldatafiler fra <repoLink>Colony Survival-repositoriet</repoLink>.",
+        "movementDisclaimer": "Beregningene tar for øyeblikket ikke hensyn til arbeidernes bevegelse eller snutid mellom handlinger, så oppskriftene forutsetter øyeblikkelig forflytning. I praksis må du forvente å trenge litt flere arbeidere for å nå ønsket produksjon, selv om forholdet mellom oppskriftene stort sett bør holde seg. Dette er en kjent begrensning som vil bli løst i en fremtidig oppdatering.",
+        "merchantGoodsDisclaimer": "Følgende gjenstander støttes ikke for øyeblikket, siden de er avhengige av varer som handles med kjøpmannen: koloni pakke, Blåregn Bonde."
     },
     "errors": {
         "UNKNOWN": "Det oppstod en feil, vennligst prøv igjen.",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "Ukjent gjenstand",
         "TOOL_LEVEL": "Kan ikke lage gjenstanden med tilgjengelige verktøy, minimumsverktøy er: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "Kan ikke lage gjenstanden med tilgjengelige verktøy, krever maskinverktøy",
-        "MULTIPLE_OVERRIDE": "Mer enn én produsentoverstyring angitt for: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "Kan ikke lage gjenstanden med tilgjengelige verktøy, krever briller",
+        "MULTIPLE_OVERRIDE": "Mer enn én produsentoverstyring angitt for: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "Gjenstanden kan ikke lages med gjeldende overstyringer"
     }
 }

@@ -327,7 +327,7 @@ test("requests item details for newly selected item if selection is changed", as
         {
             filters: {
                 id: expectedItem.id,
-                optimal: { maxAvailableTool: "NONE", hasMachineTools: false },
+                optimal: { default: "NONE", machine: false, eyeglasses: false },
             },
             locale: "en-US",
         },

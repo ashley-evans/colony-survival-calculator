@@ -5,9 +5,14 @@ import {
     queryItemByCreatorCount,
 } from "../../adapters/mongodb-query-item";
 import { queryItem } from "../query-item";
-import { DefaultToolset, TranslatedItem } from "../../../../types";
+import {
+    DefaultToolset,
+    EyeglassesToolset,
+    TranslatedItem,
+} from "../../../../types";
 import {
     createTranslatedItem,
+    createTranslatedItemWithEyeglasses,
     createTranslatedItemWithMachineTools,
 } from "../../../../../test";
 import { QueryFilters } from "../../interfaces/query-item-primary-port";
@@ -278,7 +283,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: "steel" as DefaultToolset },
+                optimal: { default: "steel" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -309,7 +314,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { maxAvailableTool: "none" as DefaultToolset },
+                optimal: { default: "none" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -338,7 +343,7 @@ describe("field queries", () => {
             mockQueryItemByField.mockResolvedValue(received);
 
             const actual = await queryItem({
-                optimal: { hasMachineTools: false },
+                optimal: { machine: false },
             });
 
             expect(actual).toHaveLength(1);
@@ -370,7 +375,7 @@ describe("field queries", () => {
                 mockQueryItemByField.mockResolvedValue(received);
 
                 const actual = await queryItem({
-                    optimal: { hasMachineTools },
+                    optimal: { machine: hasMachineTools },
                 });
 
                 expect(actual).toHaveLength(1);
@@ -401,8 +406,8 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasMachineTools: true,
-                    maxAvailableTool: "steel" as DefaultToolset,
+                    machine: true,
+                    default: "steel" as DefaultToolset,
                 },
             });
 
@@ -423,7 +428,129 @@ describe("field queries", () => {
 
             const actual = await queryItem({
                 optimal: {
-                    hasMachineTools: false,
+                    machine: false,
+                },
+            });
+
+            expect(actual).toHaveLength(0);
+        });
+
+        test("ignores any item that requires eyeglasses if no eyeglasses are available even if more optimal", async () => {
+            const itemName = "item 1";
+            const expected = createTranslatedItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "none" as DefaultToolset,
+            });
+            const received = [
+                expected,
+                createTranslatedItemWithEyeglasses({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "eyeglasses" as EyeglassesToolset,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: { eyeglasses: false },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test.each([
+            ["default behaviour", undefined],
+            ["has eyeglasses", true],
+        ])(
+            "returns item with eyeglasses if more optimal (%s)",
+            async (_: string, hasEyeglasses: boolean | undefined) => {
+                const itemName = "item 1";
+                const expected = createTranslatedItemWithEyeglasses({
+                    name: itemName,
+                    createTime: 1,
+                    output: 1.8,
+                    requirements: [],
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "eyeglasses" as EyeglassesToolset,
+                });
+                const received = [
+                    expected,
+                    createTranslatedItem({
+                        name: itemName,
+                        createTime: 1,
+                        output: 2,
+                        requirements: [],
+                    }),
+                ];
+                mockQueryItemByField.mockResolvedValue(received);
+
+                const actual = await queryItem({
+                    optimal: { eyeglasses: hasEyeglasses },
+                });
+
+                expect(actual).toHaveLength(1);
+                expect(actual[0]).toEqual(expected);
+            },
+        );
+
+        test("prefers optimal recipe regardless of whether item has recipe with eyeglasses", async () => {
+            const itemName = "item 1";
+            const expected = createTranslatedItem({
+                name: itemName,
+                createTime: 1,
+                output: 2,
+                requirements: [],
+                minimumTool: "none" as DefaultToolset,
+                maximumTool: "steel" as DefaultToolset,
+            });
+            const received = [
+                expected,
+                createTranslatedItemWithEyeglasses({
+                    name: itemName,
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "eyeglasses" as EyeglassesToolset,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: {
+                    eyeglasses: true,
+                    default: "steel" as DefaultToolset,
+                },
+            });
+
+            expect(actual).toHaveLength(1);
+            expect(actual[0]).toEqual(expected);
+        });
+
+        test("returns nothing if only recipe requires eyeglasses and no eyeglasses are available", async () => {
+            const received = [
+                createTranslatedItemWithEyeglasses({
+                    name: "test item",
+                    createTime: 1,
+                    output: 3,
+                    requirements: [],
+                    minimumTool: "eyeglasses" as EyeglassesToolset,
+                    maximumTool: "eyeglasses" as EyeglassesToolset,
+                }),
+            ];
+            mockQueryItemByField.mockResolvedValue(received);
+
+            const actual = await queryItem({
+                optimal: {
+                    eyeglasses: false,
                 },
             });
 
@@ -695,7 +822,7 @@ describe("creator count queries", () => {
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: "steel" as DefaultToolset },
+                optimal: { default: "steel" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);
@@ -727,7 +854,7 @@ describe("creator count queries", () => {
 
             const actual = await queryItem({
                 minimumCreators: 2,
-                optimal: { maxAvailableTool: "none" as DefaultToolset },
+                optimal: { default: "none" as DefaultToolset },
             });
 
             expect(actual).toHaveLength(1);

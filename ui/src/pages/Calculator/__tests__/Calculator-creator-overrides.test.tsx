@@ -31,7 +31,7 @@ import {
     CreatorOverride,
     Item,
     OutputUnit,
-    AvailableTools,
+    AvailableDefaultTools,
 } from "../../../graphql/__generated__/graphql";
 import userEvent from "@testing-library/user-event";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
@@ -848,7 +848,7 @@ describe("given items w/ multiple creators returned", () => {
 
         test("returns to querying optimal recipe if applicable override is removed", async () => {
             const expectedItem = expectedSecondItemName;
-            const expectedTool = AvailableTools.None;
+            const expectedTool = AvailableDefaultTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -858,8 +858,9 @@ describe("given items w/ multiple creators returned", () => {
                     filters: {
                         id: expectedSecondItem.id,
                         optimal: {
-                            maxAvailableTool: expectedTool,
-                            hasMachineTools: false,
+                            default: expectedTool,
+                            machine: false,
+                            eyeglasses: false,
                         },
                     },
                     locale: "en-US",
@@ -902,7 +903,7 @@ describe("given items w/ multiple creators returned", () => {
                     creatorID: expectedSecondItemCreatorOverrides[1].creatorID,
                 },
             ];
-            const expectedTool = AvailableTools.None;
+            const expectedTool = AvailableDefaultTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -942,8 +943,11 @@ describe("given items w/ multiple creators returned", () => {
                 amount: null,
                 workers: expectedWorkers,
                 unit: OutputUnit.Minutes,
-                maxAvailableTool: expectedTool,
-                hasMachineTools: false,
+                availableTools: {
+                    default: expectedTool,
+                    machine: false,
+                    eyeglasses: false,
+                },
                 creatorOverrides: expectedOverrides,
                 locale: "en-US",
             });
@@ -952,7 +956,7 @@ describe("given items w/ multiple creators returned", () => {
         test("returns to querying calculator output without creator overrides if removed", async () => {
             const expectedItem = expectedSecondItemName;
             const expectedWorkers = 5;
-            const expectedTool = AvailableTools.None;
+            const expectedTool = AvailableDefaultTools.None;
             const expectedRequest = waitForRequest(
                 server,
                 "POST",
@@ -963,8 +967,11 @@ describe("given items w/ multiple creators returned", () => {
                     amount: null,
                     workers: expectedWorkers,
                     unit: OutputUnit.Minutes,
-                    maxAvailableTool: expectedTool,
-                    hasMachineTools: false,
+                    availableTools: {
+                        default: expectedTool,
+                        machine: false,
+                        eyeglasses: false,
+                    },
                     locale: "en-US",
                 },
             );
@@ -991,7 +998,7 @@ describe("given items w/ multiple creators returned", () => {
             const expectedCreator =
                 expectedSecondItemCreatorOverrides[1].creator;
             const expectedWorkers = 5;
-            const expectedTool = AvailableTools.None;
+            const expectedTool = AvailableDefaultTools.None;
             const expectedOutputUnit = OutputUnit.Minutes;
             const expectedOverrides: CreatorOverride[] = [
                 {
@@ -1031,8 +1038,11 @@ describe("given items w/ multiple creators returned", () => {
                 workers: expectedWorkers,
                 amount: null,
                 unit: expectedOutputUnit,
-                maxAvailableTool: expectedTool,
-                hasMachineTools: false,
+                availableTools: {
+                    default: expectedTool,
+                    machine: false,
+                    eyeglasses: false,
+                },
                 creatorOverrides: expectedOverrides,
                 locale: "en-US",
             });

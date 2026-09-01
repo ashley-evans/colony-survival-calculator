@@ -7,14 +7,16 @@ import OutputUnitSelector from "./components/OutputUnitSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
     DefaultToolSelector,
+    EyeglassesCheckbox,
     MachineToolCheckbox,
     PageContainer,
     TabContainer,
     TabHeader,
     Tabs,
+    ToolAvailabilityRow,
 } from "./styles";
 import {
-    AvailableTools,
+    AvailableDefaultTools,
     CreatorOverride,
     ItemsFilters,
     OutputUnit,
@@ -52,16 +54,18 @@ type StateProp<S> = [S, (value: S) => void];
 type CalculatorTabProps = {
     itemIDState: StateProp<string | undefined>;
     currentTarget: StateProp<Target | undefined>;
-    toolState: StateProp<AvailableTools>;
+    toolState: StateProp<AvailableDefaultTools>;
     machineToolState: StateProp<boolean>;
+    eyeglassesToolState: StateProp<boolean>;
     outputUnitState: StateProp<OutputUnit>;
     selectedCreatorOverrides: CreatorOverride[];
 };
 
 function getItemDetailsFilters(
     itemID?: string,
-    tool?: AvailableTools,
+    tool?: AvailableDefaultTools,
     hasMachineTools?: boolean,
+    hasEyeglasses?: boolean,
     overrides?: CreatorOverride[],
 ): ItemsFilters {
     const creatorID = overrides
@@ -73,7 +77,11 @@ function getItemDetailsFilters(
         ? { id: itemID, creatorID }
         : {
               id: itemID,
-              optimal: { maxAvailableTool: tool, hasMachineTools },
+              optimal: {
+                  default: tool,
+                  machine: hasMachineTools,
+                  eyeglasses: hasEyeglasses,
+              },
           };
 }
 
@@ -82,6 +90,7 @@ function CalculatorTab({
     currentTarget: [target, setTarget],
     toolState: [selectedTool, setSelectedTool],
     machineToolState: [hasMachineTools, setHasMachineTools],
+    eyeglassesToolState: [hasEyeglasses, setHasEyeglasses],
     outputUnitState: [selectedOutputUnit, setSelectedOutputUnit],
     selectedCreatorOverrides,
 }: CalculatorTabProps) {
@@ -101,6 +110,7 @@ function CalculatorTab({
                     selectedItemID,
                     selectedTool,
                     hasMachineTools,
+                    hasEyeglasses,
                     selectedCreatorOverrides,
                 ),
                 locale: i18n.language,
@@ -154,11 +164,18 @@ function CalculatorTab({
                         onToolChange={setSelectedTool}
                         defaultTool={selectedTool}
                     />
-                    <MachineToolCheckbox
-                        onChange={setHasMachineTools}
-                        label={t("calculator.tools.machineTools.label")}
-                        checked={hasMachineTools}
-                    />
+                    <ToolAvailabilityRow>
+                        <MachineToolCheckbox
+                            onChange={setHasMachineTools}
+                            label={t("calculator.tools.machineTools.label")}
+                            checked={hasMachineTools}
+                        />
+                        <EyeglassesCheckbox
+                            onChange={setHasEyeglasses}
+                            label={t("calculator.tools.eyeglasses.label")}
+                            checked={hasEyeglasses}
+                        />
+                    </ToolAvailabilityRow>
                     <OutputUnitSelector
                         onUnitChange={setSelectedOutputUnit}
                         defaultUnit={selectedOutputUnit}
@@ -183,6 +200,7 @@ function CalculatorTab({
                                 outputUnit={selectedOutputUnit}
                                 maxAvailableTool={selectedTool}
                                 hasMachineTools={hasMachineTools}
+                                hasEyeglasses={hasEyeglasses}
                                 creatorOverrides={selectedCreatorOverrides}
                                 onSelectedItemTotalChange={
                                     handleSelectedItemTotalChange
@@ -247,6 +265,8 @@ function AboutTab() {
                     }}
                 />
             </span>
+            <span>{t("about.movementDisclaimer")}</span>
+            <span>{t("about.merchantGoodsDisclaimer")}</span>
         </>
     );
 }
@@ -265,8 +285,11 @@ function Calculator() {
 
     const selectedItemIDState = useState<string>();
     const targetState = useState<Target>();
-    const selectedToolState = useState<AvailableTools>(AvailableTools.None);
+    const selectedToolState = useState<AvailableDefaultTools>(
+        AvailableDefaultTools.None,
+    );
     const hasMachineToolState = useState<boolean>(false);
+    const hasEyeglassesToolState = useState<boolean>(false);
     const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
     const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
 
@@ -305,6 +328,7 @@ function Calculator() {
                         currentTarget={targetState}
                         toolState={selectedToolState}
                         machineToolState={hasMachineToolState}
+                        eyeglassesToolState={hasEyeglassesToolState}
                         outputUnitState={selectedOutputUnitState}
                         selectedCreatorOverrides={selectedCreatorOverrides[0]}
                     />

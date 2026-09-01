@@ -50,6 +50,9 @@
             "machineTools": {
                 "label": "機械ツールは利用可能ですか？"
             },
+            "eyeglasses": {
+                "label": "眼鏡は利用可能ですか？"
+            },
             "mapping": {
                 "none": "なし",
                 "stone": "石",
@@ -107,7 +110,9 @@
     },
     "about": {
         "version": "計算はバージョン {{version}} ({{date}}) に対応しています",
-        "source": "計算は<repoLink>Colony Survivalリポジトリ</repoLink>の公開ゲームデータファイルを使用しています。"
+        "source": "計算は<repoLink>Colony Survivalリポジトリ</repoLink>の公開ゲームデータファイルを使用しています。",
+        "movementDisclaimer": "現在の計算では、作業間の労働者の移動や方向転換にかかる時間は考慮されておらず、レシピは瞬間移動を前提としています。目標生産量を達成するには実際には多少多めの労働者が必要になると予想されますが、レシピ間の比率はおおむね維持されるはずです。これは既知の制限事項であり、今後のアップデートで対応される予定です。",
+        "merchantGoodsDisclaimer": "以下のアイテムは、商人取引の物品に依存しているため、現在サポートされていません：集落キット、藤の収穫人。"
     },
     "errors": {
         "UNKNOWN": "エラーが発生しました。もう一度お試しください。",
@@ -117,7 +122,8 @@
         "UNKNOWN_ITEM": "不明なアイテムです",
         "TOOL_LEVEL": "利用可能なツールではアイテムを作成できません。最低限必要なツール: {{requiredTool}}",
         "TOOL_LEVEL_MACHINE": "利用可能なツールではアイテムを作成できません。機械ツールが必要です",
-        "MULTIPLE_OVERRIDE": "生産者の上書きが複数指定されています: {{itemId}}",
+        "TOOL_LEVEL_EYEGLASSES": "利用可能なツールではアイテムを作成できません。眼鏡が必要です",
+        "MULTIPLE_OVERRIDE": "生産者の上書きが複数指定されています: {{itemID}}",
         "INVALID_OVERRIDE_ITEM_NOT_CREATABLE": "現在の上書き設定ではアイテムを作成できません"
     }
 }

@@ -2,14 +2,18 @@ import {
     calculateOutput,
     DEFAULT_LOCALE,
     isAvailableToolSufficient,
+    resolveAvailableTools,
 } from "../../../common";
-import { DefaultToolset, TranslatedItem } from "../../../types";
+import {
+    AvailableToolsInput,
+    DefaultToolset,
+    TranslatedItem,
+} from "../../../types";
 import {
     queryItemByCreatorCount,
     queryItemByField,
 } from "../adapters/mongodb-query-item";
 import type {
-    OptimalFilter,
     QueryFilters,
     QueryItemPrimaryPort,
 } from "../interfaces/query-item-primary-port";
@@ -19,17 +23,17 @@ const INVALID_FILTER_ERROR =
 
 function filterByOptimal(
     items: TranslatedItem[],
-    filters: OptimalFilter,
+    filters: AvailableToolsInput,
 ): TranslatedItem[] {
     const itemMap = new Map<string, TranslatedItem>();
-    const maxAvailableTool =
-        filters.maxAvailableTool ?? ("steel" as DefaultToolset);
-    const hasMachineTools = filters.hasMachineTools ?? true;
+    const availableTools = resolveAvailableTools(filters, {
+        default: "steel" as DefaultToolset,
+        machine: true,
+        eyeglasses: true,
+    });
 
     for (const item of items) {
-        if (
-            !isAvailableToolSufficient(maxAvailableTool, hasMachineTools, item)
-        ) {
+        if (!isAvailableToolSufficient({ available: availableTools, item })) {
             continue;
         }
 
@@ -41,12 +45,9 @@ function filterByOptimal(
 
         const currentOptimalOutput = calculateOutput(
             currentOptimalItem,
-            maxAvailableTool ?? currentOptimalItem.toolset.maximumTool,
+            availableTools,
         );
-        const itemOutput = calculateOutput(
-            item,
-            maxAvailableTool ?? item.toolset.maximumTool,
-        );
+        const itemOutput = calculateOutput(item, availableTools);
 
         if (itemOutput > currentOptimalOutput) {
             itemMap.set(item.name, item);
