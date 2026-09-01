@@ -3,6 +3,7 @@ import {
     PiplizTools,
     DefaultToolset,
     MachineToolset,
+    EyeglassesToolset,
     Recipe,
 } from "../types";
 import { splitPiplizName } from "./utils";
@@ -112,6 +113,16 @@ const getToolset = (
             type: "machine",
             minimumTool: MachineToolset.machine,
             maximumTool: MachineToolset.machine,
+        };
+    }
+
+    if (tools.includes(PiplizTools.eyeglasses)) {
+        return {
+            type: "eyeglasses",
+            minimumTool: tools.includes(PiplizTools.notools)
+                ? EyeglassesToolset.noglasses
+                : EyeglassesToolset.eyeglasses,
+            maximumTool: EyeglassesToolset.eyeglasses,
         };
     }
 

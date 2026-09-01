@@ -116,6 +116,13 @@ Woodcutters' recipe's needs to be updated to:
 - Align result type and names for light brown quarter block recipe:
     - Update `quarterblockbrownlightitem` to `quarterblockbrownlight`
 
+Writer's recipe's need to be updated to:
+
+- Align result type and names for scroll shelf recipe:
+    - Update `scrollshelffilled` to `scrollshelf`
+- Align result type and names for bookcase recipe:
+    - Update `bookcasefilled` to `bookcase`
+
 Mineable items file (`types.json`) needs to be updated to:
 
 - Only include one stone rubble mining recipe, remove entry for `darkstone`

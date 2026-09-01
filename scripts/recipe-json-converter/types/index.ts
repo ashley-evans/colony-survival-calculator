@@ -15,9 +15,10 @@ import {
     OptionalOutput,
     DefaultToolset,
     MachineToolset,
+    EyeglassesToolset,
 } from "./__generated__/items";
 
-type APITools = DefaultToolset | MachineToolset;
+type APITools = DefaultToolset | MachineToolset | EyeglassesToolset;
 
 type NPCToolsetMapping = {
     npcType: string;
@@ -28,7 +29,7 @@ type Recipe = Recipes[number];
 type RecipeResult = Recipe["results"][number];
 type UntranslatedItem = Omit<Item, "i18n">;
 
-export { PiplizTools, DefaultToolset, MachineToolset };
+export { PiplizTools, DefaultToolset, MachineToolset, EyeglassesToolset };
 export type {
     NPCToolsetMapping,
     Item,
