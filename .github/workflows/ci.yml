@@ -12,19 +12,19 @@ jobs:
     format:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
-            - uses: hashicorp/setup-terraform@v3
+            - uses: hashicorp/setup-terraform@v4
               with:
                   terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -48,16 +48,16 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -82,16 +82,16 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name == 'pull_request'
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -109,23 +109,23 @@ jobs:
             id-token: write
             contents: read
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
-            - uses: aws-actions/configure-aws-credentials@v4
+            - uses: aws-actions/configure-aws-credentials@v6
               with:
                   aws-region: eu-west-2
                   role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
-            - uses: hashicorp/setup-terraform@v3
+            - uses: hashicorp/setup-terraform@v4
               with:
                   terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -149,16 +149,16 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -182,16 +182,16 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -218,23 +218,23 @@ jobs:
             id-token: write
             contents: read
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
-            - uses: aws-actions/configure-aws-credentials@v4
+            - uses: aws-actions/configure-aws-credentials@v6
               with:
                   aws-region: eu-west-2
                   role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
-            - uses: hashicorp/setup-terraform@v3
+            - uses: hashicorp/setup-terraform@v4
               with:
                   terraform_version: 1.14.3
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
@@ -265,17 +265,17 @@ jobs:
         needs: [format, lint, validate, build, test, deploy-dryrun]
         if: ${{ github.ref == 'refs/heads/master' }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
                   persist-credentials: false
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v7
               with:
                   node-version-file: ".nvmrc"
             - name: Get yarn cache directory path
               id: yarn-cache-dir-path
               run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v4
+            - uses: actions/cache@v6
               with:
                   path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
                   key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('**/yarn.lock') }}
