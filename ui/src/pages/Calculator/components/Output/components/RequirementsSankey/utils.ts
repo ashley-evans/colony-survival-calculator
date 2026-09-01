@@ -1,4 +1,4 @@
-import { Requirement } from "../../../../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../../../../graphql/__generated__/schema-types";
 
 export type TreeNode<T> = T & { children: TreeNode<T>[]; depth: number };
 

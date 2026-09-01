@@ -61,9 +61,9 @@ declare module "javascript-lp-solver" {
          * Specify an object with variable name as keys.
          */
         constraints: {
-            [variable in
-                | TSolutionVar
-                | TInternalVar]?: IModelVariableConstraint;
+            [
+                variable in TSolutionVar | TInternalVar
+            ]?: IModelVariableConstraint;
         };
         /**
          * Variable identity relations.
@@ -232,14 +232,7 @@ declare module "javascript-lp-solver" {
      * @internal
      */
     export type VariablePriority =
-        | 0
-        | "required"
-        | 1
-        | "strong"
-        | 2
-        | "medium"
-        | 3
-        | "weak";
+        0 | "required" | 1 | "strong" | 2 | "medium" | 3 | "weak";
 
     /**
     /**

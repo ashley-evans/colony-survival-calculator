@@ -7,7 +7,7 @@ import {
     RowType,
     SortableFields,
 } from "./types";
-import { Requirement } from "../../../../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../../../../graphql/__generated__/schema-types";
 
 export type ValidSortDirections = "none" | "ascending" | "descending";
 

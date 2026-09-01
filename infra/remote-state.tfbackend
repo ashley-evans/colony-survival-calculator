@@ -1,3 +1,2 @@
 region         = "eu-west-1"
 bucket         = "common-tf-state-bucket"
-dynamodb_table = "common-tf-state-table"

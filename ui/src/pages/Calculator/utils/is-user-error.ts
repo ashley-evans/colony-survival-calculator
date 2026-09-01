@@ -2,7 +2,7 @@ import {
     OutputResult,
     RequirementResult,
     UserError,
-} from "../../../graphql/__generated__/graphql";
+} from "../../../graphql/__generated__/schema-types";
 
 function isUserError(
     input: RequirementResult | OutputResult,

@@ -11,7 +11,7 @@ import {
 import {
     AvailableDefaultTools,
     OutputUnit,
-} from "../../../../graphql/__generated__/graphql";
+} from "../../../../graphql/__generated__/schema-types";
 import { selectOption } from "../../../../test";
 
 const ToolSelectorMappings: Readonly<Record<AvailableDefaultTools, string>> = {

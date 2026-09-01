@@ -48,9 +48,11 @@ type LanguageOptionProps = {
 
 export const LanguageOption = styled.li<LanguageOptionProps>`
     ${({ theme, $isActive, $isHighlighted }) => css`
-        background-color: ${$isActive || $isHighlighted
-            ? theme.color.secondary.outline
-            : "transparent"};
+        background-color: ${
+            $isActive || $isHighlighted
+                ? theme.color.secondary.outline
+                : "transparent"
+        };
         font-weight: ${$isActive ? "bold" : "normal"};
 
         &:hover {

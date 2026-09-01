@@ -25,7 +25,7 @@ import {
     toggleBreakdown,
 } from "./utils";
 import { RequirementsTableRow } from "./types";
-import { Requirement } from "../../../../../../graphql/__generated__/graphql";
+import { Requirement } from "../../../../../../graphql/__generated__/schema-types";
 type RequirementsProps = {
     requirements: Requirement[];
 };

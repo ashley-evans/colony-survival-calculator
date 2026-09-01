@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { OutputUnit } from "../../../../graphql/__generated__/graphql";
+import { OutputUnit } from "../../../../graphql/__generated__/schema-types";
 import { OutputUnitI18NKeyMapping } from "../../utils";
 import { Selector } from "../../../../common/components";
 

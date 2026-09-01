@@ -7,7 +7,7 @@ import {
     OutputUnit,
     AvailableDefaultTools,
     CreatorOverride,
-} from "../../../../graphql/__generated__/graphql";
+} from "../../../../graphql/__generated__/schema-types";
 import { gql } from "../../../../graphql/__generated__";
 import { DEFAULT_DEBOUNCE, isUserError } from "../../utils";
 import { Requirements, RequirementsSankey } from "./components";

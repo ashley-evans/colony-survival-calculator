@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AutoCompleteSelector } from "../../../../common/components";
-import { ItemName } from "../../../../graphql/__generated__/graphql";
+import { ItemName } from "../../../../graphql/__generated__/schema-types";
 
 type ItemSelectorProps = {
     items: ItemName[];
