@@ -136,10 +136,10 @@ test("throws an error if an unhandled exception occurs while fetching item requi
 });
 
 test.each([
-    [OutputUnit.GAME_DAYS, 2, 3, 3262.5],
+    [OutputUnit.GAME_DAYS, 2, 3, 3330],
     [OutputUnit.MINUTES, 2, 3, 450],
     [OutputUnit.SECONDS, 2, 3, 7.5],
-    [OutputUnit.GAME_DAYS, 8.5, 1, 255.88],
+    [OutputUnit.GAME_DAYS, 8.5, 1, 261.18],
     [OutputUnit.MINUTES, 8.5, 1, 35.29],
     [OutputUnit.SECONDS, 8.5, 1, 0.59],
 ])(

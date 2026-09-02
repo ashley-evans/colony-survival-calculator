@@ -7763,7 +7763,7 @@
     {
         "id": "scientificnote",
         "creatorID": "researcher",
-        "createTime": 85,
+        "createTime": 90.1,
         "requires": [{ "id": "paper", "amount": 1 }],
         "output": 1,
         "toolset": {
@@ -8009,7 +8009,7 @@
     {
         "id": "tabletwisdom",
         "creatorID": "scribe",
-        "createTime": 75,
+        "createTime": 80,
         "requires": [{ "id": "tabletclay", "amount": 1 }],
         "output": 1,
         "toolset": {
@@ -10916,7 +10916,7 @@
     },
     {
         "id": "wheat",
-        "createTime": 870,
+        "createTime": 888,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -10955,7 +10955,7 @@
     },
     {
         "id": "flax",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -10994,7 +10994,7 @@
     },
     {
         "id": "cotton",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11033,7 +11033,7 @@
     },
     {
         "id": "cabbage",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11072,7 +11072,7 @@
     },
     {
         "id": "alkanet",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11111,7 +11111,7 @@
     },
     {
         "id": "hollyhock",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11150,7 +11150,7 @@
     },
     {
         "id": "wolfsbane",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11189,7 +11189,7 @@
     },
     {
         "id": "barley",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11228,7 +11228,7 @@
     },
     {
         "id": "hemp",
-        "createTime": 435,
+        "createTime": 444,
         "output": 100,
         "requires": [],
         "toolset": {
@@ -11267,7 +11267,7 @@
     },
     {
         "id": "wisteriaflower",
-        "createTime": 435,
+        "createTime": 18.5,
         "output": 1,
         "requires": [],
         "toolset": {
@@ -11305,7 +11305,7 @@
     },
     {
         "id": "log",
-        "createTime": 435,
+        "createTime": 444,
         "output": 44,
         "requires": [],
         "optionalOutputs": [
@@ -11347,7 +11347,7 @@
     },
     {
         "id": "leaves",
-        "createTime": 435,
+        "createTime": 444,
         "output": 59.4,
         "requires": [],
         "optionalOutputs": [{ "id": "log", "amount": 44, "likelihood": 1 }],
