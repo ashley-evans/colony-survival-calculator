@@ -251,8 +251,8 @@ function AboutTab() {
         <>
             <span>
                 {t("about.version", {
-                    version: "0.15.0.11",
-                    date: "2025-11-28",
+                    version: "0.18.0.0",
+                    date: "2026-08-21",
                 })}
             </span>
             <span>
