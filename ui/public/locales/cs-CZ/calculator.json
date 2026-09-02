@@ -111,7 +111,7 @@
     "about": {
         "version": "Výpočty jsou správné pro verzi: {{version}} ({{date}})",
         "source": "Výpočty používají veřejné herní datové soubory z <repoLink>repozitáře Colony Survival</repoLink>.",
-        "movementDisclaimer": "Výpočty v současnosti nezohledňují pohyb pracovníků ani čas potřebný na otočení mezi činnostmi, takže recepty předpokládají okamžitý přesun. V praxi očekávejte, že pro dosažení cílového výstupu budete potřebovat o něco více pracovníků, i když poměry mezi recepty by měly zůstat přibližně zachovány. Jedná se o známé omezení, které bude řešeno v budoucí aktualizaci.",
+        "movementDisclaimer": "Výpočty obecně předpokládají optimální rozvržení, kde pracovník nikdy nemusí mezi činnostmi chodit. Jedinou výjimkou jsou Vědecká poznámka, Starobylá naučná destička a Květ vistárie, kde chůze podstatně mění denní výstup, a proto je zohledněna v jejich číslech.",
         "merchantGoodsDisclaimer": "Následující předměty nejsou v současnosti podporovány, protože závisí na zboží obchodovaném s obchodníkem: Osadnická sada, Sběrač vistárie."
     },
     "errors": {

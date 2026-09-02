@@ -111,7 +111,7 @@
     "about": {
         "version": "Berechnungen sind korrekt für Version: {{version}} ({{date}})",
         "source": "Berechnungen verwenden öffentliche Spieldateien aus dem <repoLink>Colony Survival Repository</repoLink>.",
-        "movementDisclaimer": "Die Berechnungen berücksichtigen derzeit keine Bewegungs- oder Wendezeiten der Arbeiter zwischen den Aktionen, die Rezepte gehen also von sofortiger Fortbewegung aus. In der Praxis werden voraussichtlich etwas mehr Arbeiter benötigt, um die Zielausgabe zu erreichen, wobei die Verhältnisse zwischen den Rezepten weitgehend erhalten bleiben sollten. Dies ist eine bekannte Einschränkung, die in einem zukünftigen Update behoben wird.",
+        "movementDisclaimer": "Die Berechnungen gehen im Allgemeinen von einem optimalen Layout aus, bei dem ein Arbeiter zwischen den Aktionen nie laufen muss. Die einzigen Ausnahmen sind Wissenschaftliche Anmerkung, Tafel der alten Weisheit und Blauregen, bei denen das Laufen den Ausstoß pro Tag erheblich verändert und daher in ihre Werte eingerechnet wird.",
         "merchantGoodsDisclaimer": "Die folgenden Gegenstände werden derzeit nicht unterstützt, da sie auf Händlerwaren angewiesen sind: Koloniekasten, Blauregenernter."
     },
     "errors": {

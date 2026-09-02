@@ -111,7 +111,7 @@
     "about": {
         "version": "Los cálculos son correctos para la versión: {{version}} ({{date}})",
         "source": "Los cálculos usan archivos de datos públicos del <repoLink>repositorio de Colony Survival</repoLink>.",
-        "movementDisclaimer": "Los cálculos actualmente no tienen en cuenta el movimiento de los trabajadores ni el tiempo de giro entre acciones, por lo que las recetas asumen un desplazamiento instantáneo. En la práctica, es de esperar que se necesiten algunos trabajadores más para alcanzar la producción objetivo, aunque las proporciones entre recetas deberían mantenerse aproximadamente. Se trata de una limitación conocida que se abordará en una futura actualización.",
+        "movementDisclaimer": "Los cálculos generalmente asumen una disposición óptima en la que un trabajador nunca necesita caminar entre acciones. La Nota tecnológica, la Tableta de sabiduría antigua y la Flor de glicina son las únicas excepciones, donde caminar cambia sustancialmente la producción diaria, por lo que se tiene en cuenta en sus cifras.",
         "merchantGoodsDisclaimer": "Los siguientes objetos no son compatibles actualmente, ya que dependen de bienes comerciados con mercaderes: Kit de colonia, Cosechador de glicina."
     },
     "errors": {
