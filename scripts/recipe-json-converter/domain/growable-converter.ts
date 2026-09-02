@@ -7,12 +7,12 @@ import { getCreatorID } from "./recipe-dictionary";
 import { checkDuplication } from "./utils";
 
 const FILE_NAME = "growables";
-const GAME_DAY_SECONDS = 435;
+const GAME_DAY_SECONDS = 444;
 
 const STATIC_RECIPES: UntranslatedItem[] = [
     {
         id: "log",
-        createTime: 435,
+        createTime: 444,
         output: 44,
         requires: [],
         optionalOutputs: [{ id: "leaves", amount: 59.4, likelihood: 1 }],
@@ -29,7 +29,7 @@ const STATIC_RECIPES: UntranslatedItem[] = [
     },
     {
         id: "leaves",
-        createTime: 435,
+        createTime: 444,
         output: 59.4,
         requires: [],
         optionalOutputs: [{ id: "log", amount: 44, likelihood: 1 }],
@@ -89,6 +89,15 @@ const getExpectedOutput = (name: string): number | null => {
     }
 };
 
+const getExpectedCreateTime = (name: string): number | null => {
+    switch (name) {
+        case "wisteriaflower":
+            return 18.5;
+        default:
+            return null;
+    }
+};
+
 const getExpectedSize = (
     name: string,
 ): NonNullable<UntranslatedItem["size"]> | null => {
@@ -130,7 +139,9 @@ const mapToItem = (growable: Growables[number]): UntranslatedItem => {
         );
     }
 
-    const createTime = daysToGrow * GAME_DAY_SECONDS;
+    const createTime =
+        getExpectedCreateTime(growable.identifier) ??
+        daysToGrow * GAME_DAY_SECONDS;
     const size = getExpectedSize(growable.identifier);
     return {
         id: growable.identifier,

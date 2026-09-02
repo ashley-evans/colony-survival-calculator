@@ -111,7 +111,7 @@
     "about": {
         "version": "Beregningene er korrekte for versjon: {{version}} ({{date}})",
         "source": "Beregningene bruker offentlige spilldatafiler fra <repoLink>Colony Survival-repositoriet</repoLink>.",
-        "movementDisclaimer": "Beregningene tar for øyeblikket ikke hensyn til arbeidernes bevegelse eller snutid mellom handlinger, så oppskriftene forutsetter øyeblikkelig forflytning. I praksis må du forvente å trenge litt flere arbeidere for å nå ønsket produksjon, selv om forholdet mellom oppskriftene stort sett bør holde seg. Dette er en kjent begrensning som vil bli løst i en fremtidig oppdatering.",
+        "movementDisclaimer": "Beregningene forutsetter generelt et optimalt oppsett der en arbeider aldri trenger å gå mellom handlinger. Vitenskapelig Notat, Tavle med gammel kunskap og Blåregn blomst er de eneste unntakene, hvor gange vesentlig endrer produksjonen per dag, så dette er tatt med i beregningen av tallene deres.",
         "merchantGoodsDisclaimer": "Følgende gjenstander støttes ikke for øyeblikket, siden de er avhengige av varer som handles med kjøpmannen: koloni pakke, Blåregn Bonde."
     },
     "errors": {

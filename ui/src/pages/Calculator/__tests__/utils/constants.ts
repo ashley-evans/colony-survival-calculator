@@ -34,6 +34,6 @@ export const expectedGameDataReferenceRepositoryLinkText =
 export const expectedGameDataReferenceRepositoryLink =
     "https://github.com/pipliz/ColonySurvival";
 export const expectedMovementDisclaimerExplanation =
-    "Calculations do not currently account for worker movement or turning time between actions, so recipes assume instant travel. Expect to need slightly more workers in practice to hit your target output, though the ratios between recipes should still roughly hold. This is a known limitation that will be addressed in a future update.";
+    "Calculations generally assume an optimal layout where a worker never needs to walk between actions. The Scientific Note, Tablet Of Ancient Wisdom, and Wisteria Flower are the only exceptions, where walking materially changes the output per day, so it's factored into their numbers.";
 export const expectedMerchantGoodsDisclaimerExplanation =
     "The following items are not currently supported, as they rely on merchant-traded goods: Colony Kit, Wisteria Harvester.";

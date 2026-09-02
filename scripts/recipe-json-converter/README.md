@@ -127,6 +127,14 @@ Mineable items file (`types.json`) needs to be updated to:
 
 - Only include one stone rubble mining recipe, remove entry for `darkstone`
 
+Researcher's recipe needs to be updated to:
+
+- Update `cooldown` for `scientificnote` from `85` to `90.1`
+
+Scribe's recipe needs to be updated to:
+
+- Update `cooldown` for `tabletwisdom` from `75` to `80.0`
+
 ### Known limitations
 
 ## Running the script

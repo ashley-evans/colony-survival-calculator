@@ -28,7 +28,7 @@ const expectedGrowablesFileFindInput = {
 
 const expectedStaticLogRecipe: UntranslatedItem = {
     id: "log",
-    createTime: 435,
+    createTime: 444,
     output: 44,
     requires: [],
     // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
@@ -47,7 +47,7 @@ const expectedStaticLogRecipe: UntranslatedItem = {
 
 const expectedStaticLeavesRecipe: UntranslatedItem = {
     id: "leaves",
-    createTime: 435,
+    createTime: 444,
     // Setting at 59.4 (11 Trees, 9 Leaves, 0.6 chance - Setting specific as base recipes cannot support likelihood)
     output: 59.4,
     requires: [],
@@ -129,7 +129,6 @@ test.each([
     ["wolfsbane", "wolfsbanefarmer", 100, { height: 10, width: 10 }],
     ["barley", "barleyfarmer", 100, { height: 10, width: 10 }],
     ["hemp", "hempfarmer", 100, { height: 10, width: 10 }],
-    ["wisteriaflower", "wisteriafarmer", 1, null],
 ])(
     "returns converted recipe given single growable (%s) found in file (2 stages)",
     async (
@@ -144,7 +143,7 @@ test.each([
         mockReadGrowablesFile.mockResolvedValue(growables);
         const expected: UntranslatedItem = {
             id: piplizID,
-            createTime: 435,
+            createTime: 444,
             output: expectedOutput,
             requires: [],
             toolset: {
@@ -163,6 +162,30 @@ test.each([
     },
 );
 
+test("returns converted recipe for wisteriaflower with a fixed createTime rather than one derived from stages", async () => {
+    const growables: Growables = [
+        { identifier: "wisteriaflower", stages: [{}, {}] },
+    ];
+    mockReadGrowablesFile.mockResolvedValue(growables);
+    const expected: UntranslatedItem = {
+        id: "wisteriaflower",
+        createTime: 18.5,
+        output: 1,
+        requires: [],
+        toolset: {
+            type: "default",
+            minimumTool: DefaultToolset.none,
+            maximumTool: DefaultToolset.none,
+        },
+        creatorID: "wisteriafarmer",
+    };
+
+    const actual = await convertGrowables(input);
+
+    expect(actual).toHaveLength(1 + expectedStaticRecipes.length);
+    expect(actual).toContainEqual(expected);
+});
+
 test("returns converted recipe given single growable with more than 2 stages", async () => {
     const growables: Growables = [
         { identifier: "wheat", stages: [{}, {}, {}] },
@@ -170,7 +193,7 @@ test("returns converted recipe given single growable with more than 2 stages", a
     mockReadGrowablesFile.mockResolvedValue(growables);
     const expected: UntranslatedItem = {
         id: "wheat",
-        createTime: 870,
+        createTime: 888,
         output: 100,
         requires: [],
         toolset: {
@@ -226,7 +249,7 @@ test("converts multiple items given multiple growables found in file", async () 
     const expected: UntranslatedItem[] = [
         {
             id: "wheat",
-            createTime: 870,
+            createTime: 888,
             output: 100,
             requires: [],
             toolset: {
@@ -242,7 +265,7 @@ test("converts multiple items given multiple growables found in file", async () 
         },
         {
             id: "flax",
-            createTime: 435,
+            createTime: 444,
             output: 100,
             requires: [],
             toolset: {

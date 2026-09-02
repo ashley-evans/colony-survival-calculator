@@ -2283,25 +2283,25 @@ describe("handles multiple output units", () => {
                 {
                     id: item.id,
                     name: item.name,
-                    amount: 3262.5,
+                    amount: 3330,
                     creators: [
                         {
                             id: item.id,
                             name: item.name,
                             creatorID: item.creatorID,
                             creator: item.creator,
-                            amount: 3262.5,
+                            amount: 3330,
                             workers: 5,
                             demands: [
                                 {
                                     id: requiredItem1.id,
                                     name: requiredItem1.name,
-                                    amount: 4350,
+                                    amount: 4440,
                                 },
                                 {
                                     id: requiredItem2.id,
                                     name: requiredItem2.name,
-                                    amount: 6525,
+                                    amount: 6660,
                                 },
                             ],
                         },
@@ -2310,14 +2310,14 @@ describe("handles multiple output units", () => {
                 {
                     id: requiredItem1.id,
                     name: requiredItem1.name,
-                    amount: 4350,
+                    amount: 4440,
                     creators: [
                         {
                             id: requiredItem1.id,
                             name: requiredItem1.name,
                             creatorID: requiredItem1.creatorID,
                             creator: requiredItem1.creator,
-                            amount: 4350,
+                            amount: 4440,
                             workers: 7.5,
                             demands: [],
                         },
@@ -2326,14 +2326,14 @@ describe("handles multiple output units", () => {
                 {
                     id: requiredItem2.id,
                     name: requiredItem2.name,
-                    amount: 6525,
+                    amount: 6660,
                     creators: [
                         {
                             id: requiredItem2.id,
                             name: requiredItem2.name,
                             creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
-                            amount: 6525,
+                            amount: 6660,
                             workers: 30,
                             demands: [],
                         },
@@ -3019,7 +3019,7 @@ describe("handles calculating requirements for target output", () => {
                             creatorID: item.creatorID,
                             creator: item.creator,
                             amount: targetAmount,
-                            workers: 0.01149425,
+                            workers: 0.01126126,
                             demands: [
                                 {
                                     id: requiredItem1.id,
@@ -3041,7 +3041,7 @@ describe("handles calculating requirements for target output", () => {
                             creatorID: requiredItem1.creatorID,
                             creator: requiredItem1.creator,
                             amount: 10,
-                            workers: 0.01724138,
+                            workers: 0.01689189,
                             demands: [
                                 {
                                     id: requiredItem2.id,
@@ -3068,7 +3068,7 @@ describe("handles calculating requirements for target output", () => {
                             creatorID: requiredItem2.creatorID,
                             creator: requiredItem2.creator,
                             amount: 15,
-                            workers: 0.06896552,
+                            workers: 0.06756757,
                             demands: [],
                         },
                     ],
@@ -3084,7 +3084,7 @@ describe("handles calculating requirements for target output", () => {
                             creatorID: requiredItem3.creatorID,
                             creator: requiredItem3.creator,
                             amount: 10,
-                            workers: 0.04597701,
+                            workers: 0.04504505,
                             demands: [],
                         },
                     ],

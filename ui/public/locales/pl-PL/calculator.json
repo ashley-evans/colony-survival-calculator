@@ -111,7 +111,7 @@
     "about": {
         "version": "Obliczenia są poprawne dla wersji: {{version}} ({{date}})",
         "source": "Obliczenia wykorzystują publiczne pliki danych gry z <repoLink>repozytorium Colony Survival</repoLink>.",
-        "movementDisclaimer": "Obliczenia nie uwzględniają obecnie ruchu pracowników ani czasu obrotu między czynnościami, więc receptury zakładają natychmiastowe przemieszczanie się. W praktyce należy spodziewać się, że do osiągnięcia docelowej produkcji potrzeba nieco więcej pracowników, choć proporcje między recepturami powinny pozostać w przybliżeniu takie same. Jest to znane ograniczenie, które zostanie rozwiązane w przyszłej aktualizacji.",
+        "movementDisclaimer": "Obliczenia zazwyczaj zakładają optymalny układ, w którym pracownik nigdy nie musi chodzić między czynnościami. Jedynymi wyjątkami są Notatki naukowca, Tablica ze starożytną wiedzą i Kwiat glicynii, w przypadku których chodzenie istotnie zmienia dzienną produkcję, dlatego zostało to uwzględnione w ich wartościach.",
         "merchantGoodsDisclaimer": "Następujące przedmioty nie są obecnie obsługiwane, ponieważ zależą od towarów handlowanych z kupcem: Zestaw do kolonizacji, Zbieracz glicynii."
     },
     "errors": {
