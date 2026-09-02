@@ -2871,6 +2871,48 @@
         }
     },
     {
+        "id": "odditypress",
+        "creatorID": "engineer",
+        "createTime": 360,
+        "requires": [
+            { "id": "scrollofknowledge", "amount": 3 },
+            { "id": "planks", "amount": 20 },
+            { "id": "copperingot", "amount": 10 }
+        ],
+        "output": 1,
+        "toolset": {
+            "type": "default",
+            "minimumTool": "copper",
+            "maximumTool": "steel"
+        },
+        "i18n": {
+            "name": {
+                "cs-CZ": "Lis na kuriozity",
+                "de-DE": "Kuriositätenpresse",
+                "en-US": "Oddity Press",
+                "es-ES": "Prensa de rarezas",
+                "fr-FR": "Presse à curiosités",
+                "ja-JP": "小物製造機",
+                "ko-KR": "잡동사니 압축기",
+                "pl-PL": "Prasa osobliwości",
+                "ru-RU": "Станок диковин",
+                "zh-CN": "奇物压制机"
+            },
+            "creator": {
+                "cs-CZ": "Technik",
+                "de-DE": "Ingenieur",
+                "en-US": "Engineer",
+                "es-ES": "Ingeniero",
+                "fr-FR": "Ingénieur",
+                "ja-JP": "技術者",
+                "ko-KR": "기술자",
+                "pl-PL": "Saper",
+                "ru-RU": "Инженер",
+                "zh-CN": "工程师"
+            }
+        }
+    },
+    {
         "id": "lantern",
         "creatorID": "engineer",
         "createTime": 360,
@@ -10392,7 +10434,7 @@
             "name": {
                 "cs-CZ": "Knihovna se svitky (prázdná)",
                 "de-DE": "Schriftrollenregal (leer)",
-                "en-US": "Scrolls Shelf (Empty)",
+                "en-US": "Scroll Shelf (Empty)",
                 "es-ES": "Estantería de pergaminos (vacía)",
                 "fr-FR": "Étagère à parchemins (vide)",
                 "ja-JP": "巻物棚（空）",

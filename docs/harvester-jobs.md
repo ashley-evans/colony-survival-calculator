@@ -3,8 +3,7 @@
 Reference for the three jobs whose colonist leaves a workstation to visit nearby
 sources. Derived from Colony Survival **0.18.0.0**, dedicated-server assembly,
 cross-checked against `baseconfig/` and `settings/server.json`.
-See [movement.md](movement.md) for speed and access rules, and
-[../CALCULATOR_CHANGES.md](../CALCULATOR_CHANGES.md) for the resulting data edits.
+See [movement.md](movement.md) for speed and access rules.
 
 ## How this was derived
 
