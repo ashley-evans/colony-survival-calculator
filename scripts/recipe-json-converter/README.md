@@ -14,7 +14,7 @@ Requires the following Colony Survival files to be placed in a folder for readin
 
 This can be found in Colony Survival's steam folder.
 
-## Known limitations (new)
+## Known limitations
 
 The following amendments must be made to the Colony Survival files before executing the script:
 
@@ -54,6 +54,11 @@ Grinder's flour pot recipe needs to be manually duplicated to have:
 
 - One entry for: `potflour` (1), with optional output `straw` (1)
 - One entry for: `straw` (1), with optional output `potflour` (1)
+
+Growables file (`growables.json`) needs to be updated to:
+
+- Align result type and name for wisteria growable:
+    - Update `wisteriaplant` identifier to `wisteriaflower`
 
 Job block crafter's recipes need to be updated to:
 
@@ -134,8 +139,6 @@ Researcher's recipe needs to be updated to:
 Scribe's recipe needs to be updated to:
 
 - Update `cooldown` for `tabletwisdom` from `75` to `80.0`
-
-### Known limitations
 
 ## Running the script
 

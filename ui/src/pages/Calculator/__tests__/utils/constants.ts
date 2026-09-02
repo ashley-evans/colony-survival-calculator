@@ -26,7 +26,7 @@ export const expectedAddCreatorOverrideButtonText = "Add creator override";
 export const expectedRemoveCreatorOverrideButtonText = "Remove";
 
 export const expectedAboutVersionExplanation =
-    "Calculations are correct for version: 0.15.0.11 (2025-11-28)";
+    "Calculations are correct for version: 0.18.0.0 (2026-08-21)";
 export const expectedGameDataReferenceRepositoryExplanation =
     "Calculations use public game data files from the Colony Survival repository.";
 export const expectedGameDataReferenceRepositoryLinkText =
