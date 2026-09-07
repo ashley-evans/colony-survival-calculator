@@ -6,4 +6,8 @@ const OutputUnitI18NKeyMapping: Readonly<Record<OutputUnit, string>> = {
     [OutputUnit.GameDays]: "gameDays",
 };
 
-export { OutputUnitI18NKeyMapping };
+function isOutputUnit(input: string): input is OutputUnit {
+    return Object.values(OutputUnit).includes(input as OutputUnit);
+}
+
+export { OutputUnitI18NKeyMapping, isOutputUnit };

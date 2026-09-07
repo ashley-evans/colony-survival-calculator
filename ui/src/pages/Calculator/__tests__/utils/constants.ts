@@ -24,6 +24,8 @@ export const expectedAboutTab = "About";
 export const expectedSettingsTabHeader = "Overrides:";
 export const expectedAddCreatorOverrideButtonText = "Add creator override";
 export const expectedRemoveCreatorOverrideButtonText = "Remove";
+export const expectedItemSelectOverrideLabel = "Item:";
+export const expectedCreatorSelectOverrideLabel = "Creator:";
 
 export const expectedAboutVersionExplanation =
     "Calculations are correct for version: 0.18.0.0 (2026-08-21)";

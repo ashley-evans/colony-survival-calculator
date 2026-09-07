@@ -24,6 +24,8 @@ import {
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
 import TargetInput, { Target } from "./components/TargetInput";
+import { useSearchParams } from "react-router-dom";
+import { isOutputUnit, isTool, parseCreatorOverrides } from "./utils";
 
 const Output = lazy(() => import("./components/Output"));
 
@@ -283,15 +285,32 @@ function Calculator() {
         PageTabs.CALCULATOR,
     );
 
-    const selectedItemIDState = useState<string>();
-    const targetState = useState<Target>();
-    const selectedToolState = useState<AvailableDefaultTools>(
-        AvailableDefaultTools.None,
+    const [searchParams] = useSearchParams();
+
+    const selectedItemIDState = useState<string | undefined>(
+        searchParams.get("item") ?? undefined,
     );
-    const hasMachineToolState = useState<boolean>(false);
-    const hasEyeglassesToolState = useState<boolean>(false);
-    const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
-    const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
+    const queryTargetAmount = parseFloat(searchParams.get("amount") ?? "");
+    const targetState = useState<Target | undefined>(
+        queryTargetAmount ? { amount: queryTargetAmount } : undefined,
+    );
+    const queryTool = searchParams.get("tools") ?? "";
+    const selectedToolState = useState<AvailableDefaultTools>(
+        isTool(queryTool) ? queryTool : AvailableDefaultTools.None,
+    );
+    const hasMachineToolState = useState<boolean>(
+        searchParams.get("machine") === "true",
+    );
+    const hasEyeglassesToolState = useState<boolean>(
+        searchParams.get("eyeglasses") === "true",
+    );
+    const queryOutputUnit = searchParams.get("unit") ?? "";
+    const selectedOutputUnitState = useState<OutputUnit>(
+        isOutputUnit(queryOutputUnit) ? queryOutputUnit : OutputUnit.Minutes,
+    );
+    const selectedCreatorOverrides = useState<CreatorOverride[]>(() =>
+        parseCreatorOverrides(searchParams.getAll("co")),
+    );
 
     return (
         <PageContainer>

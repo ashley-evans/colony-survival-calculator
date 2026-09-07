@@ -80,14 +80,16 @@ function CreatorOverrides({
             setItemMap(itemMap);
             setAllItems(Array.from(itemMap.values()));
             setCreatorMap(creatorMap);
-        }
-
-        if (defaultOverrides) {
             const active = new Map(
-                defaultOverrides.map(({ itemID, creatorID }) => [
-                    itemID,
-                    creatorID,
-                ]),
+                defaultOverrides
+                    .filter(({ itemID, creatorID }) =>
+                        data.item.some(
+                            (item) =>
+                                item.id === itemID &&
+                                item.creatorID === creatorID,
+                        ),
+                    )
+                    .map(({ itemID, creatorID }) => [itemID, creatorID]),
             );
 
             setActiveOverrides(active);
@@ -95,6 +97,10 @@ function CreatorOverrides({
     }, [data]);
 
     useEffect(() => {
+        if (itemMap.size === 0) {
+            return;
+        }
+
         const overrides: CreatorOverride[] = Array.from(
             activeOverrides.entries(),
         ).map(([itemID, creatorID]) => ({ itemID, creatorID }));
@@ -167,7 +173,7 @@ function CreatorOverrides({
             {!loading && data?.item.length === 0 ? (
                 <span role="alert">{t("settings.none")}</span>
             ) : null}
-            {data && data.item.length > 0 ? (
+            {data && data.item.length > 0 && itemMap.size > 0 ? (
                 <OverrideListContainer>
                     {Array.from(activeOverrides.entries()).map(
                         ([itemID, creatorID]) => (
