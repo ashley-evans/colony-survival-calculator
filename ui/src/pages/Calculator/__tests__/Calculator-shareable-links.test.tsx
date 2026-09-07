@@ -7,6 +7,7 @@ import {
     clickByName,
     createRequirement,
     createRequirementCreator,
+    expectedAddCreatorOverrideButtonText,
     expectedCreatorOverrideQueryName,
     expectedCreatorSelectOverrideLabel,
     expectedEyeglassesCheckboxLabel,
@@ -16,14 +17,23 @@ import {
     expectedItemSelectOverrideLabel,
     expectedMachineToolCheckboxLabel,
     expectedOutputUnitLabel,
+    expectedRemoveCreatorOverrideButtonText,
     expectedSettingsTab,
     expectedSettingsTabHeader,
     expectedTargetAmountInputLabel,
     expectedToolSelectLabel,
     generateItemCreatorOverridesResponse,
+    selectItemAndTarget,
+    selectOutputUnit,
+    selectTool,
 } from "./utils";
 import { createCalculatorOutputResponseHandler } from "./utils/handlers";
-import { renderWithRouterProvider } from "../../../test";
+import {
+    clearInput,
+    click,
+    renderWithRouterProvider,
+    selectOption,
+} from "../../../test";
 import {
     AvailableDefaultTools,
     OutputUnit,
@@ -455,11 +465,285 @@ test("renders all calculator state from a query string containing every paramete
     );
 });
 
-// Decided: write continuously as the user makes changes, rather than a separate share button. Some advice to self on doing this properly:
-// - Read must only happen once (a useState lazy initializer off the URL on mount), not a useEffect reacting to searchParams - otherwise write updating the URL triggers read again, which sets state, which triggers write again, infinite loop
-// - Always write via setSearchParams with { replace: true }, never the push default - otherwise every keystroke/toggle pushes a new history entry and the back button becomes useless after a few edits
-// - Follow the same only-write-target-amount approach as read (never write both amount and workers at once, matches the derive-from-amount precedence decided for read)
-// - Only write params that are actually set / differ from default, don't pad the URL with every field at its default value - also means clearing a field should delete the param rather than writing it empty, so the URL round-trips cleanly
-// - Debounce the numeric inputs before writing (amount/workers) - otherwise typing "10" replaces history with "1" then "10", and it's a lot of churn for no benefit
-// - Write booleans as exactly "true"/"false" to match what read now expects, not "1"/"0" or omitting the key on false - keep the two directions symmetric so round-tripping a shared link doesn't silently drift
-// - Creator overrides need the same getAll("co") shape on the way out (repeat co={itemID}:{creatorID} per override) as on the way in
+test("updates to the target item update the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectOption({
+        label: expectedItemSelectLabel,
+        optionName: items[1].name,
+    });
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual(`?item=${items[1].id}`),
+    );
+});
+
+test("updates to the target amount update the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectItemAndTarget({ amount: 9001.9 });
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?amount=9001.9"),
+    );
+});
+
+test("updates to the output unit update the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectOutputUnit(OutputUnit.Seconds);
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual(`?unit=${OutputUnit.Seconds}`),
+    );
+});
+
+test("updates to the available tools update the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectTool(AvailableDefaultTools.Steel);
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            `?tools=${AvailableDefaultTools.Steel}`,
+        ),
+    );
+});
+
+test("checking the machine tools checkbox updates the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await click({
+        label: expectedMachineToolCheckboxLabel,
+        role: "checkbox",
+    });
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?machine=true"),
+    );
+});
+
+test("checking the eye glasses checkbox updates the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await click({
+        label: expectedEyeglassesCheckboxLabel,
+        role: "checkbox",
+    });
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?eyeglasses=true"),
+    );
+});
+
+test("configuring a creator override updates the query string parameter", async () => {
+    const override = expectedCreatorOverrides[1][1];
+
+    renderWithRouterProvider({ defaultRoute: "/" });
+    await clickByName(expectedSettingsTab, "tab");
+    await clickByName(expectedAddCreatorOverrideButtonText, "button");
+    await selectOption({
+        label: expectedItemSelectOverrideLabel,
+        optionName: override.name,
+    });
+    await selectOption({
+        label: expectedCreatorSelectOverrideLabel,
+        optionName: override.creator,
+    });
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            `?co=${override.id}%3A${override.creatorID}`,
+        ),
+    );
+});
+
+test("configuring multiple creator overrides updates the query string parameter", async () => {
+    const firstOverride = expectedCreatorOverrides[0][0];
+    const secondOverride = expectedCreatorOverrides[1][0];
+
+    renderWithRouterProvider({ defaultRoute: "/" });
+    await clickByName(expectedSettingsTab, "tab");
+    await clickByName(expectedAddCreatorOverrideButtonText, "button");
+    await clickByName(expectedAddCreatorOverrideButtonText, "button");
+
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            `?co=${firstOverride.id}%3A${firstOverride.creatorID}` +
+                `&co=${secondOverride.id}%3A${secondOverride.creatorID}`,
+        ),
+    );
+});
+
+test("clearing the target amount removes the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectItemAndTarget({ amount: 9001.9 });
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?amount=9001.9"),
+    );
+    await clearInput({ label: expectedTargetAmountInputLabel });
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("resetting the output unit to the default removes the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectOutputUnit(OutputUnit.Seconds);
+    await waitFor(() =>
+        expect(window.location.search).toEqual(`?unit=${OutputUnit.Seconds}`),
+    );
+    await selectOutputUnit(OutputUnit.Minutes);
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("resetting the available tools to the default removes the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectTool(AvailableDefaultTools.Steel);
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            `?tools=${AvailableDefaultTools.Steel}`,
+        ),
+    );
+    await selectTool(AvailableDefaultTools.None);
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("unchecking the machine tools checkbox removes the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await click({ label: expectedMachineToolCheckboxLabel, role: "checkbox" });
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?machine=true"),
+    );
+    await click({ label: expectedMachineToolCheckboxLabel, role: "checkbox" });
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("unchecking the eye glasses checkbox removes the query string parameter", async () => {
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await click({ label: expectedEyeglassesCheckboxLabel, role: "checkbox" });
+    await waitFor(() =>
+        expect(window.location.search).toEqual("?eyeglasses=true"),
+    );
+    await click({ label: expectedEyeglassesCheckboxLabel, role: "checkbox" });
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("removing a creator override removes the query string parameter", async () => {
+    const override = expectedCreatorOverrides[1][1];
+
+    renderWithRouterProvider({ defaultRoute: "/" });
+    await clickByName(expectedSettingsTab, "tab");
+    await clickByName(expectedAddCreatorOverrideButtonText, "button");
+    await selectOption({
+        label: expectedItemSelectOverrideLabel,
+        optionName: override.name,
+    });
+    await selectOption({
+        label: expectedCreatorSelectOverrideLabel,
+        optionName: override.creator,
+    });
+    await waitFor(() =>
+        expect(window.location.search).toEqual(
+            `?co=${override.id}%3A${override.creatorID}`,
+        ),
+    );
+    await clickByName(expectedRemoveCreatorOverrideButtonText, "button");
+
+    await waitFor(() => expect(window.location.search).toEqual(""));
+});
+
+test("updates to multiple inputs are all reflected together in the query string", async () => {
+    const override = expectedCreatorOverrides[1][1];
+
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectItemAndTarget({ itemName: items[1].name, amount: 9001.9 });
+    await selectOutputUnit(OutputUnit.Seconds);
+    await selectTool(AvailableDefaultTools.Steel);
+    await click({ label: expectedMachineToolCheckboxLabel, role: "checkbox" });
+    await click({ label: expectedEyeglassesCheckboxLabel, role: "checkbox" });
+    await clickByName(expectedSettingsTab, "tab");
+    await clickByName(expectedAddCreatorOverrideButtonText, "button");
+    await selectOption({
+        label: expectedItemSelectOverrideLabel,
+        optionName: override.name,
+    });
+    await selectOption({
+        label: expectedCreatorSelectOverrideLabel,
+        optionName: override.creator,
+    });
+
+    await waitFor(() => {
+        const params = new URLSearchParams(window.location.search);
+        expect(params.get("item")).toBe(items[1].id);
+        expect(params.get("amount")).toBe("9001.9");
+        expect(params.get("unit")).toBe(OutputUnit.Seconds);
+        expect(params.get("tools")).toBe(AvailableDefaultTools.Steel);
+        expect(params.get("machine")).toBe("true");
+        expect(params.get("eyeglasses")).toBe("true");
+        expect(params.getAll("co")).toEqual([
+            `${override.id}:${override.creatorID}`,
+        ]);
+    });
+});
+
+test("removing one input from a route with many configured parameters only removes that parameter", async () => {
+    renderWithRouterProvider({
+        defaultRoute:
+            `/?item=${items[1].id}` +
+            `&amount=9001.9` +
+            `&unit=${OutputUnit.Seconds}` +
+            `&tools=${AvailableDefaultTools.Steel}` +
+            `&machine=true` +
+            `&eyeglasses=true`,
+    });
+    await waitFor(() =>
+        expect(
+            screen.getByRole("checkbox", {
+                name: expectedMachineToolCheckboxLabel,
+            }),
+        ).toBeChecked(),
+    );
+
+    await click({ label: expectedMachineToolCheckboxLabel, role: "checkbox" });
+
+    await waitFor(() => {
+        const params = new URLSearchParams(window.location.search);
+        expect(params.has("machine")).toBe(false);
+        expect(params.get("item")).toBe(items[1].id);
+        expect(params.get("amount")).toBe("9001.9");
+        expect(params.get("unit")).toBe(OutputUnit.Seconds);
+        expect(params.get("tools")).toBe(AvailableDefaultTools.Steel);
+        expect(params.get("eyeglasses")).toBe("true");
+    });
+});
+
+test("updates the query string amount parameter to the computed amount when the worker count is changed", async () => {
+    const expectedItem = items[0];
+
+    renderWithRouterProvider({ defaultRoute: "/" });
+
+    await selectItemAndTarget({ itemName: expectedItem.name, workers: 20 });
+
+    await waitFor(() =>
+        expect(
+            screen.getByLabelText(expectedTargetAmountInputLabel, {
+                selector: "input",
+            }),
+        ).toHaveValue("30"),
+    );
+    await waitFor(() => {
+        const params = new URLSearchParams(window.location.search);
+        expect(params.get("item")).toBe(expectedItem.id);
+        expect(params.get("amount")).toBe("30");
+    });
+});
