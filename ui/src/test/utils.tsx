@@ -7,6 +7,7 @@ import { ThemeProvider } from "styled-components";
 import { darkTheme } from "../routes/components/SiteLayout/theme";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
+import { MemoryRouter } from "react-router-dom";
 import AppRouterProvider, {
     AppRouterProviderProps,
 } from "../routes/AppRouterProvider";
@@ -30,12 +31,17 @@ function createApolloClient(apiURL: string): ApolloClient {
 function wrapWithTestProviders(
     children: ReactElement,
     apiURL = defaultGraphQLURL,
+    initialEntry = "/",
 ) {
     const client = createApolloClient(apiURL);
 
     return (
         <ApolloProvider client={client}>
-            <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
+            <ThemeProvider theme={darkTheme}>
+                <MemoryRouter initialEntries={[initialEntry]}>
+                    {children}
+                </MemoryRouter>
+            </ThemeProvider>
         </ApolloProvider>
     );
 }
@@ -59,9 +65,10 @@ function renderWithRouterProvider(
 function renderWithTestProviders(
     children: ReactElement,
     apiURL = defaultGraphQLURL,
+    initialEntry = "/",
 ) {
     return {
-        ...render(wrapWithTestProviders(children, apiURL)),
+        ...render(wrapWithTestProviders(children, apiURL, initialEntry)),
     };
 }
 

@@ -24,6 +24,7 @@ import {
 import { gql } from "../../graphql/__generated__";
 import CreatorOverrides from "./components/CreatorOverrides";
 import TargetInput, { Target } from "./components/TargetInput";
+import { StateProp, useCalculatorState } from "./hooks";
 
 const Output = lazy(() => import("./components/Output"));
 
@@ -49,11 +50,10 @@ const GET_ITEM_DETAILS_QUERY = gql(`
     }
 `);
 
-type StateProp<S> = [S, (value: S) => void];
-
 type CalculatorTabProps = {
     itemIDState: StateProp<string | undefined>;
     currentTarget: StateProp<Target | undefined>;
+    amountState: StateProp<number | undefined>;
     toolState: StateProp<AvailableDefaultTools>;
     machineToolState: StateProp<boolean>;
     eyeglassesToolState: StateProp<boolean>;
@@ -88,6 +88,7 @@ function getItemDetailsFilters(
 function CalculatorTab({
     itemIDState: [selectedItemID, setSelectedItemID],
     currentTarget: [target, setTarget],
+    amountState: [, setAmount],
     toolState: [selectedTool, setSelectedTool],
     machineToolState: [hasMachineTools, setHasMachineTools],
     eyeglassesToolState: [hasEyeglasses, setHasEyeglasses],
@@ -122,9 +123,17 @@ function CalculatorTab({
     const handleSelectedItemTotalChange = (total: Target) => {
         if ("amount" in total) {
             setTargetAmount(total.amount);
+            setAmount(total.amount);
         } else {
             setWorkers(total.workers);
         }
+    };
+
+    const handleTargetChange = (newTarget?: Target) => {
+        setTarget(newTarget);
+        setAmount(
+            newTarget && "amount" in newTarget ? newTarget.amount : undefined,
+        );
     };
 
     const [workers, setWorkers] = useState<number | undefined>(
@@ -156,7 +165,7 @@ function CalculatorTab({
                         defaultSelectedItemID={selectedItemID}
                     />
                     <TargetInput
-                        onTargetChange={setTarget}
+                        onTargetChange={handleTargetChange}
                         defaultWorkers={workers}
                         defaultAmount={targetAmount}
                     />
@@ -283,15 +292,16 @@ function Calculator() {
         PageTabs.CALCULATOR,
     );
 
-    const selectedItemIDState = useState<string>();
-    const targetState = useState<Target>();
-    const selectedToolState = useState<AvailableDefaultTools>(
-        AvailableDefaultTools.None,
-    );
-    const hasMachineToolState = useState<boolean>(false);
-    const hasEyeglassesToolState = useState<boolean>(false);
-    const selectedOutputUnitState = useState<OutputUnit>(OutputUnit.Minutes);
-    const selectedCreatorOverrides = useState<CreatorOverride[]>([]);
+    const {
+        itemIDState: selectedItemIDState,
+        targetState,
+        amountState,
+        toolState: selectedToolState,
+        machineToolState: hasMachineToolState,
+        eyeglassesToolState: hasEyeglassesToolState,
+        outputUnitState: selectedOutputUnitState,
+        creatorOverridesState: selectedCreatorOverrides,
+    } = useCalculatorState();
 
     return (
         <PageContainer>
@@ -326,6 +336,7 @@ function Calculator() {
                     <CalculatorTab
                         itemIDState={selectedItemIDState}
                         currentTarget={targetState}
+                        amountState={amountState}
                         toolState={selectedToolState}
                         machineToolState={hasMachineToolState}
                         eyeglassesToolState={hasEyeglassesToolState}

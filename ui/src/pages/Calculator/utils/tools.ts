@@ -11,4 +11,10 @@ const ToolSelectorI18NKeyMapping: Readonly<
     [AvailableDefaultTools.Steel]: "steel",
 };
 
-export { ToolSelectorI18NKeyMapping };
+function isTool(input: string): input is AvailableDefaultTools {
+    return Object.values(AvailableDefaultTools).includes(
+        input as AvailableDefaultTools,
+    );
+}
+
+export { ToolSelectorI18NKeyMapping, isTool };
