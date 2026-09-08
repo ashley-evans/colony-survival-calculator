@@ -178,13 +178,13 @@ describe("field queries", () => {
                 requirements: [],
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 5,
                     output: 2,
                     requirements: [],
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -212,7 +212,6 @@ describe("field queries", () => {
                 }),
             ];
             const received = [
-                ...expected,
                 createTranslatedItem({
                     name: itemName1,
                     createTime: 5,
@@ -225,6 +224,7 @@ describe("field queries", () => {
                     output: 12,
                     requirements: [],
                 }),
+                ...expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -244,7 +244,6 @@ describe("field queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -252,6 +251,7 @@ describe("field queries", () => {
                     requirements: [],
                     maximumTool: "copper" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -271,7 +271,6 @@ describe("field queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -279,6 +278,7 @@ describe("field queries", () => {
                     requirements: [],
                     maximumTool: "copper" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -301,7 +301,6 @@ describe("field queries", () => {
                 maximumTool: "none" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -310,6 +309,7 @@ describe("field queries", () => {
                     minimumTool: "steel" as DefaultToolset,
                     maximumTool: "steel" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -332,13 +332,13 @@ describe("field queries", () => {
                 maximumTool: "none" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItemWithMachineTools({
                     name: itemName,
                     createTime: 1,
                     output: 3,
                     requirements: [],
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -394,13 +394,13 @@ describe("field queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItemWithMachineTools({
                     name: itemName,
                     createTime: 1,
                     output: 3,
                     requirements: [],
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -446,7 +446,6 @@ describe("field queries", () => {
                 maximumTool: "none" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItemWithEyeglasses({
                     name: itemName,
                     createTime: 1,
@@ -455,6 +454,7 @@ describe("field queries", () => {
                     minimumTool: "eyeglasses" as EyeglassesToolset,
                     maximumTool: "eyeglasses" as EyeglassesToolset,
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -482,13 +482,13 @@ describe("field queries", () => {
                     maximumTool: "eyeglasses" as EyeglassesToolset,
                 });
                 const received = [
-                    expected,
                     createTranslatedItem({
                         name: itemName,
                         createTime: 1,
                         output: 2,
                         requirements: [],
                     }),
+                    expected,
                 ];
                 mockQueryItemByField.mockResolvedValue(received);
 
@@ -512,7 +512,6 @@ describe("field queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItemWithEyeglasses({
                     name: itemName,
                     createTime: 1,
@@ -521,6 +520,7 @@ describe("field queries", () => {
                     minimumTool: "eyeglasses" as EyeglassesToolset,
                     maximumTool: "eyeglasses" as EyeglassesToolset,
                 }),
+                expected,
             ];
             mockQueryItemByField.mockResolvedValue(received);
 
@@ -707,13 +707,13 @@ describe("creator count queries", () => {
                 requirements: [],
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 5,
                     output: 2,
                     requirements: [],
                 }),
+                expected,
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
@@ -744,7 +744,6 @@ describe("creator count queries", () => {
                 }),
             ];
             const received = [
-                ...expected,
                 createTranslatedItem({
                     name: itemName1,
                     createTime: 5,
@@ -757,6 +756,7 @@ describe("creator count queries", () => {
                     output: 12,
                     requirements: [],
                 }),
+                ...expected,
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
@@ -779,7 +779,6 @@ describe("creator count queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -787,6 +786,7 @@ describe("creator count queries", () => {
                     requirements: [],
                     maximumTool: "copper" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
@@ -809,7 +809,6 @@ describe("creator count queries", () => {
                 maximumTool: "steel" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -817,6 +816,7 @@ describe("creator count queries", () => {
                     requirements: [],
                     maximumTool: "copper" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 
@@ -840,7 +840,6 @@ describe("creator count queries", () => {
                 maximumTool: "none" as DefaultToolset,
             });
             const received = [
-                expected,
                 createTranslatedItem({
                     name: itemName,
                     createTime: 1,
@@ -849,6 +848,7 @@ describe("creator count queries", () => {
                     minimumTool: "steel" as DefaultToolset,
                     maximumTool: "steel" as DefaultToolset,
                 }),
+                expected,
             ];
             mockQueryItemByCreatorCount.mockResolvedValue(received);
 

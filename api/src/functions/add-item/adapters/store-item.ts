@@ -20,9 +20,21 @@ const storeItem: StoreItemPort = async (items) => {
     const connection = await client;
     const db = connection.db(databaseName);
     const collection = db.collection(itemCollectionName);
+    const session = connection.startSession();
 
-    await collection.deleteMany({});
-    await collection.insertMany(items);
+    try {
+        await session.withTransaction(
+            async () => {
+                await collection.deleteMany({}, { session });
+                await collection.insertMany(items, { session });
+            },
+            {
+                writeConcern: { w: "majority" },
+            },
+        );
+    } finally {
+        await session.endSession();
+    }
 
     return true;
 };

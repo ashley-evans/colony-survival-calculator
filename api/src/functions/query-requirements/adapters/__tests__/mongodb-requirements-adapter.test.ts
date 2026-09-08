@@ -1,4 +1,4 @@
-import type { MongoMemoryServer } from "mongodb-memory-server";
+import type { MongoMemoryReplSet } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 
 import {
@@ -14,7 +14,7 @@ const itemCollectionName = "Items";
 const validItemID = "test item id";
 const defaultLocale = "en-US";
 
-let mongoDBMemoryServer: MongoMemoryServer;
+let mongoDBMemoryServer: MongoMemoryReplSet;
 
 async function storeItems(items: Items) {
     const { storeItem } = await import("../../../add-item/adapters/store-item");

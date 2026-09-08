@@ -25,9 +25,9 @@ import {
     click,
     openSelectMenu,
     renderWithTestProviders as render,
-} from "../../../test/utils";
+    waitForRequest,
+} from "../../../test";
 import Calculator from "../Calculator";
-import { waitForRequest } from "../../../helpers/utils";
 import {
     OutputUnit,
     AvailableDefaultTools,
