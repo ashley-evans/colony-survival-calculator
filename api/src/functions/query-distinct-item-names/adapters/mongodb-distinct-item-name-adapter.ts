@@ -30,9 +30,8 @@ const queryDistinctItemNames: ItemDatabasePort = async (locale) => {
         ])
         .toArray();
 
-    return results.sort((a, b) =>
-        a.name.localeCompare(b.name, locale, { sensitivity: "base" }),
-    );
+    const collator = new Intl.Collator(locale, { sensitivity: "base" });
+    return results.sort((a, b) => collator.compare(a.name, b.name));
 };
 
 export { queryDistinctItemNames };
