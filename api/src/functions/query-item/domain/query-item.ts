@@ -50,7 +50,7 @@ function filterByOptimal(
         const itemOutput = calculateOutput(item, availableTools);
 
         if (itemOutput > currentOptimalOutput) {
-            itemMap.set(item.name, item);
+            itemMap.set(item.id, item);
         }
     }
 
