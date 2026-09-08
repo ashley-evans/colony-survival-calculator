@@ -1,12 +1,14 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 
 async function createMemoryServer(databaseName: string) {
-    return MongoMemoryServer.create({
+    return MongoMemoryReplSet.create({
         binary: {
             version: "8.0.4",
         },
-        instance: {
+        replSet: {
+            count: 1,
             dbName: databaseName,
+            storageEngine: "wiredTiger",
         },
     });
 }

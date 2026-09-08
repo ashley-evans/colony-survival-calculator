@@ -1,4 +1,4 @@
-import type { MongoMemoryServer } from "mongodb-memory-server";
+import type { MongoMemoryReplSet } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 import { vi } from "vitest";
 
@@ -7,7 +7,7 @@ import { createItem, createMemoryServer } from "../../../../../test/index";
 const databaseName = "TestDatabase";
 const itemCollectionName = "Items";
 
-let mongoDBMemoryServer: MongoMemoryServer;
+let mongoDBMemoryServer: MongoMemoryReplSet;
 
 import { Items } from "../../../../types";
 
@@ -76,10 +76,11 @@ test.each([
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
-    const { queryDistinctItemNames } =
-        await import("../mongodb-distinct-item-name-adapter");
+    const { queryDistinctItemNames } = await import(
+        "../mongodb-distinct-item-name-adapter"
+    );
 
-    const actual = await queryDistinctItemNames("en-US");
+    const actual = await queryDistinctItemNames(new Intl.Locale("en-US"));
 
     expect(actual).toEqual([]);
 });
@@ -306,10 +307,11 @@ test.each<[string, string, Items, string, ItemNamePair[]]>([
         expected: ItemNamePair[],
     ) => {
         await storeItems(items);
-        const { queryDistinctItemNames } =
-            await import("../mongodb-distinct-item-name-adapter");
+        const { queryDistinctItemNames } = await import(
+            "../mongodb-distinct-item-name-adapter"
+        );
 
-        const actual = await queryDistinctItemNames(locale);
+        const actual = await queryDistinctItemNames(new Intl.Locale(locale));
 
         expect(actual).toEqual(expect.arrayContaining(expected));
         expect(actual).toHaveLength(expected.length);
@@ -351,10 +353,11 @@ describe("alphabetical ordering", () => {
             }),
         ];
         await storeItems(items);
-        const { queryDistinctItemNames } =
-            await import("../mongodb-distinct-item-name-adapter");
+        const { queryDistinctItemNames } = await import(
+            "../mongodb-distinct-item-name-adapter"
+        );
 
-        const actual = await queryDistinctItemNames("en-US");
+        const actual = await queryDistinctItemNames(new Intl.Locale("en-US"));
 
         expect(actual).toEqual([
             { id: "apple", name: "Apple" },
@@ -397,10 +400,11 @@ describe("alphabetical ordering", () => {
             }),
         ];
         await storeItems(items);
-        const { queryDistinctItemNames } =
-            await import("../mongodb-distinct-item-name-adapter");
+        const { queryDistinctItemNames } = await import(
+            "../mongodb-distinct-item-name-adapter"
+        );
 
-        const actual = await queryDistinctItemNames("de-DE");
+        const actual = await queryDistinctItemNames(new Intl.Locale("de-DE"));
 
         // In German locale, ä is sorted near a (not after z as in some other locales)
         expect(actual).toEqual([
