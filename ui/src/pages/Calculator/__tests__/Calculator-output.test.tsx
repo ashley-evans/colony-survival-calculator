@@ -12,9 +12,9 @@ import {
     click,
     openSelectMenu,
     renderWithTestProviders as render,
+    waitForRequest,
     wrapWithTestProviders,
-} from "../../../test/utils";
-import { waitForRequest } from "../../../helpers/utils";
+} from "../../../test";
 import {
     expectedCalculatorTab,
     expectedItemDetailsQueryName,

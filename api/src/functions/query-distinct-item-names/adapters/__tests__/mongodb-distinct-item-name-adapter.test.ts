@@ -76,9 +76,8 @@ test.each([
 );
 
 test("returns an empty array if no items are stored in the items collection", async () => {
-    const { queryDistinctItemNames } = await import(
-        "../mongodb-distinct-item-name-adapter"
-    );
+    const { queryDistinctItemNames } =
+        await import("../mongodb-distinct-item-name-adapter");
 
     const actual = await queryDistinctItemNames(new Intl.Locale("en-US"));
 
@@ -307,9 +306,8 @@ test.each<[string, string, Items, string, ItemNamePair[]]>([
         expected: ItemNamePair[],
     ) => {
         await storeItems(items);
-        const { queryDistinctItemNames } = await import(
-            "../mongodb-distinct-item-name-adapter"
-        );
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
 
         const actual = await queryDistinctItemNames(new Intl.Locale(locale));
 
@@ -353,9 +351,8 @@ describe("alphabetical ordering", () => {
             }),
         ];
         await storeItems(items);
-        const { queryDistinctItemNames } = await import(
-            "../mongodb-distinct-item-name-adapter"
-        );
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
 
         const actual = await queryDistinctItemNames(new Intl.Locale("en-US"));
 
@@ -400,9 +397,8 @@ describe("alphabetical ordering", () => {
             }),
         ];
         await storeItems(items);
-        const { queryDistinctItemNames } = await import(
-            "../mongodb-distinct-item-name-adapter"
-        );
+        const { queryDistinctItemNames } =
+            await import("../mongodb-distinct-item-name-adapter");
 
         const actual = await queryDistinctItemNames(new Intl.Locale("de-DE"));
 

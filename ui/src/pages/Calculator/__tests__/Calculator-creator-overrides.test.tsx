@@ -2,13 +2,13 @@ import { screen, waitFor } from "@testing-library/react";
 import { delay, graphql, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import { waitForRequest } from "../../../helpers/utils";
 import Calculator from "../Calculator";
 import {
     openSelectMenu,
     renderWithTestProviders as render,
     selectOption,
-} from "../../../test/utils";
+    waitForRequest,
+} from "../../../test";
 import {
     expectedItemNameQueryName,
     ItemName,
